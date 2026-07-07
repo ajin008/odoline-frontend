@@ -1,25 +1,35 @@
 {
-  "name": "my-app",
+  "name": "cars4-frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "serwist build serwist.config.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "lint:security": "eslint . --max-warnings 0",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@serwist/next": "^9.5.11",
     "next": "16.2.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "serwist": "^9.5.11"
   },
   "devDependencies": {
+    "@serwist/cli": "^9.5.11",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.28.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "eslint-plugin-no-secrets": "^2.3.3",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-security": "^4.0.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
