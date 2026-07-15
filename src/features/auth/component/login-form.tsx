@@ -22,176 +22,179 @@ export function LoginForm() {
   return (
     <>
       {/* MOBILE LAYOUT - Clean & Minimal */}
-      <div className="relative flex min-h-screen flex-col md:hidden">
-        {/* TOP: Brand - Simple & Bold */}
-        <div className="relative flex-[1.2] flex items-center justify-center overflow-hidden bg-linear-to-br from-black via-neutral-900 to-black">
-          {/* Subtle texture */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
-            <div
-              className="absolute inset-0"
-              style={{
-                // eslint-disable-next-line no-secrets/no-secrets -- SVG noise-texture data URI, not a secret
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-                backgroundSize: "128px 128px",
-              }}
-            />
-          </div>
-
-          {/* Minimal decorative orb */}
-          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-
-          {/* Simple brand display */}
-          <div className="relative z-10 text-center px-6">
-            <div className="flex items-center justify-center gap-1">
-              <span className="font-heading text-7xl font-bold tracking-tight text-white">
-                Cars
-              </span>
-              <span className="font-heading text-7xl font-bold tracking-tight text-white">
-                4
-              </span>
-            </div>
-            <p className="mt-2 text-sm font-medium text-white/30 tracking-[0.15em] uppercase">
-              Dealership Management
-            </p>
-          </div>
-        </div>
-
-        {/* BOTTOM: Form */}
-        <div className="relative flex-shrink-0 bg-canvas px-6 pb-8 pt-6 shadow-[0_-8px_40px_rgba(0,0,0,0.06)] border-t border-line/50">
-          <div className="mx-auto w-full max-w-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
-                  Welcome back
-                </h2>
-                <p className="mt-0.5 text-sm text-ink-secondary/60">
-                  Enter credentials to continue
-                </p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-canvas-secondary/80 flex items-center justify-center border border-line/50">
-                <svg
-                  className="w-4 h-4 text-ink-secondary/40"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-              </div>
+      <div className="relative flex min-h-screen flex-col bg-canvas-secondary p-4 md:hidden">
+        {/* Floating card — brand + form together, rounded on every side */}
+        <div className="relative flex flex-1 flex-col overflow-hidden rounded-3xl">
+          {/* TOP: Brand - Simple & Bold */}
+          <div className="relative flex-[1.2] flex items-center justify-center overflow-hidden bg-linear-to-br from-black via-neutral-900 to-black">
+            {/* Subtle texture */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
+              <div
+                className="absolute inset-0"
+                style={{
+                  // eslint-disable-next-line no-secrets/no-secrets -- SVG noise-texture data URI, not a secret
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                  backgroundSize: "128px 128px",
+                }}
+              />
             </div>
 
-            <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
-              {/* Phone */}
-              <div>
-                <label className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/50">
-                  Phone number
-                  <span className="font-normal lowercase tracking-normal text-[10px] text-ink-secondary/30">
-                    +91
-                  </span>
-                </label>
-                <div className="relative mt-1.5 group">
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ink/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel"
-                    maxLength={10}
-                    placeholder="99953 56243"
-                    aria-invalid={!!errors.phone}
-                    className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 pl-12 text-base text-ink outline-none transition-all duration-200 placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
-                    {...register("phone")}
-                  />
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-muted/40">
-                    +91
-                  </span>
-                </div>
-                {errors.phone && (
-                  <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
-                    <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
+            {/* Minimal decorative orb */}
+            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
+            <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
 
-              {/* PIN */}
-              <div>
-                <label className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/50">
-                  PIN
-                  <span className="font-normal lowercase tracking-normal text-[10px] text-ink-secondary/30">
-                    6 digits
-                  </span>
-                </label>
-                <div className="relative mt-1.5 group">
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ink/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
-                  <input
-                    type="password"
-                    inputMode="numeric"
-                    autoComplete="current-password"
-                    maxLength={6}
-                    placeholder="••••••"
-                    aria-invalid={!!errors.pin}
-                    className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
-                    {...register("pin")}
-                  />
-                </div>
-                {errors.pin && (
-                  <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
-                    <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {errors.pin.message}
-                  </p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="relative w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-inverse transition-all duration-200 hover:bg-ink/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                {isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-inverse/30 border-t-inverse" />
-                    Signing in…
-                  </span>
-                ) : (
-                  <span className="relative flex items-center justify-center gap-2">
-                    Log in
-                    <svg
-                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                      />
-                    </svg>
-                  </span>
-                )}
-              </button>
-
-              <div className="flex items-center justify-center gap-3 pt-1">
-                <div className="h-px flex-1 bg-line/50" />
-                <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-ink-secondary/30">
-                  Secure Access
+            {/* Simple brand display */}
+            <div className="relative z-10 text-center px-6">
+              <div className="flex items-center justify-center gap-1">
+                <span className="font-heading text-7xl font-bold tracking-tight text-white">
+                  Cars
                 </span>
-                <div className="h-px flex-1 bg-line/50" />
+                <span className="font-heading text-7xl font-bold tracking-tight text-white">
+                  4
+                </span>
               </div>
-            </form>
+              <p className="mt-2 text-sm font-medium text-white/30 tracking-[0.15em] uppercase">
+                Dealership Management
+              </p>
+            </div>
+          </div>
+
+          {/* BOTTOM: Form */}
+          <div className="relative flex-shrink-0 bg-canvas px-6 pb-8 pt-6 border-t border-line/50">
+            <div className="mx-auto w-full max-w-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
+                    Welcome back
+                  </h2>
+                  <p className="mt-0.5 text-sm text-ink-secondary/60">
+                    Enter credentials to continue
+                  </p>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-canvas-secondary/80 flex items-center justify-center border border-line/50">
+                  <svg
+                    className="w-4 h-4 text-ink-secondary/40"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
+                {/* Phone */}
+                <div>
+                  <label className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/50">
+                    Phone number
+                    <span className="font-normal lowercase tracking-normal text-[10px] text-ink-secondary/30">
+                      +91
+                    </span>
+                  </label>
+                  <div className="relative mt-1.5 group">
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ink/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
+                    <input
+                      type="tel"
+                      inputMode="numeric"
+                      autoComplete="tel"
+                      maxLength={10}
+                      placeholder="99953 56243"
+                      aria-invalid={!!errors.phone}
+                      className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 pl-12 text-base text-ink outline-none transition-all duration-200 placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
+                      {...register("phone")}
+                    />
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-muted/40">
+                      +91
+                    </span>
+                  </div>
+                  {errors.phone && (
+                    <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
+                      <span className="inline-block w-1 h-1 rounded-full bg-danger" />
+                      {errors.phone.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* PIN */}
+                <div>
+                  <label className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/50">
+                    PIN
+                    <span className="font-normal lowercase tracking-normal text-[10px] text-ink-secondary/30">
+                      6 digits
+                    </span>
+                  </label>
+                  <div className="relative mt-1.5 group">
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ink/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
+                    <input
+                      type="password"
+                      inputMode="numeric"
+                      autoComplete="current-password"
+                      maxLength={6}
+                      placeholder="••••••"
+                      aria-invalid={!!errors.pin}
+                      className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
+                      {...register("pin")}
+                    />
+                  </div>
+                  {errors.pin && (
+                    <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
+                      <span className="inline-block w-1 h-1 rounded-full bg-danger" />
+                      {errors.pin.message}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="relative w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-inverse transition-all duration-200 hover:bg-ink/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-inverse/30 border-t-inverse" />
+                      Signing in…
+                    </span>
+                  ) : (
+                    <span className="relative flex items-center justify-center gap-2">
+                      Log in
+                      <svg
+                        className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 7l5 5m0 0l-5 5m5-5H6"
+                        />
+                      </svg>
+                    </span>
+                  )}
+                </button>
+
+                <div className="flex items-center justify-center gap-3 pt-1">
+                  <div className="h-px flex-1 bg-line/50" />
+                  <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-ink-secondary/30">
+                    Secure Access
+                  </span>
+                  <div className="h-px flex-1 bg-line/50" />
+                </div>
+              </form>
+            </div>
           </div>
         </div>
 
         {/* Safe area for PWA */}
-        <div className="h-safe-bottom bg-canvas" />
+        <div className="h-safe-bottom" />
       </div>
 
       {/* DESKTOP LAYOUT - Enhanced */}
