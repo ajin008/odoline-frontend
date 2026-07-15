@@ -23,26 +23,9 @@ export function LoginForm() {
     <>
       {/* MOBILE LAYOUT - Clean & Minimal */}
       <div className="relative flex min-h-screen flex-col md:hidden">
-        {/* TOP: Brand - Simple & Bold */}
-        <div className="relative flex-[1.2] flex items-center justify-center overflow-hidden bg-linear-to-br from-black via-neutral-900 to-black">
-          {/* Subtle texture */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
-            <div
-              className="absolute inset-0"
-              style={{
-                // eslint-disable-next-line no-secrets/no-secrets -- SVG noise-texture data URI, not a secret
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-                backgroundSize: "128px 128px",
-              }}
-            />
-          </div>
-
-          {/* Minimal decorative orb */}
-          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-
-          {/* Simple brand display */}
-          <div className="relative z-10 text-center px-6">
+        {/* TOP: Brand - flat black, no gradient/texture/blur */}
+        <div className="relative flex-[1.2] flex items-center justify-center bg-black">
+          <div className="text-center px-6">
             <div className="flex items-center justify-center gap-1">
               <span className="font-heading text-7xl font-bold tracking-tight text-white">
                 Cars
@@ -181,7 +164,7 @@ export function LoginForm() {
 
               <div className="flex items-center justify-center gap-3 pt-1">
                 <div className="h-px flex-1 bg-line/50" />
-                <span className="text-[10px] font-medium uppercase tracking-[0.1em] text-ink-secondary/30">
+                <span className="text-[10px] font-medium uppercase tracking-widest text-ink-secondary/30">
                   Secure Access
                 </span>
                 <div className="h-px flex-1 bg-line/50" />
@@ -197,7 +180,7 @@ export function LoginForm() {
       {/* DESKTOP LAYOUT - Enhanced */}
       <div className="hidden md:flex min-h-screen">
         {/* LEFT: Visual Panel with rich gradient */}
-        <div className="relative flex flex-1 flex-col justify-between bg-gradient-to-br from-ink via-ink/95 to-ink/90 p-12 overflow-hidden">
+        <div className="relative flex flex-1 flex-col justify-between bg-linear-to-br from-ink via-ink/95 to-ink/90 p-12 overflow-hidden">
           {/* Animated gradient overlay */}
           <div className="absolute inset-0 opacity-[0.06]">
             <div
