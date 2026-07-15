@@ -24,7 +24,7 @@ export function LoginForm() {
       {/* MOBILE LAYOUT - Clean & Minimal */}
       <div className="relative flex min-h-screen flex-col md:hidden">
         {/* TOP: Brand - Simple & Bold */}
-        <div className="relative flex-[1.2] flex items-center justify-center overflow-hidden bg-linear-to-br from-ink via-ink/95 to-ink/90">
+        <div className="relative flex-[1.2] flex items-center justify-center overflow-hidden bg-linear-to-br from-black via-neutral-900 to-black">
           {/* Subtle texture */}
           <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
             <div
@@ -47,7 +47,7 @@ export function LoginForm() {
               <span className="font-heading text-7xl font-bold tracking-tight text-white">
                 Cars
               </span>
-              <span className="font-heading text-7xl font-bold tracking-tight text-white/40">
+              <span className="font-heading text-7xl font-bold tracking-tight text-white">
                 4
               </span>
             </div>

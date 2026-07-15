@@ -10,5 +10,5 @@
     "noEmit": true,
     "types": []
   },
-  "include": ["app/sw.ts"]
+  "include": ["src/app/sw.ts"]
 }
