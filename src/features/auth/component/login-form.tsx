@@ -19,9 +19,10 @@ export function LoginForm() {
       {/* ------------------------------------------------------------- */}
       {/* PWA MOBILE SHELL LAYOUT (Native App Window Style)             */}
       {/* ------------------------------------------------------------- */}
-      <div className="flex min-h-screen flex-col justify-between px-5 pt-12 pb-6 md:hidden">
+      {/* Changed to h-dvh and removed extra paddings to eliminate scrolling entirely */}
+      <div className="flex h-dvh flex-col justify-between px-5 pt-8 pb-5 md:hidden overflow-hidden">
         {/* Upper Portion: Clean Content Branding (Matching Clean Weights) */}
-        <div className="space-y-6 pt-4">
+        <div className="space-y-5 pt-2">
           <div className="flex items-center gap-2">
             <Image
               src="/icons/icon-192.png"
@@ -36,7 +37,7 @@ export function LoginForm() {
             </span>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1">
             <h1 className="font-heading text-4xl font-semibold tracking-tight text-ink leading-[1.15]">
               Your showroom, <br />
               your data.
@@ -47,21 +48,21 @@ export function LoginForm() {
           </div>
         </div>
 
-        {/* Lower Portion: Login Box snapped directly to the bottom */}
-        <div className="mt-auto w-full bg-card border border-line rounded-[2.25rem] shadow-bento px-6 py-8 space-y-6">
+        {/* Lower Portion: Login Box snapped directly to the bottom area */}
+        <div className="w-full bg-card border border-line rounded-[2.25rem] shadow-bento px-6 py-7 space-y-5 mb-1">
           {/* Panel Sub-heading (Clean Semibold Style) */}
           <div className="text-center">
             <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
               Welcome to Cars4 login now!
             </h2>
-            <p className="text-xs font-medium text-ink-muted mt-1.5">
+            <p className="text-xs font-medium text-ink-muted mt-1">
               For Authorized Cars4 team members only
             </p>
           </div>
 
-          <form onSubmit={mobile.onSubmit} noValidate className="space-y-4">
+          <form onSubmit={mobile.onSubmit} noValidate className="space-y-3.5">
             {/* Mobile Phone Field */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <label className="block text-xs font-semibold text-ink-muted pl-1">
                 Phone Number
               </label>
@@ -75,7 +76,7 @@ export function LoginForm() {
                   maxLength={10}
                   placeholder="Enter registered number"
                   aria-invalid={!!mobile.errors.phone}
-                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3.5 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                   {...mobile.register("phone")}
                 />
               </div>
@@ -87,7 +88,7 @@ export function LoginForm() {
             </div>
 
             {/* Mobile PIN Field */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <label className="block text-xs font-semibold text-ink-muted pl-1">
                 Security PIN
               </label>
@@ -98,7 +99,7 @@ export function LoginForm() {
                   maxLength={6}
                   placeholder="••••••"
                   aria-invalid={!!mobile.errors.pin}
-                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3.5 pr-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3 pr-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                   {...mobile.register("pin")}
                 />
                 <button
@@ -120,7 +121,7 @@ export function LoginForm() {
             <button
               type="submit"
               disabled={mobile.isSubmitting}
-              className="w-full rounded-full bg-accent py-4 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center cursor-pointer shadow-sm mt-2"
+              className="w-full rounded-full bg-accent py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center cursor-pointer shadow-sm mt-1"
             >
               {mobile.isSubmitting ? "Verifying..." : "Login"}
             </button>

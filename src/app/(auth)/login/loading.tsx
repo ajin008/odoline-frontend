@@ -1,206 +1,116 @@
-/* eslint-disable react-hooks/purity */
 // app/(auth)/login/loading.tsx
 import React from "react";
+import { BackgroundPattern } from "@/src/features/auth/component/background-pattern";
 
 export default function Loading() {
   return (
-    <>
-      {/* MOBILE SKELETON */}
-      <div className="flex min-h-screen flex-col md:hidden">
-        {/* TOP: Brand Section */}
-        <div className="relative flex-[1.2] flex items-center justify-center overflow-hidden bg-gradient-to-br from-ink via-ink/95 to-ink/90">
-          {/* Decorative orbs */}
-          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
+    <div className="relative min-h-screen w-full bg-canvas overflow-hidden">
+      {/* Absolute global grid pattern to prevent structural flashing */}
+      <BackgroundPattern />
 
-          <div className="relative z-10 text-center px-6">
-            {/* Brand skeleton */}
-            <div className="flex items-center justify-center gap-1">
-              <div className="h-16 w-20 bg-white/10 rounded-lg animate-pulse" />
-              <div className="h-16 w-12 bg-white/5 rounded-lg animate-pulse" />
-            </div>
-            <div className="mt-3 h-4 w-48 bg-white/10 rounded-full mx-auto animate-pulse" />
+      {/* ------------------------------------------------------------- */}
+      {/* MOBILE SKELETON                                               */}
+      {/* ------------------------------------------------------------- */}
+      <div className="flex min-h-screen flex-col justify-between px-5 pt-12 pb-6 md:hidden">
+        {/* Upper Portion: Branding Skeleton */}
+        <div className="space-y-6 pt-4">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 bg-ink/10 rounded-xl animate-pulse" />
+            <div className="h-4 w-16 bg-ink/10 rounded-md animate-pulse" />
+          </div>
+
+          <div className="space-y-3">
+            <div className="h-9 w-48 bg-ink/10 rounded-xl animate-pulse" />
+            <div className="h-9 w-36 bg-ink/10 rounded-xl animate-pulse" />
+            <div className="h-4 w-32 bg-ink/5 rounded-md animate-pulse pt-1" />
           </div>
         </div>
 
-        {/* BOTTOM: Form Skeleton */}
-        <div className="relative flex-1 bg-canvas px-6 pt-6 pb-8 shadow-[0_-8px_40px_rgba(0,0,0,0.06)] border-t border-line/50">
-          <div className="mx-auto w-full max-w-sm">
-            {/* Header skeleton */}
-            <div className="flex items-center justify-between">
-              <div className="space-y-2">
-                <div className="h-7 w-36 bg-ink/10 rounded-lg animate-pulse" />
-                <div className="h-4 w-48 bg-ink/5 rounded-full animate-pulse" />
-              </div>
-              <div className="h-10 w-10 bg-ink/5 rounded-full animate-pulse" />
+        {/* Lower Portion: Login Box Container Skeleton snapped down */}
+        <div className="mt-auto w-full bg-card border border-line rounded-[2.25rem] shadow-bento px-6 py-8 space-y-6">
+          {/* Panel Header */}
+          <div className="flex flex-col items-center space-y-2">
+            <div className="h-5 w-56 bg-ink/10 rounded-lg animate-pulse" />
+            <div className="h-3 w-48 bg-ink/5 rounded-md animate-pulse" />
+          </div>
+
+          <div className="space-y-4">
+            {/* Phone input container field */}
+            <div className="space-y-2 pl-1">
+              <div className="h-3 w-20 bg-ink/5 rounded animate-pulse" />
+              <div className="w-full h-12 rounded-2xl border border-line bg-inset/50 animate-pulse" />
             </div>
 
-            {/* Form fields skeleton */}
-            <div className="mt-6 space-y-4">
-              {/* Phone field */}
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="h-3 w-24 bg-ink/5 rounded animate-pulse" />
-                  <div className="h-3 w-8 bg-ink/5 rounded animate-pulse" />
-                </div>
-                <div className="relative mt-1.5">
-                  <div className="w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 pl-12">
-                    <div className="h-5 w-32 bg-ink/5 rounded animate-pulse" />
-                  </div>
-                </div>
-              </div>
-
-              {/* PIN field */}
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="h-3 w-16 bg-ink/5 rounded animate-pulse" />
-                  <div className="h-3 w-12 bg-ink/5 rounded animate-pulse" />
-                </div>
-                <div className="relative mt-1.5">
-                  <div className="w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5">
-                    <div className="h-5 w-24 bg-ink/5 rounded animate-pulse" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Button skeleton */}
-              <div className="w-full rounded-xl bg-ink/20 px-6 py-3.5 animate-pulse">
-                <div className="h-5 w-20 bg-white/20 rounded mx-auto" />
-              </div>
-
-              {/* Footer skeleton */}
-              <div className="flex items-center justify-center gap-3 pt-1">
-                <div className="h-px flex-1 bg-line/50" />
-                <div className="h-3 w-24 bg-ink/5 rounded animate-pulse" />
-                <div className="h-px flex-1 bg-line/50" />
-              </div>
+            {/* PIN input container field */}
+            <div className="space-y-2 pl-1">
+              <div className="h-3 w-16 bg-ink/5 rounded animate-pulse" />
+              <div className="w-full h-12 rounded-2xl border border-line bg-inset/50 animate-pulse" />
             </div>
+
+            {/* Submit full-rounded button control */}
+            <div className="w-full h-13 rounded-full bg-ink/10 animate-pulse mt-2" />
           </div>
         </div>
-
-        {/* Safe area */}
-        <div className="h-safe-bottom bg-canvas" />
       </div>
 
-      {/* DESKTOP SKELETON */}
-      <div className="hidden md:flex min-h-screen">
-        {/* LEFT: Visual Panel */}
-        <div className="relative flex flex-1 flex-col justify-between bg-gradient-to-br from-ink via-ink/95 to-ink/90 p-12 overflow-hidden">
-          {/* Decorative orbs */}
-          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-white/5 blur-3xl" />
-
-          {/* Floating dots */}
-          <div className="absolute inset-0 pointer-events-none">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 rounded-full bg-white/5"
-                style={{
-                  top: `${15 + Math.random() * 70}%`,
-                  left: `${10 + Math.random() * 80}%`,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Brand skeleton */}
-          <div className="relative z-10">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/5">
-              <div className="h-5 w-5 bg-white/20 rounded animate-pulse" />
+      {/* ------------------------------------------------------------- */}
+      {/* DESKTOP SKELETON                                              */}
+      {/* ------------------------------------------------------------- */}
+      <div className="hidden md:flex min-h-screen items-center justify-between max-w-300 mx-auto w-full px-12 lg:px-16">
+        {/* Left Side Editorial Content Area */}
+        <div className="max-w-md py-12 flex flex-col justify-between h-130">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <div className="h-8 w-8 bg-ink/10 rounded-lg animate-pulse" />
+              <div className="h-4 w-16 bg-ink/10 rounded-md animate-pulse" />
             </div>
           </div>
 
-          {/* Content skeleton */}
-          <div className="relative z-10 max-w-md space-y-6">
+          <div className="space-y-5">
+            <div className="h-6 w-36 bg-ink/5 rounded-md animate-pulse" />
+            <div className="space-y-3">
+              <div className="h-10 w-full bg-ink/10 rounded-xl animate-pulse" />
+              <div className="h-10 w-full bg-ink/10 rounded-xl animate-pulse" />
+              <div className="h-10 w-2/3 bg-ink/10 rounded-xl animate-pulse" />
+            </div>
+            <div className="h-4 w-64 bg-ink/5 rounded-md animate-pulse pt-2" />
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="h-3 w-24 bg-ink/5 rounded animate-pulse" />
+            <div className="h-3 w-28 bg-ink/5 rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Right Side Box Container Box */}
+        <div className="w-105 bg-card border border-line rounded-2xl shadow-bento p-8 flex flex-col justify-between min-h-115">
+          <div className="my-auto space-y-6">
             <div className="space-y-2">
-              <div className="h-3 w-32 bg-white/10 rounded animate-pulse" />
-              <div className="space-y-3">
-                <div className="h-10 w-full bg-white/10 rounded animate-pulse" />
-                <div className="h-10 w-3/4 bg-white/10 rounded animate-pulse" />
-              </div>
+              <div className="h-6 w-36 bg-ink/10 rounded-lg animate-pulse" />
+              <div className="h-3.5 w-64 bg-ink/5 rounded-md animate-pulse" />
             </div>
-            <div className="flex items-center gap-5">
-              <div className="h-px w-12 bg-white/10" />
-              <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
-            </div>
-          </div>
 
-          {/* Footer skeleton */}
-          <div className="relative z-10 flex items-center gap-6">
-            <div className="h-3 w-32 bg-white/10 rounded animate-pulse" />
-            <div className="h-4 w-px bg-white/10" />
-            <div className="flex gap-1.5">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="w-1.5 h-1.5 rounded-full bg-white/10" />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT: Form Skeleton */}
-        <div className="flex flex-1 items-center justify-center bg-canvas px-12 relative">
-          {/* Background pattern */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.015]">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(circle at 20px 20px, #272727 1px, transparent 1px)`,
-                backgroundSize: "40px 40px",
-              }}
-            />
-          </div>
-
-          <div className="relative z-10 w-full max-w-sm">
-            {/* Header skeleton */}
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-ink/5 rounded-lg animate-pulse" />
+            <div className="space-y-4">
+              {/* Desktop Phone container field */}
               <div className="space-y-2">
-                <div className="h-7 w-32 bg-ink/10 rounded animate-pulse" />
-                <div className="h-4 w-48 bg-ink/5 rounded animate-pulse" />
-              </div>
-            </div>
-
-            {/* Form skeleton */}
-            <div className="mt-8 space-y-5">
-              {/* Phone field */}
-              <div>
-                <div className="h-3 w-24 bg-ink/5 rounded animate-pulse" />
-                <div className="relative mt-1.5">
-                  <div className="w-full rounded-lg border border-line bg-canvas-secondary/60 px-4 py-3 pl-12">
-                    <div className="h-5 w-40 bg-ink/5 rounded animate-pulse" />
-                  </div>
-                </div>
+                <div className="h-3 w-20 bg-ink/5 rounded animate-pulse" />
+                <div className="w-full h-11 rounded-xl border border-line bg-inset/50 animate-pulse" />
               </div>
 
-              {/* PIN field */}
-              <div>
+              {/* Desktop PIN container field */}
+              <div className="space-y-2">
                 <div className="h-3 w-16 bg-ink/5 rounded animate-pulse" />
-                <div className="relative mt-1.5">
-                  <div className="w-full rounded-lg border border-line bg-canvas-secondary/60 px-4 py-3">
-                    <div className="h-5 w-24 bg-ink/5 rounded animate-pulse" />
-                  </div>
-                </div>
+                <div className="w-full h-11 rounded-xl border border-line bg-inset/50 animate-pulse" />
               </div>
 
-              {/* Button skeleton */}
-              <div className="w-full rounded-lg bg-ink/20 px-6 py-3 animate-pulse">
-                <div className="h-5 w-16 bg-white/20 rounded mx-auto" />
-              </div>
-
-              {/* Divider skeleton */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-line/60" />
-                </div>
-                <div className="relative flex justify-center">
-                  <div className="h-4 w-24 bg-ink/5 rounded animate-pulse" />
-                </div>
-              </div>
+              {/* Submit trigger component */}
+              <div className="w-full h-12 rounded-xl bg-ink/10 animate-pulse mt-2" />
             </div>
           </div>
+
+          <div className="w-24 h-3 bg-ink/5 mx-auto rounded animate-pulse pt-4" />
         </div>
       </div>
-    </>
+    </div>
   );
 }
