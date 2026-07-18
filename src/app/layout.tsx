@@ -3,7 +3,6 @@ import { Toaster } from "sonner";
 import { generalSans, clashGrotesk } from "./fonts";
 import "./globals.css";
 import RegisterServiceWorker from "./register-sw";
-import { SplashScreen } from "@/src/components/splash-screen";
 
 export { metadata, viewport } from "./metadata";
 
@@ -23,7 +22,6 @@ export default function RootLayout({
       className={`${generalSans.variable} ${clashGrotesk.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <SplashScreen />
         <RegisterServiceWorker />
         {children}
         <Toaster position="top-right" theme="system" richColors={false} closeButton />

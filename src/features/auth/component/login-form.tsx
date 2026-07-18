@@ -1,6 +1,7 @@
 // features/auth/components/login-form.tsx
 "use client";
 
+import { useState } from "react";
 import { useLogin } from "../hooks/use-login";
 
 // Fixed positions instead of Math.random() during render — avoids SSR/client
@@ -17,7 +18,13 @@ const FLOATING_DOTS = [
 ];
 
 export function LoginForm() {
-  const { register, errors, onSubmit, isSubmitting } = useLogin();
+  // Mobile and desktop layouts are both always mounted (CSS just hides one),
+  // so each needs its OWN useLogin() instance — sharing one instance means
+  // both forms' inputs register to the same field names simultaneously,
+  // and whichever one registers last "wins" the value read on submit.
+  const mobile = useLogin();
+  const desktop = useLogin();
+  const [showPin, setShowPin] = useState(false);
 
   return (
     <>
@@ -69,7 +76,11 @@ export function LoginForm() {
               </div>
             </div>
 
-            <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
+            <form
+              onSubmit={mobile.onSubmit}
+              noValidate
+              className="mt-6 space-y-4"
+            >
               {/* Phone */}
               <div>
                 <label className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/50">
@@ -86,18 +97,18 @@ export function LoginForm() {
                     autoComplete="tel"
                     maxLength={10}
                     placeholder="99953 56243"
-                    aria-invalid={!!errors.phone}
+                    aria-invalid={!!mobile.errors.phone}
                     className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 pl-12 text-base text-ink outline-none transition-all duration-200 placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
-                    {...register("phone")}
+                    {...mobile.register("phone")}
                   />
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-muted/40">
                     +91
                   </span>
                 </div>
-                {errors.phone && (
+                {mobile.errors.phone && (
                   <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
                     <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {errors.phone.message}
+                    {mobile.errors.phone.message}
                   </p>
                 )}
               </div>
@@ -113,31 +124,73 @@ export function LoginForm() {
                 <div className="relative mt-1.5 group">
                   <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ink/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
                   <input
-                    type="password"
+                    type={showPin ? "text" : "password"}
                     inputMode="numeric"
                     autoComplete="current-password"
                     maxLength={6}
                     placeholder="••••••"
-                    aria-invalid={!!errors.pin}
-                    className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
-                    {...register("pin")}
+                    aria-invalid={!!mobile.errors.pin}
+                    className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 pr-11 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
+                    {...mobile.register("pin")}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPin((prev) => !prev)}
+                    aria-label={showPin ? "Hide PIN" : "Show PIN"}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-secondary/40 hover:text-ink-secondary transition-colors"
+                  >
+                    {showPin ? (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    )}
+                  </button>
                 </div>
-                {errors.pin && (
+                {mobile.errors.pin && (
                   <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
                     <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {errors.pin.message}
+                    {mobile.errors.pin.message}
                   </p>
                 )}
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={mobile.isSubmitting}
                 className="relative w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-inverse transition-all duration-200 hover:bg-ink/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                {isSubmitting ? (
+                <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                {mobile.isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-inverse/30 border-t-inverse" />
                     Signing in…
@@ -196,7 +249,7 @@ export function LoginForm() {
           {/* Geometric decorations */}
           <div className="absolute top-20 right-20 w-64 h-64 border border-white/5 rounded-full" />
           <div className="absolute bottom-20 left-20 w-96 h-96 border border-white/5 rounded-full" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-white/5 rounded-full" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 border border-white/5 rounded-full" />
 
           {/* Colorful accent orbs */}
           <div className="absolute top-40 right-40 w-32 h-32 rounded-full bg-blue-500/10 blur-3xl" />
@@ -299,7 +352,11 @@ export function LoginForm() {
               </div>
             </div>
 
-            <form onSubmit={onSubmit} noValidate className="mt-8 space-y-5">
+            <form
+              onSubmit={desktop.onSubmit}
+              noValidate
+              className="mt-8 space-y-5"
+            >
               {/* Phone */}
               <div>
                 <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/60">
@@ -312,18 +369,18 @@ export function LoginForm() {
                     autoComplete="tel"
                     maxLength={10}
                     placeholder="99953 56243"
-                    aria-invalid={!!errors.phone}
+                    aria-invalid={!!desktop.errors.phone}
                     className="w-full rounded-lg border border-line bg-canvas-secondary/60 px-4 py-3 pl-12 text-base text-ink outline-none transition-all duration-200 placeholder:text-ink-muted/50 focus:border-ink/30 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/40 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.06)]"
-                    {...register("phone")}
+                    {...desktop.register("phone")}
                   />
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-muted/50">
                     +91
                   </span>
                 </div>
-                {errors.phone && (
+                {desktop.errors.phone && (
                   <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
                     <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {errors.phone.message}
+                    {desktop.errors.phone.message}
                   </p>
                 )}
               </div>
@@ -335,31 +392,73 @@ export function LoginForm() {
                 </label>
                 <div className="relative mt-1.5 group">
                   <input
-                    type="password"
+                    type={showPin ? "text" : "password"}
                     inputMode="numeric"
                     autoComplete="current-password"
                     maxLength={6}
                     placeholder="••••••"
-                    aria-invalid={!!errors.pin}
-                    className="w-full rounded-lg border border-line bg-canvas-secondary/60 px-4 py-3 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/50 focus:border-ink/30 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/40 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.06)]"
-                    {...register("pin")}
+                    aria-invalid={!!desktop.errors.pin}
+                    className="w-full rounded-lg border border-line bg-canvas-secondary/60 px-4 py-3 pr-11 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/50 focus:border-ink/30 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/40 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.06)]"
+                    {...desktop.register("pin")}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPin((prev) => !prev)}
+                    aria-label={showPin ? "Hide PIN" : "Show PIN"}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-secondary/40 hover:text-ink-secondary transition-colors"
+                  >
+                    {showPin ? (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.5}
+                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                        />
+                      </svg>
+                    )}
+                  </button>
                 </div>
-                {errors.pin && (
+                {desktop.errors.pin && (
                   <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
                     <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {errors.pin.message}
+                    {desktop.errors.pin.message}
                   </p>
                 )}
               </div>
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={desktop.isSubmitting}
                 className="relative w-full rounded-lg bg-ink px-6 py-3 text-sm font-semibold text-inverse transition-all duration-200 hover:bg-ink/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 overflow-hidden group"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                {isSubmitting ? (
+                <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                {desktop.isSubmitting ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-inverse/30 border-t-inverse" />
                     Signing in…
