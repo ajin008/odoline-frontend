@@ -41,7 +41,7 @@ export function useLogin() {
       // Success means the server already set the httpOnly cookie.
       // There's no token to store — just navigate in.
       // `replace` so the back button doesn't return to the login screen.
-      router.replace("/dashboard");
+      router.replace("/owner/dashboard");
     } catch (error) {
       toast.error(getApiErrorMessage(error));
     }

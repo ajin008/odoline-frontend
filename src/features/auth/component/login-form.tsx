@@ -2,530 +2,259 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useLogin } from "../hooks/use-login";
-
-// Fixed positions instead of Math.random() during render — avoids SSR/client
-// hydration mismatches and keeps the component pure.
-const FLOATING_DOTS = [
-  { top: "18%", left: "12%", duration: "9s", delay: "0s" },
-  { top: "32%", left: "68%", duration: "11s", delay: "1.2s" },
-  { top: "55%", left: "22%", duration: "8s", delay: "2.4s" },
-  { top: "70%", left: "80%", duration: "13s", delay: "0.6s" },
-  { top: "25%", left: "45%", duration: "10s", delay: "3s" },
-  { top: "60%", left: "60%", duration: "7s", delay: "1.8s" },
-  { top: "40%", left: "85%", duration: "12s", delay: "2.1s" },
-  { top: "80%", left: "35%", duration: "9.5s", delay: "0.9s" },
-];
+import { BackgroundPattern } from "./background-pattern";
 
 export function LoginForm() {
-  // Mobile and desktop layouts are both always mounted (CSS just hides one),
-  // so each needs its OWN useLogin() instance — sharing one instance means
-  // both forms' inputs register to the same field names simultaneously,
-  // and whichever one registers last "wins" the value read on submit.
   const mobile = useLogin();
   const desktop = useLogin();
   const [showPin, setShowPin] = useState(false);
 
   return (
-    <>
-      {/* MOBILE LAYOUT - Clean & Minimal */}
-      <div className="relative flex min-h-screen flex-col md:hidden">
-        {/* TOP: Brand - flat black, no gradient/texture/blur */}
-        <div className="relative flex-[1.2] flex items-center justify-center bg-black">
-          <div className="text-center px-6">
-            <div className="flex items-center justify-center gap-1">
-              <span className="font-heading text-7xl font-bold tracking-tight text-white">
-                Cars
-              </span>
-              <span className="font-heading text-7xl font-bold tracking-tight text-white">
-                4
-              </span>
-            </div>
-            <p className="mt-2 text-sm font-medium text-white/30 tracking-[0.15em] uppercase">
-              Dealership Management
+    <div className="relative min-h-screen w-full font-sans antialiased text-ink selection:bg-accent-light selection:text-accent">
+      {/* Absolute global grid pattern */}
+      <BackgroundPattern />
+
+      {/* ------------------------------------------------------------- */}
+      {/* PWA MOBILE SHELL LAYOUT (Native App Window Style)             */}
+      {/* ------------------------------------------------------------- */}
+      <div className="flex min-h-screen flex-col justify-between px-5 pt-12 pb-6 md:hidden">
+        {/* Upper Portion: Clean Content Branding (Matching Clean Weights) */}
+        <div className="space-y-6 pt-4">
+          <div className="flex items-center gap-2">
+            <Image
+              src="/icons/icon-192.png"
+              alt="Cars4 Icon"
+              width={32}
+              height={32}
+              className="rounded-xl object-contain"
+              priority
+            />
+            <span className="font-heading text-lg font-semibold tracking-tight text-accent">
+              Cars4
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            <h1 className="font-heading text-4xl font-semibold tracking-tight text-ink leading-[1.15]">
+              Your showroom, <br />
+              your data.
+            </h1>
+            <p className="text-sm font-medium text-ink-muted">
+              Sign in to continue.
             </p>
           </div>
         </div>
 
-        {/* BOTTOM: Form */}
-        <div className="relative flex-shrink-0 rounded-t-2xl bg-canvas px-6 pb-8 pt-6 shadow-[0_-8px_40px_rgba(0,0,0,0.06)] border-t border-line/50">
-          <div className="mx-auto w-full max-w-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
-                  Welcome back
-                </h2>
-                <p className="mt-0.5 text-sm text-ink-secondary/60">
-                  Enter credentials to continue
+        {/* Lower Portion: Login Box snapped directly to the bottom */}
+        <div className="mt-auto w-full bg-card border border-line rounded-[2.25rem] shadow-bento px-6 py-8 space-y-6">
+          {/* Panel Sub-heading (Clean Semibold Style) */}
+          <div className="text-center">
+            <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
+              Welcome to Cars4 login now!
+            </h2>
+            <p className="text-xs font-medium text-ink-muted mt-1.5">
+              For Authorized Cars4 team members only
+            </p>
+          </div>
+
+          <form onSubmit={mobile.onSubmit} noValidate className="space-y-4">
+            {/* Mobile Phone Field */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-ink-muted pl-1">
+                Phone Number
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-ink-subtle">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  placeholder="Enter registered number"
+                  aria-invalid={!!mobile.errors.phone}
+                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3.5 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                  {...mobile.register("phone")}
+                />
+              </div>
+              {mobile.errors.phone && (
+                <p className="mt-1 text-xs font-semibold text-danger pl-1">
+                  {mobile.errors.phone.message}
                 </p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-canvas-secondary/80 flex items-center justify-center border border-line/50">
-                <svg
-                  className="w-4 h-4 text-ink-secondary/40"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-              </div>
+              )}
             </div>
 
-            <form
-              onSubmit={mobile.onSubmit}
-              noValidate
-              className="mt-6 space-y-4"
+            {/* Mobile PIN Field */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-ink-muted pl-1">
+                Security PIN
+              </label>
+              <div className="relative">
+                <input
+                  type={showPin ? "text" : "password"}
+                  inputMode="numeric"
+                  maxLength={6}
+                  placeholder="••••••"
+                  aria-invalid={!!mobile.errors.pin}
+                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3.5 pr-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                  {...mobile.register("pin")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin((prev) => !prev)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-subtle hover:text-ink transition-colors"
+                >
+                  {showPin ? "HIDE" : "SHOW"}
+                </button>
+              </div>
+              {mobile.errors.pin && (
+                <p className="mt-1 text-xs font-semibold text-danger pl-1">
+                  {mobile.errors.pin.message}
+                </p>
+              )}
+            </div>
+
+            {/* Submit Control Button */}
+            <button
+              type="submit"
+              disabled={mobile.isSubmitting}
+              className="w-full rounded-full bg-accent py-4 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center cursor-pointer shadow-sm mt-2"
             >
-              {/* Phone */}
-              <div>
-                <label className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/50">
-                  Phone number
-                  <span className="font-normal lowercase tracking-normal text-[10px] text-ink-secondary/30">
-                    +91
-                  </span>
-                </label>
-                <div className="relative mt-1.5 group">
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ink/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel"
-                    maxLength={10}
-                    placeholder="99953 56243"
-                    aria-invalid={!!mobile.errors.phone}
-                    className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 pl-12 text-base text-ink outline-none transition-all duration-200 placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
-                    {...mobile.register("phone")}
-                  />
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-muted/40">
-                    +91
-                  </span>
-                </div>
-                {mobile.errors.phone && (
-                  <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
-                    <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {mobile.errors.phone.message}
-                  </p>
-                )}
-              </div>
-
-              {/* PIN */}
-              <div>
-                <label className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/50">
-                  PIN
-                  <span className="font-normal lowercase tracking-normal text-[10px] text-ink-secondary/30">
-                    6 digits
-                  </span>
-                </label>
-                <div className="relative mt-1.5 group">
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-ink/5 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" />
-                  <input
-                    type={showPin ? "text" : "password"}
-                    inputMode="numeric"
-                    autoComplete="current-password"
-                    maxLength={6}
-                    placeholder="••••••"
-                    aria-invalid={!!mobile.errors.pin}
-                    className="relative w-full rounded-xl border border-line bg-canvas-secondary/60 px-4 py-3.5 pr-11 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/40 focus:border-ink/40 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/50 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.08)]"
-                    {...mobile.register("pin")}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPin((prev) => !prev)}
-                    aria-label={showPin ? "Hide PIN" : "Show PIN"}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-secondary/40 hover:text-ink-secondary transition-colors"
-                  >
-                    {showPin ? (
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                {mobile.errors.pin && (
-                  <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
-                    <span className="inline-block w-1 h-1 rounded-full bg-danger" />
-                    {mobile.errors.pin.message}
-                  </p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                disabled={mobile.isSubmitting}
-                className="relative w-full rounded-xl bg-ink px-6 py-3.5 text-sm font-semibold text-inverse transition-all duration-200 hover:bg-ink/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 overflow-hidden group"
-              >
-                <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                {mobile.isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-inverse/30 border-t-inverse" />
-                    Signing in…
-                  </span>
-                ) : (
-                  <span className="relative flex items-center justify-center gap-2">
-                    Log in
-                    <svg
-                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                      />
-                    </svg>
-                  </span>
-                )}
-              </button>
-
-              <div className="flex items-center justify-center gap-3 pt-1">
-                <div className="h-px flex-1 bg-line/50" />
-                <span className="text-[10px] font-medium uppercase tracking-widest text-ink-secondary/30">
-                  Secure Access
-                </span>
-                <div className="h-px flex-1 bg-line/50" />
-              </div>
-            </form>
-          </div>
+              {mobile.isSubmitting ? "Verifying..." : "Login"}
+            </button>
+          </form>
         </div>
-
-        {/* Safe area for PWA */}
-        <div className="h-safe-bottom bg-canvas" />
       </div>
 
-      {/* DESKTOP LAYOUT - Enhanced */}
-      <div className="hidden md:flex min-h-screen">
-        {/* LEFT: Visual Panel with rich gradient */}
-        <div className="relative flex flex-1 flex-col justify-between bg-linear-to-br from-ink via-ink/95 to-ink/90 p-12 overflow-hidden">
-          {/* Animated gradient overlay */}
-          <div className="absolute inset-0 opacity-[0.06]">
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(circle at 30% 50%, #ffffff 0%, transparent 70%)",
-                animation: "pulse 8s ease-in-out infinite",
-              }}
-            />
-          </div>
-
-          {/* Geometric decorations */}
-          <div className="absolute top-20 right-20 w-64 h-64 border border-white/5 rounded-full" />
-          <div className="absolute bottom-20 left-20 w-96 h-96 border border-white/5 rounded-full" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 border border-white/5 rounded-full" />
-
-          {/* Colorful accent orbs */}
-          <div className="absolute top-40 right-40 w-32 h-32 rounded-full bg-blue-500/10 blur-3xl" />
-          <div className="absolute bottom-40 left-40 w-40 h-40 rounded-full bg-purple-500/10 blur-3xl" />
-
-          {/* Floating dots */}
-          <div className="absolute inset-0 pointer-events-none">
-            {FLOATING_DOTS.map((dot, i) => (
-              <div
-                key={i}
-                className="absolute w-1 h-1 rounded-full bg-white/10"
-                style={{
-                  top: dot.top,
-                  left: dot.left,
-                  animation: `float ${dot.duration} ease-in-out infinite`,
-                  animationDelay: dot.delay,
-                }}
+      {/* ------------------------------------------------------------- */}
+      {/* DESKTOP CAL.COM EDITORIAL STRUCTURE                           */}
+      {/* ------------------------------------------------------------- */}
+      <div className="hidden md:flex min-h-screen items-center justify-between max-w-300 mx-auto w-full px-12 lg:px-16">
+        {/* Left Side Editorial Content Area */}
+        <div className="max-w-md py-12 flex flex-col justify-between h-130">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <Image
+                src="/icons/icon-192.png"
+                alt="Cars4 Logo"
+                width={32}
+                height={32}
+                className="rounded-lg object-contain"
+                priority
               />
-            ))}
-          </div>
-
-          <div className="relative z-10">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/20 bg-white/5 backdrop-blur-sm">
-              <span className="font-heading text-lg font-bold text-white">
-                4
+              <span className="font-heading text-base font-semibold tracking-tight text-ink">
+                Cars4
               </span>
             </div>
           </div>
 
-          <div className="relative z-10 max-w-md">
-            <p className="text-xs font-medium uppercase tracking-[0.12em] text-white/50">
-              Dealership Management
+          <div className="space-y-5">
+            <span className="text-[10px] font-bold tracking-widest text-accent uppercase font-mono bg-accent-light/50 border border-accent/10 px-2.5 py-1 rounded-md inline-block">
+              Proprietary Internal Tool
+            </span>
+            <h1 className="font-heading text-4xl lg:text-5xl font-semibold leading-[1.15] tracking-tight text-ink">
+              Every car, every customer, every rupee — in one place.
+            </h1>
+            <p className="text-sm text-ink-muted leading-relaxed max-w-sm">
+              Welcome back. This system is for authorized Cars4 team members.
             </p>
-            <h2 className="mt-4 font-heading text-[42px] font-semibold leading-[1.1] tracking-tight text-white">
-              Every car, every customer,
-              <br />
-              every rupee — in one place.
-            </h2>
-            <div className="mt-8 flex items-center gap-5">
-              <div className="h-px w-12 bg-white/20" />
-              <span className="text-sm font-medium text-white/40 tracking-wide">
-                Built for the forecourt
-              </span>
-            </div>
           </div>
 
-          <div className="relative z-10">
-            <div className="flex items-center gap-6">
-              <p className="text-xs text-white/30">Secure • India • 2026</p>
-              <div className="h-4 w-px bg-white/10" />
-              <div className="flex gap-1.5">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-white/20"
-                  />
-                ))}
-              </div>
-            </div>
+          <div className="flex items-center gap-6 text-[10px] font-mono font-bold tracking-wider text-ink-subtle uppercase">
+            <span>Branch Terminal v2.6</span>
+            <span>Network Status: Secure</span>
           </div>
         </div>
 
-        {/* RIGHT: Form Panel */}
-        <div className="flex flex-1 items-center justify-center bg-canvas px-12 relative">
-          {/* Subtle background pattern */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.015]">
-            <div
-              className="absolute inset-0"
-              style={{
-                backgroundImage: `radial-gradient(circle at 20px 20px, #272727 1px, transparent 1px)`,
-                backgroundSize: "40px 40px",
-              }}
-            />
-          </div>
-
-          <div className="relative z-10 w-full max-w-sm">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-ink/5 flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-ink/30"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h1 className="font-heading text-2xl font-semibold tracking-tight text-ink">
-                  Welcome back
-                </h1>
-                <p className="text-sm text-ink-secondary/70">
-                  Enter credentials to continue
-                </p>
-              </div>
+        {/* Right Side: The Substantial Minimalist Box Container */}
+        <div className="w-105 bg-card border border-line rounded-2xl shadow-bento p-8 flex flex-col justify-between min-h-115">
+          <div className="my-auto space-y-6">
+            <div>
+              <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
+                Sign in to system
+              </h2>
+              <p className="text-xs text-ink-muted mt-1.5">
+                Provide credentials associated with your active terminal device.
+              </p>
             </div>
 
-            <form
-              onSubmit={desktop.onSubmit}
-              noValidate
-              className="mt-8 space-y-5"
-            >
-              {/* Phone */}
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/60">
-                  Phone number
+            <form onSubmit={desktop.onSubmit} noValidate className="space-y-4">
+              {/* Desktop Phone Field */}
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-ink-muted">
+                  Phone Number
                 </label>
-                <div className="relative mt-1.5 group">
+                <div className="relative group">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-ink-subtle">
+                    +91
+                  </span>
                   <input
                     type="tel"
                     inputMode="numeric"
-                    autoComplete="tel"
                     maxLength={10}
                     placeholder="99953 56243"
                     aria-invalid={!!desktop.errors.phone}
-                    className="w-full rounded-lg border border-line bg-canvas-secondary/60 px-4 py-3 pl-12 text-base text-ink outline-none transition-all duration-200 placeholder:text-ink-muted/50 focus:border-ink/30 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/40 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.06)]"
+                    className="w-full rounded-xl border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                     {...desktop.register("phone")}
                   />
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-ink-muted/50">
-                    +91
-                  </span>
                 </div>
                 {desktop.errors.phone && (
-                  <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
-                    <span className="inline-block w-1 h-1 rounded-full bg-danger" />
+                  <p className="text-xs font-semibold text-danger pl-1">
                     {desktop.errors.phone.message}
                   </p>
                 )}
               </div>
 
-              {/* PIN */}
-              <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-[0.08em] text-ink-secondary/60">
-                  PIN
+              {/* Desktop PIN Field */}
+              <div className="space-y-1.5">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-ink-muted">
+                  Security PIN
                 </label>
-                <div className="relative mt-1.5 group">
+                <div className="relative">
                   <input
                     type={showPin ? "text" : "password"}
                     inputMode="numeric"
-                    autoComplete="current-password"
                     maxLength={6}
                     placeholder="••••••"
                     aria-invalid={!!desktop.errors.pin}
-                    className="w-full rounded-lg border border-line bg-canvas-secondary/60 px-4 py-3 pr-11 text-base tracking-[0.3em] text-ink outline-none transition-all duration-200 placeholder:tracking-normal placeholder:text-ink-muted/50 focus:border-ink/30 focus:bg-canvas focus:shadow-[0_0_0_4px_rgba(39,39,39,0.04)] aria-invalid:border-danger/40 aria-invalid:shadow-[0_0_0_4px_rgba(196,90,74,0.06)]"
+                    className="w-full rounded-xl border border-line bg-inset px-4 py-3 pr-12 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                     {...desktop.register("pin")}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPin((prev) => !prev)}
-                    aria-label={showPin ? "Hide PIN" : "Show PIN"}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-ink-secondary/40 hover:text-ink-secondary transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-subtle hover:text-ink active:scale-95 transition-colors"
                   >
-                    {showPin ? (
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                    )}
+                    {showPin ? "HIDE" : "SHOW"}
                   </button>
                 </div>
                 {desktop.errors.pin && (
-                  <p className="mt-1.5 text-xs font-medium text-danger/80 flex items-center gap-1.5">
-                    <span className="inline-block w-1 h-1 rounded-full bg-danger" />
+                  <p className="text-xs font-semibold text-danger pl-1">
                     {desktop.errors.pin.message}
                   </p>
                 )}
               </div>
 
+              {/* Submit Trigger */}
               <button
                 type="submit"
                 disabled={desktop.isSubmitting}
-                className="relative w-full rounded-lg bg-ink px-6 py-3 text-sm font-semibold text-inverse transition-all duration-200 hover:bg-ink/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 overflow-hidden group"
+                className="w-full rounded-xl bg-accent px-4 py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
-                <div className="absolute inset-0 bg-linear-to-r from-white/0 via-white/5 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                {desktop.isSubmitting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-inverse/30 border-t-inverse" />
-                    Signing in…
-                  </span>
-                ) : (
-                  <span className="relative flex items-center justify-center gap-2">
-                    Log in
-                    <svg
-                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7l5 5m0 0l-5 5m5-5H6"
-                      />
-                    </svg>
-                  </span>
-                )}
+                {desktop.isSubmitting
+                  ? "Syncing Terminal Tokens..."
+                  : "Log In to Dashboard"}
               </button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-line/60" />
-                </div>
-                <div className="relative flex justify-center text-xs">
-                  <span className="px-3 bg-canvas text-ink-secondary/40">
-                    Secure access
-                  </span>
-                </div>
-              </div>
             </form>
+          </div>
+
+          <div className="text-[10px] font-mono text-ink-subtle text-center uppercase tracking-widest pt-4 border-t border-line/40">
+            Secure Endpoint Connection
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 0.03;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.06;
-            transform: scale(1.1);
-          }
-        }
-        @keyframes float {
-          0%,
-          100% {
-            transform: translate(0, 0);
-          }
-          25% {
-            transform: translate(10px, -15px);
-          }
-          50% {
-            transform: translate(-5px, -25px);
-          }
-          75% {
-            transform: translate(15px, -10px);
-          }
-        }
-      `}</style>
-    </>
+    </div>
   );
 }

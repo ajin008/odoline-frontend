@@ -1,180 +1,100 @@
 @import "tailwindcss";
 @import "sonner/dist/styles.css";
 
-/*
- * "Two colors. Four greys. Color only for status." — see design-system.md.
- * Buttons/nav/borders are monochrome; color is reserved for status badges
- * and document-status indicators only.
- *
- * Tailwind generates one utility class per color-consuming property
- * (bg-*, text-*, border-*) from the SAME theme key, so a key literally
- * named "primary" can't mean a different color for bg vs text. Tokens
- * are named by what they're for instead: canvas (backgrounds), ink
- * (text), line (borders), interactive-bg/-text (buttons/active states).
- */
+/* 1. Register Local Custom Fonts */
+@font-face {
+  font-family: "Clash Grotesk";
+  src: url("/fonts/clash-grotesk/ClashGrotesk-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Clash Grotesk";
+  src: url("/fonts/clash-grotesk/ClashGrotesk-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/general-sans/GeneralSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/general-sans/GeneralSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/general-sans/GeneralSans-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* 2. Style Configurations & System Custom Variables */
 :root {
-  /* Core palette — four values only */
-  --canvas: #ffffff; /* bg-primary */
-  --canvas-secondary: #edeef0; /* bg-secondary / bg-hover */
+  /* Canvas Matrix (Inspired by Cal.com minimal container sheets) */
+  --canvas-bg: #f3f4f6;
+  --canvas-card: #ffffff;
+  --canvas-inset: #f9fafb;
 
-  --ink: #272727; /* text-primary */
-  --ink-secondary: #777778; /* text-secondary / text-muted */
-  --inverse: #ffffff; /* text-inverse */
+  /* Text & Contrast Typography */
+  --ink-primary: #111827;
+  --ink-secondary: #4b5563;
+  --ink-muted: #9ca3af;
+  --inverse: #ffffff;
 
-  --line: #edeef0; /* border */
-  --line-dark: #272727; /* border-dark (active/focused) */
+  /* The Signature Accent Color Block */
+  --brand-accent: #7c3aed;
+  --brand-accent-hover: #6d28d9;
+  --brand-accent-light: rgba(124, 58, 237, 0.09);
 
-  --interactive-bg: #000000; /* button bg, active tab bg — pure black, distinct from --ink */
-  --interactive-text: #ffffff; /* text on --interactive-bg */
-  --interactive-hover: #3d3d3d;
+  /* Super Crisp Hairlines */
+  --border-clean: rgba(17, 24, 39, 0.05);
+  --border-focus: rgba(124, 58, 237, 0.2);
 
-  /* System states — used ONLY for status badges / alerts, never buttons or nav */
-  --danger: #c45a4a;
-  --danger-light: rgba(196, 90, 74, 0.1);
-  --success: #2b7a4b;
-  --success-light: rgba(43, 122, 75, 0.1);
-  --warning: #d4a14b;
-  --warning-light: rgba(212, 161, 75, 0.1);
-  --info: #3b82f6;
-  --info-light: rgba(59, 130, 246, 0.1);
+  /* Font Stack Mapping pointing directly to your @font-face names */
+  --font-sans: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-heading: "Clash Grotesk", -apple-system, sans-serif;
 
-  /* --- Legacy aliases: kept so in-progress components using the old
-     "accent" naming don't go unstyled. New code should use the
-     canonical names above (interactive, canvas-secondary, ink-secondary). --- */
-  --canvas-hover: var(--canvas-secondary);
-  --ink-muted: var(--ink-secondary);
-  --line-light: var(--line);
-  --accent: var(--interactive-bg);
-  --accent-hover: var(--interactive-hover);
-  --accent-light: rgba(39, 39, 39, 0.08);
+  /* Smooth Soft-Shadow Layering */
+  --shadow-bento: 0 1px 3px rgba(0, 0, 0, 0.01),
+    0 4px 20px rgba(17, 24, 39, 0.03);
 }
 
 @theme inline {
-  --color-canvas: var(--canvas);
-  --color-canvas-secondary: var(--canvas-secondary);
-  --color-canvas-hover: var(--canvas-hover);
+  --color-canvas: var(--canvas-bg);
+  --color-card: var(--canvas-card);
+  --color-inset: var(--canvas-inset);
 
-  --color-ink: var(--ink);
-  --color-ink-secondary: var(--ink-secondary);
-  --color-ink-muted: var(--ink-muted);
+  --color-ink: var(--ink-primary);
+  --color-ink-muted: var(--ink-secondary);
+  --color-ink-subtle: var(--ink-muted);
   --color-inverse: var(--inverse);
 
-  --color-line: var(--line);
-  --color-line-light: var(--line-light);
-  --color-line-dark: var(--line-dark);
+  --color-accent: var(--brand-accent);
+  --color-accent-hover: var(--brand-accent-hover);
+  --color-accent-light: var(--brand-accent-light);
 
-  --color-interactive-bg: var(--interactive-bg);
-  --color-interactive-text: var(--interactive-text);
-  --color-interactive-hover: var(--interactive-hover);
+  --color-line: var(--border-clean);
+  --color-line-focus: var(--border-focus);
 
-  /* Legacy aliases */
-  --color-accent: var(--accent);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-light: var(--accent-light);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
 
-  --color-danger: var(--danger);
-  --color-danger-light: var(--danger-light);
-  --color-success: var(--success);
-  --color-success-light: var(--success-light);
-  --color-warning: var(--warning);
-  --color-warning-light: var(--warning-light);
-  --color-info: var(--info);
-  --color-info-light: var(--info-light);
-
-  /* Status badges */
-  --color-status-draft-text: #777778;
-  --color-status-draft-bg: #edeef0;
-  --color-status-draft-border: #edeef0;
-
-  --color-status-purchasing-text: #92540a;
-  --color-status-purchasing-bg: #fef3c7;
-  --color-status-purchasing-border: #d4a14b;
-
-  --color-status-refurb-text: #1e40af;
-  --color-status-refurb-bg: #dbeafe;
-  --color-status-refurb-border: #3b82f6;
-
-  --color-status-refurb-complete-text: #14532d;
-  --color-status-refurb-complete-bg: #dcfce7;
-  --color-status-refurb-complete-border: #2b7a4b;
-
-  --color-status-stock-text: #14532d;
-  --color-status-stock-bg: #dcfce7;
-  --color-status-stock-border: #2b7a4b;
-
-  --color-status-booked-text: #5b21b6;
-  --color-status-booked-bg: #ede9fe;
-  --color-status-booked-border: #7c3aed;
-
-  --color-status-delivered-text: #777778;
-  --color-status-delivered-bg: #edeef0;
-  --color-status-delivered-border: #edeef0;
-
-  --color-status-closed-text: #777778;
-  --color-status-closed-bg: #edeef0;
-  --color-status-closed-border: #edeef0;
-
-  /* Document status */
-  --color-doc-hard-text: #c45a4a;
-  --color-doc-hard-bg: rgba(196, 90, 74, 0.08);
-  --color-doc-hard-border: #c45a4a;
-
-  --color-doc-soft-text: #777778;
-  --color-doc-soft-bg: #edeef0;
-  --color-doc-soft-border: #edeef0;
-
-  --color-doc-uploaded-text: #14532d;
-  --color-doc-uploaded-bg: #dcfce7;
-  --color-doc-uploaded-border: #2b7a4b;
-
-  --color-doc-pending-text: #92540a;
-  --color-doc-pending-bg: #fef3c7;
-  --color-doc-pending-border: #d4a14b;
-
-  --font-sans: var(--font-general-sans);
-  --font-heading: var(--font-clash-grotesk);
-  --font-mono: var(--font-geist-mono);
-
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-bento: var(--shadow-bento);
 }
 
 body {
-  background: var(--canvas);
-  color: var(--ink);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-heading), var(--font-sans), Arial, Helvetica, sans-serif;
-}
-
-/* Sonner toasts — monochrome by default; success/warning/error/info use
-   the system-state colors (the one place besides badges color is allowed). */
-[data-sonner-toaster] {
-  --normal-bg: var(--canvas);
-  --normal-border: var(--line);
-  --normal-text: var(--ink);
-
-  --success-bg: var(--success-light);
-  --success-border: var(--success);
-  --success-text: var(--ink);
-
-  --info-bg: var(--info-light);
-  --info-border: var(--info);
-  --info-text: var(--ink);
-
-  --warning-bg: var(--warning-light);
-  --warning-border: var(--warning);
-  --warning-text: var(--ink);
-
-  --error-bg: var(--danger-light);
-  --error-border: var(--danger);
-  --error-text: var(--ink);
+  background-color: var(--canvas-bg);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
