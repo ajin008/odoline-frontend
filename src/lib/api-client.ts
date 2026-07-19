@@ -37,11 +37,16 @@ apiClient.interceptors.response.use(
 
     const status = error.response.status;
     const isRefreshCall = originalRequest.url?.includes("/auth/refresh");
+    const isLoginCall = originalRequest.url?.includes("/auth/login");
 
     // Only 401 triggers refresh. 403 = "logged in but not allowed" → let it fail.
     // isRefreshCall guard = don't refresh a failed refresh (kills the infinite loop).
+    // isLoginCall guard = a 401 from /auth/login means "wrong credentials", NOT
+    // "session expired" — there was never a session to refresh. Without this,
+    // a failed login attempt triggers a refresh (which also fails) and then a
+    // hard window.location.href reload, wiping the error toast instantly.
     // _retry guard = each request is retried at most ONCE.
-    if (status !== 401 || isRefreshCall || originalRequest._retry) {
+    if (status !== 401 || isRefreshCall || isLoginCall || originalRequest._retry) {
       return Promise.reject(error);
     }
 
@@ -62,7 +67,14 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest); // retry the request that started this
     } catch (refreshError) {
       processQueue(refreshError); // refresh dead → fail everyone
-      if (typeof window !== "undefined") {
+      // Don't reload if we're already on /login — e.g. useMe() checking
+      // "is anyone logged in?" from the login page itself will 401 + fail
+      // to refresh perfectly normally. Redirecting-to-login-from-login is
+      // what caused the reload loop; let the caller just see the rejection.
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/login"
+      ) {
         window.location.href = "/login";
       }
       return Promise.reject(refreshError);

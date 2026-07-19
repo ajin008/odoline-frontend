@@ -27,6 +27,20 @@ All colors are mapped to CSS variables in the root theme.
   - Primary: `--color-ink` (#111827)
   - Muted: `--color-ink-muted` (#4b5563)
   - Subtle: `--color-ink-subtle` (#9ca3af)
+- **System States** (error text, toasts, status indicators only — never buttons/nav):
+  - Danger: `--color-danger` (#dc2626), tint `--color-danger-light`
+  - Success: `--color-success` (#16a34a), tint `--color-success-light`
+  - Warning: `--color-warning` (#d97706), tint `--color-warning-light`
+
+### Toasts (Sonner)
+
+Toasts follow the same card language as the rest of the app: `--color-card`
+background, `shadow-bento`, and a `0.875rem` radius (between the `rounded-xl`
+and `rounded-2xl` card sizes). Default/neutral toasts use ink text on card
+background; `success`/`warning`/`error` use the matching state color's tint
+as background with the solid color as border; `info`/action toasts use the
+violet accent. Action buttons inside a toast use `--color-accent` filled,
+matching the primary button style.
 
 ---
 

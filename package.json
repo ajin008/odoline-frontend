@@ -14,6 +14,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
     "@serwist/next": "^9.5.11",
+    "@tanstack/react-query": "^5.101.2",
     "axios": "^1.18.1",
     "lucide-react": "^1.25.0",
     "next": "16.2.10",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@serwist/cli": "^9.5.11",
     "@tailwindcss/postcss": "^4",
+    "@tanstack/react-query-devtools": "^5.101.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -1,5 +1,5 @@
 // features/auth/hooks/use-login.ts
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -11,16 +11,27 @@ import type { UserRole } from "../types/auth-types";
 
 export type { LoginFormValues };
 import { getApiErrorMessage } from "@/src/utils/error-handler";
-
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/src/lib/query-keys";
+import { useMe } from "./use-me";
 /**
  * All the login *logic* lives here. The component that uses this hook
  * stays "dumb": it renders inputs and shows whatever this hook returns.
  */
+
 export function useLogin() {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   // The owner/staff toggle. UX only — NOT sent as a credential.
   const [role, setRole] = useState<UserRole>("owner");
+
+  const { data: user } = useMe();
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/owner/dashboard");
+    }
+  }, [user, router]);
 
   const {
     register,
@@ -36,7 +47,11 @@ export function useLogin() {
     try {
       // console.log("Login form submitted with values:", values);
       // Send only phone + pin. The server determines the real role.
-      await authApi.login({ phone: values.phone, pin: values.pin });
+      const user = await authApi.login({
+        phone: values.phone,
+        pin: values.pin,
+      });
+      queryClient.setQueryData(queryKeys.me, user);
 
       // Success means the server already set the httpOnly cookie.
       // There's no token to store — just navigate in.

@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ownerNavItems } from "./nav-items";
 import { ShieldCheck, MapPin } from "lucide-react";
@@ -11,15 +12,18 @@ export function OwnerSidebar() {
 
   return (
     <aside className="flex h-full flex-col bg-card border border-line rounded-2xl shadow-bento overflow-hidden select-none">
-      {/* Brand Identity Branding Header */}
-      <div className="flex h-[72px] items-center px-6 border-b border-line/60">
-        <div className="flex items-center gap-3">
-          <div className="h-7 w-7 rounded-xl bg-accent flex items-center justify-center shadow-md shadow-accent/20">
-            <span className="text-xs font-bold text-inverse tracking-tight">
-              C4
-            </span>
-          </div>
-          <span className="font-heading text-[15px] font-extrabold tracking-tight text-ink">
+      {/* Brand Identity Branding Header (Updated with Image & Fixed Typography) */}
+      <div className="flex h-18 items-center px-6 border-b border-line/60">
+        <div className="flex items-center gap-2.5">
+          <Image
+            src="/icons/icon-192.png"
+            alt="Cars4 Logo"
+            width={28}
+            height={28}
+            className="rounded-lg object-contain"
+            priority
+          />
+          <span className="font-heading text-[15px] font-semibold tracking-tight text-ink">
             Cars4
           </span>
         </div>

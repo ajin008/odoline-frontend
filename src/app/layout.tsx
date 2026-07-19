@@ -5,6 +5,7 @@ import "./globals.css";
 import RegisterServiceWorker from "./register-sw";
 
 export { metadata, viewport } from "./metadata";
+import { Providers } from "../components/providers";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -23,8 +24,15 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <RegisterServiceWorker />
-        {children}
-        <Toaster position="top-right" theme="system" richColors={false} closeButton />
+        <Providers>
+          {children}
+          <Toaster
+            position="top-right"
+            theme="system"
+            richColors={false}
+            closeButton
+          />
+        </Providers>
       </body>
     </html>
   );

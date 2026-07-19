@@ -195,7 +195,7 @@ export function LoginForm() {
                     type="tel"
                     inputMode="numeric"
                     maxLength={10}
-                    placeholder="99953 56243"
+                    placeholder="9876543210"
                     aria-invalid={!!desktop.errors.phone}
                     className="w-full rounded-xl border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                     {...desktop.register("phone")}

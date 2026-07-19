@@ -59,6 +59,14 @@
   --border-clean: rgba(17, 24, 39, 0.05);
   --border-focus: rgba(124, 58, 237, 0.2);
 
+  /* System state colors — error/success/warning text + toasts */
+  --state-danger: #dc2626;
+  --state-danger-light: rgba(220, 38, 38, 0.09);
+  --state-success: #16a34a;
+  --state-success-light: rgba(22, 163, 74, 0.09);
+  --state-warning: #d97706;
+  --state-warning-light: rgba(217, 119, 6, 0.09);
+
   /* Font Stack Mapping pointing directly to your @font-face names */
   --font-sans: "General Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
@@ -86,6 +94,13 @@
   --color-line: var(--border-clean);
   --color-line-focus: var(--border-focus);
 
+  --color-danger: var(--state-danger);
+  --color-danger-light: var(--state-danger-light);
+  --color-success: var(--state-success);
+  --color-success-light: var(--state-success-light);
+  --color-warning: var(--state-warning);
+  --color-warning-light: var(--state-warning-light);
+
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
 
@@ -97,4 +112,42 @@ body {
   color: var(--ink-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Sonner toasts — matched to the card/accent/shadow-bento aesthetic. */
+[data-sonner-toaster] {
+  --border-radius: 0.875rem;
+  --normal-bg: var(--canvas-card);
+  --normal-border: var(--border-clean);
+  --normal-text: var(--ink-primary);
+
+  --success-bg: var(--state-success-light);
+  --success-border: var(--state-success);
+  --success-text: var(--ink-primary);
+
+  --info-bg: var(--brand-accent-light);
+  --info-border: var(--brand-accent);
+  --info-text: var(--ink-primary);
+
+  --warning-bg: var(--state-warning-light);
+  --warning-border: var(--state-warning);
+  --warning-text: var(--ink-primary);
+
+  --error-bg: var(--state-danger-light);
+  --error-border: var(--state-danger);
+  --error-text: var(--ink-primary);
+}
+
+[data-sonner-toast] {
+  font-family: var(--font-sans);
+  box-shadow: var(--shadow-bento) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  font-weight: 600;
+}
+
+[data-sonner-toast] [data-button] {
+  background: var(--brand-accent) !important;
+  color: var(--inverse) !important;
 }
