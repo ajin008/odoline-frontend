@@ -1,7 +1,8 @@
 // features/cars/components/car-card.tsx
 import Link from "next/link";
-import { ImagePlus, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import type { Car } from "../api/cars-api";
+import { CarThumbnail } from "./car-thumbnail";
 
 export function CarCard({ car }: { car: Car }) {
   const isPurchasing = car.status.toLowerCase() === "purchasing";
@@ -14,14 +15,9 @@ export function CarCard({ car }: { car: Car }) {
         "hover:border-accent hover:shadow-bento hover:-translate-y-0.5 active:scale-[0.98]",
       ].join(" ")}
     >
-      {/* Upper Aspect Box Container — Premium Editorial Media Slot */}
-      <div className="relative aspect-video w-full bg-inset border-b border-line/40 flex flex-col items-center justify-center gap-2 text-ink-subtle transition-colors duration-300 group-hover:bg-accent-light/30 group-hover:text-accent">
-        <div className="p-3 rounded-xl bg-card border border-line shadow-sm transition-transform duration-300 group-hover:scale-105">
-          <ImagePlus className="h-5 w-5 stroke-[2px]" />
-        </div>
-        <span className="text-[10px] font-mono font-medium tracking-wider uppercase opacity-75">
-          No Media Attached
-        </span>
+      {/* 2. Replaced the static placeholder with the dynamic thumbnail container */}
+      <div className="relative aspect-video w-full bg-inset border-b border-line/40 overflow-hidden shrink-0">
+        <CarThumbnail carId={car.id} />
       </div>
 
       {/* Lower Descriptive Detail Information Section */}
@@ -32,7 +28,7 @@ export function CarCard({ car }: { car: Car }) {
               {car.make} {car.model}
             </h3>
 
-            {/* Conditional Status Badge: Uses warning yellow tokens if status is "purchasing" */}
+            {/* Conditional Status Badge */}
             <span
               className={[
                 "text-[9px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 rounded-md shrink-0 mt-0.5 border",

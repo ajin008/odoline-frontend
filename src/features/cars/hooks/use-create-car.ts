@@ -25,7 +25,7 @@ export function useCreateCar() {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
 
       // Continue to Steps 2 & 3 for this car (id now lives in the URL).
-      router.push(`/owner/cars/${car.id}/intake`);
+      router.push(`/owner/cars/${car.id}/documents`);
     },
 
     onError: (error) => {

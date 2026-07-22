@@ -19,7 +19,7 @@ export function QuickActions() {
         </div>
 
         <Link
-          href="/owner/onboard"
+          href="/owner/cars/add"
           className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-inverse shadow-sm transition-all duration-200 hover:bg-accent-hover active:scale-[0.98]"
         >
           <Plus className="h-3.5 w-3.5 stroke-[2.5px]" />
@@ -37,7 +37,7 @@ export function QuickActions() {
 
         {/* Height reduced drastically to a clean, single-row interactive asset */}
         <Link
-          href="/owner/onboard"
+          href="/owner/cars/add"
           className="flex items-center justify-between rounded-xl border border-dashed border-ink-subtle/30 bg-card p-4 transition-all duration-200 active:scale-[0.98] shadow-sm"
         >
           <div className="flex items-center gap-3">
