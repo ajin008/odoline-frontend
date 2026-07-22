@@ -68,7 +68,7 @@ export function OwnerSidebar() {
                           : "bg-inset text-ink-muted",
                       ].join(" ")}
                     >
-                      12
+                      0
                     </span>
                   )}
                 </Link>
