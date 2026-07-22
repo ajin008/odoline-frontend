@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 import { ShieldCheck } from "lucide-react";
 import { UserMenu } from "./user-menu";
 import { AnimatedGreeting } from "@/src/components/ui/animated-greeting";
@@ -33,15 +34,29 @@ export function OwnerNavbar() {
             <div className="flex flex-col justify-center">
               {/* Animated text element executes greeting sequence without username */}
               <AnimatedGreeting />
-              <p className="text-xs font-medium text-ink-subtle font-sans mt-1 min-h-[16px]">
+              <p className="text-xs font-medium text-ink-subtle font-sans mt-1 min-h-4">
                 {clientDate}
               </p>
             </div>
           ) : (
-            /* Icon placeholder displayed exclusively on non-dashboard management panels */
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-card text-ink-muted shadow-sm transition-colors duration-200">
-              <ShieldCheck className="h-5 w-5 stroke-[2px]" />
-            </div>
+            /* Non-dashboard layout icon control */
+            <>
+              {/* Mobile View: Custom PWA App Icon */}
+              <div className="flex sm:hidden h-9 w-9 items-center justify-center rounded-xl border border-line bg-card overflow-hidden shadow-sm transition-colors duration-200">
+                <Image
+                  src="/icons/icon-192.png"
+                  alt="App Icon"
+                  width={24}
+                  height={24}
+                  className="object-cover rounded-md"
+                />
+              </div>
+
+              {/* Tablet & Desktop View: ShieldCheck Icon */}
+              <div className="hidden sm:flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-card text-ink-muted shadow-sm transition-colors duration-200">
+                <ShieldCheck className="h-5 w-5 stroke-[2px]" />
+              </div>
+            </>
           )}
         </div>
 
