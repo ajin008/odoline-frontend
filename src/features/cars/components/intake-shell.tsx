@@ -8,7 +8,7 @@ import { VehicleSellerForm } from "./vehicle-seller-form";
 import { DocumentsGrid } from "./documents-grid";
 import { useCarDocuments } from "../hooks/use-documents"; // <-- 1. Import documents hook
 import { DOCUMENT_CONFIGS } from "../type/document-types"; // <-- 2. Import configs
-
+import { RefurbishmentTab } from "./refurbishment-tab";
 const TABS = [
   { key: "vehicle", label: "Vehicle & Seller" },
   { key: "documents", label: "Documents" },
@@ -76,7 +76,7 @@ export function IntakeShell({ carId }: { carId: string }) {
       <div className="rounded-2xl border border-line bg-card p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="font-heading text-lg font-semibold tracking-tight text-ink">
+            <h1 className="font-heading text-lg font-semibold text-ink">
               {car.make} {car.model}
             </h1>
 
@@ -157,14 +157,8 @@ export function IntakeShell({ carId }: { carId: string }) {
         )}
 
         {tab === "refurbishment" && (
-          <div className="rounded-2xl border border-dashed border-line bg-card p-12 text-center">
-            <p className="text-sm font-semibold text-ink font-sans tracking-tight">
-              Refurbishment Cost Allocations
-            </p>
-            <p className="mt-1 text-xs text-ink-subtle font-sans max-w-xs mx-auto">
-              Workshop structural check logs, itemized damage listings, and
-              spare cost updates setup coming next.
-            </p>
+          <div className="rounded-2xl border border-line bg-card p-6">
+            <RefurbishmentTab carId={car.id} />
           </div>
         )}
       </div>

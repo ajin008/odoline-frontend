@@ -14,15 +14,17 @@ export const endpoints = {
     detail: (id: string) => `/cars/${id}`,
     update: (id: string) => `/cars/${id}`,
     changeStatus: (id: string) => `/cars/${id}/status`,
-    addToStock: (id: string) => `/cars/${id}/add-to-stock`,
+    // addToStock: (id: string) => `/cars/${id}/add-to-stock`,
 
     documents: (id: string) => `/cars/${id}/documents`,
     refurbItems: (id: string) => `/cars/${id}/refurbishment-items`,
+    margin: (id: string) => `/cars/${id}/margin`,
+    addToStock: (id: string) => `/cars/${id}/add-to-stock`,
   },
 
   refurbItems: {
-    update: (itemId: string) => `/refurbishment-items/${itemId}`,
-    remove: (itemId: string) => `/refurbishment-items/${itemId}`,
+    update: (itemId: string) => `/refurbishment/items/${itemId}`,
+    remove: (itemId: string) => `/refurbishment/items/${itemId}`,
   },
 
   dashboard: {

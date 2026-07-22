@@ -22,7 +22,7 @@ export default function OnboardPage() {
         </button>
 
         <div className="w-full border-b border-line pb-4">
-          <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
+          <h1 className="font-heading text-xl font-bold text-ink">
             Add car to stock
           </h1>
           <p className="mt-0.5 text-xs font-medium text-ink-muted">

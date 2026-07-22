@@ -59,4 +59,14 @@ export const carsApi = {
     const res = await apiClient.patch(endpoints.cars.update(id), data);
     return res.data.data;
   },
+
+  async updateMargin(carId: string, margin: string) {
+    const res = await apiClient.patch(endpoints.cars.margin(carId), { margin });
+    return res.data.data;
+  },
+
+  async addToStock(carId: string) {
+    const res = await apiClient.post(endpoints.cars.addToStock(carId));
+    return res.data.data;
+  },
 };

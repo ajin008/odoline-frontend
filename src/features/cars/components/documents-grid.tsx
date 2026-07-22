@@ -30,25 +30,25 @@ interface DocumentsGridProps {
 function DocumentsGridSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="h-18 w-full animate-pulse rounded-2xl bg-inset border border-line" />
+      <div className="h-16 w-full animate-pulse rounded-2xl bg-inset border border-line" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 9 }).map((_, i) => (
           <div
             key={i}
-            className="flex h-40 flex-col justify-between rounded-2xl border border-line bg-card p-5"
+            className="flex h-36 flex-col justify-between rounded-2xl border border-line bg-card p-4"
           >
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <div className="h-9 w-9 animate-pulse rounded-xl bg-inset" />
-                <div className="space-y-1.5">
-                  <div className="h-3.5 w-24 animate-pulse rounded-md bg-inset" />
-                  <div className="h-2.5 w-14 animate-pulse rounded-md bg-inset" />
+                <div className="h-8 w-8 animate-pulse rounded-xl bg-inset" />
+                <div className="space-y-1">
+                  <div className="h-3 w-20 animate-pulse rounded-md bg-inset" />
+                  <div className="h-2 w-12 animate-pulse rounded-md bg-inset" />
                 </div>
               </div>
-              <div className="h-2.5 w-3/4 animate-pulse rounded-md bg-inset" />
+              <div className="h-2 w-3/4 animate-pulse rounded-md bg-inset" />
             </div>
-            <div className="border-t border-line/50 pt-3">
-              <div className="h-9 w-full animate-pulse rounded-xl bg-inset" />
+            <div className="border-t border-line/50 pt-2.5">
+              <div className="h-8 w-full animate-pulse rounded-xl bg-inset" />
             </div>
           </div>
         ))}
@@ -134,20 +134,20 @@ export function DocumentsGrid({
 
         {/* Header Status Banner */}
         <div
-          className={`flex items-start gap-3.5 rounded-2xl border p-4.5 transition-all ${
+          className={`flex items-start gap-3.5 rounded-2xl border p-4 transition-all ${
             canProceed
               ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-950"
               : "border-[#f5b023]/30 bg-[#f5b023]/10 text-amber-950"
           }`}
         >
           <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-white"
             style={{ backgroundColor: canProceed ? "#16a34a" : "#f5b023" }}
           >
             {canProceed ? (
-              <CheckCircle2 className="h-4.5 w-4.5 stroke-[2.5px]" />
+              <CheckCircle2 className="h-4 w-4 stroke-[2.5px]" />
             ) : (
-              <AlertCircle className="h-4.5 w-4.5 stroke-[2.5px]" />
+              <AlertCircle className="h-4 w-4 stroke-[2.5px]" />
             )}
           </div>
 
@@ -167,7 +167,7 @@ export function DocumentsGrid({
           </div>
         </div>
 
-        {/* Grid Matrix */}
+        {/* Grid Matrix (Outer container card removed completely) */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DOCUMENT_CONFIGS.map((config) => {
             const uploadedDoc = documents.find(
@@ -176,13 +176,12 @@ export function DocumentsGrid({
             const isThisCardUploading =
               isUploading && selectedDocType === config.type;
 
-            // Neutral background and border by default to keep the interface clean
+            // Card styling
             let cardContainerStyle =
               "border-line bg-card hover:border-line-focus";
             let iconBoxStyle = "bg-inset text-ink-subtle border border-line";
 
             if (uploadedDoc) {
-              // Uploaded state (Clean High-Contrast Green)
               cardContainerStyle =
                 "border-emerald-500/40 bg-emerald-500/[0.03]";
               iconBoxStyle = "bg-emerald-600 text-white";
@@ -194,11 +193,9 @@ export function DocumentsGrid({
 
             if (!uploadedDoc && isIntakePage) {
               if (config.isHardDoc) {
-                // Bright red button for required missing docs
                 buttonClass =
                   "bg-rose-600 hover:bg-rose-700 text-white border-transparent shadow-sm";
               } else {
-                // Custom #f5b023 solid background for optional missing docs
                 buttonClass =
                   "text-white border-transparent shadow-sm hover:opacity-90";
                 buttonCustomStyle = { backgroundColor: "#f5b023" };
@@ -208,23 +205,23 @@ export function DocumentsGrid({
             return (
               <div
                 key={config.type}
-                className={`flex flex-col justify-between rounded-2xl border p-5 transition-all ${cardContainerStyle}`}
+                className={`flex flex-col justify-between rounded-2xl border p-4.5 transition-all ${cardContainerStyle}`}
               >
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0">
                       <span
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${iconBoxStyle}`}
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${iconBoxStyle}`}
                       >
                         {uploadedDoc ? (
-                          <Check className="h-5 w-5 stroke-[3px]" />
+                          <Check className="h-4 w-4 stroke-[3px]" />
                         ) : (
-                          <FileText className="h-4.5 w-4.5 stroke-[2px]" />
+                          <FileText className="h-4 w-4 stroke-[2px]" />
                         )}
                       </span>
 
                       <div className="min-w-0">
-                        <h3 className="text-xs font-bold text-ink tracking-tight truncate">
+                        <h3 className="text-xs font-bold text-ink font-sans truncate">
                           {config.label}
                         </h3>
 
@@ -253,7 +250,7 @@ export function DocumentsGrid({
                 </div>
 
                 {/* Card Action Controls */}
-                <div className="mt-5 border-t border-line/60 pt-3.5">
+                <div className="mt-4 border-t border-line/60 pt-3">
                   {uploadedDoc ? (
                     <div className="flex items-center justify-between">
                       <button
@@ -285,7 +282,7 @@ export function DocumentsGrid({
                       disabled={isThisCardUploading}
                       onClick={() => handleCardClick(config)}
                       style={buttonCustomStyle}
-                      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-xs font-bold transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 ${buttonClass}`}
+                      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-3 py-2 text-xs font-bold transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 ${buttonClass}`}
                     >
                       {isThisCardUploading ? (
                         <>
@@ -314,7 +311,7 @@ export function DocumentsGrid({
 
         {/* Wizard Step Progression Button */}
         {isWizardMode && (
-          <div className="flex justify-end pt-4 border-t border-line/60 mt-6">
+          <div className="flex justify-end pt-4 border-t border-line/60">
             <button
               type="button"
               disabled={!canProceed}
@@ -332,11 +329,11 @@ export function DocumentsGrid({
       {previewUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 sm:p-6"
-          onClick={() => setPreviewUrl(null)} // Click outside to close
+          onClick={() => setPreviewUrl(null)}
         >
           <div
             className="relative flex flex-col max-h-full max-w-4xl w-full rounded-2xl bg-card shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()} // Prevent clicks inside modal from closing it
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-line p-4 bg-card z-10">

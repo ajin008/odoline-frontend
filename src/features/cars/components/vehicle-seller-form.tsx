@@ -128,10 +128,10 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
             <Car className="h-4 w-4 stroke-[2px]" />
           </div>
           <div>
-            <h2 className="text-sm font-bold tracking-tight text-ink font-sans">
+            <h2 className="text-sm font-bold text-ink font-sans">
               Vehicle Details
             </h2>
-            <p className="text-xs text-ink-subtle font-sans tracking-tight">
+            <p className="text-xs text-ink-subtle font-sans">
               Enter core specifications and performance histories.
             </p>
           </div>
