@@ -175,17 +175,9 @@ export function IntakeShell({ carId }: { carId: string }) {
       <div className="transition-all duration-200">
         {tab === "vehicle" && <VehicleSellerForm car={car} />}
 
-        {tab === "documents" && (
-          <div className="rounded-2xl border border-line bg-card p-6">
-            <DocumentsGrid carId={car.id} />
-          </div>
-        )}
+        {tab === "documents" && <DocumentsGrid carId={car.id} />}
 
-        {tab === "refurbishment" && (
-          <div className="rounded-2xl border border-line bg-card p-6">
-            <RefurbishmentTab carId={car.id} />
-          </div>
-        )}
+        {tab === "refurbishment" && <RefurbishmentTab carId={car.id} />}
       </div>
     </div>
   );

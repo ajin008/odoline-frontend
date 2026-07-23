@@ -62,7 +62,7 @@ export function RefurbishmentTab({
 
   if (isCarLoading || isItemsLoading || isDocsLoading) {
     return (
-      <div className="flex h-64 items-center justify-center rounded-2xl border border-line bg-card">
+      <div className="flex h-64 items-center justify-center rounded-2xl bg-card">
         <Loader2 className="h-6 w-6 animate-spin text-ink-muted" />
       </div>
     );
@@ -72,7 +72,7 @@ export function RefurbishmentTab({
     <>
       <div className="space-y-4 sm:space-y-6 select-none font-sans">
         {/* 1. Bento Financial Overview Header */}
-        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-6 shadow-bento">
+        <div className="rounded-2xl bg-card p-2.5 sm:p-6 shadow-bento">
           <RefurbPricingSummary
             carId={carId}
             purchaseNum={purchaseNum}
@@ -84,7 +84,7 @@ export function RefurbishmentTab({
         </div>
 
         {/* 2. Interactive Workshop Operations Container */}
-        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-6 shadow-bento space-y-6">
+        <div className="rounded-2xl bg-card p-2.5 sm:p-6 shadow-bento space-y-6">
           <div className="flex items-center gap-3 border-b border-line/50 pb-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-light text-accent shrink-0">
               <Wrench className="h-4 w-4 stroke-[2.5px]" />
@@ -113,7 +113,7 @@ export function RefurbishmentTab({
         </div>
 
         {/* 3. Action Hub & Validation Status */}
-        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-6 shadow-bento space-y-4">
+        <div className="rounded-2xl bg-card p-2.5 sm:p-6 shadow-bento space-y-4">
           {(isMissingHardDocs || hasPendingRefurbTasks) && !isAlreadyInStock && (
             <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-950 text-xs">
               {isMissingHardDocs && (
