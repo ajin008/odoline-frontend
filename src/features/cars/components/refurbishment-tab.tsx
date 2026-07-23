@@ -3,7 +3,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, ArrowRight, PackageCheck, AlertCircle } from "lucide-react";
+import {
+  Loader2,
+  ArrowRight,
+  PackageCheck,
+  AlertCircle,
+  Wrench,
+  CheckCircle2,
+} from "lucide-react";
 import { useRefurbishmentItems } from "../hooks/use-refurbishment";
 import { useCar, useAddToCartStock } from "../hooks/use-car";
 import { useCarDocuments } from "../hooks/use-documents";
@@ -44,14 +51,12 @@ export function RefurbishmentTab({
 
   const isAlreadyInStock = car?.status === "in_stock";
 
-  // Check mandatory hard documents (RC Book & Purchase Photo)
   const uploadedDocTypes = new Set(documents.map((doc) => doc.document_type));
   const missingHardDocs = DOCUMENT_CONFIGS.filter(
     (cfg) => cfg.isHardDoc && !uploadedDocTypes.has(cfg.type)
   );
   const isMissingHardDocs = missingHardDocs.length > 0;
 
-  // Check pending workshop refurbishment tasks (must be 100% completed / Done)
   const hasPendingRefurbTasks =
     items.length > 0 && items.some((item) => item.status !== "done");
 
@@ -65,9 +70,9 @@ export function RefurbishmentTab({
 
   return (
     <>
-      <div className="space-y-6 select-none font-sans">
-        {/* 1. Pricing Pipeline Summary with Live Margin Input */}
-        <div className="pb-6 border-b border-line/60">
+      <div className="space-y-4 sm:space-y-6 select-none font-sans">
+        {/* 1. Bento Financial Overview Header */}
+        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-6 shadow-bento">
           <RefurbPricingSummary
             carId={carId}
             purchaseNum={purchaseNum}
@@ -78,94 +83,120 @@ export function RefurbishmentTab({
           />
         </div>
 
-        {/* 2. Add Workshop Task Form */}
-        <div className="pb-6 border-b border-line/60">
+        {/* 2. Interactive Workshop Operations Container */}
+        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-6 shadow-bento space-y-6">
+          <div className="flex items-center gap-3 border-b border-line/50 pb-4">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-light text-accent shrink-0">
+              <Wrench className="h-4 w-4 stroke-[2.5px]" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-ink">
+                Workshop & Refurbishment Matrix
+              </h2>
+              <p className="text-xs text-ink-subtle">
+                Register parts, track vendor bills, and monitor task completion status.
+              </p>
+            </div>
+          </div>
+
+          {/* Add Item Form Component */}
           <AddRefurbItemForm carId={carId} />
+
+          <div className="border-t border-line/60 pt-6">
+            <RefurbTaskList
+              carId={carId}
+              items={items}
+              progressPercentage={stats.progressPercentage}
+              onViewBill={setBillPreviewUrl}
+            />
+          </div>
         </div>
 
-        {/* 3. Workshop Task List Matrix */}
-        <div className="pb-6 border-b border-line/60">
-          <RefurbTaskList
-            carId={carId}
-            items={items}
-            progressPercentage={stats.progressPercentage}
-            onViewBill={setBillPreviewUrl}
-          />
-        </div>
-
-        {/* 4. Action Buttons & Validation Warnings */}
-        <div className="flex flex-col items-end gap-3 pt-2">
-          {isMissingHardDocs && !isAlreadyInStock && (
-            <div className="flex items-center gap-2 text-xs font-medium text-amber-950 bg-[#f5b023]/10 px-3.5 py-2 rounded-xl border border-[#f5b023]/30">
-              <AlertCircle className="h-4 w-4 shrink-0 text-[#f5b023]" />
-              <span>
-                Mandatory document(s) missing:{" "}
-                <strong className="font-semibold text-amber-950">
-                  {missingHardDocs.map((d) => d.label).join(" & ")}
-                </strong>
-              </span>
-            </div>
-          )}
-
-          {hasPendingRefurbTasks && !isAlreadyInStock && (
-            <div className="flex items-center gap-2 text-xs font-medium text-amber-950 bg-[#f5b023]/10 px-3.5 py-2 rounded-xl border border-[#f5b023]/30">
-              <AlertCircle className="h-4 w-4 shrink-0 text-[#f5b023]" />
-              <span>
-                Workshop tasks pending:{" "}
-                <strong className="font-semibold text-amber-950">
-                  All refurbishment tasks must be marked as Done before moving to stock.
-                </strong>
-              </span>
-            </div>
-          )}
-
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-            {/* Leave it for Now Button */}
-            <button
-              type="button"
-              onClick={() => router.push("/owner/inventory")}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl border border-line bg-inset px-4 py-3 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all cursor-pointer"
-            >
-              Leave it for Now
-            </button>
-
-            {/* Add to Stock Button */}
-            <button
-              type="button"
-              disabled={
-                addToStockMutation.isPending ||
-                isAlreadyInStock ||
-                isMissingHardDocs ||
-                hasPendingRefurbTasks
-              }
-              onClick={() => addToStockMutation.mutate()}
-              className="w-full sm:w-auto min-w-45 inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {addToStockMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isAlreadyInStock ? (
-                <>
-                  <PackageCheck className="h-4 w-4 stroke-[2.5px]" />
-                  Car Currently In Stock
-                </>
-              ) : (
-                <>
-                  {isWizardMode ? "Complete & Add to Stock" : "Add to Stock"}
-                  <ArrowRight className="h-4 w-4 stroke-[2.5px]" />
-                </>
+        {/* 3. Action Hub & Validation Status */}
+        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-6 shadow-bento space-y-4">
+          {(isMissingHardDocs || hasPendingRefurbTasks) && !isAlreadyInStock && (
+            <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-950 text-xs">
+              {isMissingHardDocs && (
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
+                  <span>
+                    Mandatory document(s) missing:{" "}
+                    <strong className="font-semibold">
+                      {missingHardDocs.map((d) => d.label).join(" & ")}
+                    </strong>
+                  </span>
+                </div>
               )}
-            </button>
+              {hasPendingRefurbTasks && (
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
+                  <span>
+                    Workshop tasks pending: All refurbishment tasks must be marked as Done.
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Action Hub */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-xs text-ink-muted text-center sm:text-left">
+              {isAlreadyInStock ? (
+                <span className="inline-flex items-center gap-1.5 text-emerald-600 font-bold">
+                  <CheckCircle2 className="h-4 w-4" /> Asset is verified and active in live stock inventory.
+                </span>
+              ) : (
+                <span>
+                  Review financial pipeline and ensure tasks are finalized before stocking.
+                </span>
+              )}
+            </div>
+
+            {/* Action Buttons: Stacked Row-by-Row on Mobile, Side-by-Side on Desktop */}
+            <div className="flex flex-col sm:flex-row-reverse items-center gap-2.5 w-full sm:w-auto">
+              <button
+                type="button"
+                disabled={
+                  addToStockMutation.isPending ||
+                  isAlreadyInStock ||
+                  isMissingHardDocs ||
+                  hasPendingRefurbTasks
+                }
+                onClick={() => addToStockMutation.mutate()}
+                className="w-full sm:w-auto min-h-[44px] min-w-45 inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {addToStockMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isAlreadyInStock ? (
+                  <>
+                    <PackageCheck className="h-4 w-4 stroke-[2.5px]" />
+                    In Stock
+                  </>
+                ) : (
+                  <>
+                    {isWizardMode ? "Complete & Add to Stock" : "Add to Stock"}
+                    <ArrowRight className="h-4 w-4 stroke-[2.5px]" />
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push("/owner/inventory")}
+                className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center rounded-xl border border-line bg-inset px-4 py-3 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all active:scale-95 cursor-pointer"
+              >
+                Leave for Now
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 5. Bill Preview Modal */}
       <BillPreviewModal
         billPreviewUrl={billPreviewUrl}
         onClose={() => setBillPreviewUrl(null)}
       />
 
-      {/* 6. Custom Stock Transition Success Modal with Tick Mark Animation */}
       <StockSuccessModal
         isOpen={addToStockMutation.isSuccess}
         redirectPath="/owner/inventory?tab=in_stock"

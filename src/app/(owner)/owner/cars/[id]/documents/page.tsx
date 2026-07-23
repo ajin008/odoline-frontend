@@ -32,8 +32,8 @@ export default async function DocumentWizardPage({
         </div>
       </div>
 
-      {/* Main Container Sheet — Shadows removed for flat, clean look */}
-      <div className="rounded-2xl border border-line bg-card p-6">
+      {/* Documents Component View */}
+      <div>
         <DocumentsGrid carId={id} isWizardMode={true} />
       </div>
     </div>

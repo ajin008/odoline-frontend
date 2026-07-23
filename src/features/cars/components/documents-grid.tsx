@@ -65,7 +65,6 @@ export function DocumentsGrid({
   const pathname = usePathname();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Detects if the route ends with "/intake"
   const isIntakePage = pathname.endsWith("/intake");
 
   const { data: documents = [], isLoading } = useCarDocuments(carId);
@@ -78,12 +77,9 @@ export function DocumentsGrid({
     isDeleting,
   } = useDocumentActions(carId);
 
-  // Local State
   const [selectedDocType, setSelectedDocType] = useState<DocumentType | null>(
     null
   );
-
-  // Modal State
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loadingPreviewId, setLoadingPreviewId] = useState<string | null>(null);
 
@@ -132,42 +128,50 @@ export function DocumentsGrid({
           className="hidden"
         />
 
-        {/* Header Status Banner */}
-        <div
-          className={`flex items-start gap-3.5 rounded-2xl border p-4 transition-all ${
-            canProceed
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-950"
-              : "border-[#f5b023]/30 bg-[#f5b023]/10 text-amber-950"
-          }`}
-        >
-          <div
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl text-white"
-            style={{ backgroundColor: canProceed ? "#16a34a" : "#f5b023" }}
-          >
-            {canProceed ? (
-              <CheckCircle2 className="h-4 w-4 stroke-[2.5px]" />
-            ) : (
-              <AlertCircle className="h-4 w-4 stroke-[2.5px]" />
-            )}
+        {/* Clean Header Status Banner without outer borders */}
+        <div className="flex items-start justify-between gap-4 rounded-2xl p-5 transition-all bg-card">
+          <div className="flex items-start gap-3.5">
+            <div
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white mt-0.5 ${
+                canProceed ? "bg-emerald-600" : "bg-[#f5b023]"
+              }`}
+            >
+              {canProceed ? (
+                <CheckCircle2 className="h-4 w-4 stroke-[2.5px]" />
+              ) : (
+                <AlertCircle className="h-4 w-4 stroke-[2.5px]" />
+              )}
+            </div>
+
+            <div>
+              <h3 className="font-heading text-sm font-bold tracking-tight text-ink">
+                {canProceed
+                  ? "Mandatory Documents Complete"
+                  : "Required Documents Pending"}
+              </h3>
+              <p className="mt-0.5 text-xs font-medium text-ink-muted leading-relaxed">
+                {canProceed
+                  ? "All required physical records are in place. You may proceed to refurbishment or add optional soft documents."
+                  : `Please upload ${missingHardDocs
+                      .map((d) => d.label)
+                      .join(" and ")} to unlock the next phase.`}
+              </p>
+            </div>
           </div>
 
-          <div className="text-xs font-sans">
-            <p className="font-bold tracking-tight text-sm">
-              {canProceed
-                ? "Mandatory Documents Complete"
-                : "Required Documents Pending"}
-            </p>
-            <p className="mt-0.5 text-ink-muted font-medium leading-relaxed">
-              {canProceed
-                ? "All required physical records are in place. You may proceed to refurbishment or add optional soft documents."
-                : `Please upload ${missingHardDocs
-                    .map((d) => d.label)
-                    .join(" and ")} to unlock the next phase.`}
-            </p>
-          </div>
+          {/* Borderless Minimal Status Pill Badge */}
+          <span
+            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider shrink-0 ${
+              canProceed
+                ? "bg-emerald-500/10 text-emerald-700"
+                : "bg-amber-500/10 text-amber-800"
+            }`}
+          >
+            {canProceed ? "Ready to Progress" : "Action Required"}
+          </span>
         </div>
 
-        {/* Grid Matrix (Outer container card removed completely) */}
+        {/* Grid Matrix */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {DOCUMENT_CONFIGS.map((config) => {
             const uploadedDoc = documents.find(
@@ -176,7 +180,6 @@ export function DocumentsGrid({
             const isThisCardUploading =
               isUploading && selectedDocType === config.type;
 
-            // Card styling
             let cardContainerStyle =
               "border-line bg-card hover:border-line-focus";
             let iconBoxStyle = "bg-inset text-ink-subtle border border-line";
@@ -187,7 +190,6 @@ export function DocumentsGrid({
               iconBoxStyle = "bg-emerald-600 text-white";
             }
 
-            // Button style calculation incorporating #f5b023
             let buttonClass = "border-line bg-card text-ink hover:bg-inset";
             let buttonCustomStyle: React.CSSProperties = {};
 
@@ -312,15 +314,26 @@ export function DocumentsGrid({
         {/* Wizard Step Progression Button */}
         {isWizardMode && (
           <div className="flex justify-end pt-4 border-t border-line/60">
-            <button
-              type="button"
-              disabled={!canProceed}
-              onClick={() => router.push(`/owner/cars/${carId}/refurbishment`)}
-              className="w-full sm:w-auto min-w-45 inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3.5 text-sm font-bold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
-            >
-              Next: Refurbishment
-              <ArrowRight className="h-4 w-4 stroke-[2.5px]" />
-            </button>
+            <div className="flex flex-col sm:flex-row-reverse items-center gap-2.5 w-full sm:w-auto">
+              <button
+                type="button"
+                disabled={!canProceed}
+                onClick={() =>
+                  router.push(`/owner/cars/${carId}/refurbishment`)
+                }
+                className="w-full sm:w-auto min-w-45 inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
+              >
+                Next: Refurbishment
+                <ArrowRight className="h-4 w-4 stroke-[2.5px]" />
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/owner/inventory")}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl border border-line bg-inset px-4 py-3 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all cursor-pointer"
+              >
+                Leave for Now
+              </button>
+            </div>
           </div>
         )}
       </div>

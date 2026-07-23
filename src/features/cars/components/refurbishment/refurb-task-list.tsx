@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Wrench, Trash2, Loader2, Eye } from "lucide-react";
+import { Wrench, Trash2, Loader2, Eye, CheckCircle2, Clock, PlayCircle } from "lucide-react";
 import { toast } from "sonner";
 import {
   RefurbishmentItem,
@@ -33,7 +33,7 @@ export function RefurbTaskList({
   const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
   const [loadingBillId, setLoadingBillId] = useState<string | null>(null);
 
-  // Stable client-side sort order to prevent items from swapping rows when updated
+  // Stable client-side sort order
   const sortedItems = [...items].sort((a, b) => {
     const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
     const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
@@ -70,63 +70,97 @@ export function RefurbTaskList({
   };
 
   return (
-    <div className="space-y-3 select-none font-sans">
-      {/* Updated Heading Styling */}
-      <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-ink">
-        Workshop Task List ({sortedItems.length}) • {progressPercentage}%
-        Completed
-      </h4>
+    <div className="space-y-4 select-none font-sans">
+      {/* Header with Visual Progress Bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-ink">
+            Workshop Task List ({sortedItems.length})
+          </h4>
+          <span className="font-mono text-xs font-bold text-accent">
+            {progressPercentage}% Completed
+          </span>
+        </div>
+
+        {/* Animated Visual Progress Bar */}
+        <div className="h-2 w-full rounded-full bg-inset border border-line overflow-hidden">
+          <div
+            className="h-full bg-accent transition-all duration-500 ease-out rounded-full"
+            style={{ width: `${progressPercentage}%` }}
+          />
+        </div>
+      </div>
 
       {sortedItems.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-line bg-card p-8 text-center text-ink-subtle text-xs">
-          No refurbishment tasks registered yet.
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line bg-inset p-8 text-center space-y-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle">
+            <Wrench className="h-5 w-5 stroke-[1.75px]" />
+          </div>
+          <p className="text-xs font-bold text-ink">No refurbishment tasks added yet</p>
+          <p className="text-[11px] text-ink-muted max-w-sm">
+            Add workshop items above to track repairs, vendor costs, and calculate total landing price.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3">
           {sortedItems.map((item) => {
             const isDone = item.status === "done";
+            const isInProgress = item.status === "in_progress";
             const isThisRowUpdating = updatingItemId === item.id;
 
             return (
               <div
                 key={item.id}
-                className={`relative flex flex-col gap-4 rounded-xl border p-4 transition-all ${
+                className={`relative flex flex-col justify-between gap-3.5 rounded-2xl border p-4 transition-all duration-200 ${
                   isDone
-                    ? "border-emerald-500/30 bg-emerald-500/[0.02]"
-                    : "border-line bg-card"
+                    ? "border-emerald-500/30 bg-emerald-500/[0.02] shadow-sm"
+                    : isInProgress
+                    ? "border-blue-500/30 bg-blue-500/[0.02]"
+                    : "border-line bg-card hover:border-line-focus"
                 }`}
               >
-                {/* Top Row: Icon, Title, Vendor, and Delete Button Inside Card */}
+                {/* Top Section: Icon, Title, Vendor Tag & Delete Action */}
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-start gap-3 min-w-0">
                     <div
-                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ${
                         isDone
                           ? "bg-emerald-600 text-white"
+                          : isInProgress
+                          ? "bg-blue-600 text-white"
                           : "bg-inset text-ink-subtle border border-line"
                       }`}
                     >
-                      <Wrench className="h-4 w-4 stroke-[2px]" />
+                      {isDone ? (
+                        <CheckCircle2 className="h-4 w-4 stroke-[2.5px]" />
+                      ) : isInProgress ? (
+                        <PlayCircle className="h-4 w-4 stroke-[2px]" />
+                      ) : (
+                        <Clock className="h-4 w-4 stroke-[2px]" />
+                      )}
                     </div>
-                    <div className="min-w-0">
-                      <h5 className="text-xs font-bold text-ink tracking-tight truncate">
+
+                    <div className="min-w-0 space-y-1">
+                      <h5 className="text-xs font-bold text-ink truncate">
                         {item.item_name}
                       </h5>
-                      <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                        <p className="text-[11px] font-mono text-ink-muted">
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="inline-flex items-center text-[10px] font-mono font-medium px-2 py-0.5 rounded-md bg-inset border border-line text-ink-muted">
                           Vendor:{" "}
-                          <span className="text-ink">
+                          <strong className="ml-1 text-ink">
                             {item.vendor_type === "inhouse"
                               ? "Inhouse"
                               : item.vendor_name || "Outside"}
-                          </span>
-                        </p>
+                          </strong>
+                        </span>
+
                         {item.bill_url && (
                           <button
                             type="button"
                             onClick={() => handleViewBill(item.id)}
                             disabled={loadingBillId === item.id}
-                            className="text-[10px] font-mono font-bold text-accent hover:underline inline-flex items-center gap-1 bg-accent-light/50 px-1.5 py-0.5 rounded border border-accent/20 cursor-pointer disabled:opacity-50"
+                            className="text-[10px] font-mono font-bold text-accent hover:underline inline-flex items-center gap-1 bg-accent-light px-2 py-0.5 rounded-md border border-accent/20 cursor-pointer disabled:opacity-50"
                           >
                             {loadingBillId === item.id ? (
                               <Loader2 className="h-3 w-3 animate-spin stroke-[2.5px]" />
@@ -140,35 +174,36 @@ export function RefurbTaskList({
                     </div>
                   </div>
 
-                  {/* Inside Delete Button */}
+                  {/* Delete Button */}
                   <button
                     type="button"
                     onClick={() => deleteItemMutation.mutate(item.id)}
                     disabled={deleteItemMutation.isPending}
-                    className="text-ink-subtle hover:text-danger transition-colors cursor-pointer p-1.5 rounded-lg hover:bg-inset shrink-0"
+                    className="text-ink-subtle hover:text-danger transition-colors cursor-pointer p-2 rounded-xl hover:bg-inset shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
                     title="Delete task"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
 
-                {/* Bottom Row: Price & Status Control Tabs */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-line/60">
-                  <div className="text-xs font-mono font-bold text-ink">
-                    Cost:{" "}
-                    <span className="text-sm">
+                {/* Bottom Section: Cost & Mobile Segmented Status Switcher */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-line/60">
+                  <div className="flex items-baseline gap-1 text-xs font-mono font-bold text-ink">
+                    <span className="text-ink-muted text-[11px] font-normal uppercase">Cost:</span>
+                    <span className="text-sm text-ink font-bold">
                       ₹{formatCurrency(item.cost)}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1 bg-inset p-1 rounded-xl border border-line w-full sm:w-auto overflow-x-auto">
+                  {/* Segmented Control Touch Switcher */}
+                  <div className="flex items-center gap-1 bg-inset p-1 rounded-xl border border-line w-full sm:w-auto">
                     <button
                       type="button"
                       disabled={isThisRowUpdating}
                       onClick={() => handleStatusUpdate(item.id, "pending")}
-                      className={`flex-1 sm:flex-initial px-3 py-1 text-[10px] font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50 ${
+                      className={`flex-1 sm:flex-initial min-h-[36px] px-3 py-1 text-[11px] font-bold rounded-lg transition-all active:scale-95 cursor-pointer disabled:opacity-50 ${
                         item.status === "pending"
-                          ? "bg-[#f5b023] text-white"
+                          ? "bg-amber-500 text-white shadow-sm"
                           : "text-ink-muted hover:text-ink"
                       }`}
                     >
@@ -178,9 +213,9 @@ export function RefurbTaskList({
                       type="button"
                       disabled={isThisRowUpdating}
                       onClick={() => handleStatusUpdate(item.id, "in_progress")}
-                      className={`flex-1 sm:flex-initial px-3 py-1 text-[10px] font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50 ${
+                      className={`flex-1 sm:flex-initial min-h-[36px] px-3 py-1 text-[11px] font-bold rounded-lg transition-all active:scale-95 cursor-pointer disabled:opacity-50 ${
                         item.status === "in_progress"
-                          ? "bg-blue-600 text-white"
+                          ? "bg-blue-600 text-white shadow-sm"
                           : "text-ink-muted hover:text-ink"
                       }`}
                     >
@@ -190,9 +225,9 @@ export function RefurbTaskList({
                       type="button"
                       disabled={isThisRowUpdating}
                       onClick={() => handleStatusUpdate(item.id, "done")}
-                      className={`flex-1 sm:flex-initial px-3 py-1 text-[10px] font-bold rounded-lg transition-colors cursor-pointer disabled:opacity-50 ${
+                      className={`flex-1 sm:flex-initial min-h-[36px] px-3 py-1 text-[11px] font-bold rounded-lg transition-all active:scale-95 cursor-pointer disabled:opacity-50 ${
                         item.status === "done"
-                          ? "bg-emerald-600 text-white"
+                          ? "bg-emerald-600 text-white shadow-sm"
                           : "text-ink-muted hover:text-ink"
                       }`}
                     >

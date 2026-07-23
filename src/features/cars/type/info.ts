@@ -23,12 +23,11 @@ export const FUEL_TYPE_OPTIONS = [
   { value: "petrol", label: "Petrol" },
   { value: "diesel", label: "Diesel" },
   { value: "cng", label: "CNG" },
-  { value: "ev", label: "Electric (EV)" },
+  { value: "electric", label: "Electric (EV)" },
   { value: "hybrid", label: "Petrol Hybrid" },
 ];
 
 export const TRANSMISSION_OPTIONS = [
   { value: "manual", label: "Manual (M/T)" },
   { value: "automatic", label: "Automatic (A/T)" },
-  { value: "imt", label: "iMT (Clutchless Manual)" },
 ];

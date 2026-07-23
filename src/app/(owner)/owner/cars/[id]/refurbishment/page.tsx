@@ -32,8 +32,8 @@ export default async function RefurbishmentWizardPage({
         </div>
       </div>
 
-      {/* Main Container Sheet */}
-      <div className="rounded-2xl border border-line bg-card p-6">
+      {/* Refurbishment Component View */}
+      <div>
         <RefurbishmentTab carId={id} isWizardMode={true} />
       </div>
     </div>
