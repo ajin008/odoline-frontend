@@ -4,11 +4,17 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Car as CarIcon, Image as ImageIcon } from "lucide-react";
+import { Car as CarIcon, Image as ImageIcon, Eye } from "lucide-react";
 import { useCarDocuments } from "../hooks/use-documents";
 import { documentsApi } from "../api/documents-api";
 
-export function CarThumbnail({ carId }: { carId: string }) {
+export function CarThumbnail({
+  carId,
+  onPreview,
+}: {
+  carId: string;
+  onPreview?: (url: string) => void;
+}) {
   const { data: documents, isLoading: docsLoading } = useCarDocuments(carId);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imageLoading, setImageLoading] = useState(false);
@@ -45,10 +51,10 @@ export function CarThumbnail({ carId }: { carId: string }) {
     );
   }
 
-  // Success State — Adjusted object positioning to push the view down slightly from the very top
+  // Success State — Render image & Eye preview overlay button
   if (imageUrl) {
     return (
-      <div className="relative h-full w-full">
+      <div className="relative h-full w-full group/thumb">
         <Image
           src={imageUrl}
           alt="Vehicle preview"
@@ -57,6 +63,20 @@ export function CarThumbnail({ carId }: { carId: string }) {
           className="object-cover object-[center_35%] transition-opacity duration-300"
           unoptimized
         />
+        {onPreview && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onPreview(imageUrl);
+            }}
+            className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-lg bg-black/20 text-white/80 backdrop-blur-xs transition-all duration-200 hover:bg-black/40 hover:text-white cursor-pointer border border-white/20"
+            title="View image preview"
+          >
+            <Eye className="h-3.5 w-3.5 stroke-[1.75px]" />
+          </button>
+        )}
       </div>
     );
   }
