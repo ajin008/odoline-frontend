@@ -5,14 +5,14 @@ export const CAR_STATUS_CONFIG: Record<
   string,
   { label: string; badge: string }
 > = {
-  draft: { label: "Draft", badge: "bg-zinc-100 text-zinc-600" },
-  purchasing: { label: "Docs Pending", badge: "bg-amber-100 text-amber-700" },
-  in_refurbishment: { label: "In Refurb", badge: "bg-blue-100 text-blue-700" },
-  refurb_complete: { label: "Refurb Done", badge: "bg-teal-100 text-teal-700" },
-  in_stock: { label: "In Stock", badge: "bg-green-100 text-green-700" },
-  booked: { label: "Booked", badge: "bg-purple-100 text-purple-700" },
-  delivered: { label: "Delivered", badge: "bg-zinc-100 text-zinc-600" },
-  closed: { label: "Closed", badge: "bg-zinc-100 text-zinc-500" },
+  draft: { label: "Draft", badge: "bg-zinc-600 text-white font-bold" },
+  purchasing: { label: "Purchasing", badge: "bg-amber-500 text-white font-bold" },
+  in_refurbishment: { label: "In Refurbishment", badge: "bg-indigo-600 text-white font-bold" },
+  refurb_complete: { label: "Refurb Complete", badge: "bg-teal-600 text-white font-bold" },
+  in_stock: { label: "In Stock", badge: "bg-emerald-600 text-white font-bold" },
+  booked: { label: "Booked", badge: "bg-purple-600 text-white font-bold" },
+  delivered: { label: "Delivered", badge: "bg-zinc-800 text-white font-bold" },
+  closed: { label: "Closed", badge: "bg-zinc-700 text-white font-bold" },
 };
 
 /** Which statuses count as "in the pipeline" (mid-intake, not yet in stock). */

@@ -13,6 +13,7 @@ import {
   useDeleteRefurbItem,
 } from "../../hooks/use-refurbishment";
 import { formatCurrency } from "../../utils/refurbishment-helpers";
+import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 
 interface RefurbTaskListProps {
   carId: string;
@@ -32,6 +33,14 @@ export function RefurbTaskList({
 
   const [updatingItemId, setUpdatingItemId] = useState<string | null>(null);
   const [loadingBillId, setLoadingBillId] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const handleConfirmDelete = () => {
+    if (!deleteTargetId) return;
+    deleteItemMutation.mutate(deleteTargetId, {
+      onSettled: () => setDeleteTargetId(null),
+    });
+  };
 
   // Stable client-side sort order
   const sortedItems = [...items].sort((a, b) => {
@@ -177,7 +186,7 @@ export function RefurbTaskList({
                   {/* Delete Button */}
                   <button
                     type="button"
-                    onClick={() => deleteItemMutation.mutate(item.id)}
+                    onClick={() => setDeleteTargetId(item.id)}
                     disabled={deleteItemMutation.isPending}
                     className="text-ink-subtle hover:text-danger transition-colors cursor-pointer p-2 rounded-xl hover:bg-inset shrink-0 min-h-[36px] min-w-[36px] flex items-center justify-center"
                     title="Delete task"
@@ -240,6 +249,19 @@ export function RefurbTaskList({
           })}
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={handleConfirmDelete}
+        isLoading={deleteItemMutation.isPending}
+        title="Delete Workshop Task"
+        description="Are you sure you want to delete this refurbishment task? The cost will be removed from your vehicle landing calculations."
+        confirmText="Delete Task"
+        cancelText="Cancel"
+        variant="danger"
+        icon={<Trash2 className="h-5.5 w-5.5 stroke-[2.25px]" />}
+      />
     </div>
   );
 }

@@ -1,18 +1,26 @@
 // features/cars/components/car-card.tsx
 import Link from "next/link";
-import { MapPin, FileText, Wrench, CheckCircle2, AlertCircle, Calendar } from "lucide-react";
+import {
+  MapPin,
+  FileText,
+  Wrench,
+  CheckCircle2,
+  AlertCircle,
+  Calendar,
+} from "lucide-react";
 import type { Car } from "../api/cars-api";
 import { CarThumbnail } from "./car-thumbnail";
 
 export function CarCard({ car }: { car: Car }) {
-  const isPurchasing = car.status.toLowerCase() === "purchasing";
   const isInStock = car.status.toLowerCase() === "in_stock";
 
   const docsSummary = car.progress_summary?.documents;
   const refurbSummary = car.progress_summary?.refurbishment;
 
   // In Stock: stock_added_at & holding days
-  const stockAddedDate = car.stock_added_at ? new Date(car.stock_added_at) : null;
+  const stockAddedDate = car.stock_added_at
+    ? new Date(car.stock_added_at)
+    : null;
   const formattedStockAddedDate = stockAddedDate
     ? stockAddedDate.toLocaleDateString("en-IN", {
         day: "numeric",
@@ -65,12 +73,18 @@ export function CarCard({ car }: { car: Car }) {
 
             <span
               className={[
-                "text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-md shrink-0 mt-0.5 border",
-                isPurchasing
-                  ? "bg-warning-light border-warning/10 text-warning"
-                  : isInStock
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-700"
-                  : "bg-accent-light/60 border-accent/10 text-accent",
+                "text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-md shrink-0 mt-0.5 border shadow-sm text-white",
+                car.status.toLowerCase() === "purchasing"
+                  ? "bg-amber-500 border-amber-600/30"
+                  : car.status.toLowerCase() === "in_refurbishment"
+                  ? "bg-indigo-600 border-indigo-700/30"
+                  : car.status.toLowerCase() === "in_stock"
+                  ? "bg-emerald-600 border-emerald-700/30"
+                  : car.status.toLowerCase() === "refurb_complete"
+                  ? "bg-teal-600 border-teal-700/30"
+                  : car.status.toLowerCase() === "booked"
+                  ? "bg-purple-600 border-purple-700/30"
+                  : "bg-zinc-700 border-zinc-800/30",
               ].join(" ")}
             >
               {car.status.replace("_", " ")}
@@ -94,8 +108,12 @@ export function CarCard({ car }: { car: Car }) {
                   {formattedStockAddedDate}
                 </span>
                 {typeof holdingDays === "number" && (
-                  <span className="bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
-                    {holdingDays}d
+                  <span className="bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+                    {holdingDays === 0
+                      ? "Stocked Today"
+                      : holdingDays === 1
+                      ? "1 Day in Stock"
+                      : `${holdingDays} Days in Stock`}
                   </span>
                 )}
               </>
@@ -126,21 +144,22 @@ export function CarCard({ car }: { car: Car }) {
 
                   {/* 1. RED / DANGER: Mandatory Hard Docs Missing */}
                   {docsSummary.hard_docs_complete === false ||
-                  (docsSummary.pending_required && docsSummary.pending_required > 0) ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/20 shrink-0">
-                      <AlertCircle className="h-3 w-3 text-rose-600" />
+                  (docsSummary.pending_required &&
+                    docsSummary.pending_required > 0) ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-rose-600 px-2 py-0.5 rounded-md shadow-sm border border-rose-700/30 shrink-0">
+                      <AlertCircle className="h-3 w-3 text-white stroke-[2.5px]" />
                       Mandatory Docs Missing
                     </span>
                   ) : docsSummary.has_pending ? (
                     /* 2. YELLOW / WARNING: Soft / Optional Docs Pending */
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20 shrink-0">
-                      <AlertCircle className="h-3 w-3 text-amber-600" />
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-amber-500 px-2 py-0.5 rounded-md shadow-sm border border-amber-600/30 shrink-0">
+                      <AlertCircle className="h-3 w-3 text-white stroke-[2.5px]" />
                       Docs Pending
                     </span>
                   ) : (
                     /* 3. GREEN / SUCCESS: All Docs Uploaded */
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 shrink-0">
-                      <CheckCircle2 className="h-3 w-3" />
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-md shadow-sm border border-emerald-700/30 shrink-0">
+                      <CheckCircle2 className="h-3 w-3 text-white stroke-[2.5px]" />
                       Docs Complete
                     </span>
                   )}
@@ -167,7 +186,9 @@ export function CarCard({ car }: { car: Car }) {
                     <div className="h-1.5 w-full rounded-full bg-inset border border-line/60 overflow-hidden">
                       <div
                         className="h-full bg-accent transition-all duration-300 rounded-full"
-                        style={{ width: `${refurbSummary.progress_percentage}%` }}
+                        style={{
+                          width: `${refurbSummary.progress_percentage}%`,
+                        }}
                       />
                     </div>
                   )}

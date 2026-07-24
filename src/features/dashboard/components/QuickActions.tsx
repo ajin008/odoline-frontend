@@ -41,7 +41,7 @@ export function QuickActions() {
           className="flex items-center justify-between rounded-xl border border-dashed border-ink-subtle/30 bg-card p-4 transition-all duration-200 active:scale-[0.98] shadow-sm"
         >
           <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent-light text-accent">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-inverse shadow-sm">
               <Plus className="h-4 w-4 stroke-[2.5px]" />
             </span>
             <span className="text-sm font-semibold tracking-tight text-ink font-sans">

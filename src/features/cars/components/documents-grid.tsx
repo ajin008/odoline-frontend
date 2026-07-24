@@ -21,6 +21,7 @@ import {
 } from "../type/document-types";
 import { useCarDocuments } from "../hooks/use-documents";
 import { useDocumentActions } from "../hooks/use-document-actions";
+import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 
 interface DocumentsGridProps {
   carId: string;
@@ -82,6 +83,13 @@ export function DocumentsGrid({
   );
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loadingPreviewId, setLoadingPreviewId] = useState<string | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+
+  const handleConfirmDelete = () => {
+    if (!deleteTargetId) return;
+    deleteDocument(deleteTargetId);
+    setDeleteTargetId(null);
+  };
 
   const handleCardClick = (config: DocumentConfigItem) => {
     setSelectedDocType(config.type);
@@ -270,7 +278,7 @@ export function DocumentsGrid({
                       </button>
                       <button
                         type="button"
-                        onClick={() => deleteDocument(uploadedDoc.id)}
+                        onClick={() => setDeleteTargetId(uploadedDoc.id)}
                         disabled={isDeleting}
                         className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-ink-subtle hover:text-danger hover:bg-danger-light transition-colors cursor-pointer disabled:opacity-50"
                         title="Delete document"
@@ -374,6 +382,19 @@ export function DocumentsGrid({
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title="Delete Document"
+        description="Are you sure you want to delete this uploaded document? This action will remove the record from vehicle records."
+        confirmText="Delete Document"
+        cancelText="Cancel"
+        variant="danger"
+        icon={<Trash2 className="h-5.5 w-5.5 stroke-[2.25px]" />}
+      />
     </>
   );
 }
