@@ -1,10 +1,8 @@
-// components/layout/owner/owner-bottom-tabs.tsx
-"use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ownerNavItems } from "./nav-items";
+import { useCars } from "@/src/features/cars/hooks/use-cars";
 import {
   Menu,
   X,
@@ -19,6 +17,8 @@ import {
 export function OwnerBottomTabs() {
   const pathname = usePathname();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const { data: inStockCars = [] } = useCars(["in_stock"]);
+  const inStockCount = inStockCars.length;
 
   // Core mobile navigation items
   const realMobileItems = ownerNavItems.filter((i) => i.mobile);
@@ -81,7 +81,7 @@ export function OwnerBottomTabs() {
 
                 {item.label === "Inventory" && (
                   <span className="absolute top-1 right-[22%] min-w-4 h-4 px-1 flex items-center justify-center text-[9px] font-bold font-mono rounded-full bg-accent text-inverse border border-card shadow-sm">
-                    12
+                    {inStockCount}
                   </span>
                 )}
               </Link>

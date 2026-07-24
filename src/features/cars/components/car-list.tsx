@@ -33,7 +33,7 @@ export function CarList({ statuses }: { statuses?: string[] }) {
 
   if (!cars || cars.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-ink-subtle/30 bg-card p-12 text-center max-w-md mx-auto my-6 shadow-sm select-none">
+      <div className="rounded-2xl border border-dashed border-ink-subtle/30 bg-card p-12 text-center max-w-md mx-auto my-6 select-none">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-inset text-ink-subtle border border-line mx-auto mb-4">
           <PackageOpen className="h-5 w-5 stroke-[1.5px]" />
         </div>

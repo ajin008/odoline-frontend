@@ -19,8 +19,8 @@ interface AddRefurbItemFormProps {
 }
 
 const PREDEFINED_CHIPS = [
-  "Car Wash & Detailing",
-  "Denting & Painting",
+  "Car Wash",
+  "Fuel",
   "Tyre Replacement",
   "Battery Replacement",
   "Engine Service",

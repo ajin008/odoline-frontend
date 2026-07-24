@@ -3,7 +3,26 @@ import { apiClient } from "@/src/lib/api-client";
 import { endpoints } from "@/src/lib/endpoints";
 import type { CreateCarFormValues } from "../schemas/create-car-schema";
 
-/** A car as returned by the backend (partial — enough for the intake flow). */
+export interface ProgressSummary {
+  documents?: {
+    has_pending?: boolean;
+    hard_docs_complete?: boolean;
+    total_required?: number;
+    uploaded_required?: number;
+    pending_required?: number;
+    is_complete?: boolean;
+    uploaded_all?: number;
+  };
+  refurbishment?: {
+    total_tasks: number;
+    completed_tasks: number;
+    pending_tasks: number;
+    progress_percentage: number;
+    is_complete: boolean;
+  };
+}
+
+/** A car as returned by the backend. */
 export interface Car {
   id: string;
 
@@ -14,14 +33,14 @@ export interface Car {
   reg_number: string;
   km_driven: number | null;
   fuel_type: string | null;
-  transmission: string | null; // ← was missing
-  color: string | null; // ← was missing
-  accident_history: string | null; // ← was missing
+  transmission: string | null;
+  color: string | null;
+  accident_history: string | null;
 
   // Purchase / seller (owner-only)
   purchase_amount?: string;
-  seller_name?: string | null; // ← was missing
-  seller_phone?: string | null; // ← was missing
+  seller_name?: string | null;
+  seller_phone?: string | null;
 
   // Pricing (owner-only, server-computed)
   refurb_total?: string;
@@ -29,17 +48,29 @@ export interface Car {
   landing_price?: string | null;
   selling_price?: string | null;
 
-  // Status & meta
+  // Status & phase timestamps
   status: string;
+  purchasing_at?: string | null;
+  refurb_started_at?: string | null;
+  refurb_completed_at?: string | null;
+  stock_added_at?: string | null;
+  booked_at?: string | null;
+  delivered_at?: string | null;
+  closed_at?: string | null;
+  notes?: string | null;
+
   created_at: string;
   updated_at?: string;
+
+  // Enriched progress summary metadata
+  progress_summary?: ProgressSummary;
 }
 
 export const carsApi = {
   /** POST /cars — create a car (Step 1). Returns the created car (with its id). */
   async create(data: CreateCarFormValues): Promise<Car> {
     const res = await apiClient.post(endpoints.cars.create, data);
-    return res.data.data; // unwrap the { data } envelope
+    return res.data.data;
   },
 
   async getList(statuses?: string[]): Promise<Car[]> {

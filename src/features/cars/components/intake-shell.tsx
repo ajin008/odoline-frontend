@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Lock } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { useCar } from "../hooks/use-car";
 import { VehicleSellerForm } from "./vehicle-seller-form";
 import { DocumentsGrid } from "./documents-grid";
@@ -27,6 +28,11 @@ export function IntakeShell({ carId }: { carId: string }) {
   const pendingDocsCount = DOCUMENT_CONFIGS.filter(
     (cfg) => !uploadedTypes.has(cfg.type)
   ).length;
+
+  const isDocsComplete = car?.progress_summary?.documents
+    ? car.progress_summary.documents.hard_docs_complete !== false &&
+      car.progress_summary.documents.is_complete !== false
+    : DOCUMENT_CONFIGS.filter((cfg) => cfg.isHardDoc && !uploadedTypes.has(cfg.type)).length === 0;
 
   if (isCarLoading) {
     return (
@@ -58,13 +64,21 @@ export function IntakeShell({ carId }: { carId: string }) {
 
   const isPurchasing = car.status.toLowerCase() === "purchasing";
 
+  const handleTabClick = (targetTab: (typeof TABS)[number]["key"]) => {
+    if (targetTab === "refurbishment" && !isDocsComplete) {
+      toast.error("Please upload mandatory documents before accessing Refurbishment.");
+      return;
+    }
+    setTab(targetTab);
+  };
+
   return (
     <div className="space-y-6 select-none font-sans">
-      {/* Accent Styled Back Button Link */}
-      <div>
+      {/* Back Link & Header Section */}
+      <div className="flex flex-col items-start">
         <Link
           href="/owner/inventory"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-bold text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
+          className="mb-4 inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-bold tracking-tight text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
         >
           <ArrowLeft className="h-3.5 w-3.5 stroke-[2.5px]" />
           Back to Inventory
@@ -73,27 +87,13 @@ export function IntakeShell({ carId }: { carId: string }) {
 
       {/* Car Profile Header Block */}
       <div className="rounded-2xl border border-line bg-card p-5">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between sm:justify-start gap-3">
-              <h1 className="font-heading text-lg font-semibold text-ink">
-                {car.make} {car.model}
-              </h1>
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="font-heading text-lg font-semibold text-ink">
+              {car.make} {car.model}
+            </h1>
 
-              {/* Bright Status Badge for Mobile / Desktop Header */}
-              <span
-                className={[
-                  "sm:hidden text-[9px] font-mono font-bold uppercase px-2.5 py-1 rounded-md border shrink-0",
-                  isPurchasing
-                    ? "bg-warning text-white border-warning"
-                    : "bg-accent text-white border-accent",
-                ].join(" ")}
-              >
-                {car.status.replace("_", " ")}
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-ink-subtle font-sans">
+            <div className="flex items-center gap-2 text-xs font-medium text-ink-subtle font-sans">
               <span className="font-mono bg-inset border border-line px-1.5 py-0.5 rounded text-[10px] text-ink-muted uppercase">
                 {car.reg_number || "NO REG NUMBER"}
               </span>
@@ -101,15 +101,14 @@ export function IntakeShell({ carId }: { carId: string }) {
               <span className="font-mono text-[11px] font-medium text-ink-muted">
                 {car.year}
               </span>
-              {/* Desktop Inline Purchase Display */}
               {car.purchase_amount && (
-                <span className="hidden sm:inline-flex items-center gap-2">
+                <>
                   <span>•</span>
-                  <span className="text-ink font-semibold">
+                  <span className="text-ink hidden sm:inline-block">
                     Purchase: ₹
                     {Number(car.purchase_amount).toLocaleString("en-IN")}
                   </span>
-                </span>
+                </>
               )}
             </div>
 
@@ -142,33 +141,40 @@ export function IntakeShell({ carId }: { carId: string }) {
 
       {/* Primary Intake Steps Segmented Switch Control */}
       <div className="flex w-full sm:w-max gap-1 overflow-x-auto rounded-xl bg-inset p-1 border border-line no-scrollbar">
-        {TABS.map((t) => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={[
-              "flex-1 sm:flex-initial text-center shrink-0 rounded-lg px-3 sm:px-4 py-2 text-xs font-bold font-sans transition-all duration-200 cursor-pointer",
-              tab === t.key
-                ? "bg-accent text-inverse shadow-sm"
-                : "text-ink-muted hover:text-ink",
-            ].join(" ")}
-          >
-            <div className="flex items-center justify-center gap-1.5">
-              <span>{t.label}</span>
-              {t.key === "documents" && pendingDocsCount > 0 && (
-                <span
-                  className={`inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
-                    tab === t.key
-                      ? "bg-inverse text-accent"
-                      : "bg-rose-600 text-white"
-                  }`}
-                >
-                  {pendingDocsCount}
-                </span>
-              )}
-            </div>
-          </button>
-        ))}
+        {TABS.map((t) => {
+          const isLocked = t.key === "refurbishment" && !isDocsComplete;
+
+          return (
+            <button
+              key={t.key}
+              onClick={() => handleTabClick(t.key)}
+              className={[
+                "flex-1 sm:flex-initial text-center shrink-0 rounded-lg px-3 sm:px-4 py-2 text-xs font-bold font-sans transition-all duration-200 cursor-pointer",
+                tab === t.key
+                  ? "bg-accent text-inverse shadow-sm"
+                  : isLocked
+                  ? "text-ink-subtle opacity-60 cursor-not-allowed"
+                  : "text-ink-muted hover:text-ink",
+              ].join(" ")}
+            >
+              <div className="flex items-center justify-center gap-1.5">
+                <span>{t.label}</span>
+                {isLocked && <Lock className="h-3 w-3 stroke-[2px] text-amber-600" />}
+                {t.key === "documents" && pendingDocsCount > 0 && (
+                  <span
+                    className={`inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
+                      tab === t.key
+                        ? "bg-inverse text-accent"
+                        : "bg-rose-600 text-white"
+                    }`}
+                  >
+                    {pendingDocsCount}
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Context-Switched Stage Panels */}

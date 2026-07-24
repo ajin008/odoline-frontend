@@ -1,14 +1,14 @@
-// components/layout/owner/owner-sidebar.tsx
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ownerNavItems } from "./nav-items";
 import { ShieldCheck, MapPin } from "lucide-react";
+import { useCars } from "@/src/features/cars/hooks/use-cars";
 
 export function OwnerSidebar() {
   const pathname = usePathname();
+  const { data: inStockCars = [] } = useCars(["in_stock"]);
+  const inStockCount = inStockCars.length;
 
   return (
     <aside className="flex h-full flex-col bg-card border border-line rounded-2xl shadow-bento overflow-hidden select-none">
@@ -68,7 +68,7 @@ export function OwnerSidebar() {
                           : "bg-inset text-ink-muted",
                       ].join(" ")}
                     >
-                      0
+                      {inStockCount}
                     </span>
                   )}
                 </Link>
