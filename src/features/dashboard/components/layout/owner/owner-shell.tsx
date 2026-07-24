@@ -34,14 +34,14 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-canvas antialiased p-0 md:p-3 lg:p-4 flex">
+    <div className="h-screen max-h-screen bg-canvas antialiased p-0 md:p-3 lg:p-4 flex overflow-hidden">
       <div className="hidden md:block md:w-[240px] shrink-0 overflow-hidden rounded-2xl md:mr-3 lg:mr-4">
         <OwnerSidebar />
       </div>
 
-      <div className="flex-1 flex flex-col bg-card rounded-2xl border border-line shadow-bento overflow-hidden">
-        <OwnerNavbar /> {/* ← no prop now */}
-        <main className="flex-1 px-6 py-6 overflow-y-auto pb-24 animate-in fade-in duration-300">
+      <div className="flex-1 flex flex-col bg-card rounded-2xl border border-line shadow-bento overflow-hidden h-full min-w-0">
+        <OwnerNavbar />
+        <main className="flex-1 px-6 py-6 overflow-y-auto pb-24 md:pb-6 animate-in fade-in duration-300">
           {children}
         </main>
       </div>

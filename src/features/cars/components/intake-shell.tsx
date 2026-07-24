@@ -1,15 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Lock } from "lucide-react";
+import { ArrowLeft, Lock, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { useCar } from "../hooks/use-car";
+import { useDeleteCar } from "../hooks/use-delete-car";
 import { VehicleSellerForm } from "./vehicle-seller-form";
 import { DocumentsGrid } from "./documents-grid";
 import { useCarDocuments } from "../hooks/use-documents";
 import { DOCUMENT_CONFIGS } from "../type/document-types";
 import { RefurbishmentTab } from "./refurbishment-tab";
+import { ConfirmModal } from "@/src/components/ui/confirm-modal";
+
+const DELETABLE_STATUSES = [
+  "draft",
+  "purchasing",
+  "in_refurbishment",
+  "refurb_complete",
+];
 
 const TABS = [
   { key: "vehicle", label: "Vehicle & Seller" },
@@ -19,6 +28,8 @@ const TABS = [
 
 export function IntakeShell({ carId }: { carId: string }) {
   const { data: car, isLoading: isCarLoading, isError } = useCar(carId);
+  const deleteCarMutation = useDeleteCar();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: documents = [] } = useCarDocuments(carId);
 
@@ -33,6 +44,9 @@ export function IntakeShell({ carId }: { carId: string }) {
     ? car.progress_summary.documents.hard_docs_complete !== false &&
       car.progress_summary.documents.is_complete !== false
     : DOCUMENT_CONFIGS.filter((cfg) => cfg.isHardDoc && !uploadedTypes.has(cfg.type)).length === 0;
+
+  const isDeletable =
+    car?.status && DELETABLE_STATUSES.includes(car.status.toLowerCase());
 
   if (isCarLoading) {
     return (
@@ -74,15 +88,27 @@ export function IntakeShell({ carId }: { carId: string }) {
 
   return (
     <div className="space-y-6 select-none font-sans">
-      {/* Back Link & Header Section */}
-      <div className="flex flex-col items-start">
+      {/* Back Link & Header Action Section */}
+      <div className="flex items-center justify-between gap-4 mb-4">
         <Link
           href="/owner/inventory"
-          className="mb-4 inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-bold tracking-tight text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-bold tracking-tight text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
         >
           <ArrowLeft className="h-3.5 w-3.5 stroke-[2.5px]" />
           Back to Inventory
         </Link>
+
+        {isDeletable && (
+          <button
+            type="button"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={deleteCarMutation.isPending}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+          >
+            <Trash2 className="h-3.5 w-3.5 stroke-[2px]" />
+            Remove Car
+          </button>
+        )}
       </div>
 
       {/* Car Profile Header Block */}
@@ -185,6 +211,19 @@ export function IntakeShell({ carId }: { carId: string }) {
 
         {tab === "refurbishment" && <RefurbishmentTab carId={car.id} />}
       </div>
+
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={() => deleteCarMutation.mutate(car.id)}
+        isLoading={deleteCarMutation.isPending}
+        title="Remove Car Record"
+        description={`Are you sure you want to remove ${car.make} ${car.model} (${car.reg_number || "NO-REG"})? This action will delete the vehicle and its associated records.`}
+        confirmText="Remove Car"
+        cancelText="Cancel"
+        variant="danger"
+        icon={<Trash2 className="h-5.5 w-5.5 stroke-[2.25px]" />}
+      />
     </div>
   );
 }

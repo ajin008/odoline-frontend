@@ -100,4 +100,8 @@ export const carsApi = {
     const res = await apiClient.post(endpoints.cars.addToStock(carId));
     return res.data.data;
   },
+
+  async remove(id: string): Promise<void> {
+    await apiClient.delete(endpoints.cars.detail(id));
+  },
 };

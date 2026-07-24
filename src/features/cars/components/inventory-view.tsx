@@ -44,26 +44,40 @@ export function InventoryView() {
 
   return (
     <div className="space-y-6 select-none font-sans">
-      {/* Sub-tabs: High-Fidelity Active Accent Navigation Wrapper */}
-      <div className="flex gap-1 overflow-x-auto rounded-xl bg-inset p-1 border border-line max-w-max no-scrollbar">
-        {SUB_TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => handleTabChange(tab.key)}
-            className={[
-              "shrink-0 rounded-lg px-4 py-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer",
-              active === tab.key
-                ? "bg-accent text-inverse shadow-sm"
-                : "text-ink-muted hover:text-ink",
-            ].join(" ")}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Sticky Header Block: Title & Filter Tabs remain fixed at top when scrolling */}
+      <div className="sticky -top-6 z-20 bg-card pt-1 pb-4 space-y-4 border-b border-line/60 -mx-6 px-6 backdrop-blur-md">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
+            Inventory Registry
+          </h1>
+          <p className="mt-0.5 text-xs font-medium text-ink-muted">
+            Track assets through pipeline states, processing channels, and live stock yards.
+          </p>
+        </div>
+
+        {/* Sub-tabs Navigation */}
+        <div className="flex gap-1 overflow-x-auto rounded-xl bg-inset p-1 border border-line max-w-max no-scrollbar">
+          {SUB_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => handleTabChange(tab.key)}
+              className={[
+                "shrink-0 rounded-lg px-4 py-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer",
+                active === tab.key
+                  ? "bg-accent text-inverse shadow-sm"
+                  : "text-ink-muted hover:text-ink",
+              ].join(" ")}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Grid Matrix output flow */}
-      <CarList statuses={[...activeTab.statuses]} />
+      {/* Grid Matrix Output Flow */}
+      <div className="pt-1">
+        <CarList statuses={[...activeTab.statuses]} />
+      </div>
     </div>
   );
 }

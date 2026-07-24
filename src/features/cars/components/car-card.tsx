@@ -49,6 +49,11 @@ export function CarCard({ car }: { car: Car }) {
         })
       : null;
 
+  // Asking Price (from server-computed selling_price or landing_price)
+  const askingPriceNum = Number(car.selling_price || car.landing_price || 0);
+  const formattedAskingPrice =
+    askingPriceNum > 0 ? `₹${askingPriceNum.toLocaleString("en-IN")}` : null;
+
   return (
     <Link
       href={`/owner/cars/${car.id}/intake`}
@@ -194,6 +199,18 @@ export function CarCard({ car }: { car: Car }) {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Asking Price Display Row */}
+          {formattedAskingPrice && (
+            <div className="pt-2 border-t border-line/50 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
+                Asking Price
+              </span>
+              <span className="text-xs font-bold font-mono text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                {formattedAskingPrice}
+              </span>
             </div>
           )}
         </div>
