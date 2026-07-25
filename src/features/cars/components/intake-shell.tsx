@@ -103,10 +103,10 @@ export function IntakeShell({ carId }: { carId: string }) {
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
             disabled={deleteCarMutation.isPending}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-rose-500/20 bg-rose-500/10 px-3.5 py-2 text-xs font-bold text-rose-700 hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-700 hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 shadow-xs"
+            title="Remove Car"
           >
-            <Trash2 className="h-3.5 w-3.5 stroke-[2px]" />
-            Remove Car
+            <Trash2 className="h-4 w-4 stroke-[2px]" />
           </button>
         )}
       </div>
