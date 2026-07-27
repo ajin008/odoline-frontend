@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
   MapPin,
@@ -16,6 +18,11 @@ import { CarThumbnail } from "./car-thumbnail";
 
 export function CarCard({ car }: { car: Car }) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isInStock = car.status.toLowerCase() === "in_stock";
 
@@ -72,8 +79,23 @@ export function CarCard({ car }: { car: Car }) {
         <div className="relative aspect-video w-full bg-inset border-b border-line/40 overflow-hidden shrink-0">
           <CarThumbnail
             carId={car.id}
+            thumbnailUrl={car.thumbnail_url}
             onPreview={(url) => setPreviewUrl(url)}
           />
+          {isInStock && holdingDays !== null && (
+            <div
+              className={[
+                "absolute top-2 left-2 z-10 flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold font-mono tracking-tight shadow-sm backdrop-blur-xs border select-none",
+                holdingDays >= 45
+                  ? "bg-red-600/90 text-white border-red-500/50"
+                  : holdingDays >= 30
+                  ? "bg-amber-600/90 text-white border-amber-500/50"
+                  : "bg-black/60 text-white/90 border-white/20",
+              ].join(" ")}
+            >
+              <span>{holdingDays}d in stock</span>
+            </div>
+          )}
         </div>
 
         {/* Content Section */}
@@ -81,9 +103,16 @@ export function CarCard({ car }: { car: Car }) {
           <div className="space-y-2.5">
             {/* Header Title & Main Status Badge */}
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-heading text-base font-semibold text-ink tracking-tight line-clamp-1 group-hover:text-accent transition-colors duration-200">
-                {car.make} {car.model}
-              </h3>
+              <div className="min-w-0 flex-1">
+                {/* Make / Brand (Upper sub-heading) */}
+                <p className="text-[10px] font-mono font-bold tracking-widest text-ink-muted uppercase truncate">
+                  {car.make}
+                </p>
+                {/* Model Name (Main headline) */}
+                <h3 className="font-heading text-base font-bold text-ink tracking-tight line-clamp-1 group-hover:text-accent transition-colors duration-200 mt-0.5">
+                  {car.model}
+                </h3>
+              </div>
 
               <span
                 className={[
@@ -241,48 +270,54 @@ export function CarCard({ car }: { car: Car }) {
       </Link>
 
       {/* Image Preview Modal */}
-      {previewUrl && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-in fade-in duration-200"
-          onClick={() => setPreviewUrl(null)}
-        >
+      {previewUrl &&
+        mounted &&
+        createPortal(
           <div
-            className="relative flex flex-col max-w-4xl w-full max-h-[90vh] bg-card border border-line rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-200"
+            onClick={() => setPreviewUrl(null)}
           >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-line px-5 py-4 bg-card z-10">
-              <div>
-                <h3 className="text-sm font-bold tracking-tight text-ink font-heading">
-                  {car.make} {car.model}
-                </h3>
-                <p className="text-[11px] font-mono text-ink-muted">
-                  {car.reg_number || "NO-REG"} • {car.year}
-                </p>
+            <div
+              className="relative flex flex-col max-w-4xl w-full max-h-[90vh] bg-card border border-line rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between border-b border-line px-5 py-4 bg-card z-10">
+                <div>
+                  <p className="text-[10px] font-mono font-bold tracking-widest text-ink-muted uppercase">
+                    {car.make}
+                  </p>
+                  <h3 className="text-base font-bold tracking-tight text-ink font-heading mt-0.5">
+                    {car.model}
+                  </h3>
+                  <p className="text-[11px] font-mono text-ink-muted mt-0.5">
+                    {car.reg_number || "NO-REG"} • {car.year}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setPreviewUrl(null)}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
+                  title="Close preview"
+                >
+                  <X className="h-5 w-5 stroke-[2.25px]" />
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setPreviewUrl(null)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
-                title="Close preview"
-              >
-                <X className="h-5 w-5 stroke-[2.25px]" />
-              </button>
+              {/* Modal Image Body */}
+              <div className="flex-1 overflow-auto bg-inset p-4 flex items-center justify-center min-h-[300px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={previewUrl}
+                  alt={`${car.make} ${car.model} Preview`}
+                  className="max-h-[75vh] w-auto max-w-full rounded-xl shadow-md object-contain"
+                />
+              </div>
             </div>
-
-            {/* Modal Image Body */}
-            <div className="flex-1 overflow-auto bg-inset p-4 flex items-center justify-center min-h-[300px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={previewUrl}
-                alt={`${car.make} ${car.model} Preview`}
-                className="max-h-[75vh] w-auto max-w-full rounded-xl shadow-md object-contain"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }

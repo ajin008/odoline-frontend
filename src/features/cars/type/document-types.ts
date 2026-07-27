@@ -16,6 +16,7 @@ export interface CarDocument {
   car_id: string;
   document_type: DocumentType;
   file_path: string;
+  url?: string;
   original_name: string;
   mime_type: string;
   created_at: string;

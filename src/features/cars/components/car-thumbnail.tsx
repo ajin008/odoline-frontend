@@ -1,49 +1,43 @@
-/* eslint-disable no-console */
 // src/features/cars/components/car-thumbnail.tsx
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Car as CarIcon, Image as ImageIcon, Eye } from "lucide-react";
-import { useCarDocuments } from "../hooks/use-documents";
-import { documentsApi } from "../api/documents-api";
+import { useCarDocuments, usePresignedUrl } from "../hooks/use-documents";
 
 export function CarThumbnail({
   carId,
+  thumbnailUrl: initialThumbnailUrl,
   onPreview,
 }: {
   carId: string;
+  thumbnailUrl?: string | null;
   onPreview?: (url: string) => void;
 }) {
-  const { data: documents, isLoading: docsLoading } = useCarDocuments(carId);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [imageLoading, setImageLoading] = useState(false);
+  // Only fetch documents if no batch-presigned thumbnail URL is passed
+  const { data: documents, isLoading: docsLoading } = useCarDocuments(carId, {
+    enabled: !initialThumbnailUrl,
+  });
 
-  useEffect(() => {
-    const fetchPresignedUrl = async () => {
-      if (!documents || documents.length === 0) return;
+  const purchasePhoto = documents?.find(
+    (d) => d.document_type === "purchase_photo"
+  );
 
-      const purchasePhoto = documents.find(
-        (d) => d.document_type === "purchase_photo"
-      );
-      if (!purchasePhoto) return;
+  // Cached presigned URL fallback if needed
+  const { data: presignedUrl, isLoading: urlLoading } = usePresignedUrl(
+    carId,
+    purchasePhoto?.id,
+    { enabled: !initialThumbnailUrl && !purchasePhoto?.url && !!purchasePhoto }
+  );
 
-      setImageLoading(true);
-      try {
-        const url = await documentsApi.getPresignedUrl(carId, purchasePhoto.id);
-        setImageUrl(url);
-      } catch (error) {
-        console.error("Failed to load thumbnail", error);
-      } finally {
-        setImageLoading(false);
-      }
-    };
+  const imageUrl = initialThumbnailUrl || purchasePhoto?.url || presignedUrl;
 
-    fetchPresignedUrl();
-  }, [documents, carId]);
+  const isLoading =
+    !initialThumbnailUrl &&
+    (docsLoading || (!!purchasePhoto && !purchasePhoto?.url && urlLoading));
 
   // Loading State
-  if (docsLoading || imageLoading) {
+  if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-inset animate-pulse">
         <ImageIcon className="h-6 w-6 text-ink-subtle opacity-30" />

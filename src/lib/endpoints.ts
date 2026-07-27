@@ -29,6 +29,7 @@ export const endpoints = {
 
   dashboard: {
     stats: "/dashboard/stats",
+    attention: "/dashboard/attention",
   },
 
   config: {

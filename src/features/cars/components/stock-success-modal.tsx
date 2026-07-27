@@ -1,7 +1,9 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 // File: src/features/cars/components/stock-success-modal.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +17,11 @@ export function StockSuccessModal({
   redirectPath = "/owner/inventory?tab=in_stock",
 }: StockSuccessModalProps) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -26,10 +33,10 @@ export function StockSuccessModal({
     return () => clearTimeout(timer);
   }, [isOpen, redirectPath, router]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-200 select-none font-sans">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md p-4 animate-in fade-in duration-200 select-none font-sans">
       <div className="relative flex flex-col items-center text-center max-w-sm w-full rounded-3xl border border-emerald-500/30 bg-card p-8 animate-in zoom-in-95 duration-300">
         {/* Animated Tick Mark Circle Container with Micro-Scale Physics Animation */}
         <div className="relative mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 border-2 border-emerald-500/20 text-emerald-600">
@@ -60,6 +67,7 @@ export function StockSuccessModal({
           <span>Redirecting to inventory...</span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

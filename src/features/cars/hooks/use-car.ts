@@ -27,6 +27,8 @@ export function useUpdateCarMargin(carId: string) {
     onSuccess: () => {
       toast.success("Margin updated & selling price recalculated");
       queryClient.invalidateQueries({ queryKey: queryKeys.cars.detail(carId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
     },
     onError: () => {
       toast.error("Failed to update margin");

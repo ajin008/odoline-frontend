@@ -62,6 +62,11 @@ export interface Car {
   created_at: string;
   updated_at?: string;
 
+  days_in_stock?: number | null;
+
+  // Batch-generated 7-day presigned thumbnail URL
+  thumbnail_url?: string | null;
+
   // Enriched progress summary metadata
   progress_summary?: ProgressSummary;
 }
@@ -73,9 +78,13 @@ export const carsApi = {
     return res.data.data;
   },
 
-  async getList(statuses?: string[]): Promise<Car[]> {
+  async getList(statuses?: string[], sort?: string): Promise<Car[]> {
+    const params: Record<string, string> = {};
+    if (statuses?.length) params.status = statuses.join(",");
+    if (sort) params.sort = sort;
+
     const res = await apiClient.get(endpoints.cars.list, {
-      params: statuses?.length ? { status: statuses.join(",") } : undefined,
+      params: Object.keys(params).length ? params : undefined,
     });
     return res.data.data;
   },

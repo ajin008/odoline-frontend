@@ -24,11 +24,13 @@ export function useAddRefurbItem(carId: string) {
       refurbishmentApi.create(carId, data),
     onSuccess: () => {
       toast.success("Workshop task added successfully");
-      // Invalidate both items list and the parent car detail (to refresh server-computed totals/landing price)
+      // Invalidate refurb items, car detail, car lists across all status tabs, and dashboard counts
       queryClient.invalidateQueries({
         queryKey: queryKeys.cars.refurbItems(carId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.cars.detail(carId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
     },
     onError: () => {
       toast.error("Failed to add workshop task");
@@ -57,6 +59,8 @@ export function useUpdateRefurbItem() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.cars.detail(updatedItem.car_id),
       });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
     },
     onError: () => {
       toast.error("Failed to update task");
@@ -75,6 +79,8 @@ export function useDeleteRefurbItem(carId: string) {
         queryKey: queryKeys.cars.refurbItems(carId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.cars.detail(carId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });
     },
     onError: () => {
       toast.error("Failed to remove task");

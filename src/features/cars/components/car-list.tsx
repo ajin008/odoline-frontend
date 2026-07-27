@@ -5,8 +5,14 @@ import { useCars } from "../hooks/use-cars";
 import { CarCard } from "./car-card";
 import { PackageOpen } from "lucide-react";
 
-export function CarList({ statuses }: { statuses?: string[] }) {
-  const { data: cars, isLoading, isError } = useCars(statuses);
+export function CarList({
+  statuses,
+  sort,
+}: {
+  statuses?: string[];
+  sort?: string;
+}) {
+  const { data: cars, isLoading, isError } = useCars(statuses, sort);
 
   if (isLoading) {
     return (
