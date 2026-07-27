@@ -6,6 +6,7 @@ export const endpoints = {
     logout: "/auth/logout",
     refresh: "/auth/refresh",
     me: "/auth/me",
+    changePin: "/auth/change-pin",
   },
 
   cars: {

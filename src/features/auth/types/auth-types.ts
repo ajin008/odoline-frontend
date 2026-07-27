@@ -27,3 +27,8 @@ export interface LoginCredentials {
   phone: string;
   pin: string;
 }
+
+export interface ChangePinPayload {
+  current_pin: string;
+  new_pin: string;
+}

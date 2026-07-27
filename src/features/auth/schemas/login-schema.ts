@@ -13,3 +13,20 @@ export const loginSchema = z.object({
 });
 
 export type LoginFormValues = z.infer<typeof loginSchema>;
+
+export const changePinSchema = z
+  .object({
+    current_pin: z.string().regex(/^\d{6}$/, "Enter your 6-digit PIN"),
+    new_pin: z.string().regex(/^\d{6}$/, "New PIN must be 6 digits"),
+    confirm_pin: z.string(),
+  })
+  .refine((d) => d.new_pin === d.confirm_pin, {
+    message: "PINs don't match",
+    path: ["confirm_pin"],
+  })
+  .refine((d) => d.current_pin !== d.new_pin, {
+    message: "New PIN must be different",
+    path: ["new_pin"],
+  });
+
+export type ChangePinValues = z.infer<typeof changePinSchema>;

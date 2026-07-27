@@ -10,7 +10,6 @@ import {
   Users,
   Sparkles,
   Layers,
-  Settings,
   Receipt,
 } from "lucide-react";
 
@@ -30,7 +29,6 @@ export function OwnerBottomTabs() {
     { href: "/owner/expenses", label: "Expenses", icon: Receipt },
     { href: "/owner/campaigns", label: "Marketing", icon: Sparkles },
     { href: "/owner/categories", label: "Categories", icon: Layers },
-    { href: "/owner/settings", label: "Settings", icon: Settings },
   ];
 
   const allTargetItems = [...realMobileItems, ...dummyOverflowItems];
