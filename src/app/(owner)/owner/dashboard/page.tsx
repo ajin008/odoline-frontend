@@ -6,6 +6,9 @@ import { QuickActions } from "@/src/features/dashboard/components/QuickActions";
 export default function DashboardPage() {
   return (
     <div className="w-full space-y-6 select-none font-sans">
+      {/* Primary Intake Action */}
+      <QuickActions />
+
       {/* ------------------------------------------------------------- */}
       {/* INTEGRATED SINGLE-ROW DESKTOP GRID (60% / 20% / 20% RATIO)   */}
       {/* ------------------------------------------------------------- */}
@@ -25,9 +28,6 @@ export default function DashboardPage() {
           <NeedsAttention />
         </div>
       </div>
-
-      {/* Primary Intake Action */}
-      <QuickActions />
     </div>
   );
 }
