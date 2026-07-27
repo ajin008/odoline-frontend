@@ -60,17 +60,17 @@ export function InventoryView() {
         </div>
 
         {/* Sub-tabs Navigation & Sort Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           {/* Scrollable Sub-tabs */}
-          <div className="flex gap-1 overflow-x-auto rounded-xl bg-inset p-1 border border-line w-full sm:w-auto no-scrollbar">
+          <div className="flex gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-auto no-scrollbar">
             {SUB_TABS.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
                 className={[
-                  "flex-1 sm:flex-none text-center rounded-lg px-3 sm:px-4 py-1.5 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+                  "flex-1 sm:flex-none text-center rounded-md px-3 sm:px-4 py-1.5 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
                   active === tab.key
-                    ? "bg-accent text-inverse shadow-sm"
+                    ? "bg-accent text-inverse shadow-xs"
                     : "text-ink-muted hover:text-ink",
                 ].join(" ")}
               >
@@ -79,24 +79,24 @@ export function InventoryView() {
             ))}
           </div>
 
-          {/* Colored Mobile-Optimized Sort Bar (Below tabs on mobile, inline on desktop) */}
+          {/* Minimalist Compact Sort Control */}
           {active === "in_stock" && (
-            <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto rounded-xl border border-accent/30 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent shadow-2xs transition-colors">
-              <span className="font-bold uppercase tracking-widest text-[10px] text-accent/80 shrink-0">
-                Sort By
+            <div className="flex items-center justify-between sm:justify-start gap-1.5 self-end sm:self-auto rounded-md border border-line/40 bg-card px-2.5 py-1 text-[11px] font-medium text-ink-muted transition-colors hover:border-line">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle shrink-0">
+                Sort:
               </span>
               <div className="relative inline-flex items-center">
                 <select
                   value={stockSort}
                   onChange={(e) => setStockSort(e.target.value)}
-                  className="appearance-none bg-transparent pr-4 font-bold text-accent text-xs focus:outline-none cursor-pointer leading-none text-right sm:text-left"
+                  className="appearance-none bg-transparent pr-3.5 font-medium text-ink text-[11px] focus:outline-none cursor-pointer leading-none text-right sm:text-left"
                 >
-                  <option value="newest_in_stock" className="text-ink bg-card font-medium">Recently Added</option>
-                  <option value="oldest_in_stock" className="text-ink bg-card font-medium">Oldest First</option>
-                  <option value="price_high" className="text-ink bg-card font-medium">Price: High-Low</option>
-                  <option value="price_low" className="text-ink bg-card font-medium">Price: Low-High</option>
+                  <option value="newest_in_stock" className="text-ink bg-card">Recently Added</option>
+                  <option value="oldest_in_stock" className="text-ink bg-card">Oldest First</option>
+                  <option value="price_high" className="text-ink bg-card">Price: High-Low</option>
+                  <option value="price_low" className="text-ink bg-card">Price: Low-High</option>
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-accent shrink-0" />
+                <ChevronDown className="pointer-events-none absolute right-0 h-3 w-3 text-ink-subtle shrink-0" />
               </div>
             </div>
           )}
