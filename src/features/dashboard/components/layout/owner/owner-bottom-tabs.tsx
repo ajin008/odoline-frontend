@@ -47,7 +47,7 @@ export function OwnerBottomTabs() {
       {/* FLOATING DETACHED DOCK NAVIGATION BAR                         */}
       {/* ------------------------------------------------------------- */}
       {/* Lifted using bottom-5, bounded left/right with mx-4, and full pill rounding */}
-      <div className="fixed bottom-5 left-4 right-4 z-50 bg-card/85 backdrop-blur-xl border border-line rounded-full shadow-bento md:hidden select-none max-w-md mx-auto">
+      <div className="fixed bottom-5 left-4 right-4 z-50 bg-card/85 backdrop-blur-xl border border-line rounded-full shadow-bento md:hidden select-none max-w-md mx-auto pointer-events-auto">
         <nav className="flex h-14 items-center justify-around px-2">
           {primaryItems.map((item) => {
             const active = pathname.startsWith(item.href) && !isMoreOpen;
@@ -129,12 +129,12 @@ export function OwnerBottomTabs() {
           {/* Backdrop Mask */}
           <div
             onClick={() => setIsMoreOpen(false)}
-            className="fixed inset-0 z-40 bg-ink/15 backdrop-blur-sm transition-opacity md:hidden animate-in fade-in duration-200"
+            className="fixed inset-0 z-40 bg-ink/15 backdrop-blur-sm transition-opacity md:hidden animate-in fade-in duration-200 pointer-events-auto"
           />
 
           {/* Floating Action Menu Drawer Sheet */}
           {/* Positioned cleanly above the floating dock bar with bottom-24 */}
-          <div className="fixed bottom-24 left-4 right-4 z-40 max-h-[55vh] overflow-y-auto bg-card border border-line rounded-[2rem] shadow-bento p-4 space-y-1.5 md:hidden max-w-md mx-auto animate-in slide-in-from-bottom-6 cubic-bezier(0.16, 1, 0.3, 1) duration-300">
+          <div className="fixed bottom-24 left-4 right-4 z-40 max-h-[55vh] overflow-y-auto bg-card border border-line rounded-[2rem] shadow-bento p-4 space-y-1.5 md:hidden max-w-md mx-auto animate-in slide-in-from-bottom-6 cubic-bezier(0.16, 1, 0.3, 1) duration-300 pointer-events-auto">
             <div className="text-[10px] font-mono font-bold tracking-widest text-ink-subtle uppercase px-3 py-1.5 border-b border-line/40 mb-2">
               System Applications
             </div>
