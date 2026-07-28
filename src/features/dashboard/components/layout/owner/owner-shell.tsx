@@ -3,6 +3,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { isAxiosError } from "axios";
 import { useMe } from "@/src/features/auth/hooks/use-me";
 import { OwnerSidebar } from "./owner-sidebar";
 import { OwnerNavbar } from "./owner-navbar";
@@ -10,14 +11,16 @@ import { OwnerBottomTabs } from "./owner-bottom-tabs";
 
 export function OwnerShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { data: user, isLoading, isError } = useMe();
+  const { data: user, isLoading, error } = useMe();
+  const isUnauthorized = isAxiosError(error) && error.response?.status === 401;
 
-  // Redirect if not an owner (or not logged in). Runs when the query resolves.
+  // Redirect if not logged in (401) or not an owner. Other failures (e.g. a
+  // transient 5xx) are not treated as "logged out" — they just fail to load.
   useEffect(() => {
-    if (isError || (user && user.role !== "owner")) {
+    if (isUnauthorized || (user && user.role !== "owner")) {
       router.replace("/login");
     }
-  }, [user, isError, router]);
+  }, [user, isUnauthorized, router]);
 
   // While the session is being verified, show the loading spinner.
   if (isLoading) {
