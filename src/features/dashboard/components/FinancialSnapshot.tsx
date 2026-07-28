@@ -36,7 +36,7 @@ export function FinancialSnapshot() {
         >
           <div className="space-y-0.5 min-w-0 flex-1">
             <span className="text-[11px] font-semibold text-slate-400 group-hover:text-white transition-colors block truncate">
-              Capital Tied Up
+              Purchase + Refurb
             </span>
             {isLoading ? (
               <div className="h-5 w-20 animate-pulse rounded-md bg-white/10 border border-white/20" />
