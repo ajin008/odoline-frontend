@@ -12,16 +12,15 @@ export default function DashboardPage() {
       {/* TIER 1: Executive KPI Metrics Strip (4 Horizontal Status Cards) */}
       <DashboardStats />
 
-      {/* TIER 2: Analytics & Operational Responsive Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Main Column: Capital & Valuation Analytics (8 Columns) */}
-        <div className="lg:col-span-8">
+      {/* TIER 2: Analytics & Operational Grid (70% / 30% Ratio) */}
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-5 items-stretch">
+        {/* Capital Overview (70% Width) */}
+        <div className="lg:col-span-7 flex">
           <FinancialSnapshot />
         </div>
 
-        {/* Right Sidebar Column: Operational Risks & Future Extension Slot (4 Columns) */}
-        <div className="lg:col-span-4 space-y-5">
-          {/* Operational Risks & Action Items */}
+        {/* Operational Attention & Risks (30% Width) */}
+        <div className="lg:col-span-3 flex">
           <NeedsAttention />
         </div>
       </div>

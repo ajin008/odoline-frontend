@@ -16,13 +16,13 @@ export function QuickActions() {
         </span>
       </div>
 
-      {/* Action Button: Accent BG & White Text on Mobile */}
+      {/* Action Button: Flat clean button without shadow */}
       <Link
         href="/owner/cars/add"
-        className="group relative flex items-center justify-between rounded-lg border border-accent md:border-line/40 bg-accent md:bg-card p-3.5 sm:p-4 text-inverse md:text-ink transition-all duration-200 hover:border-accent/50 md:hover:bg-accent/5 active:scale-[0.98] shadow-sm md:shadow-2xs"
+        className="group relative flex items-center justify-between rounded-xl border border-accent md:border-line/40 bg-accent md:bg-card p-3.5 sm:p-4 text-inverse md:text-ink transition-all duration-200 hover:border-accent/50 md:hover:bg-accent/5 active:scale-[0.98]"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-md bg-white/20 md:bg-accent text-white md:text-inverse shadow-xs transition-transform duration-200 group-hover:scale-105">
+          <div className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-lg bg-white/20 md:bg-accent text-white md:text-inverse transition-transform duration-200 group-hover:scale-105">
             <Plus className="h-4 w-4 sm:h-4.5 sm:w-4.5 stroke-[2.5px]" />
           </div>
           <div>
