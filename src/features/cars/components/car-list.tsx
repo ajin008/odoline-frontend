@@ -18,8 +18,8 @@ export function CarList({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {[1, 2, 3, 4, 5].map((i) => (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
             className="h-[280px] animate-pulse rounded-2xl bg-inset border border-line"
@@ -75,7 +75,7 @@ export function CarList({
 
   return (
     /* Shifted seamlessly into modern 5-column architectural layout */
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {cars.map((car) => (
         <CarCard key={car.id} car={car} />
       ))}
