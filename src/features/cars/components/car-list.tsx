@@ -3,7 +3,7 @@
 
 import { useCars } from "../hooks/use-cars";
 import { CarCard } from "./car-card";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, SearchX } from "lucide-react";
 
 export function CarList({
   statuses,
@@ -40,6 +40,23 @@ export function CarList({
   }
 
   if (!cars || cars.length === 0) {
+    if (search?.trim()) {
+      return (
+        <div className="rounded-2xl border border-dashed border-ink-subtle/30 bg-card p-12 text-center max-w-md mx-auto my-6 select-none">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-inset text-ink-subtle border border-line mx-auto mb-4">
+            <SearchX className="h-5 w-5 stroke-[1.5px]" />
+          </div>
+          <p className="text-sm font-semibold text-ink font-sans tracking-tight">
+            No car found
+          </p>
+          <p className="mt-1 text-xs text-ink-subtle font-sans">
+            No results for &ldquo;{search}&rdquo;. Try a different make or
+            model.
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="rounded-2xl border border-dashed border-ink-subtle/30 bg-card p-12 text-center max-w-md mx-auto my-6 select-none">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-inset text-ink-subtle border border-line mx-auto mb-4">
