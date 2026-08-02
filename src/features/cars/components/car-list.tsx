@@ -8,11 +8,13 @@ import { PackageOpen } from "lucide-react";
 export function CarList({
   statuses,
   sort,
+  search,
 }: {
   statuses?: string[];
   sort?: string;
+  search?: string;
 }) {
-  const { data: cars, isLoading, isError } = useCars(statuses, sort);
+  const { data: cars, isLoading, isError } = useCars(statuses, sort, search);
 
   if (isLoading) {
     return (

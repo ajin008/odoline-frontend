@@ -78,10 +78,15 @@ export const carsApi = {
     return res.data.data;
   },
 
-  async getList(statuses?: string[], sort?: string): Promise<Car[]> {
+  async getList(
+    statuses?: string[],
+    sort?: string,
+    search?: string
+  ): Promise<Car[]> {
     const params: Record<string, string> = {};
     if (statuses?.length) params.status = statuses.join(",");
     if (sort) params.sort = sort;
+    if (search?.trim()) params.search = search.trim();
 
     const res = await apiClient.get(endpoints.cars.list, {
       params: Object.keys(params).length ? params : undefined,

@@ -4,10 +4,11 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useDebounce } from "use-debounce";
 import { CarList } from "./car-list";
 import { PIPELINE_STATUSES } from "../status-config";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
 
 const SUB_TABS = [
   { key: "pipeline", label: "Pipeline", statuses: PIPELINE_STATUSES },
@@ -33,6 +34,10 @@ export function InventoryView() {
   // Default In Stock tab to newest_in_stock (Recently Added)
   const [stockSort, setStockSort] = useState<string>("newest_in_stock");
 
+  // Search — debounced so we don't fire a request on every keystroke.
+  const [searchInput, setSearchInput] = useState("");
+  const [search] = useDebounce(searchInput, 400);
+
   useEffect(() => {
     if (tabParam && SUB_TABS.some((t) => t.key === tabParam)) {
       setActive(tabParam);
@@ -41,6 +46,7 @@ export function InventoryView() {
 
   const handleTabChange = (key: TabKey) => {
     setActive(key);
+    if (key !== "in_stock") setSearchInput("");
     router.replace(`/owner/inventory?tab=${key}`, { scroll: false });
   };
 
@@ -79,24 +85,49 @@ export function InventoryView() {
             ))}
           </div>
 
-          {/* Sort Option Control (h-9 Height matching Subtab box height) */}
+          {/* In Stock-only controls: search + sort */}
           {active === "in_stock" && (
-            <div className="flex h-9 items-center justify-between sm:justify-start gap-1.5 shrink-0 rounded-lg border border-line/40 bg-card px-3 text-xs font-medium text-ink-muted transition-colors hover:border-line">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle shrink-0">
-                Sort:
-              </span>
-              <div className="relative inline-flex items-center">
-                <select
-                  value={stockSort}
-                  onChange={(e) => setStockSort(e.target.value)}
-                  className="appearance-none bg-transparent pr-4 font-bold text-ink text-xs focus:outline-none cursor-pointer leading-none text-right sm:text-left"
-                >
-                  <option value="newest_in_stock" className="text-ink bg-card">Recently Added</option>
-                  <option value="oldest_in_stock" className="text-ink bg-card">Oldest First</option>
-                  <option value="price_high" className="text-ink bg-card">Price: High-Low</option>
-                  <option value="price_low" className="text-ink bg-card">Price: Low-High</option>
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-ink-subtle shrink-0 stroke-[2.25px]" />
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 shrink-0">
+              {/* Search — make/model only, scoped to in_stock cars */}
+              <div className="relative h-9">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-subtle stroke-[2px]" />
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="Search by make or model"
+                  className="h-9 w-full sm:w-56 rounded-lg border border-line/40 bg-card pl-9 pr-8 text-xs font-medium text-ink placeholder:text-ink-subtle focus:border-accent focus:outline-none transition-colors"
+                />
+                {searchInput && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchInput("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <X className="h-3.5 w-3.5 stroke-[2px]" />
+                  </button>
+                )}
+              </div>
+
+              {/* Sort Option Control (h-9 Height matching Subtab box height) */}
+              <div className="flex h-9 items-center justify-between sm:justify-start gap-1.5 shrink-0 rounded-lg border border-line/40 bg-card px-3 text-xs font-medium text-ink-muted transition-colors hover:border-line">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle shrink-0">
+                  Sort:
+                </span>
+                <div className="relative inline-flex items-center">
+                  <select
+                    value={stockSort}
+                    onChange={(e) => setStockSort(e.target.value)}
+                    className="appearance-none bg-transparent pr-4 font-bold text-ink text-xs focus:outline-none cursor-pointer leading-none text-right sm:text-left"
+                  >
+                    <option value="newest_in_stock" className="text-ink bg-card">Recently Added</option>
+                    <option value="oldest_in_stock" className="text-ink bg-card">Oldest First</option>
+                    <option value="price_high" className="text-ink bg-card">Price: High-Low</option>
+                    <option value="price_low" className="text-ink bg-card">Price: Low-High</option>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-ink-subtle shrink-0 stroke-[2.25px]" />
+                </div>
               </div>
             </div>
           )}
@@ -108,6 +139,7 @@ export function InventoryView() {
         <CarList
           statuses={[...activeTab.statuses]}
           sort={active === "in_stock" ? stockSort : undefined}
+          search={active === "in_stock" ? search : undefined}
         />
       </div>
     </div>
