@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   TrendingUp,
   MoreVertical,
-  IndianRupee,
   PieChart,
   BarChart2,
   ArrowUpRight,
@@ -13,10 +12,14 @@ import {
   Coins,
 } from "lucide-react";
 import { useDashboardStats } from "../hooks/use-dashboard-stats";
-import { formatCompactCurrency, formatFullCurrency } from "@/src/utils/currency";
+import {
+  formatCompactCurrency,
+  formatFullCurrency,
+} from "@/src/utils/currency";
 
 export function FinancialSnapshot() {
   const { data, isLoading, isError } = useDashboardStats();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 
   if (isError) return null;
@@ -88,8 +91,8 @@ export function FinancialSnapshot() {
               </span>
               {roiPct > 0 && (
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full font-mono">
-                  <TrendingUp className="h-3 w-3 stroke-[2.5px]" />
-                  +{roiPct.toFixed(1)}% ROI
+                  <TrendingUp className="h-3 w-3 stroke-[2.5px]" />+
+                  {roiPct.toFixed(1)}% ROI
                 </span>
               )}
             </div>
@@ -99,13 +102,20 @@ export function FinancialSnapshot() {
         {/* Key Breakdown Details Pill */}
         <div className="rounded-xl border border-line/50 bg-inset p-2.5 space-y-1.5 text-xs font-sans">
           <div className="flex items-center justify-between">
-            <span className="text-ink-muted text-[11px]">Total Capital Invested:</span>
-            <span className="font-mono font-bold text-ink" title={formatFullCurrency(capitalTiedUpNum)}>
+            <span className="text-ink-muted text-[11px]">
+              Total Capital Invested:
+            </span>
+            <span
+              className="font-mono font-bold text-ink"
+              title={formatFullCurrency(capitalTiedUpNum)}
+            >
               {formatCompactCurrency(capitalTiedUpNum)}
             </span>
           </div>
           <div className="flex items-center justify-between border-t border-line/30 pt-1.5">
-            <span className="text-ink-muted text-[11px]">Active In-Stock Fleet:</span>
+            <span className="text-ink-muted text-[11px]">
+              Active In-Stock Fleet:
+            </span>
             <span className="font-mono font-bold text-ink">
               {totalStockCount} Vehicles
             </span>
@@ -132,7 +142,9 @@ export function FinancialSnapshot() {
           {/* Invested Capital Bar */}
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[10px] font-sans">
-              <span className="text-ink-muted font-medium">Invested Capital</span>
+              <span className="text-ink-muted font-medium">
+                Invested Capital
+              </span>
               <span className="font-mono font-bold text-ink">
                 {formatCompactCurrency(capitalTiedUpNum)}
               </span>
@@ -140,7 +152,9 @@ export function FinancialSnapshot() {
             <div className="h-2 w-full rounded-full bg-inset border border-line/60 overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 transition-all duration-500"
-                style={{ width: `${Math.min(100, (capitalTiedUpNum / total) * 100)}%` }}
+                style={{
+                  width: `${Math.min(100, (capitalTiedUpNum / total) * 100)}%`,
+                }}
               />
             </div>
           </div>
@@ -148,7 +162,9 @@ export function FinancialSnapshot() {
           {/* Expected Profit Bar with Glowing Tooltip Callout */}
           <div className="space-y-1 relative">
             <div className="flex items-center justify-between text-[10px] font-sans">
-              <span className="text-ink-muted font-medium">Expected Gross Profit</span>
+              <span className="text-ink-muted font-medium">
+                Expected Gross Profit
+              </span>
               <span className="font-mono font-bold text-emerald-600">
                 +{formatCompactCurrency(profit)}
               </span>
