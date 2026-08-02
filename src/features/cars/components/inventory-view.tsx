@@ -61,14 +61,14 @@ export function InventoryView() {
 
         {/* Sub-tabs Navigation & Sort Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          {/* Scrollable Sub-tabs */}
-          <div className="flex gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-auto no-scrollbar">
+          {/* Scrollable Sub-tabs Container (h-9 Height) */}
+          <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-auto no-scrollbar shrink-0">
             {SUB_TABS.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
                 className={[
-                  "flex-1 sm:flex-none text-center rounded-md px-3 sm:px-4 py-1.5 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+                  "flex-1 sm:flex-none h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
                   active === tab.key
                     ? "bg-accent text-inverse shadow-xs"
                     : "text-ink-muted hover:text-ink",
@@ -79,9 +79,9 @@ export function InventoryView() {
             ))}
           </div>
 
-          {/* Minimalist Compact Sort Control */}
+          {/* Sort Option Control (h-9 Height matching Subtab box height) */}
           {active === "in_stock" && (
-            <div className="flex items-center justify-between sm:justify-start gap-1.5 self-end sm:self-auto rounded-md border border-line/40 bg-card px-2.5 py-1 text-[11px] font-medium text-ink-muted transition-colors hover:border-line">
+            <div className="flex h-9 items-center justify-between sm:justify-start gap-1.5 shrink-0 rounded-lg border border-line/40 bg-card px-3 text-xs font-medium text-ink-muted transition-colors hover:border-line">
               <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle shrink-0">
                 Sort:
               </span>
@@ -89,14 +89,14 @@ export function InventoryView() {
                 <select
                   value={stockSort}
                   onChange={(e) => setStockSort(e.target.value)}
-                  className="appearance-none bg-transparent pr-3.5 font-medium text-ink text-[11px] focus:outline-none cursor-pointer leading-none text-right sm:text-left"
+                  className="appearance-none bg-transparent pr-4 font-bold text-ink text-xs focus:outline-none cursor-pointer leading-none text-right sm:text-left"
                 >
                   <option value="newest_in_stock" className="text-ink bg-card">Recently Added</option>
                   <option value="oldest_in_stock" className="text-ink bg-card">Oldest First</option>
                   <option value="price_high" className="text-ink bg-card">Price: High-Low</option>
                   <option value="price_low" className="text-ink bg-card">Price: Low-High</option>
                 </select>
-                <ChevronDown className="pointer-events-none absolute right-0 h-3 w-3 text-ink-subtle shrink-0" />
+                <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-ink-subtle shrink-0 stroke-[2.25px]" />
               </div>
             </div>
           )}
