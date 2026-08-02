@@ -14,7 +14,7 @@ export function NeedsAttention() {
   const totalAlerts = docsPending + agingOver60;
 
   return (
-    <div className="rounded-2xl border border-line bg-card p-4 space-y-3.5 shadow-sm select-none font-sans transition-all hover:border-accent/40">
+    <div className="rounded-2xl border border-line bg-card p-4 space-y-3.5 select-none font-sans transition-all hover:border-accent/40">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-line/40 pb-2.5">
         <div className="flex items-center gap-2">
@@ -57,7 +57,7 @@ export function NeedsAttention() {
             ) : (
               <span
                 className={[
-                  "font-mono text-xs font-bold px-2.5 py-0.5 rounded-md border leading-none shadow-xs",
+                  "font-mono text-xs font-bold px-2.5 py-0.5 rounded-md border leading-none",
                   docsPending > 0
                     ? "bg-amber-500 text-white border-amber-600/30"
                     : "bg-inset text-ink-muted border-line/50",
@@ -95,7 +95,7 @@ export function NeedsAttention() {
             ) : (
               <span
                 className={[
-                  "font-mono text-xs font-bold px-2.5 py-0.5 rounded-md border leading-none shadow-xs",
+                  "font-mono text-xs font-bold px-2.5 py-0.5 rounded-md border leading-none",
                   agingOver60 > 0
                     ? "bg-rose-600 text-white border-rose-700/30"
                     : "bg-inset text-ink-muted border-line/50",
