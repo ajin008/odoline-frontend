@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Car, CalendarCheck, Truck, Wrench } from "lucide-react";
+import { Car, CalendarCheck, Truck, Wrench, ArrowUpRight } from "lucide-react";
 import { useDashboardStats } from "../hooks/use-dashboard-stats";
 
 export function DashboardStats() {
@@ -14,72 +14,64 @@ export function DashboardStats() {
       label: "Total Stock",
       value: data?.total_stock ?? 0,
       icon: Car,
+      color: "text-blue-600 bg-blue-500/10 border-blue-500/20",
       href: "/owner/inventory?tab=in_stock",
     },
     {
       label: "Booked",
       value: data?.booked ?? 0,
       icon: CalendarCheck,
+      color: "text-purple-600 bg-purple-500/10 border-purple-500/20",
       href: "/owner/inventory?tab=booked",
     },
     {
-      label: "In Refurb",
+      label: "In Refurbish",
       value: data?.in_refurbishment ?? 0,
       icon: Wrench,
+      color: "text-amber-600 bg-amber-500/10 border-amber-500/20",
       href: "/owner/inventory?tab=in_refurbishment",
     },
     {
       label: "Delivered",
       value: data?.delivered_this_month ?? 0,
       icon: Truck,
+      color: "text-emerald-600 bg-emerald-500/10 border-emerald-500/20",
       href: "/owner/inventory?tab=delivered",
     },
   ];
 
   return (
-    <div className="flex flex-col h-full space-y-3 select-none font-sans">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-line/40 pb-2">
-        <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-ink-muted">
-          Yard Inventory Status
-        </h2>
-        <span className="text-[10px] font-mono text-ink-subtle uppercase">
-          Live Count
-        </span>
-      </div>
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 select-none font-sans">
+      {statsList.map((stat) => {
+        const Icon = stat.icon;
+        return (
+          <Link
+            key={stat.label}
+            href={stat.href}
+            className="group relative flex flex-col justify-between rounded-2xl border border-line bg-card p-4 transition-all duration-200 hover:border-accent/50 hover:shadow-sm active:scale-[0.98]"
+          >
+            <div className="flex items-center justify-between">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-xl border ${stat.color} shrink-0`}>
+                <Icon className="h-4 w-4 stroke-[2.25px]" />
+              </div>
+              <ArrowUpRight className="h-4 w-4 text-ink-subtle opacity-40 group-hover:opacity-100 group-hover:text-accent transition-all" />
+            </div>
 
-      {/* 2x2 Minimalist Grid */}
-      <div className="grid grid-cols-2 gap-3 flex-1">
-        {statsList.map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Link
-              key={stat.label}
-              href={stat.href}
-              className="group relative flex flex-col justify-between rounded-lg border border-line/40 bg-inset p-3.5 transition-all duration-200 hover:border-accent/40 hover:bg-card active:scale-[0.98]"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-ink-muted group-hover:text-ink transition-colors truncate">
-                  {stat.label}
+            <div className="mt-3 space-y-0.5">
+              <span className="text-[11px] font-semibold text-ink-muted group-hover:text-ink transition-colors block truncate">
+                {stat.label}
+              </span>
+              {isLoading ? (
+                <div className="h-7 w-12 animate-pulse rounded-md bg-inset" />
+              ) : (
+                <span className="font-heading text-2xl font-extrabold tracking-tight text-ink block leading-none">
+                  {stat.value}
                 </span>
-                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-card border border-line/40 text-ink-muted group-hover:text-accent group-hover:border-accent/30 transition-colors">
-                  <Icon className="h-3.5 w-3.5 stroke-[2px]" />
-                </div>
-              </div>
-
-              <div className="mt-3">
-                {isLoading ? (
-                  <div className="h-7 w-12 animate-pulse rounded-md bg-card border border-line/40" />
-                ) : (
-                  <span className="font-heading text-2xl font-bold tracking-tight text-ink block leading-none">
-                    {stat.value}
-                  </span>
-                )}
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+              )}
+            </div>
+          </Link>
+        );
+      })}
     </div>
   );
 }

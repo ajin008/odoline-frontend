@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, Clock, ArrowRight } from "lucide-react";
+import { FileText, Clock, ArrowUpRight, ShieldAlert } from "lucide-react";
 import { useDashboardStats } from "../hooks/use-dashboard-stats";
 
 export function NeedsAttention() {
@@ -11,90 +11,100 @@ export function NeedsAttention() {
 
   const docsPending = data?.attention?.docs_pending ?? 0;
   const agingOver60 = data?.attention?.aging_over_60 ?? 0;
+  const totalAlerts = docsPending + agingOver60;
 
   return (
-    <div className="flex flex-col h-full space-y-3 select-none font-sans">
+    <div className="rounded-2xl border border-line bg-card p-4 space-y-3.5 shadow-sm select-none font-sans transition-all hover:border-accent/40">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-line/40 pb-2">
-        <h2 className="text-[11px] font-mono font-bold uppercase tracking-wider text-ink-muted truncate">
-          Action &amp; Risks
-        </h2>
-        <span className="text-[9px] font-mono text-ink-subtle uppercase shrink-0">
-          Risks
+      <div className="flex items-center justify-between border-b border-line/40 pb-2.5">
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 shrink-0">
+            <ShieldAlert className="h-4 w-4 stroke-[2.25px]" />
+          </div>
+          <h2 className="text-xs font-bold text-ink tracking-tight font-heading">
+            Operational Attention & Risks
+          </h2>
+        </div>
+        <span className="text-[10px] font-mono font-bold uppercase text-rose-600 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-full">
+          {totalAlerts} Alerts
         </span>
       </div>
 
-      {/* 2 Stacked #171819 Dark Alert Cards */}
-      <div className="flex flex-col gap-2.5 flex-1">
+      {/* 2 High-Density Risk Cards */}
+      <div className="grid grid-cols-1 gap-2.5">
         {/* Row 1: Docs Pending */}
         <Link
           href="/owner/inventory?tab=in_stock"
-          className="group relative flex-1 flex items-center justify-between rounded-lg border border-[#262729] bg-[#171819] p-3 text-white transition-all duration-200 hover:border-amber-400/70 hover:shadow-md active:scale-[0.98]"
+          className="group flex items-center justify-between rounded-xl border border-line/60 bg-inset p-3 transition-all duration-200 hover:border-amber-500/40 hover:bg-card active:scale-[0.98]"
         >
-          <div className="space-y-0.5 min-w-0 flex-1">
-            <span className="text-[11px] font-semibold text-slate-400 group-hover:text-white transition-colors block truncate">
-              Docs Pending
-            </span>
-            <div className="flex items-center gap-1 mt-0.5">
-              <FileText className="h-3 w-3 text-amber-400 shrink-0 stroke-[2px]" />
-              <span className="text-[10px] text-slate-400 truncate">
-                Missing doc scans
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">
+              <FileText className="h-4 w-4 stroke-[2.25px]" />
+            </div>
+            <div className="space-y-0.5 min-w-0">
+              <span className="text-xs font-bold text-ink group-hover:text-amber-600 transition-colors block truncate">
+                Docs Pending
+              </span>
+              <span className="text-[10px] text-ink-muted block truncate font-sans">
+                Vehicles missing mandatory paperwork
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0 ml-1.5">
+          <div className="flex items-center gap-2 shrink-0 ml-2">
             {isLoading ? (
-              <div className="h-5 w-8 animate-pulse rounded-md bg-white/10 border border-white/20" />
+              <div className="h-5 w-8 animate-pulse rounded-md bg-line/20" />
             ) : (
               <span
                 className={[
-                  "font-mono text-[11px] font-bold px-2 py-0.5 rounded-md border leading-none shadow-xs",
+                  "font-mono text-xs font-bold px-2.5 py-0.5 rounded-md border leading-none shadow-xs",
                   docsPending > 0
-                    ? "bg-amber-500/25 text-amber-300 border-amber-400/50"
-                    : "bg-white/10 text-slate-300 border-white/20",
+                    ? "bg-amber-500 text-white border-amber-600/30"
+                    : "bg-inset text-ink-muted border-line/50",
                 ].join(" ")}
               >
                 {docsPending}
               </span>
             )}
-            <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+            <ArrowUpRight className="h-4 w-4 text-ink-subtle opacity-40 group-hover:opacity-100 group-hover:text-amber-600 transition-all" />
           </div>
         </Link>
 
-        {/* Row 2: Aging Over 60 Days */}
+        {/* Row 2: Aging > 60 Days */}
         <Link
           href="/owner/inventory?tab=in_stock"
-          className="group relative flex-1 flex items-center justify-between rounded-lg border border-[#262729] bg-[#171819] p-3 text-white transition-all duration-200 hover:border-rose-400/70 hover:shadow-md active:scale-[0.98]"
+          className="group flex items-center justify-between rounded-xl border border-line/60 bg-inset p-3 transition-all duration-200 hover:border-rose-500/40 hover:bg-card active:scale-[0.98]"
         >
-          <div className="space-y-0.5 min-w-0 flex-1">
-            <span className="text-[11px] font-semibold text-slate-400 group-hover:text-white transition-colors block truncate">
-              Aging &gt; 60 Days
-            </span>
-            <div className="flex items-center gap-1 mt-0.5">
-              <Clock className="h-3 w-3 text-rose-400 shrink-0 stroke-[2px]" />
-              <span className="text-[10px] text-slate-400 truncate">
-                Sitting &gt; 60 days
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/10 text-rose-600 border border-rose-500/20 shrink-0">
+              <Clock className="h-4 w-4 stroke-[2.25px]" />
+            </div>
+            <div className="space-y-0.5 min-w-0">
+              <span className="text-xs font-bold text-ink group-hover:text-rose-600 transition-colors block truncate">
+                Aging &gt; 60 Days
+              </span>
+              <span className="text-[10px] text-ink-muted block truncate font-sans">
+                Vehicles sitting &gt; 60 days in stock
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0 ml-1.5">
+          <div className="flex items-center gap-2 shrink-0 ml-2">
             {isLoading ? (
-              <div className="h-5 w-8 animate-pulse rounded-md bg-white/10 border border-white/20" />
+              <div className="h-5 w-8 animate-pulse rounded-md bg-line/20" />
             ) : (
               <span
                 className={[
-                  "font-mono text-[11px] font-bold px-2 py-0.5 rounded-md border leading-none shadow-xs",
+                  "font-mono text-xs font-bold px-2.5 py-0.5 rounded-md border leading-none shadow-xs",
                   agingOver60 > 0
-                    ? "bg-rose-500/25 text-rose-300 border-rose-400/50"
-                    : "bg-white/10 text-slate-300 border-white/20",
+                    ? "bg-rose-600 text-white border-rose-700/30"
+                    : "bg-inset text-ink-muted border-line/50",
                 ].join(" ")}
               >
                 {agingOver60}
               </span>
             )}
-            <ArrowRight className="h-3 w-3 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+            <ArrowUpRight className="h-4 w-4 text-ink-subtle opacity-40 group-hover:opacity-100 group-hover:text-rose-600 transition-all" />
           </div>
         </Link>
       </div>
