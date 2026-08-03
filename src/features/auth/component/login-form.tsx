@@ -49,7 +49,7 @@ export function LoginForm() {
         </div>
 
         {/* Lower Portion: Login Box snapped directly to the bottom area */}
-        <div className="w-full bg-card border border-line rounded-[2.25rem] shadow-bento px-6 py-7 space-y-5 mb-1">
+        <div className="w-full bg-card border border-line rounded-2xl shadow-bento px-6 py-7 space-y-5 mb-1">
           {/* Panel Sub-heading (Clean Semibold Style) */}
           <div className="text-center">
             <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
@@ -76,7 +76,7 @@ export function LoginForm() {
                   maxLength={10}
                   placeholder="Enter registered number"
                   aria-invalid={!!mobile.errors.phone}
-                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                  className="w-full rounded-xl border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                   {...mobile.register("phone")}
                 />
               </div>
@@ -99,7 +99,7 @@ export function LoginForm() {
                   maxLength={6}
                   placeholder="••••••"
                   aria-invalid={!!mobile.errors.pin}
-                  className="w-full rounded-2xl border border-line bg-inset px-4 py-3 pr-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                  className="w-full rounded-xl border border-line bg-inset px-4 py-3 pr-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                   {...mobile.register("pin")}
                 />
                 <button
@@ -121,7 +121,7 @@ export function LoginForm() {
             <button
               type="submit"
               disabled={mobile.isSubmitting}
-              className="w-full rounded-full bg-accent py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center cursor-pointer shadow-sm mt-1"
+              className="w-full rounded-xl bg-accent py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center cursor-pointer shadow-sm mt-1"
             >
               {mobile.isSubmitting ? "Verifying..." : "Login"}
             </button>
@@ -170,7 +170,7 @@ export function LoginForm() {
         </div>
 
         {/* Right Side: The Substantial Minimalist Box Container */}
-        <div className="w-105 bg-card border border-line rounded-2xl shadow-bento p-8 flex flex-col justify-between min-h-115">
+        <div className="w-105 bg-card border border-line rounded-xl shadow-bento p-8 flex flex-col justify-between min-h-115">
           <div className="my-auto space-y-6">
             <div>
               <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
@@ -197,7 +197,7 @@ export function LoginForm() {
                     maxLength={10}
                     placeholder="9876543210"
                     aria-invalid={!!desktop.errors.phone}
-                    className="w-full rounded-xl border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                    className="w-full rounded-lg border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                     {...desktop.register("phone")}
                   />
                 </div>
@@ -220,7 +220,7 @@ export function LoginForm() {
                     maxLength={6}
                     placeholder="••••••"
                     aria-invalid={!!desktop.errors.pin}
-                    className="w-full rounded-xl border border-line bg-inset px-4 py-3 pr-12 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
+                    className="w-full rounded-lg border border-line bg-inset px-4 py-3 pr-12 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
                     {...desktop.register("pin")}
                   />
                   <button
@@ -242,7 +242,7 @@ export function LoginForm() {
               <button
                 type="submit"
                 disabled={desktop.isSubmitting}
-                className="w-full rounded-xl bg-accent px-4 py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer"
+                className="w-full rounded-lg bg-accent px-4 py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
                 {desktop.isSubmitting
                   ? "Syncing Terminal Tokens..."

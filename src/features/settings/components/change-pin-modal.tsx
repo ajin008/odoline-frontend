@@ -80,11 +80,11 @@ export function ChangePinModal({ isOpen, onClose }: ChangePinModalProps) {
         onClick={onClose}
       />
 
-      <div className="relative z-10 w-full max-w-md bg-card border border-line/40 rounded-2xl p-5 sm:p-6 shadow-bento space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-md bg-card border border-line/40 rounded-xl p-5 sm:p-6 shadow-bento space-y-5 animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line/40 pb-3.5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent text-inverse shadow-xs">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-inverse shadow-xs">
               <KeyRound className="h-4 w-4 stroke-[2.5px]" />
             </div>
             <div>

@@ -23,7 +23,7 @@ export function FinancialSnapshot() {
   const costSharePct = Math.min(100, Math.max(0, (capitalTiedUpNum / total) * 100));
 
   return (
-    <div className="flex flex-col justify-between h-full w-full rounded-2xl border border-line bg-card p-4 space-y-3.5 select-none font-sans transition-all hover:border-accent/40">
+    <div className="flex flex-col justify-between h-full w-full rounded-xl border border-line bg-card p-4 space-y-3.5 select-none font-sans transition-all hover:border-accent/40">
       {/* 1. Header Bar */}
       <div className="flex items-center justify-between border-b border-line/40 pb-2.5">
         <div className="flex items-center gap-2">
@@ -47,7 +47,7 @@ export function FinancialSnapshot() {
       {/* 2. Full-Width 3-Column Core Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
         {/* Metric 1: Total Invested (Purchase + Refurbish) */}
-        <div className="rounded-xl border border-line/50 bg-inset p-3 space-y-1 w-full">
+        <div className="rounded-lg border border-line/50 bg-inset p-3 space-y-1 w-full">
           <div className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
             <Vault className="h-3.5 w-3.5 text-blue-500 shrink-0" />
             <span className="truncate">Invested Capital</span>
@@ -68,7 +68,7 @@ export function FinancialSnapshot() {
         </div>
 
         {/* Metric 2: Total Stock Value */}
-        <div className="rounded-xl border border-line/50 bg-inset p-3 space-y-1 w-full">
+        <div className="rounded-lg border border-line/50 bg-inset p-3 space-y-1 w-full">
           <div className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
             <Coins className="h-3.5 w-3.5 text-purple-500 shrink-0" />
             <span className="truncate">Total Stock Value</span>
@@ -89,7 +89,7 @@ export function FinancialSnapshot() {
         </div>
 
         {/* Metric 3: Expected Gross Profit */}
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 space-y-1 w-full">
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 space-y-1 w-full">
           <div className="flex items-center justify-between text-xs font-medium text-emerald-700">
             <span className="truncate">Gross Profit</span>
             {roiPct > 0 && (
@@ -116,7 +116,7 @@ export function FinancialSnapshot() {
       </div>
 
       {/* 3. Visual Capital Range Spread Bar */}
-      <div className="rounded-xl border border-line/60 bg-inset/50 p-3 space-y-1.5 w-full">
+      <div className="rounded-lg border border-line/60 bg-inset/50 p-3 space-y-1.5 w-full">
         <div className="flex items-center justify-between text-[11px] font-mono">
           <span className="text-ink-muted">
             Cost ({costSharePct.toFixed(0)}%)

@@ -84,9 +84,9 @@ export function RefurbishmentTab({
         </div>
 
         {/* 2. Interactive Workshop Operations Container */}
-        <div className="rounded-2xl bg-card p-2.5 sm:p-6 shadow-bento space-y-6">
+        <div className="rounded-xl bg-card p-2.5 sm:p-6 shadow-bento space-y-6">
           <div className="flex items-center gap-3 border-b border-line/50 pb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent-light text-accent shrink-0">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-light text-accent shrink-0">
               <Wrench className="h-4 w-4 stroke-[2.5px]" />
             </div>
             <div>
@@ -113,9 +113,9 @@ export function RefurbishmentTab({
         </div>
 
         {/* 3. Action Hub & Validation Status */}
-        <div className="rounded-2xl bg-card p-2.5 sm:p-6 shadow-bento space-y-4">
+        <div className="rounded-xl bg-card p-2.5 sm:p-6 shadow-bento space-y-4">
           {(isMissingHardDocs || hasPendingRefurbTasks) && !isAlreadyInStock && (
-            <div className="flex flex-col gap-2 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-950 text-xs">
+            <div className="flex flex-col gap-2 p-3.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-950 text-xs">
               {isMissingHardDocs && (
                 <div className="flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0 text-amber-600" />
@@ -163,7 +163,7 @@ export function RefurbishmentTab({
                   hasPendingRefurbTasks
                 }
                 onClick={() => addToStockMutation.mutate()}
-                className="w-full sm:w-auto min-h-[44px] min-w-45 inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto min-h-[44px] min-w-45 inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-5 py-3 text-sm font-bold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {addToStockMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -183,7 +183,7 @@ export function RefurbishmentTab({
               <button
                 type="button"
                 onClick={() => router.push("/owner/inventory")}
-                className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center rounded-xl border border-line bg-inset px-4 py-3 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all active:scale-95 cursor-pointer"
+                className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center rounded-lg border border-line bg-inset px-4 py-3 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all active:scale-95 cursor-pointer"
               >
                 Leave for Now
               </button>

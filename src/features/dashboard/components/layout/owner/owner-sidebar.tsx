@@ -11,7 +11,7 @@ export function OwnerSidebar() {
   const inStockCount = inStockCars.length;
 
   return (
-    <aside className="flex h-full flex-col bg-[#171819] text-white border border-[#262729] rounded-2xl shadow-bento overflow-hidden select-none">
+    <aside className="flex h-full flex-col bg-[#171819] text-white border border-[#262729] rounded-xl shadow-bento overflow-hidden select-none">
       {/* Brand Identity Branding Header (Updated with Image & Fixed Typography) */}
       <div className="flex h-18 items-center px-6 border-b border-[#262729]">
         <div className="flex items-center gap-2.5">
@@ -20,7 +20,7 @@ export function OwnerSidebar() {
             alt="Cars4 Logo"
             width={28}
             height={28}
-            className="rounded-lg object-contain"
+            className="rounded-md object-contain"
             priority
           />
           <span className="font-heading text-[15px] font-semibold tracking-tight text-white">
@@ -41,7 +41,7 @@ export function OwnerSidebar() {
                 <Link
                   href={item.href}
                   className={[
-                    "group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-[13px] font-semibold transition-all duration-200 ease-out active:scale-[0.98]",
+                    "group flex items-center justify-between rounded-lg px-3.5 py-2.5 text-[13px] font-semibold transition-all duration-200 ease-out active:scale-[0.98]",
                     active
                       ? "bg-accent text-white shadow-sm"
                       : "text-slate-400 hover:bg-white/10 hover:text-white",

@@ -61,13 +61,13 @@ export function ConfirmModal({
       />
 
       {/* Modal Dialog Container */}
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-line bg-card p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-md rounded-xl border border-line bg-card p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
         {/* Close Icon */}
         <button
           type="button"
           disabled={isLoading}
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-xl p-1.5 text-ink-subtle hover:bg-inset hover:text-ink transition-all cursor-pointer disabled:opacity-50"
+          className="absolute right-4 top-4 rounded-lg p-1.5 text-ink-subtle hover:bg-inset hover:text-ink transition-all cursor-pointer disabled:opacity-50"
         >
           <X className="h-4 w-4" />
         </button>
@@ -75,7 +75,7 @@ export function ConfirmModal({
         {/* Header Icon & Title */}
         <div className="flex items-start gap-4">
           <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border ${variantBadgeStyles[variant]}`}
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${variantBadgeStyles[variant]}`}
           >
             {icon || <AlertTriangle className="h-5.5 w-5.5 stroke-[2.25px]" />}
           </div>
@@ -96,7 +96,7 @@ export function ConfirmModal({
             type="button"
             disabled={isLoading}
             onClick={onClose}
-            className="w-full sm:w-auto min-h-10.5 inline-flex items-center justify-center rounded-xl border border-line bg-inset px-4 py-2.5 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+            className="w-full sm:w-auto min-h-10.5 inline-flex items-center justify-center rounded-lg border border-line bg-inset px-4 py-2.5 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all active:scale-95 cursor-pointer disabled:opacity-50"
           >
             {cancelText}
           </button>
@@ -105,7 +105,7 @@ export function ConfirmModal({
             type="button"
             disabled={isLoading}
             onClick={onConfirm}
-            className={`w-full sm:w-auto min-h-10.5 min-w-28 inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-50 ${variantButtonStyles[variant]}`}
+            className={`w-full sm:w-auto min-h-10.5 min-w-28 inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-xs font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-50 ${variantButtonStyles[variant]}`}
           >
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin stroke-[2.5px]" />

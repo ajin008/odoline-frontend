@@ -42,7 +42,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             aria-invalid={!!error}
             list={datalistId}
             className={[
-              "w-full rounded-xl border bg-inset px-4 py-3 text-sm text-ink outline-none transition-all duration-200 font-medium placeholder:text-ink-subtle/70",
+              "w-full rounded-lg border bg-inset px-4 py-3 text-sm text-ink outline-none transition-all duration-200 font-medium placeholder:text-ink-subtle/70",
               "focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light",
               error
                 ? "border-danger focus:border-danger focus:ring-danger-light"

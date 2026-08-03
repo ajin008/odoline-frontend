@@ -20,7 +20,7 @@ export function NeedsAttention() {
   const totalAlerts = docsPending + agingOver60;
 
   return (
-    <div className="flex flex-col justify-between h-full w-full rounded-2xl border border-line bg-card p-4 space-y-3.5 select-none font-sans transition-all hover:border-accent/40">
+    <div className="flex flex-col justify-between h-full w-full rounded-xl border border-line bg-card p-4 space-y-3.5 select-none font-sans transition-all hover:border-accent/40">
       <div className="space-y-3.5">
         {/* Header Bar */}
         <div className="flex items-center justify-between border-b border-line/40 pb-2.5">
@@ -42,7 +42,7 @@ export function NeedsAttention() {
           {/* Row 1: Docs Pending */}
           <Link
             href="/owner/inventory?tab=in_stock"
-            className="group flex items-center justify-between rounded-xl border border-line/60 bg-inset p-2.5 transition-all duration-200 hover:border-amber-500/40 hover:bg-card active:scale-[0.98]"
+            className="group flex items-center justify-between rounded-lg border border-line/60 bg-inset p-2.5 transition-all duration-200 hover:border-amber-500/40 hover:bg-card active:scale-[0.98]"
           >
             <div className="flex items-center gap-2 min-w-0">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">
@@ -80,7 +80,7 @@ export function NeedsAttention() {
           {/* Row 2: Aging > 60 Days */}
           <Link
             href="/owner/inventory?tab=in_stock"
-            className="group flex items-center justify-between rounded-xl border border-line/60 bg-inset p-2.5 transition-all duration-200 hover:border-rose-500/40 hover:bg-card active:scale-[0.98]"
+            className="group flex items-center justify-between rounded-lg border border-line/60 bg-inset p-2.5 transition-all duration-200 hover:border-rose-500/40 hover:bg-card active:scale-[0.98]"
           >
             <div className="flex items-center gap-2 min-w-0">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 shrink-0">
@@ -118,7 +118,7 @@ export function NeedsAttention() {
       </div>
 
       {/* Bottom Compliance & Risk Health Banner */}
-      <div className="rounded-xl border border-line/60 bg-inset/50 p-2.5 space-y-1.5 mt-auto">
+      <div className="rounded-lg border border-line/60 bg-inset/50 p-2.5 space-y-1.5 mt-auto">
         <div className="flex items-center justify-between text-[10px] font-sans">
           <div className="flex items-center gap-1 text-ink-muted font-medium min-w-0">
             <CheckCircle2 className="h-3 w-3 text-emerald-500 shrink-0" />

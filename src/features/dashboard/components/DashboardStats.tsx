@@ -48,10 +48,10 @@ export function DashboardStats() {
           <Link
             key={stat.label}
             href={stat.href}
-            className="group relative flex flex-col justify-between rounded-2xl border border-line bg-card p-4 transition-all duration-200 hover:border-accent/50 hover:shadow-sm active:scale-[0.98]"
+            className="group relative flex flex-col justify-between rounded-xl border border-line bg-card p-4 transition-all duration-200 hover:border-accent/50 hover:shadow-sm active:scale-[0.98]"
           >
             <div className="flex items-center justify-between">
-              <div className={`flex h-8 w-8 items-center justify-center rounded-xl border ${stat.color} shrink-0`}>
+              <div className={`flex h-8 w-8 items-center justify-center rounded-lg border ${stat.color} shrink-0`}>
                 <Icon className="h-4 w-4 stroke-[2.25px]" />
               </div>
               <ArrowUpRight className="h-4 w-4 text-ink-subtle opacity-40 group-hover:opacity-100 group-hover:text-accent transition-all" />

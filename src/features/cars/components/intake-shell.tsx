@@ -51,15 +51,15 @@ export function IntakeShell({ carId }: { carId: string }) {
   if (isCarLoading) {
     return (
       <div className="space-y-4">
-        <div className="h-24 animate-pulse rounded-2xl bg-inset border border-line" />
-        <div className="h-64 animate-pulse rounded-2xl bg-inset border border-line" />
+        <div className="h-24 animate-pulse rounded-xl bg-inset border border-line" />
+        <div className="h-64 animate-pulse rounded-xl bg-inset border border-line" />
       </div>
     );
   }
 
   if (isError || !car) {
     return (
-      <div className="rounded-2xl border border-line bg-card p-8 text-center max-w-md mx-auto my-6">
+      <div className="rounded-xl border border-line bg-card p-8 text-center max-w-md mx-auto my-6">
         <p className="text-sm font-semibold text-danger font-sans">
           Car not found.
         </p>
@@ -68,7 +68,7 @@ export function IntakeShell({ carId }: { carId: string }) {
         </p>
         <Link
           href="/owner/inventory"
-          className="mt-4 inline-flex items-center justify-center rounded-xl bg-accent px-4 py-2 text-xs font-bold text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98]"
+          className="mt-4 inline-flex items-center justify-center rounded-lg bg-accent px-4 py-2 text-xs font-bold text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98]"
         >
           Back to Inventory
         </Link>
@@ -92,7 +92,7 @@ export function IntakeShell({ carId }: { carId: string }) {
       <div className="flex items-center justify-between gap-4 mb-4">
         <Link
           href="/owner/inventory"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-bold tracking-tight text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold tracking-tight text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
         >
           <ArrowLeft className="h-3.5 w-3.5 stroke-[2.5px]" />
           Back to Inventory
@@ -103,7 +103,7 @@ export function IntakeShell({ carId }: { carId: string }) {
             type="button"
             onClick={() => setShowDeleteConfirm(true)}
             disabled={deleteCarMutation.isPending}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/10 text-rose-700 hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 shadow-xs"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-700 hover:bg-rose-600 hover:text-white transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50 shadow-xs"
             title="Remove Car"
           >
             <Trash2 className="h-4 w-4 stroke-[2px]" />
@@ -112,7 +112,7 @@ export function IntakeShell({ carId }: { carId: string }) {
       </div>
 
       {/* Car Profile Header Block */}
-      <div className="rounded-2xl border border-line bg-card p-5">
+      <div className="rounded-xl border border-line bg-card p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <h1 className="font-heading text-lg font-semibold text-ink">
@@ -166,7 +166,7 @@ export function IntakeShell({ carId }: { carId: string }) {
       </div>
 
       {/* Primary Intake Steps Segmented Switch Control */}
-      <div className="flex w-full sm:w-max gap-1 overflow-x-auto rounded-xl bg-inset p-1 border border-line no-scrollbar">
+      <div className="flex w-full sm:w-max gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line no-scrollbar">
         {TABS.map((t) => {
           const isLocked = t.key === "refurbishment" && !isDocsComplete;
 
@@ -175,7 +175,7 @@ export function IntakeShell({ carId }: { carId: string }) {
               key={t.key}
               onClick={() => handleTabClick(t.key)}
               className={[
-                "flex-1 sm:flex-initial text-center shrink-0 rounded-lg px-3 sm:px-4 py-2 text-xs font-bold font-sans transition-all duration-200 cursor-pointer",
+                "flex-1 sm:flex-initial text-center shrink-0 rounded-md px-3 sm:px-4 py-2 text-xs font-bold font-sans transition-all duration-200 cursor-pointer",
                 tab === t.key
                   ? "bg-accent text-inverse shadow-sm"
                   : isLocked

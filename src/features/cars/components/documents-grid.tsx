@@ -31,16 +31,16 @@ interface DocumentsGridProps {
 function DocumentsGridSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="h-16 w-full animate-pulse rounded-2xl bg-inset border border-line" />
+      <div className="h-16 w-full animate-pulse rounded-xl bg-inset border border-line" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 9 }).map((_, i) => (
           <div
             key={i}
-            className="flex h-36 flex-col justify-between rounded-2xl border border-line bg-card p-4"
+            className="flex h-36 flex-col justify-between rounded-xl border border-line bg-card p-4"
           >
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 animate-pulse rounded-xl bg-inset" />
+                <div className="h-8 w-8 animate-pulse rounded-lg bg-inset" />
                 <div className="space-y-1">
                   <div className="h-3 w-20 animate-pulse rounded-md bg-inset" />
                   <div className="h-2 w-12 animate-pulse rounded-md bg-inset" />
@@ -49,7 +49,7 @@ function DocumentsGridSkeleton() {
               <div className="h-2 w-3/4 animate-pulse rounded-md bg-inset" />
             </div>
             <div className="border-t border-line/50 pt-2.5">
-              <div className="h-8 w-full animate-pulse rounded-xl bg-inset" />
+              <div className="h-8 w-full animate-pulse rounded-lg bg-inset" />
             </div>
           </div>
         ))}
@@ -137,10 +137,10 @@ export function DocumentsGrid({
         />
 
         {/* Clean Header Status Banner without outer borders */}
-        <div className="flex items-start justify-between gap-4 rounded-2xl p-5 transition-all bg-card">
+        <div className="flex items-start justify-between gap-4 rounded-xl p-5 transition-all bg-card">
           <div className="flex items-start gap-3.5">
             <div
-              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-white mt-0.5 ${
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white mt-0.5 ${
                 canProceed ? "bg-emerald-600" : "bg-[#f5b023]"
               }`}
             >
@@ -215,13 +215,13 @@ export function DocumentsGrid({
             return (
               <div
                 key={config.type}
-                className={`flex flex-col justify-between rounded-2xl border p-4.5 transition-all ${cardContainerStyle}`}
+                className={`flex flex-col justify-between rounded-xl border p-4.5 transition-all ${cardContainerStyle}`}
               >
                 <div className="space-y-2.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0">
                       <span
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition-colors ${iconBoxStyle}`}
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors ${iconBoxStyle}`}
                       >
                         {uploadedDoc ? (
                           <Check className="h-4 w-4 stroke-[3px]" />

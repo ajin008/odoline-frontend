@@ -36,7 +36,7 @@ export const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
             ref={ref}
             aria-invalid={!!error}
             className={[
-              "w-full rounded-xl border bg-inset px-4 py-3 text-sm text-ink outline-none appearance-none transition-all duration-200 font-medium dynamic-select cursor-pointer",
+              "w-full rounded-lg border bg-inset px-4 py-3 text-sm text-ink outline-none appearance-none transition-all duration-200 font-medium dynamic-select cursor-pointer",
               "focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light",
               error
                 ? "border-danger focus:border-danger focus:ring-danger-light"

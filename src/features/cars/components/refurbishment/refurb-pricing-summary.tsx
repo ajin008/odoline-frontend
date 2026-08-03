@@ -65,7 +65,7 @@ export function RefurbPricingSummary({
       {/* Grid Matrix: Responsive 2-col on Mobile, 5-col Flow on Desktop */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 items-stretch">
         {/* 1. Purchase Amount Card */}
-        <div className="flex flex-col justify-between rounded-xl border border-line bg-inset p-3.5 transition-all hover:bg-card">
+        <div className="flex flex-col justify-between rounded-lg border border-line bg-inset p-3.5 transition-all hover:bg-card">
           <p className="text-[10px] font-mono font-semibold uppercase text-ink-muted">
             Purchase Price
           </p>
@@ -75,7 +75,7 @@ export function RefurbPricingSummary({
         </div>
 
         {/* 2. Refurbishment Cost Card */}
-        <div className="flex flex-col justify-between rounded-xl border border-accent/20 bg-accent-light/30 p-3.5 transition-all hover:bg-accent-light/50">
+        <div className="flex flex-col justify-between rounded-lg border border-accent/20 bg-accent-light/30 p-3.5 transition-all hover:bg-accent-light/50">
           <p className="text-[10px] font-mono font-semibold uppercase text-accent">
             + Refurb Cost
           </p>
@@ -85,7 +85,7 @@ export function RefurbPricingSummary({
         </div>
 
         {/* 3. Landing Price (Break-Even) Card */}
-        <div className="flex flex-col justify-between rounded-xl border border-ink bg-ink p-3.5 text-inverse shadow-sm">
+        <div className="flex flex-col justify-between rounded-lg border border-ink bg-ink p-3.5 text-inverse shadow-sm">
           <p className="text-[10px] font-mono font-semibold uppercase text-inverse/70">
             = Landing Price
           </p>
@@ -95,7 +95,7 @@ export function RefurbPricingSummary({
         </div>
 
         {/* 4. Profit Margin Input Card */}
-        <div className="flex flex-col justify-between rounded-xl border border-line bg-inset p-3.5 transition-all focus-within:border-accent focus-within:bg-card">
+        <div className="flex flex-col justify-between rounded-lg border border-line bg-inset p-3.5 transition-all focus-within:border-accent focus-within:bg-card">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-mono font-semibold uppercase text-ink-muted">
               + Profit Margin
@@ -125,7 +125,7 @@ export function RefurbPricingSummary({
         </div>
 
         {/* 5. Live Selling Price Hero Card (Spans full width on Mobile) */}
-        <div className="col-span-2 lg:col-span-1 flex flex-col justify-between rounded-xl border border-emerald-500 bg-emerald-600 p-3.5 text-white shadow-sm">
+        <div className="col-span-2 lg:col-span-1 flex flex-col justify-between rounded-lg bg-emerald-600 p-3.5 text-white shadow-sm">
           <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-100">
             Target Selling Price
           </p>

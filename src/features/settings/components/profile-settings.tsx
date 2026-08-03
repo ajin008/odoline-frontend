@@ -41,7 +41,7 @@ export function ProfileSettings() {
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line/40 pb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent text-inverse shadow-xs shrink-0">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-inverse shadow-xs shrink-0">
               <User className="h-5 w-5 stroke-[2.5px]" />
             </div>
             <div>

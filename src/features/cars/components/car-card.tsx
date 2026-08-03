@@ -71,7 +71,7 @@ export function CarCard({ car }: { car: Car }) {
       <Link
         href={`/owner/cars/${car.id}/intake`}
         className={[
-          "group flex flex-col justify-between rounded-2xl border border-line bg-card overflow-hidden transition-all duration-300 select-none",
+          "group flex flex-col justify-between rounded-xl border border-line bg-card overflow-hidden transition-all duration-300 select-none",
           "hover:border-accent hover:-translate-y-0.5 active:scale-[0.98]",
         ].join(" ")}
       >
@@ -278,7 +278,7 @@ export function CarCard({ car }: { car: Car }) {
             onClick={() => setPreviewUrl(null)}
           >
             <div
-              className="relative flex flex-col max-w-4xl w-full max-h-[90vh] bg-card border border-line rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
+              className="relative flex flex-col max-w-4xl w-full max-h-[90vh] bg-card border border-line rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
@@ -298,7 +298,7 @@ export function CarCard({ car }: { car: Car }) {
                 <button
                   type="button"
                   onClick={() => setPreviewUrl(null)}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
+                  className="rounded-lg p-1.5 text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
                   title="Close preview"
                 >
                   <X className="h-5 w-5 stroke-[2.25px]" />
