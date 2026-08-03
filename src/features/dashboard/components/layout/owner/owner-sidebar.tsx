@@ -3,12 +3,12 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ownerNavItems } from "./nav-items";
 import { ShieldCheck, MapPin } from "lucide-react";
-import { useCars } from "@/src/features/cars/hooks/use-cars";
+import { useDashboardStats } from "@/src/features/dashboard/hooks/use-dashboard-stats";
 
 export function OwnerSidebar() {
   const pathname = usePathname();
-  const { data: inStockCars = [] } = useCars(["in_stock"]);
-  const inStockCount = inStockCars.length;
+  const { data: stats } = useDashboardStats();
+  const inStockCount = stats?.total_stock ?? 0;
 
   return (
     <aside className="flex h-full flex-col bg-[#171819] text-white border border-[#262729] rounded-xl shadow-bento overflow-hidden select-none">

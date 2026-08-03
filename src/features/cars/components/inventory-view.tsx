@@ -8,7 +8,12 @@ import { useDebounce } from "use-debounce";
 import { CarList } from "./car-list";
 import { PIPELINE_STATUSES } from "../status-config";
 
-import { ChevronDown, Search } from "lucide-react";
+import { Search } from "lucide-react";
+
+const STOCK_SORTS = [
+  { key: "newest", label: "Recently Added" },
+  { key: "aging", label: "Longest in Stock" },
+] as const;
 
 const SUB_TABS = [
   { key: "pipeline", label: "Pipeline", statuses: PIPELINE_STATUSES },
@@ -31,8 +36,8 @@ export function InventoryView() {
       : "pipeline";
 
   const [active, setActive] = useState<TabKey>(validInitialTab);
-  // Default In Stock tab to newest_in_stock (Recently Added)
-  const [stockSort, setStockSort] = useState<string>("newest_in_stock");
+  // Default In Stock tab to newest (Recently Added)
+  const [stockSort, setStockSort] = useState<string>("newest");
 
   // Search — debounced so we don't fire a request on every keystroke.
   const [searchInput, setSearchInput] = useState("");
@@ -108,24 +113,23 @@ export function InventoryView() {
               )}
             </div>
 
-            {/* Sort Option Control (h-9 Height matching search input height) */}
-            <div className="flex h-9 items-center justify-between sm:justify-start gap-1.5 shrink-0 rounded-lg border border-line/40 bg-card px-3 text-xs font-medium text-ink-muted transition-colors hover:border-line">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle shrink-0">
-                Sort:
-              </span>
-              <div className="relative inline-flex items-center">
-                <select
-                  value={stockSort}
-                  onChange={(e) => setStockSort(e.target.value)}
-                  className="appearance-none bg-transparent pr-4 font-bold text-ink text-xs focus:outline-none cursor-pointer leading-none text-right sm:text-left"
+            {/* Sort toggle — newest vs. aging (the two sorts the API supports) */}
+            <div className="flex h-9 items-center gap-1 shrink-0 rounded-lg bg-inset p-1 border border-line/40">
+              {STOCK_SORTS.map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => setStockSort(option.key)}
+                  className={[
+                    "h-full rounded-md px-3 flex items-center justify-center text-[11px] font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+                    stockSort === option.key
+                      ? "bg-accent text-inverse shadow-xs"
+                      : "text-ink-muted hover:text-ink",
+                  ].join(" ")}
                 >
-                  <option value="newest_in_stock" className="text-ink bg-card">Recently Added</option>
-                  <option value="oldest_in_stock" className="text-ink bg-card">Oldest First</option>
-                  <option value="price_high" className="text-ink bg-card">Price: High-Low</option>
-                  <option value="price_low" className="text-ink bg-card">Price: Low-High</option>
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-0 h-3.5 w-3.5 text-ink-subtle shrink-0 stroke-[2.25px]" />
-              </div>
+                  {option.label}
+                </button>
+              ))}
             </div>
           </div>
         )}

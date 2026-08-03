@@ -71,6 +71,17 @@ export interface Car {
   progress_summary?: ProgressSummary;
 }
 
+/** Pagination metadata that comes back alongside every cars list page. */
+export interface CarsPagination {
+  next_cursor: string | null;
+  has_more: boolean;
+}
+
+export interface CarsPage {
+  data: Car[];
+  pagination: CarsPagination;
+}
+
 export const carsApi = {
   /** POST /cars — create a car (Step 1). Returns the created car (with its id). */
   async create(data: CreateCarFormValues): Promise<Car> {
@@ -78,20 +89,34 @@ export const carsApi = {
     return res.data.data;
   },
 
-  async getList(
-    statuses?: string[],
-    sort?: string,
-    search?: string
-  ): Promise<Car[]> {
-    const params: Record<string, string> = {};
+  /**
+   * GET /cars — cursor (keyset) paginated. Omit `cursor` for the first page;
+   * pass the previous page's `pagination.next_cursor` to fetch the next one.
+   */
+  async getList({
+    statuses,
+    sort,
+    search,
+    cursor,
+    limit,
+  }: {
+    statuses?: string[];
+    sort?: string;
+    search?: string;
+    cursor?: string;
+    limit?: number;
+  } = {}): Promise<CarsPage> {
+    const params: Record<string, string | number> = {};
     if (statuses?.length) params.status = statuses.join(",");
     if (sort) params.sort = sort;
     if (search?.trim()) params.search = search.trim();
+    if (cursor) params.cursor = cursor;
+    if (limit) params.limit = limit;
 
     const res = await apiClient.get(endpoints.cars.list, {
       params: Object.keys(params).length ? params : undefined,
     });
-    return res.data.data;
+    return { data: res.data.data, pagination: res.data.pagination };
   },
 
   async getById(id: string): Promise<Car> {

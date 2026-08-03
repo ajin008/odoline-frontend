@@ -1,9 +1,10 @@
 // features/cars/components/car-list.tsx
 "use client";
 
-import { useCars } from "../hooks/use-cars";
+import { useEffect, useRef } from "react";
+import { useInfiniteCars } from "../hooks/use-infinite-cars";
 import { CarCard } from "./car-card";
-import { PackageOpen, SearchX } from "lucide-react";
+import { PackageOpen, SearchX, Loader2 } from "lucide-react";
 
 export function CarList({
   statuses,
@@ -14,7 +15,36 @@ export function CarList({
   sort?: string;
   search?: string;
 }) {
-  const { data: cars, isLoading, isError } = useCars(statuses, sort, search);
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteCars({ statuses, sort, search });
+
+  // Sentinel for the IntersectionObserver — when it scrolls into view, load
+  // the next page. Guarded so we never fire while a fetch is already in
+  // flight or once the last page has been reached.
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (isLoading) {
     return (
@@ -39,7 +69,9 @@ export function CarList({
     );
   }
 
-  if (!cars || cars.length === 0) {
+  const cars = data?.pages.flatMap((page) => page.data) ?? [];
+
+  if (cars.length === 0) {
     if (search?.trim()) {
       return (
         <div className="rounded-2xl border border-dashed border-ink-subtle/30 bg-card p-12 text-center max-w-md mx-auto my-6 select-none">
@@ -74,11 +106,27 @@ export function CarList({
   }
 
   return (
-    /* Shifted seamlessly into modern 5-column architectural layout */
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {cars.map((car) => (
-        <CarCard key={car.id} car={car} />
-      ))}
+    <div>
+      {/* Shifted seamlessly into modern 4-column architectural layout */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cars.map((car) => (
+          <CarCard key={car.id} car={car} />
+        ))}
+      </div>
+
+      {/* Infinite-scroll sentinel + status row */}
+      <div ref={sentinelRef} className="flex items-center justify-center py-8">
+        {isFetchingNextPage ? (
+          <div className="flex items-center gap-2 text-xs font-medium text-ink-subtle font-sans">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Loading more…
+          </div>
+        ) : !hasNextPage ? (
+          <p className="text-[11px] font-mono uppercase tracking-widest text-ink-subtle">
+            End of list
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

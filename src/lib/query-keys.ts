@@ -13,6 +13,13 @@ export const queryKeys = {
     detail: (id: string) => ["cars", id] as const,
     documents: (id: string) => ["cars", id, "documents"] as const,
     refurbItems: (id: string) => ["cars", id, "refurbishment-items"] as const,
+    // Infinite (cursor-paginated) lists — statuses/sort/search identify a
+    // distinct scroll; changing any of them starts a fresh cache entry.
+    infinite: (params: {
+      statuses?: string[];
+      sort?: string;
+      search?: string;
+    }) => ["cars", "infinite", params] as const,
   },
 
   dashboard: {

@@ -1,0 +1,38 @@
+// features/cars/hooks/use-infinite-cars.ts
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { carsApi } from "../api/cars-api";
+import { queryKeys } from "@/src/lib/query-keys";
+
+const PAGE_SIZE = 16;
+
+/**
+ * Cursor-paginated cars list, as infinite-scroll server state.
+ *
+ * Reusable across every inventory sub-tab — statuses/sort/search fully
+ * describe one distinct scroll. Changing any of them changes the query key,
+ * so TanStack Query starts a fresh page-1 fetch instead of continuing the
+ * old scroll's cursor chain.
+ */
+export function useInfiniteCars({
+  statuses,
+  sort,
+  search,
+}: {
+  statuses?: string[];
+  sort?: string;
+  search?: string;
+}) {
+  return useInfiniteQuery({
+    queryKey: queryKeys.cars.infinite({ statuses, sort, search }),
+    queryFn: ({ pageParam }) =>
+      carsApi.getList({
+        statuses,
+        sort,
+        search,
+        cursor: pageParam,
+        limit: PAGE_SIZE,
+      }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.next_cursor ?? undefined,
+  });
+}

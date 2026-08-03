@@ -6,8 +6,8 @@ export function ExportDataSettings() {
   return (
     <div className="space-y-5 select-none font-sans max-w-2xl">
       {/* Coming Soon Card */}
-      <div className="rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 text-center space-y-3.5 shadow-bento">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-accent text-inverse shadow-sm">
+      <div className="rounded-xl border border-dashed border-accent/40 bg-accent/5 p-6 text-center space-y-3.5">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-accent text-inverse">
           <Download className="h-6 w-6 stroke-[2.5px]" />
         </div>
 
