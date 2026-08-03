@@ -71,13 +71,13 @@ export function InventoryView() {
         </div>
 
         {/* Sub-tabs Navigation */}
-        <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-auto no-scrollbar shrink-0">
+        <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-fit no-scrollbar shrink-0">
           {SUB_TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
               className={[
-                "flex-1 sm:flex-none h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+                "flex-1 sm:flex-initial h-full text-center rounded-md px-3.5 sm:px-4 flex items-center justify-center text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
                 active === tab.key
                   ? "bg-accent text-inverse shadow-xs"
                   : "text-ink-muted hover:text-ink",

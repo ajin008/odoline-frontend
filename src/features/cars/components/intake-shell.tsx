@@ -13,6 +13,8 @@ import { DOCUMENT_CONFIGS } from "../type/document-types";
 import { RefurbishmentTab } from "./refurbishment-tab";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 
+import { CarSubtabSkeleton } from "./car-subtab-skeleton";
+
 const DELETABLE_STATUSES = [
   "draft",
   "purchasing",
@@ -49,12 +51,7 @@ export function IntakeShell({ carId }: { carId: string }) {
     car?.status && DELETABLE_STATUSES.includes(car.status.toLowerCase());
 
   if (isCarLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="h-24 animate-pulse rounded-xl bg-inset border border-line" />
-        <div className="h-64 animate-pulse rounded-xl bg-inset border border-line" />
-      </div>
-    );
+    return <CarSubtabSkeleton />;
   }
 
   if (isError || !car) {
