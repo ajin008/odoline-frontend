@@ -9,27 +9,33 @@ export function useDocumentActions(carId: string) {
   const deleteMutation = useDeleteDocument(carId);
 
   const uploadAndCompress = async (file: File, documentType: DocumentType) => {
-    const loadingToastId = toast.loading("Compressing and uploading...");
+    const isImage = file.type.startsWith("image/");
+    const loadingToastId = toast.loading(
+      isImage ? "Compressing and uploading..." : "Uploading document..."
+    );
 
     try {
-      const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-        initialQuality: 0.8,
-      };
+      let fileToUpload = file;
 
-      const compressedFile = await imageCompression(file, options);
+      if (isImage) {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+          initialQuality: 0.8,
+        };
+        fileToUpload = await imageCompression(file, options);
+      }
 
       uploadMutation.mutate(
-        { carId, documentType, file: compressedFile },
+        { carId, documentType, file: fileToUpload },
         { onSettled: () => toast.dismiss(loadingToastId) }
       );
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error("[Image Compression Error]:", error);
+      console.error("[Document Upload Error]:", error);
       toast.dismiss(loadingToastId);
-      toast.error("Failed to process the image. Please try another file.");
+      toast.error("Failed to process the document. Please try another file.");
     }
   };
 

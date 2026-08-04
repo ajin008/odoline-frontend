@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Check,
   X,
+  ExternalLink,
 } from "lucide-react";
 import {
   DOCUMENT_CONFIGS,
@@ -81,7 +82,11 @@ export function DocumentsGrid({
   const [selectedDocType, setSelectedDocType] = useState<DocumentType | null>(
     null
   );
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewItem, setPreviewItem] = useState<{
+    url: string;
+    mimeType: string;
+    name?: string;
+  } | null>(null);
   const [loadingPreviewId, setLoadingPreviewId] = useState<string | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
@@ -106,13 +111,21 @@ export function DocumentsGrid({
     }
   };
 
-  const handleViewPreview = async (documentId: string) => {
-    setLoadingPreviewId(documentId);
-    const url = await fetchDocumentUrl(documentId);
-    if (url) {
-      setPreviewUrl(url);
-    }
+  const handleViewPreview = async (doc: {
+    id: string;
+    mime_type?: string;
+    original_name?: string;
+  }) => {
+    setLoadingPreviewId(doc.id);
+    const url = await fetchDocumentUrl(doc.id);
     setLoadingPreviewId(null);
+    if (url) {
+      setPreviewItem({
+        url,
+        mimeType: doc.mime_type || "image/jpeg",
+        name: doc.original_name,
+      });
+    }
   };
 
   if (isLoading) {
@@ -132,7 +145,7 @@ export function DocumentsGrid({
           type="file"
           ref={fileInputRef}
           onChange={handleFileChange}
-          accept="image/jpeg, image/png, image/webp"
+          accept="image/jpeg, image/png, image/webp, application/pdf"
           className="hidden"
         />
 
@@ -212,6 +225,8 @@ export function DocumentsGrid({
               }
             }
 
+            const isPdf = uploadedDoc?.mime_type === "application/pdf";
+
             return (
               <div
                 key={config.type}
@@ -236,8 +251,8 @@ export function DocumentsGrid({
                         </h3>
 
                         {uploadedDoc ? (
-                          <span className="inline-block mt-0.5 text-[10px] font-bold tracking-tight text-emerald-700">
-                            ✓ Uploaded
+                          <span className="inline-flex items-center gap-1 mt-0.5 text-[10px] font-bold tracking-tight text-emerald-700">
+                            ✓ {isPdf ? "PDF Uploaded" : "Uploaded"}
                           </span>
                         ) : (
                           <span
@@ -265,7 +280,7 @@ export function DocumentsGrid({
                     <div className="flex items-center justify-between">
                       <button
                         type="button"
-                        onClick={() => handleViewPreview(uploadedDoc.id)}
+                        onClick={() => handleViewPreview(uploadedDoc)}
                         disabled={loadingPreviewId === uploadedDoc.id}
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-900 transition-colors cursor-pointer disabled:opacity-50"
                       >
@@ -274,7 +289,7 @@ export function DocumentsGrid({
                         ) : (
                           <Eye className="h-3.5 w-3.5 stroke-[2.5px]" />
                         )}
-                        View Document
+                        {isPdf ? "View PDF" : "View Document"}
                       </button>
                       <button
                         type="button"
@@ -346,38 +361,66 @@ export function DocumentsGrid({
         )}
       </div>
 
-      {/* Full Screen Image Modal */}
-      {previewUrl && (
+      {/* Full Screen Document / PDF Modal */}
+      {previewItem && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 sm:p-6"
-          onClick={() => setPreviewUrl(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-6"
+          onClick={() => setPreviewItem(null)}
         >
           <div
-            className="relative flex flex-col max-h-full max-w-4xl w-full rounded-2xl bg-card shadow-2xl overflow-hidden"
+            className="relative flex flex-col max-h-[92vh] max-w-5xl w-full rounded-xl bg-card shadow-2xl overflow-hidden border border-line"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-line p-4 bg-card z-10">
-              <h3 className="text-sm font-bold tracking-tight text-ink">
-                Document Preview
-              </h3>
-              <button
-                type="button"
-                onClick={() => setPreviewUrl(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
+            <div className="flex items-center justify-between border-b border-line px-5 py-3.5 bg-card z-10">
+              <div className="flex items-center gap-2 min-w-0">
+                <h3 className="text-sm font-bold tracking-tight text-ink font-sans truncate">
+                  {previewItem.name || "Document Preview"}
+                </h3>
+                {previewItem.mimeType === "application/pdf" && (
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-500/10 text-rose-700 border border-rose-500/20 px-2 py-0.5 rounded-md shrink-0">
+                    PDF Document
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <a
+                  href={previewItem.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1 rounded-md hover:bg-inset"
+                  title="Open in new tab"
+                >
+                  <ExternalLink className="h-3.5 w-3.5 stroke-[2px]" />
+                  <span className="hidden sm:inline">Open in Tab</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setPreviewItem(null)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
-            {/* Modal Image Body */}
-            <div className="flex-1 overflow-auto bg-inset p-4 flex items-center justify-center min-h-75">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={previewUrl}
-                alt="Document Preview"
-                className="max-h-[75vh] w-auto max-w-full rounded-lg shadow-sm object-contain"
-              />
+            {/* Modal Body */}
+            <div className="flex-1 overflow-hidden bg-inset p-3 flex items-center justify-center min-h-[60vh]">
+              {previewItem.mimeType === "application/pdf" ? (
+                <iframe
+                  src={previewItem.url}
+                  title="PDF Document Preview"
+                  className="w-full h-[75vh] min-h-[480px] rounded-lg border border-line bg-card shadow-xs"
+                />
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={previewItem.url}
+                  alt="Document Preview"
+                  className="max-h-[75vh] w-auto max-w-full rounded-lg shadow-sm object-contain"
+                />
+              )}
             </div>
           </div>
         </div>
