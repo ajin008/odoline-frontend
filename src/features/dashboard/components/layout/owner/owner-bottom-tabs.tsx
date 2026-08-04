@@ -3,15 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ownerNavItems } from "./nav-items";
 import { useDashboardStats } from "@/src/features/dashboard/hooks/use-dashboard-stats";
-import {
-  Menu,
-  X,
-  BarChart3,
-  Users,
-  Sparkles,
-  Layers,
-  Receipt,
-} from "lucide-react";
+import { Menu, X, BarChart3, Sparkles, Layers, Receipt } from "lucide-react";
 
 export function OwnerBottomTabs() {
   const pathname = usePathname();
@@ -19,21 +11,19 @@ export function OwnerBottomTabs() {
   const { data: stats } = useDashboardStats();
   const inStockCount = stats?.total_stock ?? 0;
 
-  // Core mobile navigation items
+  // Core mobile navigation items (Dashboard, Inventory, Team, Settings)
   const realMobileItems = ownerNavItems.filter((i) => i.mobile);
 
   // Simulated future scale items
   const dummyOverflowItems = [
     { href: "/owner/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/owner/team", label: "Team Members", icon: Users },
     { href: "/owner/expenses", label: "Expenses", icon: Receipt },
     { href: "/owner/campaigns", label: "Marketing", icon: Sparkles },
     { href: "/owner/categories", label: "Categories", icon: Layers },
   ];
 
-  const allTargetItems = [...realMobileItems, ...dummyOverflowItems];
-  const primaryItems = allTargetItems.slice(0, 3);
-  const overflowItems = allTargetItems.slice(3);
+  const primaryItems = realMobileItems;
+  const overflowItems = dummyOverflowItems;
 
   const isOverflowActive = overflowItems.some((item) =>
     pathname.startsWith(item.href)

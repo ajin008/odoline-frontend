@@ -3,12 +3,14 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { User, Download } from "lucide-react";
+import { User, Building2, Download } from "lucide-react";
 import { ProfileSettings } from "./profile-settings";
+import { ShowroomSetupSettings } from "./showroom-setup-settings";
 import { ExportDataSettings } from "./export-data-settings";
 
 const SETTINGS_TABS = [
   { key: "profile", label: "Profile", icon: User },
+  { key: "showroom", label: "Showroom Setup", icon: Building2 },
   { key: "export", label: "Export Data", icon: Download },
 ] as const;
 
@@ -46,7 +48,7 @@ export function SettingsShell() {
             Terminal Settings
           </h1>
           <p className="mt-0.5 text-xs font-medium text-ink-muted">
-            Manage owner profile credentials, security privileges, and inventory
+            Manage owner profile credentials, showroom setups, security privileges, and inventory
             data exports.
           </p>
         </div>
@@ -82,6 +84,7 @@ export function SettingsShell() {
       {/* Active Tab View Content */}
       <div>
         {activeTab === "profile" && <ProfileSettings />}
+        {activeTab === "showroom" && <ShowroomSetupSettings />}
         {activeTab === "export" && <ExportDataSettings />}
       </div>
     </div>
