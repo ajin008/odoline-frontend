@@ -8,7 +8,6 @@ import { StaffList } from "./staff-list";
 import { StaffDetailView } from "./staff-detail-view";
 import { TeamOverview } from "./team-overview";
 import { StaffModal } from "./staff-modal";
-import type { StaffMember } from "../types/staff-types";
 import { BarChart3, CheckCircle2, UserX, UserPlus } from "lucide-react";
 
 const TEAM_TABS = [
@@ -30,32 +29,37 @@ export function TeamShell() {
       : "overview";
 
   const [activeTab, setActiveTab] = useState<TeamTabKey>(initialTab);
-  const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Fetch staff list for active tab
   const staffStatusFilter = activeTab === "inactive" ? "inactive" : "active";
   const { data: staffList = [], isLoading } = useStaff(staffStatusFilter);
 
+  // Derive current selected staff dynamically from updated staffList query data
+  const currentStaff = selectedStaffId
+    ? staffList.find((s) => s.id === selectedStaffId) || null
+    : null;
+
   useEffect(() => {
     if (tabParam && TEAM_TABS.some((t) => t.key === tabParam)) {
       setActiveTab(tabParam);
-      setSelectedStaff(null); // reset detail view on tab switch
+      setSelectedStaffId(null); // reset detail view on tab switch
     }
   }, [tabParam]);
 
   const handleTabChange = (key: TeamTabKey) => {
     setActiveTab(key);
-    setSelectedStaff(null);
+    setSelectedStaffId(null);
     router.replace(`/owner/team?tab=${key}`, { scroll: false });
   };
 
   return (
     <div className="w-full space-y-6 select-none font-sans max-w-5xl">
       {/* ------------------------------------------------------------- */}
-      {/* TEAM HEADER & SUBTABS NAVIGATION (UX PATTERN MATCHING SETTINGS) */}
+      {/* TEAM HEADER & SUBTABS NAVIGATION (FIXED/STICKY AT TOP)        */}
       {/* ------------------------------------------------------------- */}
-      <div className="space-y-4 border-b border-line/40 pb-4">
+      <div className="sticky -top-5 z-20 bg-card/95 backdrop-blur-md -mx-4 sm:-mx-6 px-4 sm:px-6 pt-5 pb-4 border-b border-line/40 space-y-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
             Team &amp; Attendance Hub
@@ -94,19 +98,19 @@ export function TeamShell() {
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* ACTIVE SUBTAB CONTENT VIEW                                    */}
+      {/* ACTIVE SUBTAB CONTENT VIEW (SCROLLS INDEPENDENTLY)             */}
       {/* ------------------------------------------------------------- */}
-      <div>
+      <div className="pt-2">
         {/* OVERVIEW SUBTAB */}
         {activeTab === "overview" && <TeamOverview />}
 
         {/* ACTIVE / INACTIVE STAFF SUBTABS */}
         {activeTab !== "overview" && (
-          selectedStaff ? (
+          currentStaff ? (
             /* In-Page Subtab Detail View */
             <StaffDetailView
-              staff={selectedStaff}
-              onBack={() => setSelectedStaff(null)}
+              staff={currentStaff}
+              onBack={() => setSelectedStaffId(null)}
             />
           ) : (
             /* Roster List View */
@@ -138,7 +142,7 @@ export function TeamShell() {
                     ? "Add your sales executive team members to set up their PIN logins and department rosters."
                     : "Staff members marked as resigned will appear in this inactive list."
                 }
-                onSelectStaff={(staff) => setSelectedStaff(staff)}
+                onSelectStaff={(staff) => setSelectedStaffId(staff.id)}
                 onAddClick={
                   activeTab === "active" ? () => setIsAddModalOpen(true) : undefined
                 }

@@ -41,8 +41,8 @@ export function SettingsShell() {
 
   return (
     <div className="w-full space-y-6 select-none font-sans">
-      {/* Settings Header & Navigation Bar */}
-      <div className="space-y-4 border-b border-line/40 pb-4">
+      {/* Settings Header & Navigation Bar (Pinned/Sticky at Top) */}
+      <div className="sticky -top-5 z-20 bg-card/95 backdrop-blur-md -mx-4 sm:-mx-6 px-4 sm:px-6 pt-5 pb-4 border-b border-line/40 space-y-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
             Terminal Settings
@@ -81,7 +81,7 @@ export function SettingsShell() {
       </div>
 
       {/* Active Tab View Content */}
-      <div>
+      <div className="pt-2">
         {activeTab === "profile" && <ProfileSettings />}
         {activeTab === "showroom" && <ShowroomSetupSettings />}
         {activeTab === "department" && <DepartmentSettings />}
