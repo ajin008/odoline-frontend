@@ -65,21 +65,46 @@ export function StaffList({
         <div
           key={staff.id}
           onClick={() => onSelectStaff(staff)}
-          className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-line/90 bg-card hover:border-accent/40 hover:bg-card-hover shadow-bento transition-all cursor-pointer"
+          className="relative group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-line/90 bg-card hover:border-accent/40 hover:bg-card-hover shadow-bento transition-all cursor-pointer"
         >
-          {/* Left: Avatar + Name + Position */}
-          <div className="flex items-center gap-3.5 min-w-0">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 border border-accent/30 text-accent font-bold overflow-hidden shrink-0">
-              {staff.photo_url ? (
-                <Image
-                  src={staff.photo_url}
-                  alt={staff.name}
-                  fill
-                  unoptimized
-                  className="object-cover"
+          {/* Top Right Active Badge on Mobile / Inline on Desktop */}
+          <div className="absolute top-3.5 right-3.5 sm:static shrink-0 z-10">
+            {staff.is_active ? (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-md">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Active</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-md">
+                <span>Inactive</span>
+              </span>
+            )}
+          </div>
+
+          {/* Left: Avatar + Active Indicator + Name + Position */}
+          <div className="flex items-center gap-3.5 min-w-0 flex-1 pr-16 sm:pr-0">
+            {/* Avatar Photo + Active Status Indicator Dot */}
+            <div className="relative shrink-0">
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15 border border-accent/30 text-accent font-bold overflow-hidden">
+                {staff.photo_url ? (
+                  <Image
+                    src={staff.photo_url}
+                    alt={staff.name}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                ) : (
+                  <User className="h-5 w-5 stroke-[2.5px]" />
+                )}
+              </div>
+
+              {/* Green dot indicator for active staff */}
+              {staff.is_active && (
+                <span
+                  className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-card shadow-xs"
+                  title="Active Staff Member"
                 />
-              ) : (
-                <User className="h-5 w-5 stroke-[2.5px]" />
               )}
             </div>
 
@@ -87,6 +112,7 @@ export function StaffList({
               <h4 className="text-sm font-bold text-ink tracking-tight font-sans truncate group-hover:text-accent transition-colors">
                 {staff.name}
               </h4>
+
               <div className="flex items-center gap-2 text-xs text-ink-muted">
                 <span className="flex items-center gap-1">
                   <Briefcase className="h-3 w-3 text-ink-subtle" />
