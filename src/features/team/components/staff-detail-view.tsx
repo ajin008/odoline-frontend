@@ -158,7 +158,7 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
           </div>
 
           {/* Quick Actions */}
-          <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
             <button
               type="button"
               onClick={() => setIsEditOpen(true)}
@@ -202,27 +202,27 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
         {/* Detailed Info Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
           {/* Phone Card with Call & WhatsApp Buttons */}
-          <div className="space-y-1.5 rounded-xl bg-inset p-4 border border-line/70">
-            <span className="text-[10px] font-semibold text-ink-subtle uppercase tracking-wider block flex items-center gap-1">
-              <Phone className="h-3 w-3 text-accent" />
+          <div className="space-y-2 rounded-xl bg-inset p-4 border border-line/70 min-w-0">
+            <span className="text-[10px] font-semibold text-ink-subtle uppercase tracking-wider flex items-center gap-1">
+              <Phone className="h-3 w-3 text-accent shrink-0" />
               <span>Mobile Phone</span>
             </span>
-            <div className="flex items-center justify-between gap-2 pt-1">
-              <span className="font-mono font-bold text-ink text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+              <span className="font-mono font-bold text-ink text-sm shrink-0">
                 +91 {staff.phone}
               </span>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
                 <a
                   href={`tel:+91${staff.phone}`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-ink hover:border-accent/40 transition-all font-bold text-xs"
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-ink hover:border-accent/40 transition-all font-bold text-xs shrink-0"
                   title={`Call +91 ${staff.phone}`}
                 >
                   <Image
                     src="/icons/phonecall-icon.png"
                     alt="Call"
-                    width={16}
-                    height={16}
-                    className="object-contain"
+                    width={15}
+                    height={15}
+                    className="object-contain shrink-0"
                   />
                   <span>Call</span>
                 </a>
@@ -230,15 +230,15 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
                   href={`https://wa.me/91${staff.phone}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-emerald-600 hover:border-emerald-500/40 transition-all font-bold text-xs"
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-emerald-600 hover:border-emerald-500/40 transition-all font-bold text-xs shrink-0"
                   title={`WhatsApp chat +91 ${staff.phone}`}
                 >
                   <Image
                     src="/icons/whatsappIcon.png"
                     alt="WhatsApp"
-                    width={16}
-                    height={16}
-                    className="object-contain"
+                    width={15}
+                    height={15}
+                    className="object-contain shrink-0"
                   />
                   <span>WhatsApp</span>
                 </a>

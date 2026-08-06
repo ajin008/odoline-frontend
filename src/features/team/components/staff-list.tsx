@@ -99,11 +99,11 @@ export function StaffList({
           </div>
 
           {/* Right: Department Badge + Phone + Call & WhatsApp Actions */}
-          <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-line/40">
+          <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-line/40 min-w-0">
             {/* Department Badge */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inset border border-line/70 text-[11px] font-bold text-ink-muted">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inset border border-line/70 text-[11px] font-bold text-ink-muted shrink-0">
               <Building2 className="h-3 w-3 text-accent shrink-0" />
-              <span className="truncate max-w-[110px]">
+              <span className="truncate max-w-[95px] sm:max-w-[110px]">
                 {staff.department_name || "Unassigned"}
               </span>
             </div>
