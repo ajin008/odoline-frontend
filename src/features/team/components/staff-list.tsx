@@ -67,21 +67,7 @@ export function StaffList({
           onClick={() => onSelectStaff(staff)}
           className="relative group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-line/90 bg-card hover:border-accent/40 hover:bg-card-hover shadow-bento transition-all cursor-pointer"
         >
-          {/* Top Right Active Badge on Mobile / Inline on Desktop */}
-          <div className="absolute top-3.5 right-3.5 sm:static shrink-0 z-10">
-            {staff.is_active ? (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-md">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Active</span>
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-md">
-                <span>Inactive</span>
-              </span>
-            )}
-          </div>
-
-          {/* Left: Avatar + Active Indicator + Name + Position */}
+          {/* Left: Avatar + Name + Position */}
           <div className="flex items-center gap-3.5 min-w-0 flex-1 pr-16 sm:pr-0">
             {/* Avatar Photo + Active Status Indicator Dot */}
             <div className="relative shrink-0">
@@ -124,8 +110,22 @@ export function StaffList({
             </div>
           </div>
 
-          {/* Right: Department Badge + Phone + Call & WhatsApp Actions */}
+          {/* Right: Active Badge (Desktop: after profile area) + Department Badge + Call & WhatsApp Actions */}
           <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-line/40 min-w-0">
+            {/* Active / Inactive Badge (Top Right on Mobile, after profile area on Desktop) */}
+            <div className="absolute top-3.5 right-3.5 sm:static shrink-0 z-10">
+              {staff.is_active ? (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-md">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Active</span>
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-md">
+                  <span>Inactive</span>
+                </span>
+              )}
+            </div>
+
             {/* Department Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inset border border-line/70 text-[11px] font-bold text-ink-muted shrink-0">
               <Building2 className="h-3 w-3 text-accent shrink-0" />
