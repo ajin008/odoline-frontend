@@ -1,6 +1,22 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "cars4-dms-documents-prod.s3.ap-south-1.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {

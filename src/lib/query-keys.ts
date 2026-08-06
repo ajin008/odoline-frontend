@@ -26,4 +26,18 @@ export const queryKeys = {
     stats: ["dashboard", "stats"] as const,
     attention: ["dashboard", "attention"] as const,
   },
+
+  config: ["config"] as const,
+
+  departments: {
+    all: ["departments"] as const,
+    list: (status?: string) => ["departments", { status }] as const,
+    detail: (id: string) => ["departments", id] as const,
+  },
+
+  staff: {
+    all: ["staff"] as const,
+    list: (status?: string) => ["staff", { status }] as const,
+    detail: (id: string) => ["staff", id] as const,
+  },
 } as const;

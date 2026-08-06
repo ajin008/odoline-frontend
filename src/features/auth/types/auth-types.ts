@@ -13,6 +13,7 @@ export interface AuthUser {
   phone: string;
   role: UserRole;
   is_active: boolean;
+  photo_url?: string | null;
   last_login_at: string | null;
 }
 

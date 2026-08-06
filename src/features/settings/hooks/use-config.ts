@@ -1,11 +1,12 @@
 // features/settings/hooks/use-config.ts
 import { useQuery } from "@tanstack/react-query";
 import { configApi } from "../api/config-api";
+import { queryKeys } from "@/src/lib/query-keys";
 
 export function useConfig() {
   return useQuery({
-    queryKey: ["config"],
+    queryKey: queryKeys.config,
     queryFn: configApi.get,
-    staleTime: 60 * 60 * 1000, // config rarely changes — cache 1 hour
+    staleTime: 5 * 60 * 1000,
   });
 }

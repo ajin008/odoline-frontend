@@ -1,15 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMe } from "@/src/features/auth/hooks/use-me";
+import { useUpdatePhoto } from "@/src/features/auth/hooks/use-update-photo";
 import { useConfig } from "../hooks/use-config";
 import { ChangePinModal } from "./change-pin-modal";
-import { User, Phone, ShieldCheck, Building2, Lock, KeyRound, MapPin } from "lucide-react";
+import {
+  User,
+  Phone,
+  ShieldCheck,
+  Building2,
+  Lock,
+  KeyRound,
+  MapPin,
+  Camera,
+  Loader2,
+} from "lucide-react";
 
 export function ProfileSettings() {
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { data: user, isLoading: isUserLoading } = useMe();
   const { data: config, isLoading: isConfigLoading } = useConfig();
+  const updatePhotoMutation = useUpdatePhoto();
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      updatePhotoMutation.mutate(file);
+    }
+  };
 
   const isLoading = isUserLoading || isConfigLoading;
 
@@ -35,15 +55,51 @@ export function ProfileSettings() {
   return (
     <div className="space-y-6 select-none font-sans max-w-2xl">
       {/* ------------------------------------------------------------- */}
-      {/* PART 1: USER PROFILE (READONLY)                               */}
+      {/* PART 1: USER PROFILE (READONLY WITH PHOTO ACTION)             */}
       {/* ------------------------------------------------------------- */}
       <div className="rounded-xl border border-line bg-card p-4 sm:p-6 space-y-5">
         {/* Section Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line pb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent text-inverse shrink-0">
-              <User className="h-5 w-5 stroke-[2.5px]" />
+          <div className="flex items-center gap-3.5">
+            {/* Interactive Profile Photo Avatar */}
+            <div className="relative group shrink-0">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handlePhotoSelect}
+              />
+              <div
+                onClick={() =>
+                  !updatePhotoMutation.isPending &&
+                  fileInputRef.current?.click()
+                }
+                className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-inverse overflow-hidden border border-line cursor-pointer transition-all hover:opacity-90 shadow-xs"
+                title="Click to upload or change profile photo"
+              >
+                {user?.photo_url ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={user.photo_url}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <User className="h-7 w-7 stroke-[2.5px]" />
+                )}
+
+                {/* Hover overlay indicator */}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                  {updatePhotoMutation.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Camera className="h-5 w-5 stroke-[2.5px]" />
+                  )}
+                </div>
+              </div>
             </div>
+
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="text-sm font-bold text-ink tracking-tight font-sans">
@@ -54,7 +110,7 @@ export function ProfileSettings() {
                 </span>
               </div>
               <p className="text-xs text-ink-subtle mt-0.5">
-                Personal credentials and authentication state
+                Click photo avatar to update profile picture
               </p>
             </div>
           </div>

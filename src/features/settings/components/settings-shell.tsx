@@ -3,15 +3,15 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { User, Building2, Download } from "lucide-react";
+import { User, Building2, Layers } from "lucide-react";
 import { ProfileSettings } from "./profile-settings";
 import { ShowroomSetupSettings } from "./showroom-setup-settings";
-import { ExportDataSettings } from "./export-data-settings";
+import { DepartmentSettings } from "./department-settings";
 
 const SETTINGS_TABS = [
   { key: "profile", label: "Profile", icon: User },
   { key: "showroom", label: "Showroom Setup", icon: Building2 },
-  { key: "export", label: "Export Data", icon: Download },
+  { key: "department", label: "Department", icon: Layers },
 ] as const;
 
 type SettingsTabKey = (typeof SETTINGS_TABS)[number]["key"];
@@ -48,8 +48,7 @@ export function SettingsShell() {
             Terminal Settings
           </h1>
           <p className="mt-0.5 text-xs font-medium text-ink-muted">
-            Manage owner profile credentials, showroom setups, security privileges, and inventory
-            data exports.
+            Manage owner profile credentials, showroom geofences, departments, and security privileges.
           </p>
         </div>
 
@@ -85,7 +84,7 @@ export function SettingsShell() {
       <div>
         {activeTab === "profile" && <ProfileSettings />}
         {activeTab === "showroom" && <ShowroomSetupSettings />}
-        {activeTab === "export" && <ExportDataSettings />}
+        {activeTab === "department" && <DepartmentSettings />}
       </div>
     </div>
   );

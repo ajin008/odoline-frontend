@@ -27,6 +27,7 @@ export function OwnerNavbar() {
   const isDashboard = pathname === "/owner/dashboard";
   const isInventory = pathname.startsWith("/owner/inventory") || pathname.startsWith("/owner/cars");
   const isSettings = pathname.startsWith("/owner/settings");
+  const isTeam = pathname.startsWith("/owner/team");
 
   return (
     <header className="sticky top-0 z-30 bg-card/90 backdrop-blur-md border-b border-line/60 select-none shrink-0 transition-colors">
@@ -71,6 +72,12 @@ export function OwnerNavbar() {
                 <div className="flex items-center gap-1.5 font-bold text-ink">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Inventory</span>
+                </div>
+              )}
+
+              {isTeam && (
+                <div className="flex items-center gap-1.5 font-bold text-ink">
+                  <span>Team</span>
                 </div>
               )}
 

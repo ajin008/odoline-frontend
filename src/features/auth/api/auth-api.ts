@@ -18,4 +18,12 @@ export const authApi = {
   async changePin(payload: ChangePinPayload): Promise<void> {
     await apiClient.patch(endpoints.auth.changePin, payload);
   },
+  async updatePhoto(file: File): Promise<AuthUser> {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await apiClient.patch(endpoints.auth.updatePhoto, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data.data;
+  },
 };
