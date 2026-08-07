@@ -244,7 +244,7 @@ export function ClockInWidget() {
               type="button"
               disabled={isPending}
               onClick={handleAction}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-bold text-inverse hover:bg-accent-hover active:scale-[0.99] disabled:opacity-50 transition-all cursor-pointer shadow-sm"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-bold text-inverse hover:bg-accent-hover active:scale-[0.99] disabled:opacity-50 transition-all cursor-pointer shadow-sm border-none"
             >
               {isPending ? (
                 <>
@@ -265,7 +265,7 @@ export function ClockInWidget() {
               type="button"
               disabled={isPending}
               onClick={handleAction}
-              className="w-full flex items-center justify-center gap-2 rounded-xl border border-amber-500/40 bg-amber-500/15 text-amber-900 dark:text-amber-200 hover:bg-amber-500/25 active:scale-[0.99] disabled:opacity-50 transition-all cursor-pointer shadow-xs font-bold text-sm py-3.5"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#171819] hover:bg-[#262729] text-white py-3.5 text-sm font-bold shadow-sm active:scale-[0.99] disabled:opacity-50 transition-all cursor-pointer border-none"
             >
               {isPending ? (
                 <>
@@ -285,7 +285,7 @@ export function ClockInWidget() {
             <button
               type="button"
               disabled={true}
-              className="w-full flex items-center justify-center gap-2 rounded-xl border border-line bg-inset px-6 py-3.5 text-xs font-bold text-ink-subtle cursor-not-allowed opacity-80"
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-inset px-6 py-3.5 text-xs font-bold text-ink-subtle cursor-not-allowed opacity-80 border-none"
             >
               <CheckCircle2 className="h-4 w-4 text-emerald-600" />
               <span>Attendance Recorded for Today</span>
