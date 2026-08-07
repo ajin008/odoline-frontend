@@ -7,8 +7,7 @@ import { useLogin } from "../hooks/use-login";
 import { BackgroundPattern } from "./background-pattern";
 
 export function LoginForm() {
-  const mobile = useLogin();
-  const desktop = useLogin();
+  const { register, errors, onSubmit, isSubmitting } = useLogin();
   const [showPin, setShowPin] = useState(false);
 
   return (
@@ -19,9 +18,8 @@ export function LoginForm() {
       {/* ------------------------------------------------------------- */}
       {/* PWA MOBILE SHELL LAYOUT (Native App Window Style)             */}
       {/* ------------------------------------------------------------- */}
-      {/* Changed to h-dvh and removed extra paddings to eliminate scrolling entirely */}
       <div className="flex h-dvh flex-col justify-between px-5 pt-8 pb-5 md:hidden overflow-hidden">
-        {/* Upper Portion: Clean Content Branding (Matching Clean Weights) */}
+        {/* Upper Portion: Clean Content Branding */}
         <div className="space-y-5 pt-2">
           <div className="flex items-center gap-2">
             <Image
@@ -50,17 +48,17 @@ export function LoginForm() {
 
         {/* Lower Portion: Login Box snapped directly to the bottom area */}
         <div className="w-full bg-card border border-line rounded-2xl shadow-bento px-6 py-7 space-y-5 mb-1">
-          {/* Panel Sub-heading (Clean Semibold Style) */}
+          {/* Panel Sub-heading */}
           <div className="text-center">
             <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
-              Welcome to Cars4 login now!
+              Welcome to Cars4 Terminal
             </h2>
             <p className="text-xs font-medium text-ink-muted mt-1">
-              For Authorized Cars4 team members only
+              For Authorized Cars4 team members
             </p>
           </div>
 
-          <form onSubmit={mobile.onSubmit} noValidate className="space-y-3.5">
+          <form onSubmit={onSubmit} noValidate className="space-y-3.5">
             {/* Mobile Phone Field */}
             <div className="space-y-1">
               <label className="block text-xs font-semibold text-ink-muted pl-1">
@@ -75,14 +73,14 @@ export function LoginForm() {
                   inputMode="numeric"
                   maxLength={10}
                   placeholder="Enter registered number"
-                  aria-invalid={!!mobile.errors.phone}
+                  aria-invalid={!!errors.phone}
                   className="w-full rounded-xl border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
-                  {...mobile.register("phone")}
+                  {...register("phone")}
                 />
               </div>
-              {mobile.errors.phone && (
+              {errors.phone && (
                 <p className="mt-1 text-xs font-semibold text-danger pl-1">
-                  {mobile.errors.phone.message}
+                  {errors.phone.message}
                 </p>
               )}
             </div>
@@ -98,21 +96,21 @@ export function LoginForm() {
                   inputMode="numeric"
                   maxLength={6}
                   placeholder="••••••"
-                  aria-invalid={!!mobile.errors.pin}
+                  aria-invalid={!!errors.pin}
                   className="w-full rounded-xl border border-line bg-inset px-4 py-3 pr-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
-                  {...mobile.register("pin")}
+                  {...register("pin")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPin((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-subtle hover:text-ink transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-subtle hover:text-ink transition-colors cursor-pointer"
                 >
                   {showPin ? "HIDE" : "SHOW"}
                 </button>
               </div>
-              {mobile.errors.pin && (
+              {errors.pin && (
                 <p className="mt-1 text-xs font-semibold text-danger pl-1">
-                  {mobile.errors.pin.message}
+                  {errors.pin.message}
                 </p>
               )}
             </div>
@@ -120,17 +118,17 @@ export function LoginForm() {
             {/* Submit Control Button */}
             <button
               type="submit"
-              disabled={mobile.isSubmitting}
+              disabled={isSubmitting}
               className="w-full rounded-xl bg-accent py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center cursor-pointer shadow-sm mt-1"
             >
-              {mobile.isSubmitting ? "Verifying..." : "Login"}
+              {isSubmitting ? "Verifying..." : "Login"}
             </button>
           </form>
         </div>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* DESKTOP CAL.COM EDITORIAL STRUCTURE                           */}
+      {/* DESKTOP STRUCTURE                                             */}
       {/* ------------------------------------------------------------- */}
       <div className="hidden md:flex min-h-screen items-center justify-between max-w-300 mx-auto w-full px-12 lg:px-16">
         {/* Left Side Editorial Content Area */}
@@ -181,7 +179,7 @@ export function LoginForm() {
               </p>
             </div>
 
-            <form onSubmit={desktop.onSubmit} noValidate className="space-y-4">
+            <form onSubmit={onSubmit} noValidate className="space-y-4">
               {/* Desktop Phone Field */}
               <div className="space-y-1.5">
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-ink-muted">
@@ -196,14 +194,14 @@ export function LoginForm() {
                     inputMode="numeric"
                     maxLength={10}
                     placeholder="9876543210"
-                    aria-invalid={!!desktop.errors.phone}
+                    aria-invalid={!!errors.phone}
                     className="w-full rounded-lg border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
-                    {...desktop.register("phone")}
+                    {...register("phone")}
                   />
                 </div>
-                {desktop.errors.phone && (
+                {errors.phone && (
                   <p className="text-xs font-semibold text-danger pl-1">
-                    {desktop.errors.phone.message}
+                    {errors.phone.message}
                   </p>
                 )}
               </div>
@@ -219,21 +217,21 @@ export function LoginForm() {
                     inputMode="numeric"
                     maxLength={6}
                     placeholder="••••••"
-                    aria-invalid={!!desktop.errors.pin}
+                    aria-invalid={!!errors.pin}
                     className="w-full rounded-lg border border-line bg-inset px-4 py-3 pr-12 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
-                    {...desktop.register("pin")}
+                    {...register("pin")}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPin((prev) => !prev)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-subtle hover:text-ink active:scale-95 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-ink-subtle hover:text-ink active:scale-95 transition-colors cursor-pointer"
                   >
                     {showPin ? "HIDE" : "SHOW"}
                   </button>
                 </div>
-                {desktop.errors.pin && (
+                {errors.pin && (
                   <p className="text-xs font-semibold text-danger pl-1">
-                    {desktop.errors.pin.message}
+                    {errors.pin.message}
                   </p>
                 )}
               </div>
@@ -241,10 +239,10 @@ export function LoginForm() {
               {/* Submit Trigger */}
               <button
                 type="submit"
-                disabled={desktop.isSubmitting}
-                className="w-full rounded-lg bg-accent px-4 py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer"
+                disabled={isSubmitting}
+                className="w-full rounded-lg bg-accent px-4 py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-sm"
               >
-                {desktop.isSubmitting
+                {isSubmitting
                   ? "Syncing Terminal Tokens..."
                   : "Log In to Dashboard"}
               </button>

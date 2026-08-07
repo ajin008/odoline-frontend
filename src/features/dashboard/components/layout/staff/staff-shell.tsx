@@ -1,32 +1,29 @@
-// components/layout/owner/owner-shell.tsx
 "use client";
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
 import { useMe } from "@/src/features/auth/hooks/use-me";
-import { OwnerSidebar } from "./owner-sidebar";
-import { OwnerNavbar } from "./owner-navbar";
-import { OwnerBottomTabs } from "./owner-bottom-tabs";
+import { StaffSidebar } from "./staff-sidebar";
+import { StaffNavbar } from "./staff-navbar";
+import { StaffBottomTabs } from "./staff-bottom-tabs";
 
-export function OwnerShell({ children }: { children: React.ReactNode }) {
+export function StaffShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: user, isLoading, error } = useMe();
   const isUnauthorized = isAxiosError(error) && error.response?.status === 401;
 
-  // Redirect if not logged in (401) or not an owner. Other failures (e.g. a
-  // transient 5xx) are not treated as "logged out" — they just fail to load.
+  // Role guard: only sales role with is_active === true can access staff routes
   useEffect(() => {
     if (isUnauthorized || (user && !user.is_active)) {
       router.replace("/login");
-    } else if (user && user.role === "sales") {
-      router.replace("/staff/dashboard");
-    } else if (user && user.role !== "owner") {
+    } else if (user && user.role === "owner") {
+      router.replace("/owner/dashboard");
+    } else if (user && user.role !== "sales") {
       router.replace("/login");
     }
   }, [user, isUnauthorized, router]);
 
-  // While the session is being verified, show the loading spinner.
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-canvas">
@@ -35,27 +32,28 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Not an owner → render nothing while the redirect above kicks in.
-  if (!user || user.role !== "owner") {
+  if (!user || user.role !== "sales" || !user.is_active) {
     return null;
   }
 
   return (
     <div className="h-[100dvh] max-h-[100dvh] bg-canvas antialiased p-0 md:p-3 lg:p-4 flex overflow-hidden">
+      {/* Desktop Sidebar Navigation */}
       <div className="hidden md:block md:w-[240px] shrink-0 overflow-hidden rounded-xl md:mr-3 lg:mr-4">
-        <OwnerSidebar />
+        <StaffSidebar />
       </div>
 
-      {/* Unified Right Workspace Panel (Modern Premium SaaS Layout) */}
+      {/* Unified Right Workspace Panel */}
       <div className="flex-1 flex flex-col bg-card rounded-none md:rounded-xl border-none md:border border-line shadow-none md:shadow-bento overflow-hidden h-full min-w-0">
-        <OwnerNavbar />
-        <main className="flex-1 px-4 sm:px-6 py-5 overflow-y-auto pb-36 md:pb-6 overscroll-y-contain animate-in fade-in duration-300">
+        <StaffNavbar />
+        <main className="flex-1 flex flex-col px-4 sm:px-6 py-5 overflow-y-auto pb-24 md:pb-6 overscroll-y-contain animate-in fade-in duration-300">
           {children}
         </main>
       </div>
 
+      {/* Mobile Floating Bottom Dock Navigation Bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 md:hidden pointer-events-none">
-        <OwnerBottomTabs />
+        <StaffBottomTabs />
       </div>
     </div>
   );

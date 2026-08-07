@@ -63,4 +63,10 @@ export const endpoints = {
   export: {
     cars: "/export/cars",
   },
+
+  attendance: {
+    today: "/attendance/me/today",
+    clockIn: "/attendance/clock-in",
+    clockOut: "/attendance/clock-out",
+  },
 } as const;

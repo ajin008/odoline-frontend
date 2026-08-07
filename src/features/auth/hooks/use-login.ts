@@ -14,22 +14,20 @@ import { getApiErrorMessage } from "@/src/utils/error-handler";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/src/lib/query-keys";
 import { useMe } from "./use-me";
-/**
- * All the login *logic* lives here. The component that uses this hook
- * stays "dumb": it renders inputs and shows whatever this hook returns.
- */
 
 export function useLogin() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  // The owner/staff toggle. UX only — NOT sent as a credential.
   const [role, setRole] = useState<UserRole>("owner");
 
   const { data: user } = useMe();
 
+  // If user visits /login while already authenticated, redirect to their dashboard
   useEffect(() => {
     if (user) {
-      router.replace("/owner/dashboard");
+      const targetUrl =
+        user.role === "sales" ? "/staff/dashboard" : "/owner/dashboard";
+      router.replace(targetUrl);
     }
   }, [user, router]);
 
@@ -45,18 +43,22 @@ export function useLogin() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      // console.log("Login form submitted with values:", values);
-      // Send only phone + pin. The server determines the real role.
-      const user = await authApi.login({
+      const loggedInUser = await authApi.login({
         phone: values.phone,
         pin: values.pin,
       });
-      queryClient.setQueryData(queryKeys.me, user);
 
-      // Success means the server already set the httpOnly cookie.
-      // There's no token to store — just navigate in.
-      // `replace` so the back button doesn't return to the login screen.
-      router.replace("/owner/dashboard");
+      queryClient.setQueryData(queryKeys.me, loggedInUser);
+
+      // Perform a hard browser redirect using window.location.assign to clear
+      // router cache and guarantee fresh httpOnly cookies on the new dashboard document
+      // without violating React Compiler immutability rules.
+      const targetUrl =
+        loggedInUser.role === "sales"
+          ? "/staff/dashboard"
+          : "/owner/dashboard";
+
+      window.location.assign(targetUrl);
     } catch (error) {
       toast.error(getApiErrorMessage(error));
     }

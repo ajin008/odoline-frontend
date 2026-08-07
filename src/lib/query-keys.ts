@@ -40,4 +40,9 @@ export const queryKeys = {
     list: (status?: string) => ["staff", { status }] as const,
     detail: (id: string) => ["staff", id] as const,
   },
+
+  attendance: {
+    all: ["attendance"] as const,
+    today: ["attendance", "today"] as const,
+  },
 } as const;
