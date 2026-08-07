@@ -121,12 +121,12 @@ export function ShowroomSetupSettings() {
             type="button"
             onClick={handleUseCurrentLocation}
             disabled={isLocating}
-            className="inline-flex items-center gap-2 rounded-lg border border-line bg-inset px-3.5 py-2 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card active:scale-[0.98] transition-all cursor-pointer self-start sm:self-auto"
+            className="inline-flex items-center gap-2 rounded-lg bg-[#171819] hover:bg-[#262729] text-white border border-[#262729] px-3.5 py-2 text-xs font-bold shadow-sm active:scale-[0.98] transition-all cursor-pointer self-start sm:self-auto border-none"
           >
             {isLocating ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <Locate className="h-3.5 w-3.5 text-accent stroke-[2.5px]" />
+              <Locate className="h-3.5 w-3.5 text-white stroke-[2.5px]" />
             )}
             <span>Use My Current Location</span>
           </button>

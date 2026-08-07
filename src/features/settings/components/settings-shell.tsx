@@ -3,14 +3,14 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { User, Building2, Layers } from "lucide-react";
+import { User, MapPin, Layers } from "lucide-react";
 import { ProfileSettings } from "./profile-settings";
 import { ShowroomSetupSettings } from "./showroom-setup-settings";
 import { DepartmentSettings } from "./department-settings";
 
 const SETTINGS_TABS = [
   { key: "profile", label: "Profile", icon: User },
-  { key: "showroom", label: "Showroom Setup", icon: Building2 },
+  { key: "showroom", label: "Geofence", icon: MapPin },
   { key: "department", label: "Department", icon: Layers },
 ] as const;
 
