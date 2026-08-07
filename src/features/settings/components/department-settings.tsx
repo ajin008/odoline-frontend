@@ -15,8 +15,6 @@ import {
   Pencil,
   Power,
   RefreshCw,
-  CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
 
 function formatTime12h(timeStr: string) {
@@ -87,7 +85,7 @@ export function DepartmentSettings() {
           </div>
           <p className="text-xs text-ink-subtle">
             Manage shift schedules, working hours, and weekly holidays for staff
-            rosters
+            members
           </p>
         </div>
 
@@ -143,9 +141,10 @@ export function DepartmentSettings() {
 
       {/* Loading Skeleton */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="h-40 rounded-xl bg-inset border border-line animate-pulse" />
-          <div className="h-40 rounded-xl bg-inset border border-line animate-pulse" />
+        <div className="space-y-2">
+          <div className="h-12 rounded-xl bg-inset border border-line animate-pulse" />
+          <div className="h-12 rounded-xl bg-inset border border-line animate-pulse" />
+          <div className="h-12 rounded-xl bg-inset border border-line animate-pulse" />
         </div>
       ) : departments.length === 0 ? (
         /* Empty State */
@@ -172,100 +171,150 @@ export function DepartmentSettings() {
           </button>
         </div>
       ) : (
-        /* Department Grid Cards */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {departments.map((dept) => (
-            <div
-              key={dept.id}
-              className={`rounded-xl border p-5 space-y-4 shadow-bento transition-all ${
-                dept.is_active
-                  ? "border-line/90 bg-card hover:border-accent/30"
-                  : "border-line/50 opacity-75 bg-inset/50"
-              }`}
-            >
-              {/* Card Header */}
-              <div className="flex items-start justify-between gap-3 border-b border-line/60 pb-3">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-ink tracking-tight font-sans">
-                      {dept.name}
-                    </h3>
+        /* Sleek Structured Data List Table */
+        <div className="bg-card border border-line rounded-xl shadow-bento overflow-hidden">
+          {/* Desktop Table Header */}
+          <div className="hidden sm:grid sm:grid-cols-12 gap-4 px-5 py-3 bg-inset border-b border-line text-[10px] font-bold text-ink-subtle uppercase tracking-wider font-mono">
+            <div className="col-span-3">Department Name</div>
+            <div className="col-span-4">Shift Timings</div>
+            <div className="col-span-3">Weekly Off</div>
+            <div className="col-span-2 text-right">Actions</div>
+          </div>
+
+          {/* Table Rows List */}
+          <div className="divide-y divide-line/60">
+            {departments.map((dept) => (
+              <div
+                key={dept.id}
+                className={`p-4 sm:px-5 sm:py-3.5 transition-colors ${
+                  dept.is_active
+                    ? "hover:bg-inset/40"
+                    : "bg-inset/20 opacity-75 hover:bg-inset/40"
+                }`}
+              >
+                {/* Desktop View (Data Table Row) */}
+                <div className="hidden sm:grid sm:grid-cols-12 gap-4 items-center text-xs">
+                  {/* Department Name + Status Indicator */}
+                  <div className="col-span-3 font-bold text-ink font-sans flex items-center gap-2">
+                    <span
+                      className={`h-2 w-2 rounded-full shrink-0 ${
+                        dept.is_active ? "bg-emerald-500" : "bg-amber-500"
+                      }`}
+                    />
+                    <span className="truncate">{dept.name}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+
+                  {/* Shift Timings */}
+                  <div className="col-span-4 font-mono font-medium text-ink flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5 text-accent shrink-0" />
+                    <span>
+                      {formatTime12h(dept.shift_start)} –{" "}
+                      {formatTime12h(dept.shift_end)}
+                    </span>
+                  </div>
+
+                  {/* Weekly Off */}
+                  <div className="col-span-3 font-sans font-medium text-ink flex items-center gap-1.5">
+                    <Calendar className="h-3.5 w-3.5 text-accent shrink-0" />
+                    <span>
+                      {WEEKLY_HOLIDAY_LABELS[dept.weekly_holiday] || "Sunday"}
+                    </span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="col-span-2 flex items-center justify-end gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEdit(dept)}
+                      className="p-1.5 rounded-md text-ink-muted hover:text-ink hover:bg-inset transition-colors cursor-pointer"
+                      title="Edit Department"
+                    >
+                      <Pencil className="h-3.5 w-3.5 stroke-[2px]" />
+                    </button>
+
                     {dept.is_active ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
-                        <CheckCircle2 className="h-3 w-3 stroke-[2.5px]" />
-                        <span>Active Roster</span>
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setDeactivateTarget(dept)}
+                        className="p-1.5 rounded-md text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        title="Deactivate Department"
+                      >
+                        <Power className="h-3.5 w-3.5 stroke-[2.5px]" />
+                      </button>
                     ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                        <AlertCircle className="h-3 w-3 stroke-[2.5px]" />
-                        <span>Deactivated</span>
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setActivateTarget(dept)}
+                        className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-500/10 transition-colors cursor-pointer"
+                        title="Reactivate Department"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5 stroke-[2.5px]" />
+                      </button>
                     )}
                   </div>
                 </div>
 
-                {/* Card Action Buttons */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenEdit(dept)}
-                    className="p-1.5 rounded-md text-ink-muted hover:text-ink hover:bg-inset transition-colors cursor-pointer"
-                    title="Edit Department"
-                  >
-                    <Pencil className="h-3.5 w-3.5 stroke-[2px]" />
-                  </button>
+                {/* Mobile View (Compact Row Card) */}
+                <div className="sm:hidden space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="font-bold text-sm text-ink font-sans flex items-center gap-2">
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          dept.is_active ? "bg-emerald-500" : "bg-amber-500"
+                        }`}
+                      />
+                      <span>{dept.name}</span>
+                    </div>
 
-                  {dept.is_active ? (
-                    <button
-                      type="button"
-                      onClick={() => setDeactivateTarget(dept)}
-                      className="p-1.5 rounded-md text-rose-600 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                      title="Deactivate Department"
-                    >
-                      <Power className="h-3.5 w-3.5 stroke-[2.5px]" />
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setActivateTarget(dept)}
-                      className="p-1.5 rounded-md text-emerald-600 hover:bg-emerald-500/10 transition-colors cursor-pointer"
-                      title="Reactivate Department"
-                    >
-                      <RefreshCw className="h-3.5 w-3.5 stroke-[2.5px]" />
-                    </button>
-                  )}
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(dept)}
+                        className="p-1.5 rounded-md text-ink-muted hover:text-ink bg-inset transition-colors cursor-pointer"
+                      >
+                        <Pencil className="h-3.5 w-3.5 stroke-[2px]" />
+                      </button>
+                      {dept.is_active ? (
+                        <button
+                          type="button"
+                          onClick={() => setDeactivateTarget(dept)}
+                          className="p-1.5 rounded-md text-rose-600 bg-rose-500/10 transition-colors cursor-pointer"
+                        >
+                          <Power className="h-3.5 w-3.5 stroke-[2.5px]" />
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setActivateTarget(dept)}
+                          className="p-1.5 rounded-md text-emerald-600 bg-emerald-500/10 transition-colors cursor-pointer"
+                        >
+                          <RefreshCw className="h-3.5 w-3.5 stroke-[2.5px]" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-ink-muted pt-1">
+                    <span className="flex items-center gap-1 font-mono">
+                      <Clock className="h-3 w-3 text-accent" />
+                      <span>
+                        {formatTime12h(dept.shift_start)} –{" "}
+                        {formatTime12h(dept.shift_end)}
+                      </span>
+                    </span>
+
+                    <span className="flex items-center gap-1 font-sans">
+                      <Calendar className="h-3 w-3 text-accent" />
+                      <span>
+                        Off:{" "}
+                        {WEEKLY_HOLIDAY_LABELS[dept.weekly_holiday] || "Sunday"}
+                      </span>
+                    </span>
+                  </div>
                 </div>
               </div>
-
-              {/* Department Timing Details */}
-              <div className="grid grid-cols-2 gap-3 text-xs">
-                {/* Shift Hours */}
-                <div className="space-y-1 rounded-lg bg-inset p-3 border border-line/70">
-                  <span className="text-[10px] font-semibold text-ink-subtle uppercase tracking-wider block flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-accent" />
-                    <span>Shift Timings</span>
-                  </span>
-                  <span className="font-mono font-bold text-ink block text-[11px]">
-                    {formatTime12h(dept.shift_start)} –{" "}
-                    {formatTime12h(dept.shift_end)}
-                  </span>
-                </div>
-
-                {/* Weekly Holiday */}
-                <div className="space-y-1 rounded-lg bg-inset p-3 border border-line/70">
-                  <span className="text-[10px] font-semibold text-ink-subtle uppercase tracking-wider block flex items-center gap-1">
-                    <Calendar className="h-3 w-3 text-accent" />
-                    <span>Weekly Off Day</span>
-                  </span>
-                  <span className="font-sans font-bold text-ink block text-[11px]">
-                    {WEEKLY_HOLIDAY_LABELS[dept.weekly_holiday] || "Sunday"}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
@@ -282,7 +331,7 @@ export function DepartmentSettings() {
         onClose={() => setDeactivateTarget(null)}
         onConfirm={handleConfirmDeactivate}
         title={`Deactivate "${deactivateTarget?.name}"?`}
-        description="Deactivating this department will soft-delete it from active rosters. Historical records will be preserved."
+        description="Deactivating this department will soft-delete it from active department lists. Historical records will be preserved."
         confirmText="Deactivate Department"
         cancelText="Cancel"
         variant="danger"
@@ -295,7 +344,7 @@ export function DepartmentSettings() {
         onClose={() => setActivateTarget(null)}
         onConfirm={handleConfirmActivate}
         title={`Reactivate "${activateTarget?.name}"?`}
-        description="Reactivating this department will restore it to the active rosters for staff assignments."
+        description="Reactivating this department will restore it to active departments for staff assignments."
         confirmText="Reactivate Department"
         cancelText="Cancel"
         variant="danger"

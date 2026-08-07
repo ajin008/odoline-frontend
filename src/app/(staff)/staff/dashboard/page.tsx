@@ -250,7 +250,7 @@ export default function StaffDashboardPage() {
                 </div>
               </button>
 
-              {/* Action 2: Stock Roster */}
+              {/* Action 2: Showroom Stock */}
               <Link
                 href="/staff/stock"
                 className="flex flex-col items-start p-3.5 rounded-lg border border-line bg-inset hover:bg-card hover:border-accent/40 transition-all text-left space-y-2 cursor-pointer group"

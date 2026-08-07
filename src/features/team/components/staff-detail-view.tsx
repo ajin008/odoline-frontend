@@ -71,17 +71,17 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 rounded-lg border border-line/70 bg-inset px-3.5 py-2 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all cursor-pointer shadow-xs"
+          className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-xs font-bold text-inverse hover:bg-accent-hover active:scale-[0.98] transition-all cursor-pointer shadow-sm border-none"
         >
           <ArrowLeft className="h-4 w-4 stroke-[2.5px]" />
-          <span>Back to Staff Roster</span>
+          <span>Back to Staff List</span>
         </button>
 
         <div className="flex items-center gap-2">
           {staff.is_active ? (
             <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">
               <CheckCircle2 className="h-3.5 w-3.5 stroke-[2.5px]" />
-              <span>Active Roster</span>
+              <span>Active Staff</span>
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-md">

@@ -5,7 +5,7 @@ export default function StaffStockPage() {
     <div className="w-full space-y-5 font-sans select-none">
       <div className="space-y-1 border-b border-line/60 pb-4">
         <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
-          Showroom Car Stock Roster
+          Showroom Car Stock
         </h1>
         <p className="text-xs text-ink-muted">
           Browse active showroom vehicles, pricing details, and stock specifications.
@@ -20,7 +20,7 @@ export default function StaffStockPage() {
           <div className="flex items-center justify-center gap-1.5">
             <Sparkles className="h-4 w-4 text-accent" />
             <h3 className="text-sm font-bold text-ink font-sans">
-              Stock Roster Engine Coming Next
+              Showroom Car Stock Coming Soon
             </h3>
           </div>
           <p className="text-xs text-ink-subtle max-w-sm mx-auto">

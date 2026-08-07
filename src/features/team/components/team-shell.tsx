@@ -65,7 +65,7 @@ export function TeamShell() {
             Team &amp; Attendance Hub
           </h1>
           <p className="mt-0.5 text-xs font-medium text-ink-muted">
-            Manage dealership staff rosters, attendance logs, department assignments, and active staff profiles.
+            Manage dealership staff members, attendance logs, department assignments, and active staff profiles.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export function TeamShell() {
               onBack={() => setSelectedStaffId(null)}
             />
           ) : (
-            /* Roster List View */
+            /* Staff List View */
             <div className="space-y-4">
               {/* Add Staff Top Action Bar */}
               {activeTab === "active" && (
@@ -139,7 +139,7 @@ export function TeamShell() {
                 }
                 emptyDescription={
                   activeTab === "active"
-                    ? "Add your sales executive team members to set up their PIN logins and department rosters."
+                    ? "Add your sales executive team members to set up their PIN logins and department assignments."
                     : "Staff members marked as resigned will appear in this inactive list."
                 }
                 onSelectStaff={(staff) => setSelectedStaffId(staff.id)}

@@ -19,7 +19,7 @@ export function TeamOverview() {
             </h3>
           </div>
           <p className="text-xs text-ink-muted leading-relaxed">
-            Live attendance dashboards, daily check-in/out rosters, late arrival logs, and staff performance metrics will automatically populate here once check-in/out engine is activated.
+            Live attendance dashboards, daily check-in/out logs, late arrival records, and staff performance metrics will automatically populate here once check-in/out engine is activated.
           </p>
         </div>
 
@@ -34,7 +34,7 @@ export function TeamOverview() {
         <div className="rounded-xl border border-line/90 bg-card p-5 space-y-2 shadow-bento">
           <div className="flex items-center gap-2 text-xs font-bold text-ink font-sans">
             <Clock className="h-4 w-4 text-accent stroke-[2.5px]" />
-            <span>Geofence Clock-In Roster</span>
+            <span>Geofence Clock-In Logs</span>
           </div>
           <p className="text-xs text-ink-subtle leading-relaxed">
             Track daily sales staff attendance inside the showroom geofence boundary automatically.
