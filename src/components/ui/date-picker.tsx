@@ -15,6 +15,7 @@ interface DatePickerProps {
   value: string; // YYYY-MM-DD
   onChange: (dateStr: string) => void;
   className?: string;
+  align?: "left" | "right" | "center";
 }
 
 /**
@@ -46,20 +47,6 @@ function formatReadableDate(dateStr: string): string {
 }
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
 
 function getMonthName(monthIndex: number): string {
   const norm = ((Math.floor(monthIndex) % 12) + 12) % 12;
@@ -97,6 +84,7 @@ export function DatePicker({
   value,
   onChange,
   className = "",
+  align = "right",
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -247,6 +235,15 @@ export function DatePicker({
     });
   }
 
+  let alignClasses =
+    "left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0";
+  if (align === "left") {
+    alignClasses =
+      "left-1/2 -translate-x-1/2 sm:left-0 sm:right-auto sm:translate-x-0";
+  } else if (align === "center") {
+    alignClasses = "left-1/2 -translate-x-1/2";
+  }
+
   return (
     <div ref={containerRef} className={`relative inline-block ${className}`}>
       {/* Trigger Button */}
@@ -268,7 +265,9 @@ export function DatePicker({
 
       {/* Custom Bento Calendar Dropdown Popover */}
       {isOpen && (
-        <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-2 z-50 w-[290px] max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-card p-4 shadow-bento animate-in fade-in zoom-in-95 duration-150 font-sans space-y-3">
+        <div
+          className={`absolute top-full mt-2 z-50 w-[290px] max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-card p-4 shadow-bento animate-in fade-in zoom-in-95 duration-150 font-sans space-y-3 ${alignClasses}`}
+        >
           {/* Header Controls: Month Navigation & Today Shortcut */}
           <div className="flex items-center justify-between border-b border-line/60 pb-3">
             <div className="flex items-center gap-1">

@@ -125,11 +125,12 @@ export function TeamOverview() {
             <ChevronLeft className="h-4 w-4" />
           </button>
 
-          {/* Premium Custom Calendar Popover (Mobile Center Bounded) */}
-          <div className="flex-1 sm:flex-initial flex justify-center">
+          {/* Premium Custom Calendar Popover (Mobile Center Bounded / Tab Right Aligned) */}
+          <div className="flex-1 sm:flex-initial flex justify-center sm:justify-end">
             <DatePicker
               value={selectedDate}
               onChange={(newDate) => setSelectedDate(newDate)}
+              align="right"
             />
           </div>
 
