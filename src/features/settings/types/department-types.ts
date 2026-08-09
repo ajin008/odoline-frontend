@@ -5,6 +5,7 @@ export interface Department {
   shift_end: string;   // e.g. "18:00:00" or "18:00"
   weekly_holiday: number; // 0-6 (0=Sunday)
   is_active: boolean;
+  active_staff_count?: number;
   created_at: string;
   updated_at: string;
 }

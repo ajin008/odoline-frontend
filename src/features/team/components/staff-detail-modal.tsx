@@ -21,7 +21,6 @@ import {
   RefreshCw,
   CheckCircle2,
   AlertCircle,
-  MessageCircle,
 } from "lucide-react";
 
 interface StaffDetailModalProps {
@@ -138,19 +137,31 @@ export function StaffDetailModal({
                   <div className="flex items-center gap-1 shrink-0">
                     <a
                       href={`tel:+91${staff.phone}`}
-                      className="p-1 rounded bg-card border border-line text-ink-muted hover:text-emerald-600 hover:border-emerald-500/30 transition-all"
+                      className="flex h-6 w-6 items-center justify-center rounded-md border border-line/70 bg-card hover:border-accent/40 hover:bg-inset transition-all cursor-pointer p-0.5"
                       title={`Call +91 ${staff.phone}`}
                     >
-                      <Phone className="h-3 w-3 stroke-[2.5px]" />
+                      <Image
+                        src="/icons/phonecall-icon.png"
+                        alt="Call"
+                        width={14}
+                        height={14}
+                        className="object-contain"
+                      />
                     </a>
                     <a
                       href={`https://wa.me/91${staff.phone}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/20 transition-all"
+                      className="flex h-6 w-6 items-center justify-center rounded-md border border-line/70 bg-card hover:border-emerald-500/40 hover:bg-inset transition-all cursor-pointer p-0.5"
                       title={`WhatsApp chat +91 ${staff.phone}`}
                     >
-                      <MessageCircle className="h-3 w-3 stroke-[2.5px]" />
+                      <Image
+                        src="/icons/whatsappIcon.png"
+                        alt="WhatsApp"
+                        width={14}
+                        height={14}
+                        className="object-contain"
+                      />
                     </a>
                   </div>
                 </div>

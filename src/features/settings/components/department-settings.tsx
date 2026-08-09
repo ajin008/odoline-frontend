@@ -15,6 +15,7 @@ import {
   Pencil,
   Power,
   RefreshCw,
+  Users,
 } from "lucide-react";
 
 function formatTime12h(timeStr: string) {
@@ -176,8 +177,9 @@ export function DepartmentSettings() {
           {/* Desktop Table Header */}
           <div className="hidden sm:grid sm:grid-cols-12 gap-4 px-5 py-3 bg-inset border-b border-line text-[10px] font-bold text-ink-subtle uppercase tracking-wider font-mono">
             <div className="col-span-3">Department Name</div>
-            <div className="col-span-4">Shift Timings</div>
-            <div className="col-span-3">Weekly Off</div>
+            <div className="col-span-3">Shift Timings</div>
+            <div className="col-span-2">Weekly Off</div>
+            <div className="col-span-2">Active Staff</div>
             <div className="col-span-2 text-right">Actions</div>
           </div>
 
@@ -205,7 +207,7 @@ export function DepartmentSettings() {
                   </div>
 
                   {/* Shift Timings */}
-                  <div className="col-span-4 font-mono font-medium text-ink flex items-center gap-1.5">
+                  <div className="col-span-3 font-mono font-medium text-ink flex items-center gap-1.5">
                     <Clock className="h-3.5 w-3.5 text-accent shrink-0" />
                     <span>
                       {formatTime12h(dept.shift_start)} –{" "}
@@ -214,10 +216,24 @@ export function DepartmentSettings() {
                   </div>
 
                   {/* Weekly Off */}
-                  <div className="col-span-3 font-sans font-medium text-ink flex items-center gap-1.5">
+                  <div className="col-span-2 font-sans font-medium text-ink flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5 text-accent shrink-0" />
                     <span>
                       {WEEKLY_HOLIDAY_LABELS[dept.weekly_holiday] || "Sunday"}
+                    </span>
+                  </div>
+
+                  {/* Active Staff Count */}
+                  <div className="col-span-2 font-sans font-medium text-ink flex items-center gap-1.5">
+                    <span
+                      className={`inline-flex items-center gap-1 text-[11px] font-mono font-bold px-2 py-0.5 rounded-md border ${
+                        dept.active_staff_count && dept.active_staff_count > 0
+                          ? "bg-amber-500/10 text-amber-700 border-amber-500/20"
+                          : "bg-inset text-ink-muted border-line/60"
+                      }`}
+                    >
+                      <Users className="h-3 w-3 text-accent shrink-0" />
+                      <span>{dept.active_staff_count ?? 0} active</span>
                     </span>
                   </div>
 
@@ -264,6 +280,9 @@ export function DepartmentSettings() {
                         }`}
                       />
                       <span>{dept.name}</span>
+                      <span className="text-[10px] font-mono text-ink-muted bg-inset border border-line px-1.5 py-0.2 rounded">
+                        {dept.active_staff_count ?? 0} active staff
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-1">
@@ -331,7 +350,11 @@ export function DepartmentSettings() {
         onClose={() => setDeactivateTarget(null)}
         onConfirm={handleConfirmDeactivate}
         title={`Deactivate "${deactivateTarget?.name}"?`}
-        description="Deactivating this department will soft-delete it from active department lists. Historical records will be preserved."
+        description={
+          deactivateTarget?.active_staff_count && deactivateTarget.active_staff_count > 0
+            ? `Warning: This department currently has ${deactivateTarget.active_staff_count} active staff assigned. Reassign or deactivate them first before deactivating.`
+            : "Deactivating this department will soft-delete it from active department lists. Historical records will be preserved."
+        }
         confirmText="Deactivate Department"
         cancelText="Cancel"
         variant="danger"

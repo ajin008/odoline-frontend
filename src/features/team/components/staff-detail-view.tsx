@@ -6,6 +6,7 @@ import type { StaffMember } from "../types/staff-types";
 import { useStaffActions } from "../hooks/use-staff-actions";
 import { StaffModal } from "./staff-modal";
 import { ResetPinModal } from "./reset-pin-modal";
+import { StaffAttendanceHeatmap } from "./staff-attendance-heatmap";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 import {
   ArrowLeft,
@@ -302,6 +303,9 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
           </div>
         </div>
       </div>
+
+      {/* Per-Staff Monthly Attendance Heatmap */}
+      <StaffAttendanceHeatmap staffId={staff.id} />
 
       {/* Prefilled Edit Modal */}
       <StaffModal

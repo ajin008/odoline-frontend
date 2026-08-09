@@ -44,5 +44,8 @@ export const queryKeys = {
   attendance: {
     all: ["attendance"] as const,
     today: ["attendance", "today"] as const,
+    overview: (date?: string) => ["attendance", "overview", date] as const,
+    staffHeatmap: (staffId: string, month?: string) =>
+      ["attendance", "staff", staffId, "heatmap", month] as const,
   },
 } as const;

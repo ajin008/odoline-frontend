@@ -68,5 +68,11 @@ export const endpoints = {
     today: "/attendance/me/today",
     clockIn: "/attendance/clock-in",
     clockOut: "/attendance/clock-out",
+    overview: (date?: string) =>
+      date ? `/attendance/overview?date=${date}` : "/attendance/overview",
+    staffHeatmap: (staffId: string, month?: string) =>
+      month
+        ? `/attendance/staff/${staffId}/heatmap?month=${month}`
+        : `/attendance/staff/${staffId}/heatmap`,
   },
 } as const;

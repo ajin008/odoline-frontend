@@ -20,6 +20,23 @@ export function useTodayAttendance() {
   });
 }
 
+export function useAttendanceOverview(date?: string) {
+  return useQuery({
+    queryKey: queryKeys.attendance.overview(date),
+    queryFn: () => attendanceApi.getOverview(date),
+    staleTime: 30000,
+  });
+}
+
+export function useStaffHeatmap(staffId: string, month?: string) {
+  return useQuery({
+    queryKey: queryKeys.attendance.staffHeatmap(staffId, month),
+    queryFn: () => attendanceApi.getStaffHeatmap(staffId, month),
+    enabled: Boolean(staffId),
+    staleTime: 30000,
+  });
+}
+
 export function useAttendanceActions() {
   const queryClient = useQueryClient();
 
@@ -38,7 +55,9 @@ export function useAttendanceActions() {
       const code = err.response?.data?.error?.code;
       const message = err.response?.data?.error?.message;
 
-      if (code === "OUTSIDE_GEOFENCE") {
+      if (code === "TOO_EARLY") {
+        toast.error(message || "It is too early to clock in for your shift.");
+      } else if (code === "OUTSIDE_GEOFENCE") {
         toast.error("You must be at the showroom to clock in.");
       } else if (code === "GEOFENCE_NOT_CONFIGURED") {
         toast.error("Showroom geofence location is not configured by owner yet.");

@@ -38,3 +38,48 @@ export interface ClockOutPayload {
   latitude: number;
   longitude: number;
 }
+
+export interface AttendanceOverviewStaffEntry {
+  id: string;
+  name: string;
+  phone: string;
+  department_name: string | null;
+  clock_in_at?: string;
+  clock_out_at?: string | null;
+  minutes_late?: number;
+}
+
+export interface AttendanceOverviewData {
+  date: string;
+  counts: {
+    present: number;
+    absent: number;
+    late: number;
+  };
+  present: AttendanceOverviewStaffEntry[];
+  absent: AttendanceOverviewStaffEntry[];
+  late: AttendanceOverviewStaffEntry[];
+}
+
+export type StaffHeatmapDayStatus =
+  | "full"
+  | "half"
+  | "late"
+  | "incomplete"
+  | "absent"
+  | "holiday"
+  | "future";
+
+export interface StaffHeatmapDayEntry {
+  date: string;
+  status: StaffHeatmapDayStatus;
+  clock_in_at?: string | null;
+  clock_out_at?: string | null;
+  minutes_late?: number;
+}
+
+export interface StaffHeatmapData {
+  staff_id: string;
+  month: string;
+  days: StaffHeatmapDayEntry[];
+}

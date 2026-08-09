@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 interface ApiErrorPayload {
   error?: {
+    code?: string;
     message?: string;
   };
 }
@@ -61,9 +62,16 @@ export function useDepartmentActions() {
       invalidateDepartments();
     },
     onError: (err: AxiosError<ApiErrorPayload>) => {
-      toast.error(
-        err.response?.data?.error?.message || "Failed to deactivate department"
-      );
+      const code = err.response?.data?.error?.code;
+      const message = err.response?.data?.error?.message;
+      if (code === "DEPARTMENT_HAS_STAFF") {
+        toast.error(
+          message ||
+            "This department has active staff assigned. Reassign or deactivate them first."
+        );
+      } else {
+        toast.error(message || "Failed to deactivate department");
+      }
     },
   });
 

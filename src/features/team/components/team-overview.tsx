@@ -1,54 +1,579 @@
+/* eslint-disable security/detect-object-injection */
 "use client";
 
-import { BarChart3, Sparkles, ShieldCheck, Clock, CalendarCheck } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
+import { useAttendanceOverview } from "@/src/features/attendance/hooks/use-attendance";
+import type { AttendanceOverviewStaffEntry } from "@/src/features/attendance/types/attendance-types";
+import { getTelUrl, getWhatsAppUrl } from "@/src/utils/phone";
+import { DatePicker } from "@/src/components/ui/date-picker";
+import {
+  CheckCircle2,
+  UserX,
+  Clock,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  RotateCcw,
+  Loader2,
+  Building2,
+  AlertCircle,
+} from "lucide-react";
+
+/**
+ * Returns today's IST date in 'YYYY-MM-DD' format.
+ */
+function getTodayISTDateString(): string {
+  const now = new Date();
+  const istOffsetMs = 5.5 * 60 * 60 * 1000;
+  const istDate = new Date(now.getTime() + istOffsetMs);
+  const year = istDate.getUTCFullYear();
+  const month = String(istDate.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(istDate.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Formats YYYY-MM-DD date string to readable IST date label (e.g. "Sunday, Aug 9, 2026").
+ */
+function formatReadableDate(dateStr: string): string {
+  if (!dateStr) return "";
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const dateObj = new Date(y, m - 1, d);
+  return dateObj.toLocaleDateString("en-IN", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+/**
+ * Formats UTC ISO timestamp to IST 12-hour time string (e.g. "09:15 AM").
+ */
+function formatISTTime(isoString?: string | null): string {
+  if (!isoString) return "";
+  return new Date(isoString).toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
 
 export function TeamOverview() {
-  return (
-    <div className="space-y-6 select-none font-sans max-w-4xl">
-      {/* Overview Analytics Placeholder Card */}
-      <div className="rounded-xl border border-dashed border-accent/40 bg-accent/5 p-8 text-center space-y-4 shadow-bento">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-accent text-inverse shadow-sm">
-          <BarChart3 className="h-6 w-6 stroke-[2.5px]" />
-        </div>
+  const todayIst = getTodayISTDateString();
+  const [selectedDate, setSelectedDate] = useState<string>(todayIst);
+  const [activeListTab, setActiveListTab] = useState<
+    "present" | "absent" | "late"
+  >("present");
 
-        <div className="space-y-1.5 max-w-md mx-auto">
-          <div className="flex items-center justify-center gap-1.5">
-            <Sparkles className="h-4 w-4 text-accent" />
-            <h3 className="text-base font-bold text-ink font-sans">
-              Attendance &amp; Team Analytics Hub
-            </h3>
+  const {
+    data: overview,
+    isLoading,
+    isError,
+  } = useAttendanceOverview(selectedDate);
+
+  // Navigate date +/- 1 day
+  const handleShiftDate = (days: number) => {
+    const [y, m, d] = selectedDate.split("-").map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    dateObj.setDate(dateObj.getDate() + days);
+    const newY = dateObj.getFullYear();
+    const newM = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const newD = String(dateObj.getDate()).padStart(2, "0");
+    setSelectedDate(`${newY}-${newM}-${newD}`);
+  };
+
+  const counts = overview?.counts ?? { present: 0, absent: 0, late: 0 };
+  const currentList: AttendanceOverviewStaffEntry[] =
+    overview?.[activeListTab] ?? [];
+
+  return (
+    <div className="space-y-4 sm:space-y-6 select-none font-sans max-w-5xl">
+      {/* ------------------------------------------------------------- */}
+      {/* 1. DATE FILTER HEADER & NAVIGATION BAR                         */}
+      {/* ------------------------------------------------------------- */}
+      <div className="bg-card border border-line rounded-xl p-3.5 sm:p-4 shadow-bento flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+        <div className="space-y-0.5 sm:space-y-1">
+          <div className="flex items-center justify-between sm:justify-start gap-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-accent shrink-0" />
+              <h2 className="text-xs sm:text-sm font-bold text-ink font-sans">
+                {formatReadableDate(selectedDate)}
+              </h2>
+            </div>
+            {selectedDate === todayIst && (
+              <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-accent/15 text-accent border border-accent/30 px-2 py-0.5 rounded-full">
+                Today
+              </span>
+            )}
           </div>
-          <p className="text-xs text-ink-muted leading-relaxed">
-            Live attendance dashboards, daily check-in/out logs, late arrival records, and staff performance metrics will automatically populate here once check-in/out engine is activated.
+          <p className="text-[11px] sm:text-xs text-ink-subtle hidden sm:block">
+            Select date to view historical showroom attendance &amp; punctuality
+            logs.
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/15 px-3.5 py-1 text-xs font-mono font-bold text-accent">
-          <ShieldCheck className="h-3.5 w-3.5" />
-          <span>ATTENDANCE ENGINE DEFERRED</span>
+        {/* Custom Bento DatePicker & Day Stepping Controls */}
+        <div className="flex items-center gap-1.5 justify-between sm:justify-end w-full sm:w-auto">
+          <button
+            type="button"
+            onClick={() => handleShiftDate(-1)}
+            className="p-2 rounded-xl bg-card border border-line hover:border-accent/40 active:scale-95 text-ink-muted hover:text-ink transition-all cursor-pointer shadow-xs shrink-0"
+            title="Previous Day"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+
+          {/* Premium Custom Calendar Popover (Mobile Center Bounded) */}
+          <div className="flex-1 sm:flex-initial flex justify-center">
+            <DatePicker
+              value={selectedDate}
+              onChange={(newDate) => setSelectedDate(newDate)}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => handleShiftDate(1)}
+            className="p-2 rounded-xl bg-card border border-line hover:border-accent/40 active:scale-95 text-ink-muted hover:text-ink transition-all cursor-pointer shadow-xs shrink-0"
+            title="Next Day"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+
+          {selectedDate !== todayIst && (
+            <button
+              type="button"
+              onClick={() => setSelectedDate(todayIst)}
+              className="inline-flex items-center gap-1 rounded-xl border border-line bg-card px-2.5 py-2 text-xs font-bold text-ink-muted hover:text-ink hover:border-accent/40 transition-all cursor-pointer shadow-xs shrink-0"
+              title="Reset to Today"
+            >
+              <RotateCcw className="h-3.5 w-3.5 text-accent" />
+              <span className="hidden sm:inline">Today</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Feature Teaser Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-line/90 bg-card p-5 space-y-2 shadow-bento">
-          <div className="flex items-center gap-2 text-xs font-bold text-ink font-sans">
-            <Clock className="h-4 w-4 text-accent stroke-[2.5px]" />
-            <span>Geofence Clock-In Logs</span>
+      {/* ------------------------------------------------------------- */}
+      {/* 2. ATTENDANCE METRICS COUNTS GRID                             */}
+      {/* ------------------------------------------------------------- */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        {/* Count Card 1: Total Present */}
+        <div
+          onClick={() => setActiveListTab("present")}
+          className={`rounded-xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 shadow-bento transition-all cursor-pointer text-center sm:text-left ${
+            activeListTab === "present"
+              ? "bg-[#171819] text-white border-none"
+              : "bg-card border border-line hover:border-emerald-500/30 text-ink"
+          }`}
+        >
+          <div
+            className={`flex items-center justify-center sm:justify-between ${
+              activeListTab === "present"
+                ? "text-emerald-400"
+                : "text-emerald-600"
+            }`}
+          >
+            <span
+              className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate ${
+                activeListTab === "present" ? "text-white/80" : "text-ink-muted"
+              }`}
+            >
+              Present
+            </span>
+            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block" />
           </div>
-          <p className="text-xs text-ink-subtle leading-relaxed">
-            Track daily sales staff attendance inside the showroom geofence boundary automatically.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
+            <span
+              className={`text-xl sm:text-2xl font-bold font-mono ${
+                activeListTab === "present" ? "text-white" : "text-ink"
+              }`}
+            >
+              {isLoading ? "…" : counts.present}
+            </span>
+            <span
+              className={`text-[9px] sm:text-[11px] hidden sm:inline ${
+                activeListTab === "present"
+                  ? "text-white/70"
+                  : "text-ink-subtle"
+              }`}
+            >
+              Clocked-in
+            </span>
+          </div>
         </div>
 
-        <div className="rounded-xl border border-line/90 bg-card p-5 space-y-2 shadow-bento">
-          <div className="flex items-center gap-2 text-xs font-bold text-ink font-sans">
-            <CalendarCheck className="h-4 w-4 text-accent stroke-[2.5px]" />
-            <span>Shift &amp; Holiday Reports</span>
+        {/* Count Card 2: Absent */}
+        <div
+          onClick={() => setActiveListTab("absent")}
+          className={`rounded-xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 shadow-bento transition-all cursor-pointer text-center sm:text-left ${
+            activeListTab === "absent"
+              ? "bg-[#171819] text-white border-none"
+              : "bg-card border border-line hover:border-rose-500/30 text-ink"
+          }`}
+        >
+          <div
+            className={`flex items-center justify-center sm:justify-between ${
+              activeListTab === "absent" ? "text-rose-400" : "text-rose-600"
+            }`}
+          >
+            <span
+              className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate ${
+                activeListTab === "absent" ? "text-white/80" : "text-ink-muted"
+              }`}
+            >
+              Absent
+            </span>
+            <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block" />
           </div>
-          <p className="text-xs text-ink-subtle leading-relaxed">
-            Automatic shift tracking with department holiday schedules and monthly attendance summaries.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
+            <span
+              className={`text-xl sm:text-2xl font-bold font-mono ${
+                activeListTab === "absent" ? "text-white" : "text-ink"
+              }`}
+            >
+              {isLoading ? "…" : counts.absent}
+            </span>
+            <span
+              className={`text-[9px] sm:text-[11px] hidden sm:inline ${
+                activeListTab === "absent" ? "text-white/70" : "text-ink-subtle"
+              }`}
+            >
+              Excl. off
+            </span>
+          </div>
+        </div>
+
+        {/* Count Card 3: Late Coming */}
+        <div
+          onClick={() => setActiveListTab("late")}
+          className={`rounded-xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 shadow-bento transition-all cursor-pointer text-center sm:text-left ${
+            activeListTab === "late"
+              ? "bg-[#171819] text-white border-none"
+              : "bg-card border border-line hover:border-amber-500/30 text-ink"
+          }`}
+        >
+          <div
+            className={`flex items-center justify-center sm:justify-between ${
+              activeListTab === "late" ? "text-amber-400" : "text-amber-600"
+            }`}
+          >
+            <span
+              className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate ${
+                activeListTab === "late" ? "text-white/80" : "text-ink-muted"
+              }`}
+            >
+              Late
+            </span>
+            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block" />
+          </div>
+          <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
+            <span
+              className={`text-xl sm:text-2xl font-bold font-mono ${
+                activeListTab === "late" ? "text-white" : "text-ink"
+              }`}
+            >
+              {isLoading ? "…" : counts.late}
+            </span>
+            <span
+              className={`text-[9px] sm:text-[11px] hidden sm:inline ${
+                activeListTab === "late" ? "text-white/70" : "text-ink-subtle"
+              }`}
+            >
+              Shift delay
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 3. SUB-TABS & GROUPED STAFF LIST CONTAINER                     */}
+      {/* ------------------------------------------------------------- */}
+      <div className="bg-card border border-line rounded-xl shadow-bento overflow-hidden space-y-0">
+        {/* Sub-tabs Navigation */}
+        <div className="p-2 sm:px-5 sm:pt-4 sm:pb-3 border-b border-line/60 bg-inset/40">
+          <div className="grid grid-cols-3 gap-1 bg-inset p-1 rounded-xl border border-line/60">
+            <button
+              type="button"
+              onClick={() => setActiveListTab("present")}
+              className={`py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center ${
+                activeListTab === "present"
+                  ? "bg-accent text-inverse shadow-xs"
+                  : "text-ink-muted hover:text-ink"
+              }`}
+            >
+              Present ({counts.present})
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveListTab("absent")}
+              className={`py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center ${
+                activeListTab === "absent"
+                  ? "bg-accent text-inverse shadow-xs"
+                  : "text-ink-muted hover:text-ink"
+              }`}
+            >
+              Absent ({counts.absent})
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveListTab("late")}
+              className={`py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center ${
+                activeListTab === "late"
+                  ? "bg-accent text-inverse shadow-xs"
+                  : "text-ink-muted hover:text-ink"
+              }`}
+            >
+              Late ({counts.late})
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable Staff List */}
+        <div className="max-h-140 overflow-y-auto divide-y divide-line/60 p-3 sm:p-0">
+          {isLoading ? (
+            <div className="p-8 text-center space-y-2">
+              <Loader2 className="h-6 w-6 text-accent animate-spin mx-auto" />
+              <p className="text-xs text-ink-muted">
+                Loading attendance data...
+              </p>
+            </div>
+          ) : isError ? (
+            <div className="p-8 text-center space-y-2 text-danger">
+              <AlertCircle className="h-6 w-6 mx-auto" />
+              <p className="text-xs font-semibold">
+                Failed to load attendance overview
+              </p>
+            </div>
+          ) : currentList.length === 0 ? (
+            <div className="p-8 text-center space-y-2">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-inset border border-line text-ink-subtle">
+                <CheckCircle2 className="h-5 w-5" />
+              </div>
+              <p className="text-xs font-bold text-ink">
+                No staff members in {activeListTab} list
+              </p>
+              <p className="text-[11px] text-ink-subtle max-w-xs mx-auto">
+                {activeListTab === "present" &&
+                  "No staff members clocked in for this date."}
+                {activeListTab === "absent" &&
+                  "All active staff are present or on weekly holiday."}
+                {activeListTab === "late" &&
+                  "No staff members arrived late for their shift."}
+              </p>
+            </div>
+          ) : (
+            currentList.map((staff) => (
+              <div key={staff.id} className="py-2.5 sm:py-0">
+                {/* MOBILE VIEW CARD (sm:hidden) */}
+                <div className="sm:hidden rounded-xl border border-line bg-card p-3 space-y-3 shadow-xs">
+                  {/* Card Top: Staff Name, Dept & Status Badge */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-inset border border-line text-ink font-bold font-sans text-xs shrink-0">
+                        {staff.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="space-y-0.5">
+                        <h4 className="text-xs font-bold text-ink font-sans">
+                          {staff.name}
+                        </h4>
+                        {staff.department_name && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-ink-muted bg-inset border border-line/60 px-1.5 py-0.2 rounded">
+                            <Building2 className="h-2.5 w-2.5 text-accent" />
+                            <span>{staff.department_name}</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Status Badge */}
+                    {activeListTab === "absent" ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md shrink-0">
+                        <UserX className="h-3 w-3" />
+                        <span>Absent</span>
+                      </span>
+                    ) : staff.minutes_late && staff.minutes_late > 0 ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md shrink-0">
+                        <Clock className="h-3 w-3 text-amber-600" />
+                        <span>{staff.minutes_late}m Late</span>
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md shrink-0">
+                        On Time
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Mobile Contact Bar with Direct Action Buttons */}
+                  <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-inset border border-line/50 text-xs">
+                    <span className="font-mono font-semibold text-ink text-[11px]">
+                      {staff.phone}
+                    </span>
+
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <a
+                        href={getTelUrl(staff.phone)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-card border border-line/80 text-[11px] font-bold text-ink hover:bg-inset shadow-xs"
+                      >
+                        <Image
+                          src="/icons/phonecall-icon.png"
+                          alt="Call"
+                          width={13}
+                          height={13}
+                          className="object-contain"
+                        />
+                        <span>Call</span>
+                      </a>
+
+                      <a
+                        href={getWhatsAppUrl(staff.phone)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-bold text-emerald-700 hover:bg-emerald-500/20 shadow-xs"
+                      >
+                        <Image
+                          src="/icons/whatsappIcon.png"
+                          alt="WhatsApp"
+                          width={13}
+                          height={13}
+                          className="object-contain"
+                        />
+                        <span>WhatsApp</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Mobile Shift Timings Panel (Present/Late) */}
+                  {activeListTab !== "absent" && (
+                    <div className="grid grid-cols-2 gap-2 text-center p-2 rounded-lg bg-inset/60 border border-line/40 font-mono text-[11px]">
+                      <div>
+                        <span className="text-[9px] uppercase tracking-wider text-ink-subtle block font-sans font-bold">
+                          Clock In
+                        </span>
+                        <span className="font-bold text-ink">
+                          {formatISTTime(staff.clock_in_at) || "—"}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] uppercase tracking-wider text-ink-subtle block font-sans font-bold">
+                          Clock Out
+                        </span>
+                        <span className="font-bold text-ink">
+                          {formatISTTime(staff.clock_out_at) || "Active Shift"}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* DESKTOP VIEW ROW (hidden sm:flex) */}
+                <div className="hidden sm:flex p-4 px-5 items-center justify-between gap-3 hover:bg-inset/40 transition-colors">
+                  {/* Left: Staff Identity & Phone Actions */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-inset border border-line/80 text-ink font-bold font-sans text-xs shrink-0">
+                      {staff.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-xs font-bold text-ink font-sans">
+                          {staff.name}
+                        </h4>
+                        {staff.department_name && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium text-ink-muted bg-inset border border-line/60 px-2 py-0.5 rounded-md">
+                            <Building2 className="h-3 w-3 text-accent" />
+                            <span>{staff.department_name}</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Phone Number with Phone & WhatsApp Action Icons */}
+                      <div className="flex items-center gap-2 text-[11px] text-ink-muted">
+                        <span className="font-mono font-semibold text-ink">
+                          {staff.phone}
+                        </span>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <a
+                            href={getTelUrl(staff.phone)}
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex h-6 w-6 items-center justify-center rounded-md border border-line/70 bg-card hover:border-accent/40 hover:bg-inset transition-all cursor-pointer p-0.5"
+                            title={`Call ${staff.phone}`}
+                          >
+                            <Image
+                              src="/icons/phonecall-icon.png"
+                              alt="Call"
+                              width={14}
+                              height={14}
+                              className="object-contain"
+                            />
+                          </a>
+
+                          <a
+                            href={getWhatsAppUrl(staff.phone)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex h-6 w-6 items-center justify-center rounded-md border border-line/70 bg-card hover:border-emerald-500/40 hover:bg-inset transition-all cursor-pointer p-0.5"
+                            title={`WhatsApp chat ${staff.phone}`}
+                          >
+                            <Image
+                              src="/icons/whatsappIcon.png"
+                              alt="WhatsApp"
+                              width={14}
+                              height={14}
+                              className="object-contain"
+                            />
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right: Clock Times / Lateness or Absent Status */}
+                  <div className="flex items-center gap-3">
+                    {activeListTab === "absent" ? (
+                      <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 bg-rose-500/10 border border-rose-500/20 px-2.5 py-1 rounded-md">
+                        <UserX className="h-3.5 w-3.5" />
+                        <span>Absent Today</span>
+                      </span>
+                    ) : (
+                      <div className="flex flex-col items-end gap-1">
+                        <div className="flex items-center gap-3 text-xs font-mono text-ink font-bold">
+                          <span>
+                            In: {formatISTTime(staff.clock_in_at) || "—"}
+                          </span>
+                          <span>•</span>
+                          <span>
+                            Out:{" "}
+                            {formatISTTime(staff.clock_out_at) ||
+                              "Active Shift"}
+                          </span>
+                        </div>
+
+                        {staff.minutes_late && staff.minutes_late > 0 ? (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                            <Clock className="h-3 w-3 text-amber-600" />
+                            <span>{staff.minutes_late}m Late</span>
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                            On Time
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
