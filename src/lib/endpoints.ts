@@ -22,6 +22,10 @@ export const endpoints = {
     refurbItems: (id: string) => `/cars/${id}/refurbishment-items`,
     margin: (id: string) => `/cars/${id}/margin`,
     addToStock: (id: string) => `/cars/${id}/add-to-stock`,
+    photos: (id: string) => `/cars/${id}/photos`,
+    photoDelete: (id: string, photoId: string) => `/cars/${id}/photos/${photoId}`,
+    photoPrimary: (id: string, photoId: string) => `/cars/${id}/photos/${photoId}/primary`,
+    photoFile: (id: string, photoId: string) => `/cars/${id}/photos/${photoId}/file`,
   },
 
   refurbItems: {
@@ -74,5 +78,6 @@ export const endpoints = {
       month
         ? `/attendance/staff/${staffId}/heatmap?month=${month}`
         : `/attendance/staff/${staffId}/heatmap`,
+    manual: "/attendance/manual",
   },
 } as const;

@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import { attendanceApi } from "../api/attendance-api";
-import type { ClockInPayload, ClockOutPayload } from "../types/attendance-types";
+import type {
+  ClockInPayload,
+  ClockOutPayload,
+  ManualAttendancePayload,
+} from "../types/attendance-types";
 import { queryKeys } from "@/src/lib/query-keys";
 import { toast } from "sonner";
 
@@ -34,6 +38,40 @@ export function useStaffHeatmap(staffId: string, month?: string) {
     queryFn: () => attendanceApi.getStaffHeatmap(staffId, month),
     enabled: Boolean(staffId),
     staleTime: 30000,
+  });
+}
+
+export function useUpsertManualAttendance(selectedDate: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: ManualAttendancePayload) =>
+      attendanceApi.upsertManual(payload),
+    onSuccess: (_, variables) => {
+      toast.success("Attendance updated successfully");
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.attendance.overview(selectedDate),
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["attendance", "staff", variables.staff_id, "heatmap"],
+      });
+    },
+    onError: (err: AxiosError<ApiErrorPayload>) => {
+      const code = err.response?.data?.error?.code;
+      const message = err.response?.data?.error?.message;
+
+      if (code === "FUTURE_DATE_NOT_ALLOWED") {
+        toast.error("Cannot record or edit attendance for a future date.");
+      } else if (code === "INVALID_ATTENDANCE_TIMES") {
+        toast.error("Clock-out time must be after clock-in time.");
+      } else if (code === "CLOCK_IN_REQUIRED") {
+        toast.error(
+          "Clock-in time is required when creating a new attendance record."
+        );
+      } else {
+        toast.error(message || "Failed to update attendance record.");
+      }
+    },
   });
 }
 

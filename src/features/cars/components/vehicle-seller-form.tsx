@@ -88,6 +88,7 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
             undefined,
           color: car.color ?? undefined,
           accident_history: car.accident_history ?? undefined,
+          specifications: car.specifications ?? undefined,
           purchase_amount: car.purchase_amount
             ? (formatIndianNumber(
                 Number(car.purchase_amount)
@@ -241,6 +242,13 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
           placeholder="Detail major records, replacements, structural fixes or leave blank..."
           error={errors.accident_history?.message}
           {...register("accident_history")}
+        />
+
+        <FormTextarea
+          label="Specifications & Key Features"
+          placeholder="Free text — engine capacity, variant, key features, selling points..."
+          error={errors.specifications?.message}
+          {...register("specifications")}
         />
 
         <div className="max-w-md">

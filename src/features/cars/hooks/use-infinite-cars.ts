@@ -8,7 +8,7 @@ const PAGE_SIZE = 16;
 /**
  * Cursor-paginated cars list, as infinite-scroll server state.
  *
- * Reusable across every inventory sub-tab — statuses/sort/search fully
+ * Reusable across every inventory sub-tab — statuses/sort/search/filters fully
  * describe one distinct scroll. Changing any of them changes the query key,
  * so TanStack Query starts a fresh page-1 fetch instead of continuing the
  * old scroll's cursor chain.
@@ -17,18 +17,34 @@ export function useInfiniteCars({
   statuses,
   sort,
   search,
+  fuel_type,
+  min_price,
+  max_price,
 }: {
   statuses?: string[];
   sort?: string;
   search?: string;
+  fuel_type?: string;
+  min_price?: number;
+  max_price?: number;
 }) {
   return useInfiniteQuery({
-    queryKey: queryKeys.cars.infinite({ statuses, sort, search }),
+    queryKey: queryKeys.cars.infinite({
+      statuses,
+      sort,
+      search,
+      fuel_type,
+      min_price,
+      max_price,
+    }),
     queryFn: ({ pageParam }) =>
       carsApi.getList({
         statuses,
         sort,
         search,
+        fuel_type,
+        min_price,
+        max_price,
         cursor: pageParam,
         limit: PAGE_SIZE,
       }),

@@ -6,6 +6,7 @@ import type {
   ClockOutPayload,
   AttendanceOverviewData,
   StaffHeatmapData,
+  ManualAttendancePayload,
 } from "../types/attendance-types";
 
 export const attendanceApi = {
@@ -41,6 +42,12 @@ export const attendanceApi = {
     const res = await apiClient.get(
       endpoints.attendance.staffHeatmap(staffId, month)
     );
+    return res.data.data;
+  },
+
+  /** Owner manual attendance correction (upsert) */
+  async upsertManual(payload: ManualAttendancePayload): Promise<unknown> {
+    const res = await apiClient.put(endpoints.attendance.manual, payload);
     return res.data.data;
   },
 };

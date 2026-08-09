@@ -12,6 +12,7 @@ export const queryKeys = {
     all: ["cars"] as const,
     detail: (id: string) => ["cars", id] as const,
     documents: (id: string) => ["cars", id, "documents"] as const,
+    photos: (id: string) => ["cars", id, "photos"] as const,
     refurbItems: (id: string) => ["cars", id, "refurbishment-items"] as const,
     // Infinite (cursor-paginated) lists — statuses/sort/search identify a
     // distinct scroll; changing any of them starts a fresh cache entry.
@@ -19,6 +20,9 @@ export const queryKeys = {
       statuses?: string[];
       sort?: string;
       search?: string;
+      fuel_type?: string;
+      min_price?: number;
+      max_price?: number;
     }) => ["cars", "infinite", params] as const,
   },
 

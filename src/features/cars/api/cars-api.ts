@@ -36,6 +36,7 @@ export interface Car {
   transmission: string | null;
   color: string | null;
   accident_history: string | null;
+  specifications?: string | null;
 
   // Purchase / seller (owner-only)
   purchase_amount?: string;
@@ -66,6 +67,10 @@ export interface Car {
 
   // Batch-generated 7-day presigned thumbnail URL
   thumbnail_url?: string | null;
+  primary_photo_url?: string | null;
+
+  // Optional gallery photos array
+  photos?: import("./car-photos-api").CarPhoto[];
 
   // Enriched progress summary metadata
   progress_summary?: ProgressSummary;
@@ -97,12 +102,18 @@ export const carsApi = {
     statuses,
     sort,
     search,
+    fuel_type,
+    min_price,
+    max_price,
     cursor,
     limit,
   }: {
     statuses?: string[];
     sort?: string;
     search?: string;
+    fuel_type?: string;
+    min_price?: number;
+    max_price?: number;
     cursor?: string;
     limit?: number;
   } = {}): Promise<CarsPage> {
@@ -110,6 +121,9 @@ export const carsApi = {
     if (statuses?.length) params.status = statuses.join(",");
     if (sort) params.sort = sort;
     if (search?.trim()) params.search = search.trim();
+    if (fuel_type?.trim()) params.fuel_type = fuel_type.trim();
+    if (min_price !== undefined) params.min_price = min_price;
+    if (max_price !== undefined) params.max_price = max_price;
     if (cursor) params.cursor = cursor;
     if (limit) params.limit = limit;
 

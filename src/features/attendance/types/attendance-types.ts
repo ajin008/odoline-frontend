@@ -83,3 +83,10 @@ export interface StaffHeatmapData {
   month: string;
   days: StaffHeatmapDayEntry[];
 }
+
+export interface ManualAttendancePayload {
+  staff_id: string;
+  date: string;
+  clock_in_at?: string | null;
+  clock_out_at?: string | null;
+}

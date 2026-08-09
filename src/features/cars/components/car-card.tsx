@@ -293,6 +293,11 @@ export function CarCard({ car }: { car: Car }) {
                   <p className="text-[11px] font-mono text-ink-muted mt-0.5">
                     {car.reg_number || "NO-REG"} • {car.year}
                   </p>
+                  {car.specifications && (
+                    <p className="text-xs font-sans text-ink-subtle mt-1.5 border-t border-line/40 pt-1.5 max-w-md line-clamp-2">
+                      {car.specifications}
+                    </p>
+                  )}
                 </div>
 
                 <button

@@ -7,6 +7,8 @@ import { useAttendanceOverview } from "@/src/features/attendance/hooks/use-atten
 import type { AttendanceOverviewStaffEntry } from "@/src/features/attendance/types/attendance-types";
 import { getTelUrl, getWhatsAppUrl } from "@/src/utils/phone";
 import { DatePicker } from "@/src/components/ui/date-picker";
+import { ManualAttendanceModal } from "./manual-attendance-modal";
+import { toast } from "sonner";
 import {
   CheckCircle2,
   UserX,
@@ -18,6 +20,7 @@ import {
   Loader2,
   Building2,
   AlertCircle,
+  Pencil,
 } from "lucide-react";
 
 /**
@@ -34,7 +37,7 @@ function getTodayISTDateString(): string {
 }
 
 /**
- * Formats YYYY-MM-DD date string to readable IST date label (e.g. "Sunday, Aug 9, 2026").
+ * Formats YYYY-MM-DD date string into readable label (e.g. "Sunday, Aug 9, 2026").
  */
 function formatReadableDate(dateStr: string): string {
   if (!dateStr) return "";
@@ -42,9 +45,9 @@ function formatReadableDate(dateStr: string): string {
   const dateObj = new Date(y, m - 1, d);
   return dateObj.toLocaleDateString("en-IN", {
     weekday: "short",
-    year: "numeric",
     month: "short",
     day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -67,13 +70,13 @@ export function TeamOverview() {
     "present" | "absent" | "late"
   >("present");
 
-  const {
-    data: overview,
-    isLoading,
-    isError,
-  } = useAttendanceOverview(selectedDate);
+  const [editTargetStaff, setEditTargetStaff] =
+    useState<AttendanceOverviewStaffEntry | null>(null);
 
-  // Navigate date +/- 1 day
+  const isFutureDate = selectedDate > todayIst;
+
+  const { data: overview, isLoading, isError } = useAttendanceOverview(selectedDate);
+
   const handleShiftDate = (days: number) => {
     const [y, m, d] = selectedDate.split("-").map(Number);
     const dateObj = new Date(y, m - 1, d);
@@ -82,6 +85,14 @@ export function TeamOverview() {
     const newM = String(dateObj.getMonth() + 1).padStart(2, "0");
     const newD = String(dateObj.getDate()).padStart(2, "0");
     setSelectedDate(`${newY}-${newM}-${newD}`);
+  };
+
+  const handleRowClick = (staff: AttendanceOverviewStaffEntry) => {
+    if (isFutureDate) {
+      toast.error("Cannot record or edit attendance for a future date.");
+      return;
+    }
+    setEditTargetStaff(staff);
   };
 
   const counts = overview?.counts ?? { present: 0, absent: 0, late: 0 };
@@ -103,14 +114,19 @@ export function TeamOverview() {
               </h2>
             </div>
             {selectedDate === todayIst && (
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-accent/15 text-accent border border-accent/30 px-2 py-0.5 rounded-full">
-                Today
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 border border-emerald-500/30">
+                TODAY
+              </span>
+            )}
+            {isFutureDate && (
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-700 border border-rose-500/30">
+                FUTURE
               </span>
             )}
           </div>
           <p className="text-[11px] sm:text-xs text-ink-subtle hidden sm:block">
             Select date to view historical showroom attendance &amp; punctuality
-            logs.
+            logs. Click any staff row to edit attendance.
           </p>
         </div>
 
@@ -147,34 +163,31 @@ export function TeamOverview() {
             <button
               type="button"
               onClick={() => setSelectedDate(todayIst)}
-              className="inline-flex items-center gap-1 rounded-xl border border-line bg-card px-2.5 py-2 text-xs font-bold text-ink-muted hover:text-ink hover:border-accent/40 transition-all cursor-pointer shadow-xs shrink-0"
+              className="p-2 rounded-xl bg-accent/15 text-accent border border-accent/30 hover:bg-accent/25 transition-all cursor-pointer shadow-xs shrink-0"
               title="Reset to Today"
             >
-              <RotateCcw className="h-3.5 w-3.5 text-accent" />
-              <span className="hidden sm:inline">Today</span>
+              <RotateCcw className="h-4 w-4" />
             </button>
           )}
         </div>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* 2. ATTENDANCE METRICS COUNTS GRID                             */}
+      {/* 2. ATTENDANCE SUMMARY COUNTS BAR                              */}
       {/* ------------------------------------------------------------- */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        {/* Count Card 1: Total Present */}
+        {/* Count Card 1: Present */}
         <div
           onClick={() => setActiveListTab("present")}
           className={`rounded-xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 shadow-bento transition-all cursor-pointer text-center sm:text-left ${
             activeListTab === "present"
               ? "bg-[#171819] text-white border-none"
-              : "bg-card border border-line hover:border-emerald-500/30 text-ink"
+              : "bg-card border border-line hover:border-accent/40 text-ink"
           }`}
         >
           <div
             className={`flex items-center justify-center sm:justify-between ${
-              activeListTab === "present"
-                ? "text-emerald-400"
-                : "text-emerald-600"
+              activeListTab === "present" ? "text-emerald-400" : "text-emerald-600"
             }`}
           >
             <span
@@ -283,23 +296,33 @@ export function TeamOverview() {
                 activeListTab === "late" ? "text-white/70" : "text-ink-subtle"
               }`}
             >
-              Shift delay
+              Subset present
             </span>
           </div>
         </div>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* 3. SUB-TABS & GROUPED STAFF LIST CONTAINER                     */}
+      {/* 3. STAFF LIST SECTION WITH SUB-TAB CONTROL & CLICK TO EDIT    */}
       {/* ------------------------------------------------------------- */}
-      <div className="bg-card border border-line rounded-xl shadow-bento overflow-hidden space-y-0">
-        {/* Sub-tabs Navigation */}
-        <div className="p-2 sm:px-5 sm:pt-4 sm:pb-3 border-b border-line/60 bg-inset/40">
-          <div className="grid grid-cols-3 gap-1 bg-inset p-1 rounded-xl border border-line/60">
+      <div className="bg-card border border-line rounded-xl shadow-bento overflow-hidden">
+        {/* Sub-Tab Selector Header */}
+        <div className="p-3 sm:px-5 sm:py-3.5 bg-inset border-b border-line flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2">
+            <h3 className="text-xs sm:text-sm font-bold text-ink capitalize font-sans">
+              {activeListTab} Staff List
+            </h3>
+            <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/30">
+              {currentList.length}
+            </span>
+          </div>
+
+          {/* Sub-tab segmented pill buttons */}
+          <div className="grid grid-cols-3 sm:inline-flex items-center gap-1 bg-card p-1 rounded-xl border border-line/60">
             <button
               type="button"
               onClick={() => setActiveListTab("present")}
-              className={`py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center ${
+              className={`px-3.5 py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center whitespace-nowrap ${
                 activeListTab === "present"
                   ? "bg-accent text-inverse shadow-xs"
                   : "text-ink-muted hover:text-ink"
@@ -311,7 +334,7 @@ export function TeamOverview() {
             <button
               type="button"
               onClick={() => setActiveListTab("absent")}
-              className={`py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center ${
+              className={`px-3.5 py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center whitespace-nowrap ${
                 activeListTab === "absent"
                   ? "bg-accent text-inverse shadow-xs"
                   : "text-ink-muted hover:text-ink"
@@ -323,7 +346,7 @@ export function TeamOverview() {
             <button
               type="button"
               onClick={() => setActiveListTab("late")}
-              className={`py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center ${
+              className={`px-3.5 py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center whitespace-nowrap ${
                 activeListTab === "late"
                   ? "bg-accent text-inverse shadow-xs"
                   : "text-ink-muted hover:text-ink"
@@ -371,7 +394,14 @@ export function TeamOverview() {
             currentList.map((staff) => (
               <div key={staff.id} className="py-2.5 sm:py-0">
                 {/* MOBILE VIEW CARD (sm:hidden) */}
-                <div className="sm:hidden rounded-xl border border-line bg-card p-3 space-y-3 shadow-xs">
+                <div
+                  onClick={() => handleRowClick(staff)}
+                  className={`sm:hidden rounded-xl border border-line bg-card p-3 space-y-3 shadow-xs transition-all ${
+                    isFutureDate
+                      ? "opacity-75 cursor-not-allowed"
+                      : "cursor-pointer hover:border-accent/40"
+                  }`}
+                >
                   {/* Card Top: Staff Name, Dept & Status Badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
@@ -391,22 +421,41 @@ export function TeamOverview() {
                       </div>
                     </div>
 
-                    {/* Status Badge */}
-                    {activeListTab === "absent" ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md shrink-0">
-                        <UserX className="h-3 w-3" />
-                        <span>Absent</span>
-                      </span>
-                    ) : staff.minutes_late && staff.minutes_late > 0 ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md shrink-0">
-                        <Clock className="h-3 w-3 text-amber-600" />
-                        <span>{staff.minutes_late}m Late</span>
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md shrink-0">
-                        On Time
-                      </span>
-                    )}
+                    {/* Status Badge & Edit Action */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {activeListTab === "absent" ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">
+                          <UserX className="h-3 w-3" />
+                          <span>Absent</span>
+                        </span>
+                      ) : staff.minutes_late && staff.minutes_late > 0 ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                          <Clock className="h-3 w-3 text-amber-600" />
+                          <span>{staff.minutes_late}m Late</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                          On Time
+                        </span>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRowClick(staff);
+                        }}
+                        disabled={isFutureDate}
+                        className="p-1 rounded-md bg-inset border border-line/70 text-ink-muted hover:text-ink disabled:opacity-40"
+                        title={
+                          isFutureDate
+                            ? "Future dates cannot be edited"
+                            : "Edit Attendance"
+                        }
+                      >
+                        <Pencil className="h-3 w-3 stroke-[2px]" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Mobile Contact Bar with Direct Action Buttons */}
@@ -474,7 +523,14 @@ export function TeamOverview() {
                 </div>
 
                 {/* DESKTOP VIEW ROW (hidden sm:flex) */}
-                <div className="hidden sm:flex p-4 px-5 items-center justify-between gap-3 hover:bg-inset/40 transition-colors">
+                <div
+                  onClick={() => handleRowClick(staff)}
+                  className={`hidden sm:flex p-4 px-5 items-center justify-between gap-3 transition-colors ${
+                    isFutureDate
+                      ? "opacity-75 cursor-not-allowed"
+                      : "cursor-pointer hover:bg-inset/40"
+                  }`}
+                >
                   {/* Left: Staff Identity & Phone Actions */}
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-inset border border-line/80 text-ink font-bold font-sans text-xs shrink-0">
@@ -537,7 +593,7 @@ export function TeamOverview() {
                     </div>
                   </div>
 
-                  {/* Right: Clock Times / Lateness or Absent Status */}
+                  {/* Right: Clock Times / Lateness or Absent Status & Edit Action */}
                   <div className="flex items-center gap-3">
                     {activeListTab === "absent" ? (
                       <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-700 bg-rose-500/10 border border-rose-500/20 px-2.5 py-1 rounded-md">
@@ -553,23 +609,38 @@ export function TeamOverview() {
                           <span>•</span>
                           <span>
                             Out:{" "}
-                            {formatISTTime(staff.clock_out_at) ||
-                              "Active Shift"}
+                            {formatISTTime(staff.clock_out_at) || "Active Shift"}
                           </span>
                         </div>
 
                         {staff.minutes_late && staff.minutes_late > 0 ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                            <Clock className="h-3 w-3 text-amber-600" />
-                            <span>{staff.minutes_late}m Late</span>
+                          <span className="text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
+                            {staff.minutes_late}m Late
                           </span>
                         ) : (
                           <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
-                            On Time
+                            On Time Arrival
                           </span>
                         )}
                       </div>
                     )}
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRowClick(staff);
+                      }}
+                      disabled={isFutureDate}
+                      className="p-1.5 rounded-lg border border-line/70 bg-card hover:bg-inset text-ink-muted hover:text-ink disabled:opacity-40 transition-colors cursor-pointer"
+                      title={
+                        isFutureDate
+                          ? "Future dates cannot be edited"
+                          : "Edit Attendance"
+                      }
+                    >
+                      <Pencil className="h-3.5 w-3.5 stroke-[2px]" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -577,6 +648,14 @@ export function TeamOverview() {
           )}
         </div>
       </div>
+
+      {/* Owner Manual Attendance Edit Modal */}
+      <ManualAttendanceModal
+        isOpen={Boolean(editTargetStaff)}
+        onClose={() => setEditTargetStaff(null)}
+        staff={editTargetStaff}
+        date={selectedDate}
+      />
     </div>
   );
 }

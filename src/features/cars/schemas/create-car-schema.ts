@@ -46,6 +46,7 @@ export const createCarSchema = z.object({
   transmission: z.enum(["manual", "automatic"]).optional(),
   color: z.string().max(30).optional(),
   accident_history: z.string().optional(),
+  specifications: z.string().optional(),
 
   // --- Purchase / Seller (required) ---
   purchase_amount: numberFromString.pipe(
