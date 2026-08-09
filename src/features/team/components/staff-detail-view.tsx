@@ -159,11 +159,11 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
           </div>
 
           {/* Quick Actions */}
-          <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
             <button
               type="button"
               onClick={() => setIsEditOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-inset px-3.5 py-2 text-xs font-bold text-ink hover:bg-card transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-line/80 bg-inset px-3.5 py-2 text-xs font-bold text-ink hover:bg-card transition-all cursor-pointer shadow-xs active:scale-[0.98]"
             >
               <Pencil className="h-3.5 w-3.5 stroke-[2px]" />
               <span>Edit Profile</span>
@@ -172,7 +172,7 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
             <button
               type="button"
               onClick={() => setIsResetPinOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-accent/30 bg-accent/15 px-3.5 py-2 text-xs font-bold text-accent hover:bg-accent/25 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-[0.98] border-none"
             >
               <KeyRound className="h-3.5 w-3.5 stroke-[2.5px]" />
               <span>Reset PIN</span>
@@ -182,7 +182,7 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
               <button
                 type="button"
                 onClick={() => setIsConfirmDeactivateOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-bold text-rose-600 hover:bg-rose-500/20 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white px-3.5 py-2 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-[0.98] border-none"
               >
                 <Power className="h-3.5 w-3.5 stroke-[2.5px]" />
                 <span>Deactivate</span>
@@ -191,7 +191,7 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
               <button
                 type="button"
                 onClick={() => setIsConfirmActivateOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-bold text-emerald-600 hover:bg-emerald-500/20 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 text-xs font-bold transition-all cursor-pointer shadow-xs active:scale-[0.98] border-none"
               >
                 <RefreshCw className="h-3.5 w-3.5 stroke-[2.5px]" />
                 <span>Reactivate Staff</span>
