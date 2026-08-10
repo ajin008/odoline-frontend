@@ -382,51 +382,49 @@ export function StaffCarDetail({ carId }: { carId: string }) {
         </div>
       </div>
 
-      {/* Primary Subtabs Segmented Switch Control (Owner Side Matching UI) */}
-      <div className="flex w-full sm:w-max gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line no-scrollbar">
-        {[
-          {
-            key: "overview",
-            label: "Overview & Specs",
-            icon: <CarIcon className="h-3.5 w-3.5 stroke-[2px]" />,
-          },
-          {
-            key: "photos",
-            label: `Showroom Photos (${photos.length})`,
-            icon: <Camera className="h-3.5 w-3.5 stroke-[2px]" />,
-          },
-          {
-            key: "refurb",
-            label: `Refurbishment (${refurbItems.length})`,
-            icon: <Wrench className="h-3.5 w-3.5 stroke-[2px]" />,
-          },
-          {
-            key: "docs",
-            label: `Documents (${documents.length})`,
-            icon: <FileText className="h-3.5 w-3.5 stroke-[2px]" />,
-          },
-        ].map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            onClick={() =>
-              setActiveTab(
-                t.key as "overview" | "photos" | "refurb" | "docs"
-              )
-            }
-            className={[
-              "flex-1 sm:flex-initial text-center shrink-0 rounded-md px-3.5 sm:px-4 py-2 text-xs font-bold font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
-              activeTab === t.key
-                ? "bg-accent text-inverse shadow-xs"
-                : "text-ink-muted hover:text-ink",
-            ].join(" ")}
-          >
-            <div className="flex items-center justify-center gap-1.5">
-              {t.icon}
-              <span>{t.label}</span>
-            </div>
-          </button>
-        ))}
+      {/* Fully Responsive Subtabs Segmented Switcher (Mobile, Tablet, Desktop) */}
+      <div className="w-full overflow-x-auto rounded-lg bg-inset p-1 border border-line no-scrollbar">
+        <div className="flex w-full min-w-max gap-1">
+          {[
+            {
+              key: "overview" as const,
+              label: "Overview & Specs",
+              icon: <CarIcon className="h-3.5 w-3.5 stroke-[2px]" />,
+            },
+            {
+              key: "photos" as const,
+              label: `Photos (${photos.length})`,
+              icon: <Camera className="h-3.5 w-3.5 stroke-[2px]" />,
+            },
+            {
+              key: "refurb" as const,
+              label: `Refurb (${refurbItems.length})`,
+              icon: <Wrench className="h-3.5 w-3.5 stroke-[2px]" />,
+            },
+            {
+              key: "docs" as const,
+              label: `Documents (${documents.length})`,
+              icon: <FileText className="h-3.5 w-3.5 stroke-[2px]" />,
+            },
+          ].map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              onClick={() => setActiveTab(t.key)}
+              className={[
+                "flex-1 text-center shrink-0 rounded-md px-3 sm:px-4 py-2 text-xs font-bold font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+                activeTab === t.key
+                  ? "bg-accent text-inverse shadow-xs"
+                  : "text-ink-muted hover:text-ink",
+              ].join(" ")}
+            >
+              <div className="flex items-center justify-center gap-1.5">
+                {t.icon}
+                <span>{t.label}</span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tab Panel 1: Overview & Specs */}
