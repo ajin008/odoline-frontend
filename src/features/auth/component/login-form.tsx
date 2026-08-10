@@ -12,16 +12,14 @@ export function LoginForm() {
   const [showPin, setShowPin] = useState(false);
 
   return (
-    <div className="relative h-dvh w-full font-sans antialiased text-ink selection:bg-accent-light selection:text-accent overflow-hidden">
+    <div className="relative min-h-dvh h-dvh w-full font-sans antialiased text-ink selection:bg-accent-light selection:text-accent overflow-hidden">
       {/* Absolute global grid pattern */}
       <BackgroundPattern />
 
-      {/* ------------------------------------------------------------- */}
-      {/* MOBILE APP LAYOUT (Native app feel, zero scroll, 100dvh)      */}
-      {/* ------------------------------------------------------------- */}
-      <div className="md:hidden flex flex-col justify-between h-dvh w-full p-5 sm:p-6 overflow-hidden relative z-10">
-        {/* Top App Header */}
-        <div className="flex items-center justify-between pt-1">
+      {/* Outer Layout Container */}
+      <div className="relative z-10 flex flex-col md:flex-row justify-between items-stretch md:items-center h-dvh min-h-screen max-w-300 mx-auto w-full p-5 sm:p-6 md:px-12 md:py-12 lg:px-16 gap-6 overflow-hidden">
+        {/* Top App Header (Mobile only) */}
+        <div className="md:hidden flex items-center justify-between pt-1">
           <div className="flex items-center gap-2.5">
             <Image
               src="/icons/icon-192.png"
@@ -47,105 +45,8 @@ export function LoginForm() {
           </span>
         </div>
 
-        {/* Center Main Card & Form */}
-        <div className="my-auto py-4 space-y-5">
-          <div className="space-y-1">
-            <h1 className="font-heading text-3xl font-bold tracking-tight text-ink">
-              Welcome back
-            </h1>
-            <p className="text-xs font-medium text-ink-muted">
-              Enter your credentials to access the showroom terminal
-            </p>
-          </div>
-
-          <div className="bg-card border border-line rounded-2xl p-5 shadow-bento space-y-4">
-            <form onSubmit={onSubmit} noValidate className="space-y-4">
-              {/* Phone Input */}
-              <div className="space-y-1.5">
-                <label className="block text-[11px] font-bold text-ink-subtle uppercase tracking-wider pl-0.5">
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-bold text-ink-subtle font-mono">
-                    +91
-                  </span>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    maxLength={10}
-                    placeholder="Enter registered number"
-                    aria-invalid={!!errors.phone}
-                    className="w-full rounded-xl border border-line bg-inset py-3.5 pl-12 pr-4 text-sm font-medium text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/20"
-                    {...register("phone")}
-                  />
-                </div>
-                {errors.phone && (
-                  <p className="text-xs font-medium text-danger pl-0.5">
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Security PIN Input */}
-              <div className="space-y-1.5">
-                <label className="block text-[11px] font-bold text-ink-subtle uppercase tracking-wider pl-0.5">
-                  Security PIN
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPin ? "text" : "password"}
-                    inputMode="numeric"
-                    maxLength={6}
-                    placeholder="••••••"
-                    aria-invalid={!!errors.pin}
-                    className="w-full rounded-xl border border-line bg-inset py-3.5 pl-4 pr-12 text-sm font-medium text-ink tracking-widest outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/20"
-                    {...register("pin")}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPin((prev) => !prev)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-ink-subtle hover:text-ink transition-colors cursor-pointer"
-                  >
-                    {showPin ? (
-                      <EyeOff className="h-4 w-4 stroke-[2px]" />
-                    ) : (
-                      <Eye className="h-4 w-4 stroke-[2px]" />
-                    )}
-                  </button>
-                </div>
-                {errors.pin && (
-                  <p className="text-xs font-medium text-danger pl-0.5">
-                    {errors.pin.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Login Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full rounded-xl bg-[#171819] py-3.5 text-sm font-bold text-white transition-all hover:bg-[#222426] active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-sm border-none mt-2"
-              >
-                <span>{isSubmitting ? "Verifying Credentials..." : "Login to Showroom"}</span>
-                {!isSubmitting && <ArrowRight className="h-4 w-4 stroke-[2.5px]" />}
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Bottom App Footer */}
-        <div className="flex items-center justify-center gap-1.5 pb-2 text-[10px] font-mono text-ink-subtle">
-          <Lock className="h-3 w-3 text-accent" />
-          <span>Encrypted Terminal Session • v2.6</span>
-        </div>
-      </div>
-
-      {/* ------------------------------------------------------------- */}
-      {/* DESKTOP LAYOUT (Editorial split view)                         */}
-      {/* ------------------------------------------------------------- */}
-      <div className="hidden md:flex relative z-10 h-full min-h-screen max-w-300 mx-auto w-full px-12 lg:px-16 py-12 flex-row justify-between items-center gap-6">
-        {/* Left Editorial Branding Section */}
-        <div className="flex flex-col justify-between space-y-6 max-w-md">
+        {/* Left Editorial Branding Section (Desktop only) */}
+        <div className="hidden md:flex flex-col justify-between space-y-6 max-w-md">
           <div>
             <div className="flex items-center gap-2.5">
               <Image
@@ -180,87 +81,114 @@ export function LoginForm() {
           </div>
         </div>
 
-        {/* Right Floating Login Bento Card */}
-        <div className="w-105 bg-card border border-line rounded-xl shadow-bento p-8 space-y-6">
-          <div>
-            <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
-              Sign in to system
-            </h2>
-            <p className="text-xs text-ink-muted mt-1">
-              Provide credentials associated with your active terminal.
+        {/* Center Main Card & Form (Mobile & Desktop shared form instance) */}
+        <div className="my-auto md:my-0 w-full md:w-105 space-y-4 md:space-y-6">
+          {/* Mobile Header Text */}
+          <div className="md:hidden space-y-1">
+            <h1 className="font-heading text-3xl font-bold tracking-tight text-ink">
+              Welcome back
+            </h1>
+            <p className="text-xs font-medium text-ink-muted">
+              Enter your credentials to access the showroom terminal
             </p>
           </div>
 
-          <form onSubmit={onSubmit} noValidate className="space-y-4">
-            {/* Phone Number Field */}
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-ink-muted">
-                Phone Number
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-ink-subtle font-mono">
-                  +91
+          {/* Form Bento Card */}
+          <div className="bg-card border border-line rounded-2xl md:rounded-xl p-5 md:p-8 shadow-bento space-y-4 md:space-y-6">
+            {/* Desktop Header Text */}
+            <div className="hidden md:block">
+              <h2 className="font-heading text-xl font-semibold tracking-tight text-ink">
+                Sign in to system
+              </h2>
+              <p className="text-xs text-ink-muted mt-1">
+                Provide credentials associated with your active terminal.
+              </p>
+            </div>
+
+            <form onSubmit={onSubmit} noValidate className="space-y-4">
+              {/* Phone Input */}
+              <div className="space-y-1.5">
+                <label className="block text-[11px] md:text-[10px] font-bold text-ink-subtle md:text-ink-muted uppercase tracking-wider pl-0.5 md:pl-0">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 md:left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-ink-subtle font-mono">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    placeholder="Enter registered number"
+                    aria-invalid={!!errors.phone}
+                    className="w-full rounded-xl md:rounded-lg border border-line bg-inset py-3.5 md:py-3 pl-12 md:pl-14 pr-4 text-sm font-medium md:font-normal text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 md:focus:ring-4 focus:ring-accent/20 md:focus:ring-accent-light"
+                    {...register("phone")}
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="text-xs font-medium md:font-semibold text-danger pl-0.5 md:pl-0 mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Security PIN Input */}
+              <div className="space-y-1.5">
+                <label className="block text-[11px] md:text-[10px] font-bold text-ink-subtle md:text-ink-muted uppercase tracking-wider pl-0.5 md:pl-0">
+                  Security PIN
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPin ? "text" : "password"}
+                    inputMode="numeric"
+                    maxLength={6}
+                    placeholder="••••••"
+                    aria-invalid={!!errors.pin}
+                    className="w-full rounded-xl md:rounded-lg border border-line bg-inset py-3.5 md:py-3 pl-4 pr-12 text-sm font-medium md:font-normal text-ink tracking-widest outline-none transition-all focus:border-accent focus:bg-card focus:ring-2 md:focus:ring-4 focus:ring-accent/20 md:focus:ring-accent-light"
+                    {...register("pin")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPin((prev) => !prev)}
+                    className="absolute right-3.5 md:right-4 top-1/2 -translate-y-1/2 p-1 text-ink-subtle hover:text-ink transition-colors cursor-pointer"
+                  >
+                    {showPin ? (
+                      <EyeOff className="h-4 w-4 stroke-[2px]" />
+                    ) : (
+                      <Eye className="h-4 w-4 stroke-[2px]" />
+                    )}
+                  </button>
+                </div>
+                {errors.pin && (
+                  <p className="text-xs font-medium md:font-semibold text-danger pl-0.5 md:pl-0 mt-1">
+                    {errors.pin.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded-xl md:rounded-lg bg-[#171819] md:bg-accent py-3.5 text-sm font-bold md:font-semibold text-white md:text-inverse transition-all hover:bg-[#222426] md:hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-sm border-none mt-2"
+              >
+                <span>
+                  {isSubmitting
+                    ? "Verifying Credentials..."
+                    : "Login to Showroom"}
                 </span>
-                <input
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={10}
-                  placeholder="Enter registered number"
-                  aria-invalid={!!errors.phone}
-                  className="w-full rounded-lg border border-line bg-inset px-4 py-3 pl-14 text-sm text-ink outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
-                  {...register("phone")}
-                />
-              </div>
-              {errors.phone && (
-                <p className="mt-1 text-xs font-semibold text-danger">
-                  {errors.phone.message}
-                </p>
-              )}
-            </div>
+                {!isSubmitting && (
+                  <ArrowRight className="h-4 w-4 stroke-[2.5px] md:hidden" />
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
 
-            {/* Security PIN Field */}
-            <div className="space-y-1.5">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-ink-muted">
-                Security PIN
-              </label>
-              <div className="relative">
-                <input
-                  type={showPin ? "text" : "password"}
-                  inputMode="numeric"
-                  maxLength={6}
-                  placeholder="••••••"
-                  aria-invalid={!!errors.pin}
-                  className="w-full rounded-lg border border-line bg-inset px-4 py-3 pr-12 text-sm text-ink tracking-widest outline-none transition-all focus:border-accent focus:bg-card focus:ring-4 focus:ring-accent-light"
-                  {...register("pin")}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPin((prev) => !prev)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-1 text-ink-subtle hover:text-ink transition-colors cursor-pointer"
-                >
-                  {showPin ? (
-                    <EyeOff className="h-4 w-4 stroke-[2px]" />
-                  ) : (
-                    <Eye className="h-4 w-4 stroke-[2px]" />
-                  )}
-                </button>
-              </div>
-              {errors.pin && (
-                <p className="mt-1 text-xs font-semibold text-danger">
-                  {errors.pin.message}
-                </p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full rounded-lg bg-accent py-3.5 text-sm font-semibold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 mt-2 cursor-pointer shadow-sm"
-            >
-              {isSubmitting ? "Verifying..." : "Login to Terminal"}
-            </button>
-          </form>
+        {/* Bottom App Footer (Mobile only) */}
+        <div className="md:hidden flex items-center justify-center gap-1.5 pb-2 text-[10px] font-mono text-ink-subtle">
+          <Lock className="h-3 w-3 text-accent" />
+          <span>Encrypted Terminal Session • v2.6</span>
         </div>
       </div>
     </div>
