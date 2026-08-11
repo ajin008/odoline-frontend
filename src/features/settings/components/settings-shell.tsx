@@ -53,7 +53,7 @@ export function SettingsShell() {
         </div>
 
         {/* Minimalist Sub-tabs Navigation */}
-        <div className="flex gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-fit no-scrollbar">
+        <div className="flex gap-1 overflow-x-auto rounded-xl bg-inset p-1 border border-line/40 w-fit no-scrollbar">
           {SETTINGS_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -62,7 +62,7 @@ export function SettingsShell() {
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
                 className={[
-                  "flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+                  "flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
                   isActive
                     ? "bg-accent text-inverse shadow-xs"
                     : "text-ink-muted hover:text-ink",

@@ -75,7 +75,7 @@ export function ProfileSettings() {
                   !updatePhotoMutation.isPending &&
                   fileInputRef.current?.click()
                 }
-                className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent text-inverse overflow-hidden border border-line cursor-pointer transition-all hover:opacity-90 shadow-xs"
+                className="relative flex h-14 w-14 items-center justify-center rounded-lg bg-accent text-inverse overflow-hidden border border-line cursor-pointer transition-all hover:opacity-90 shadow-xs"
                 title="Click to upload or change profile photo"
               >
                 {user?.photo_url ? (

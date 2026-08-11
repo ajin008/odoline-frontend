@@ -105,7 +105,7 @@ export function DepartmentModal({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-lg rounded-2xl bg-card border border-line shadow-2xl overflow-hidden select-none font-sans"
+        className="relative w-full max-w-lg rounded-xl bg-card border border-line shadow-2xl overflow-hidden select-none font-sans"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
