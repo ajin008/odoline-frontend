@@ -1,0 +1,239 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useInfiniteLeads } from "../hooks/use-infinite-leads";
+import { LeadCard } from "./lead-card";
+import type { LeadPriority } from "../types/lead-types";
+import {
+  Users,
+  Loader2,
+  AlertTriangle,
+  Flame,
+  CheckCircle2,
+  XCircle,
+  Filter,
+} from "lucide-react";
+
+type LeadStatusTab = "active" | "won" | "lost";
+
+const PRIORITY_CHIPS: { label: string; value: LeadPriority | "all" }[] = [
+  { label: "All Priorities", value: "all" },
+  { label: "Very Hot", value: "very_hot" },
+  { label: "Hot", value: "hot" },
+  { label: "Warm", value: "warm" },
+  { label: "Cold", value: "cold" },
+];
+
+export function LeadList() {
+  const [activeTab, setActiveTab] = useState<LeadStatusTab>("active");
+  const [selectedPriority, setSelectedPriority] = useState<
+    LeadPriority | undefined
+  >(undefined);
+
+  // When switching away from 'active' tab, clear priority filter
+  const handleTabChange = (tab: LeadStatusTab) => {
+    setActiveTab(tab);
+    if (tab !== "active") {
+      setSelectedPriority(undefined);
+    }
+  };
+
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteLeads({
+    status: activeTab,
+    priority: activeTab === "active" ? selectedPriority : undefined,
+  });
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "400px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  const leads = data?.pages.flatMap((page) => page.data) ?? [];
+
+  return (
+    <div className="space-y-4 font-sans select-none">
+      {/* 1. Status Subtabs & Priority Filter Controls - Responsive across Mobile, Tablet, and Desktop */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-line/60 pb-3">
+        {/* Status Subtabs */}
+        <div className="grid grid-cols-3 w-full sm:w-auto sm:inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line shrink-0">
+          <button
+            type="button"
+            onClick={() => handleTabChange("active")}
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "active"
+                ? "bg-accent text-inverse shadow-xs font-bold"
+                : "text-ink-subtle hover:text-ink hover:bg-card/50"
+            }`}
+          >
+            <Flame className="h-3.5 w-3.5 shrink-0" />
+            <span>
+              Active<span className="hidden sm:inline"> Leads</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange("won")}
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "won"
+                ? "bg-emerald-600 text-white shadow-xs font-bold"
+                : "text-ink-subtle hover:text-ink hover:bg-card/50"
+            }`}
+          >
+            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+            <span>
+              Won<span className="hidden sm:inline"> Deals</span>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange("lost")}
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+              activeTab === "lost"
+                ? "bg-rose-600 text-white shadow-xs font-bold"
+                : "text-ink-subtle hover:text-ink hover:bg-card/50"
+            }`}
+          >
+            <XCircle className="h-3.5 w-3.5 shrink-0" />
+            <span>
+              Lost<span className="hidden sm:inline"> Leads</span>
+            </span>
+          </button>
+        </div>
+
+        {/* Priority Chips Row - VISIBLE ON ACTIVE TAB ONLY */}
+        {activeTab === "active" && (
+          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full py-1 scrollbar-none shrink-0">
+            <span className="text-[11px] font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
+              <Filter className="h-3 w-3 text-accent" />
+              Priority:
+            </span>
+
+            {PRIORITY_CHIPS.map((chip) => {
+              const isSelected =
+                chip.value === "all"
+                  ? selectedPriority === undefined
+                  : selectedPriority === chip.value;
+
+              return (
+                <button
+                  key={chip.value}
+                  type="button"
+                  onClick={() =>
+                    setSelectedPriority(
+                      chip.value === "all"
+                        ? undefined
+                        : (chip.value as LeadPriority)
+                    )
+                  }
+                  className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                    isSelected
+                      ? "bg-accent/15 border border-accent text-accent shadow-xs font-bold"
+                      : "bg-card border border-line text-ink-subtle hover:text-ink hover:border-line/80 font-medium"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* 2. Loading State Skeleton */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <div
+              key={i}
+              className="h-[180px] animate-pulse rounded-xl bg-inset border border-line"
+            />
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="p-4 rounded-lg border border-danger/20 bg-state-danger-light">
+          <div className="flex items-center gap-2 text-danger">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            <p className="text-sm font-medium font-sans">
+              Failed to load customer leads. Please try refreshing.
+            </p>
+          </div>
+        </div>
+      ) : leads.length === 0 ? (
+        /* 3. Empty States Per Status Tab */
+        <div className="rounded-xl border border-dashed border-line bg-card p-10 text-center max-w-md mx-auto my-6 select-none">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-inset text-ink-subtle border border-line mx-auto mb-3">
+            {activeTab === "won" ? (
+              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+            ) : activeTab === "lost" ? (
+              <XCircle className="h-5 w-5 text-rose-500" />
+            ) : (
+              <Users className="h-5 w-5 stroke-[1.5px]" />
+            )}
+          </div>
+          <p className="text-sm font-semibold text-ink font-sans tracking-tight">
+            {activeTab === "active"
+              ? "No active leads"
+              : activeTab === "won"
+              ? "No won deals yet"
+              : "No lost leads"}
+          </p>
+          <p className="mt-1 text-xs text-ink-subtle font-sans">
+            {activeTab === "active"
+              ? selectedPriority
+                ? `No active leads matching '${selectedPriority.replace("_", " ")}' priority.`
+                : "All buyer leads have been closed or no leads have been created."
+              : activeTab === "won"
+              ? "Closed won buyer deals will appear here."
+              : "Closed lost leads will appear here."}
+          </p>
+        </div>
+      ) : (
+        /* 4. Leads Grid List */
+        <div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {leads.map((lead) => (
+              <LeadCard key={lead.id} lead={lead} />
+            ))}
+          </div>
+
+          {/* Infinite-scroll sentinel + status row */}
+          <div ref={sentinelRef} className="flex items-center justify-center py-8">
+            {isFetchingNextPage ? (
+              <div className="flex items-center gap-2 text-xs font-medium text-ink-subtle font-sans">
+                <Loader2 className="h-4 w-4 animate-spin text-accent" />
+                Loading more leads…
+              </div>
+            ) : !hasNextPage ? (
+              <p className="text-[11px] font-mono uppercase tracking-widest text-ink-subtle">
+                End of {activeTab} leads list
+              </p>
+            ) : null}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

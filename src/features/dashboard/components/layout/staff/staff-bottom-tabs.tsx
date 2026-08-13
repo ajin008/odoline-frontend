@@ -8,12 +8,13 @@ import {
   Car,
   Users,
   CalendarCheck,
+  Clock,
   Settings,
   Plus,
   Menu,
   X,
 } from "lucide-react";
-import { CreateLeadModal } from "@/src/features/leads/components/create-lead-modal";
+import { LeadModal } from "@/src/features/leads/components/lead-modal";
 
 export function StaffBottomTabs() {
   const pathname = usePathname();
@@ -21,6 +22,11 @@ export function StaffBottomTabs() {
   const [isCreateLeadOpen, setIsCreateLeadOpen] = useState(false);
 
   const overflowItems = [
+    {
+      href: "/staff/follow-ups",
+      label: "Follow-ups",
+      icon: Clock,
+    },
     {
       href: "/staff/booking",
       label: "Booking",
@@ -237,8 +243,8 @@ export function StaffBottomTabs() {
         </>
       )}
 
-      {/* CREATE NEW LEAD STRUCTURAL MODAL */}
-      <CreateLeadModal
+      {/* FUNCTIONAL ADD LEAD MODAL */}
+      <LeadModal
         isOpen={isCreateLeadOpen}
         onClose={() => setIsCreateLeadOpen(false)}
       />

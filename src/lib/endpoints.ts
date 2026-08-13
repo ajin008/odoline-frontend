@@ -64,6 +64,23 @@ export const endpoints = {
     activate: (id: string) => `/staff/${id}/activate`,
   },
 
+  leads: {
+    list: "/leads",
+    create: "/leads",
+    detail: (id: string) => `/leads/${id}`,
+    activities: (id: string) => `/leads/${id}/activities`,
+    followUps: (id: string) => `/leads/${id}/follow-ups`,
+    followUp: (id: string, fuId: string) => `/leads/${id}/follow-ups/${fuId}`,
+    stage: (id: string) => `/leads/${id}/stage`,
+    stageHistory: (id: string) => `/leads/${id}/stage-history`,
+    cars: (id: string) => `/leads/${id}/cars`,
+    car: (id: string, carId: string) => `/leads/${id}/cars/${carId}`,
+  },
+
+  followUps: {
+    list: (bucket: string) => `/follow-ups?bucket=${bucket}`,
+  },
+
   export: {
     cars: "/export/cars",
   },

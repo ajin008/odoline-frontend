@@ -1,5 +1,12 @@
 // lib/query-keys.ts
 
+export interface ListLeadsQueryParams {
+  status?: "active" | "won" | "lost";
+  priority?: "very_hot" | "hot" | "warm" | "cold";
+  cursor?: string;
+  limit?: number;
+}
+
 /**
  * Every query key in one place, mirroring the API resource structure.
  * Using these (instead of typing arrays by hand) keeps keys consistent,
@@ -43,6 +50,23 @@ export const queryKeys = {
     all: ["staff"] as const,
     list: (status?: string) => ["staff", { status }] as const,
     detail: (id: string) => ["staff", id] as const,
+  },
+
+  leads: {
+    all: ["leads"] as const,
+    list: (params?: ListLeadsQueryParams) =>
+      ["leads", "list", params] as const,
+    infinite: (params?: ListLeadsQueryParams) =>
+      ["leads", "infinite", params] as const,
+    detail: (id: string) => ["leads", id] as const,
+    activities: (id: string) => ["leads", id, "activities"] as const,
+    followUps: (id: string) => ["leads", id, "follow-ups"] as const,
+    stageHistory: (id: string) => ["leads", id, "stage-history"] as const,
+  },
+
+  followUps: {
+    all: ["follow-ups"] as const,
+    actionList: (bucket: string) => ["follow-ups", "action-list", bucket] as const,
   },
 
   attendance: {

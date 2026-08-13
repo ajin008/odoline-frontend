@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Car,
   Users,
+  Clock,
   CalendarCheck,
   Settings,
 } from "lucide-react";
@@ -30,6 +31,12 @@ export const staffNavItems: StaffNavItem[] = [
     href: "/staff/leads",
     label: "Leads",
     icon: Users,
+    mobile: true,
+  },
+  {
+    href: "/staff/follow-ups",
+    label: "Follow-ups",
+    icon: Clock,
     mobile: true,
   },
   {

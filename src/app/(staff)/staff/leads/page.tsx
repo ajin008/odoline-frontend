@@ -1,33 +1,43 @@
-import { Users, Sparkles } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { UserPlus } from "lucide-react";
+import { LeadModal } from "@/src/features/leads/components/lead-modal";
+import { LeadList } from "@/src/features/leads/components/lead-list";
 
 export default function StaffLeadsPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="w-full space-y-5 font-sans select-none">
-      <div className="space-y-1 border-b border-line/60 pb-4">
-        <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
-          Customer Leads &amp; Enquiries
-        </h1>
-        <p className="text-xs text-ink-muted">
-          Manage buyer leads, follow-ups, test drives, and customer contacts.
-        </p>
-      </div>
-
-      <div className="rounded-xl border border-dashed border-line bg-inset p-8 text-center space-y-3">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle">
-          <Users className="h-6 w-6 stroke-[2px]" />
-        </div>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-4">
         <div className="space-y-1">
-          <div className="flex items-center justify-center gap-1.5">
-            <Sparkles className="h-4 w-4 text-accent" />
-            <h3 className="text-sm font-bold text-ink font-sans">
-              Leads Management Engine Coming Next
-            </h3>
-          </div>
-          <p className="text-xs text-ink-subtle max-w-sm mx-auto">
-            Customer lead tracking, call logs, and deal stages will be available here.
+          <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
+            Customer Leads &amp; Enquiries
+          </h1>
+          <p className="text-xs text-ink-muted">
+            Manage buyer leads, follow-ups, test drives, and customer contacts.
           </p>
         </div>
+
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="hidden sm:inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity shrink-0 cursor-pointer"
+        >
+          <UserPlus className="h-4 w-4 stroke-[2.5px]" />
+          <span>Add Lead</span>
+        </button>
       </div>
+
+      {/* Infinite Leads List */}
+      <LeadList />
+
+      {/* Add Lead Modal */}
+      <LeadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
