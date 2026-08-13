@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLeadActions } from "../hooks/use-lead-actions";
@@ -22,6 +22,15 @@ import {
   IndianRupee,
   MessageSquare,
   CalendarDays,
+  ChevronDown,
+  Check,
+  MessageCircle,
+  PhoneCall,
+  UserCheck,
+  Camera,
+  Car,
+  Footprints,
+  type LucideIcon,
 } from "lucide-react";
 
 interface LeadModalProps {
@@ -30,8 +39,141 @@ interface LeadModalProps {
   onSuccess?: () => void;
 }
 
+const SOURCE_CONFIG: Record<
+  string,
+  { label: string; icon: LucideIcon; colorBg: string; colorText: string }
+> = {
+  walk_in: {
+    label: "Walk In",
+    icon: Footprints,
+    colorBg: "bg-purple-500/10",
+    colorText: "text-purple-500",
+  },
+  whatsapp: {
+    label: "WhatsApp",
+    icon: MessageCircle,
+    colorBg: "bg-emerald-500/10",
+    colorText: "text-emerald-500",
+  },
+  phone: {
+    label: "Phone Call",
+    icon: PhoneCall,
+    colorBg: "bg-blue-500/10",
+    colorText: "text-blue-500",
+  },
+  referral: {
+    label: "Referral",
+    icon: UserCheck,
+    colorBg: "bg-indigo-500/10",
+    colorText: "text-indigo-500",
+  },
+  instagram: {
+    label: "Instagram",
+    icon: Camera,
+    colorBg: "bg-pink-500/10",
+    colorText: "text-pink-500",
+  },
+  olx: {
+    label: "OLX",
+    icon: Car,
+    colorBg: "bg-amber-500/10",
+    colorText: "text-amber-500",
+  },
+  other: {
+    label: "Other",
+    icon: Globe,
+    colorBg: "bg-slate-500/10",
+    colorText: "text-slate-500",
+  },
+};
+
+const PRIORITY_CONFIG_MODAL: Record<
+  string,
+  { label: string; dotColor: string; textColor: string }
+> = {
+  very_hot: {
+    label: "Very Hot",
+    dotColor: "bg-red-500",
+    textColor: "text-red-500",
+  },
+  hot: {
+    label: "Hot",
+    dotColor: "bg-amber-500",
+    textColor: "text-amber-500",
+  },
+  warm: {
+    label: "Warm",
+    dotColor: "bg-yellow-500",
+    textColor: "text-yellow-600 dark:text-yellow-400",
+  },
+  cold: {
+    label: "Cold",
+    dotColor: "bg-blue-500",
+    textColor: "text-blue-500",
+  },
+};
+
+function getSourceConfig(source: string | null | undefined) {
+  if (source && Object.prototype.hasOwnProperty.call(SOURCE_CONFIG, source)) {
+    return SOURCE_CONFIG[source as keyof typeof SOURCE_CONFIG];
+  }
+  return SOURCE_CONFIG.walk_in;
+}
+
+function getPriorityConfig(priority: string | null | undefined) {
+  if (
+    priority &&
+    Object.prototype.hasOwnProperty.call(PRIORITY_CONFIG_MODAL, priority)
+  ) {
+    return PRIORITY_CONFIG_MODAL[priority as keyof typeof PRIORITY_CONFIG_MODAL];
+  }
+  return PRIORITY_CONFIG_MODAL.warm;
+}
+
+function formatIndianNumber(value: string | null | undefined): string {
+  if (!value) return "";
+  const rawNum = value.replace(/[^0-9]/g, "");
+  if (!rawNum) return "";
+  const num = parseInt(rawNum, 10);
+  if (isNaN(num)) return "";
+  return num.toLocaleString("en-IN");
+}
+
+function parseRawNumber(value: string | null | undefined): string {
+  if (!value) return "";
+  return value.replace(/[^0-9]/g, "");
+}
+
+function getLakhText(value: string | null | undefined): string | null {
+  const raw = parseRawNumber(value);
+  if (!raw) return null;
+  const num = parseInt(raw, 10);
+  if (isNaN(num) || num <= 0) return null;
+
+  if (num >= 10000000) {
+    const crore = (num / 10000000).toFixed(2).replace(/\.00$/, "");
+    return `₹${crore} Cr`;
+  }
+  if (num >= 100000) {
+    const lakh = (num / 100000).toFixed(2).replace(/\.00$/, "");
+    return `₹${lakh} Lakh`;
+  }
+  if (num >= 1000) {
+    const k = (num / 1000).toFixed(1).replace(/\.0$/, "");
+    return `₹${k}k`;
+  }
+  return `₹${num.toLocaleString("en-IN")}`;
+}
+
 export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
   const { createLead } = useLeadActions();
+
+  // Custom Dropdown Open States
+  const [isSourceOpen, setIsSourceOpen] = useState(false);
+  const [isPriorityOpen, setIsPriorityOpen] = useState(false);
+
+  const sourceRef = useRef<HTMLDivElement>(null);
+  const priorityRef = useRef<HTMLDivElement>(null);
 
   const {
     register,
@@ -56,7 +198,11 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
   });
 
   const selectedSource = useWatch({ control, name: "source" });
-  const selectedFollowUpDate = useWatch({ control, name: "first_follow_up_at" }) || "";
+  const selectedPriority = useWatch({ control, name: "priority" });
+  const selectedFollowUpDate =
+    useWatch({ control, name: "first_follow_up_at" }) || "";
+  const budgetMinRaw = useWatch({ control, name: "budget_min" }) || "";
+  const budgetMaxRaw = useWatch({ control, name: "budget_max" }) || "";
 
   useEffect(() => {
     if (isOpen) {
@@ -73,6 +219,26 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
       });
     }
   }, [isOpen, reset]);
+
+  // Outside click listener for custom dropdowns
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        sourceRef.current &&
+        !sourceRef.current.contains(event.target as Node)
+      ) {
+        setIsSourceOpen(false);
+      }
+      if (
+        priorityRef.current &&
+        !priorityRef.current.contains(event.target as Node)
+      ) {
+        setIsPriorityOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -92,8 +258,8 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
       priority: data.priority,
       source: data.source,
       source_note: data.source === "other" ? data.source_note : null,
-      budget_min: data.budget_min || null,
-      budget_max: data.budget_max || null,
+      budget_min: parseRawNumber(data.budget_min) || null,
+      budget_max: parseRawNumber(data.budget_max) || null,
       remark: data.remark || null,
       first_follow_up_at: isoFollowUp,
     };
@@ -106,6 +272,14 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
       },
     });
   };
+
+  const currentSourceConfig = getSourceConfig(selectedSource);
+  const currentPriorityConfig = getPriorityConfig(selectedPriority);
+
+  const SourceIcon = currentSourceConfig.icon;
+
+  const minLakhBadge = getLakhText(budgetMinRaw);
+  const maxLakhBadge = getLakhText(budgetMaxRaw);
 
   return (
     <div
@@ -210,45 +384,136 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Priority */}
-                <div className="space-y-1">
+                {/* Custom Priority Dropdown */}
+                <div className="space-y-1 relative" ref={priorityRef}>
                   <label className="text-xs font-medium text-ink">
                     Lead Priority
                   </label>
-                  <select
-                    {...register("priority")}
-                    className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none transition-colors focus:border-accent"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsPriorityOpen(!isPriorityOpen);
+                      setIsSourceOpen(false);
+                    }}
+                    className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink flex items-center justify-between shadow-xs hover:border-accent transition-colors cursor-pointer"
                   >
-                    {LEAD_PRIORITY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`h-2.5 w-2.5 rounded-full ${currentPriorityConfig.dotColor}`}
+                      />
+                      <span className="font-semibold text-xs">
+                        {currentPriorityConfig.label}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-ink-subtle" />
+                  </button>
+
+                  {isPriorityOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1 z-30 rounded-xl border border-line bg-card p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-150 space-y-0.5">
+                      {LEAD_PRIORITY_OPTIONS.map((opt) => {
+                        const isSelected = selectedPriority === opt.value;
+                        const pConfig = getPriorityConfig(opt.value);
+
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => {
+                              setValue("priority", opt.value, {
+                                shouldValidate: true,
+                              });
+                              setIsPriorityOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between rounded-lg px-2.5 py-2 text-xs transition-colors cursor-pointer ${
+                              isSelected
+                                ? "bg-accent/15 font-bold text-accent"
+                                : "hover:bg-inset text-ink"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`h-2.5 w-2.5 rounded-full ${pConfig.dotColor}`}
+                              />
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && (
+                              <Check className="h-3.5 w-3.5 text-accent" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
-                {/* Source */}
-                <div className="space-y-1">
+                {/* Custom Rich Lead Source Dropdown */}
+                <div className="space-y-1 relative" ref={sourceRef}>
                   <label className="text-xs font-medium text-ink flex items-center gap-1">
                     Lead Source <span className="text-danger">*</span>
                   </label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-2.5 h-4 w-4 text-ink-subtle" />
-                    <select
-                      {...register("source")}
-                      className={`w-full rounded-lg border bg-surface pl-9 pr-3 py-2 text-sm text-ink outline-none transition-colors ${
-                        errors.source
-                          ? "border-danger focus:border-danger"
-                          : "border-line focus:border-accent"
-                      }`}
-                    >
-                      {LEAD_SOURCE_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSourceOpen(!isSourceOpen);
+                      setIsPriorityOpen(false);
+                    }}
+                    className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-ink flex items-center justify-between shadow-xs hover:border-accent transition-colors cursor-pointer ${
+                      errors.source ? "border-danger" : "border-line"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`flex h-6 w-6 items-center justify-center rounded-md ${currentSourceConfig.colorBg} ${currentSourceConfig.colorText}`}
+                      >
+                        <SourceIcon className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="font-semibold text-xs">
+                        {currentSourceConfig.label}
+                      </span>
+                    </div>
+                    <ChevronDown className="h-4 w-4 text-ink-subtle" />
+                  </button>
+
+                  {isSourceOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1 z-30 rounded-xl border border-line bg-card p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-150 space-y-0.5 max-h-56 overflow-y-auto">
+                      {LEAD_SOURCE_OPTIONS.map((opt) => {
+                        const isSelected = selectedSource === opt.value;
+                        const srcConfig = getSourceConfig(opt.value);
+                        const IconComponent = srcConfig.icon;
+
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => {
+                              setValue("source", opt.value, {
+                                shouldValidate: true,
+                              });
+                              setIsSourceOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between rounded-lg px-2.5 py-2 text-xs transition-colors cursor-pointer ${
+                              isSelected
+                                ? "bg-accent/15 font-bold text-accent"
+                                : "hover:bg-inset text-ink"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <div
+                                className={`flex h-6 w-6 items-center justify-center rounded-md ${srcConfig.colorBg} ${srcConfig.colorText}`}
+                              >
+                                <IconComponent className="h-3.5 w-3.5" />
+                              </div>
+                              <span>{opt.label}</span>
+                            </div>
+                            {isSelected && (
+                              <Check className="h-3.5 w-3.5 text-accent" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
                   {errors.source && (
                     <p className="text-[11px] text-danger font-medium">
                       {errors.source.message}
@@ -290,16 +555,28 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Budget Min */}
+                {/* Min Budget (Formatted with Indian Comma Separator) */}
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-ink">
-                    Min Budget (₹)
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-ink">
+                      Min Budget (₹)
+                    </label>
+                    {minLakhBadge && (
+                      <span className="text-[10px] font-bold font-mono text-accent bg-accent/10 px-1.5 py-0.2 rounded border border-accent/20">
+                        {minLakhBadge}
+                      </span>
+                    )}
+                  </div>
                   <input
-                    type="number"
-                    placeholder="e.g. 500000"
-                    {...register("budget_min")}
-                    className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-ink outline-none transition-colors ${
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="e.g. 5,00,000"
+                    value={formatIndianNumber(budgetMinRaw)}
+                    onChange={(e) => {
+                      const raw = parseRawNumber(e.target.value);
+                      setValue("budget_min", raw, { shouldValidate: true });
+                    }}
+                    className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-ink outline-none transition-colors font-mono ${
                       errors.budget_min
                         ? "border-danger focus:border-danger"
                         : "border-line focus:border-accent"
@@ -312,16 +589,28 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
                   )}
                 </div>
 
-                {/* Budget Max */}
+                {/* Max Budget (Formatted with Indian Comma Separator) */}
                 <div className="space-y-1">
-                  <label className="text-xs font-medium text-ink">
-                    Max Budget (₹)
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-ink">
+                      Max Budget (₹)
+                    </label>
+                    {maxLakhBadge && (
+                      <span className="text-[10px] font-bold font-mono text-accent bg-accent/10 px-1.5 py-0.2 rounded border border-accent/20">
+                        {maxLakhBadge}
+                      </span>
+                    )}
+                  </div>
                   <input
-                    type="number"
-                    placeholder="e.g. 800000"
-                    {...register("budget_max")}
-                    className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-ink outline-none transition-colors ${
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="e.g. 8,00,000"
+                    value={formatIndianNumber(budgetMaxRaw)}
+                    onChange={(e) => {
+                      const raw = parseRawNumber(e.target.value);
+                      setValue("budget_max", raw, { shouldValidate: true });
+                    }}
+                    className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-ink outline-none transition-colors font-mono ${
                       errors.budget_max
                         ? "border-danger focus:border-danger"
                         : "border-line focus:border-accent"
@@ -373,14 +662,14 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-ink hover:bg-hover transition-colors"
+              className="rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-ink hover:bg-hover transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={createLead.isPending}
-              className="flex items-center gap-2 rounded-xl bg-accent px-5 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+              className="flex items-center gap-2 rounded-xl bg-accent px-5 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
             >
               {createLead.isPending ? (
                 <>

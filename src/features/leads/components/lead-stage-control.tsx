@@ -13,7 +13,13 @@ import {
   XCircle,
   Loader2,
   X,
-  Sparkles,
+  ShoppingBag,
+  Tag,
+  CreditCard,
+  RefreshCw,
+  SearchX,
+  MoreHorizontal,
+  type LucideIcon,
 } from "lucide-react";
 
 interface LeadStageControlProps {
@@ -76,6 +82,58 @@ const COMMON_LOST_REASONS = [
   "Other",
 ];
 
+const LOST_REASON_CONFIG: Record<
+  string,
+  { label: string; icon: LucideIcon; colorBg: string; colorText: string }
+> = {
+  "Bought elsewhere": {
+    label: "Bought Elsewhere",
+    icon: ShoppingBag,
+    colorBg: "bg-blue-500/10",
+    colorText: "text-blue-500",
+  },
+  "Price too high": {
+    label: "Price Too High",
+    icon: Tag,
+    colorBg: "bg-amber-500/10",
+    colorText: "text-amber-500",
+  },
+  "Loan rejected": {
+    label: "Loan Rejected",
+    icon: CreditCard,
+    colorBg: "bg-purple-500/10",
+    colorText: "text-purple-500",
+  },
+  "Changed mind / no longer buying": {
+    label: "Changed Mind",
+    icon: RefreshCw,
+    colorBg: "bg-indigo-500/10",
+    colorText: "text-indigo-500",
+  },
+  "Car model not available": {
+    label: "Model Unavailable",
+    icon: SearchX,
+    colorBg: "bg-pink-500/10",
+    colorText: "text-pink-500",
+  },
+  Other: {
+    label: "Other Reason",
+    icon: MoreHorizontal,
+    colorBg: "bg-slate-500/10",
+    colorText: "text-slate-500",
+  },
+};
+
+function getLostReasonConfig(reason: string) {
+  if (
+    reason &&
+    Object.prototype.hasOwnProperty.call(LOST_REASON_CONFIG, reason)
+  ) {
+    return LOST_REASON_CONFIG[reason];
+  }
+  return LOST_REASON_CONFIG["Other"];
+}
+
 function formatCurrency(amountStr: string | null): string {
   if (!amountStr) return "";
   const num = Number(amountStr);
@@ -99,44 +157,36 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
   const [customReason, setCustomReason] = useState("");
   const [lostNotes, setLostNotes] = useState("");
 
-  // In-stock cars query for WON dialog
-  const { data: inStockCarsPage, isLoading: isLoadingCars } = useQuery({
-    queryKey: ["cars", "in-stock-list"],
+  // In-stock cars query for Won dialog picker
+  const { data: inStockCars, isLoading: isCarsLoading } = useQuery({
+    queryKey: ["cars", "in-stock-picker"],
     queryFn: () => carsApi.getList({ statuses: ["in_stock"] }),
     enabled: isWonOpen,
   });
-
-  const inStockCars = inStockCarsPage?.data || [];
 
   const currentStage = lead.stage;
   const isTerminal = currentStage === "won" || currentStage === "lost";
   const activeIndex = ACTIVE_STAGES.indexOf(currentStage as LeadStage);
 
-  // Simple next / prev stage derivation for active stages
+  const prevActiveStage =
+    activeIndex > 0 ? ACTIVE_STAGES[activeIndex - 1] : null;
   const nextActiveStage =
     activeIndex >= 0 && activeIndex < ACTIVE_STAGES.length - 1
       ? ACTIVE_STAGES[activeIndex + 1]
       : null;
 
-  const prevActiveStage =
-    activeIndex > 0 ? ACTIVE_STAGES[activeIndex - 1] : null;
-
   const handleAdvanceStage = () => {
     if (!nextActiveStage) return;
-    changeStageMutation.mutate({ to_stage: nextActiveStage });
+    changeStageMutation.mutate({
+      to_stage: nextActiveStage,
+    });
   };
 
   const handlePrevStage = () => {
     if (!prevActiveStage) return;
-    changeStageMutation.mutate({ to_stage: prevActiveStage });
-  };
-
-  const handleCarSelect = (carId: string) => {
-    setSelectedCarId(carId);
-    const chosenCar = inStockCars.find((c) => c.id === carId);
-    if (chosenCar && chosenCar.selling_price) {
-      setWonPrice(chosenCar.selling_price);
-    }
+    changeStageMutation.mutate({
+      to_stage: prevActiveStage,
+    });
   };
 
   const handleWonSubmit = (e: React.FormEvent) => {
@@ -160,6 +210,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
   const handleLostSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     const finalReason =
       selectedReasonOption === "Other"
         ? customReason.trim()
@@ -182,21 +233,32 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
   };
 
   return (
-    <div className="rounded-2xl border border-line bg-card p-5 space-y-4 font-sans select-none">
-      {/* Header & Framing */}
+    <div className="rounded-xl border border-line bg-card p-5 space-y-4 font-sans select-none">
+      {/* Header Info & Stage Transition Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-3">
         <div>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-accent" />
-            Buyer Pipeline Journey
-          </h3>
-          <p className="text-[11px] text-ink-subtle mt-0.5">
-            Stage represents customer progression (independent of priority
-            quality label).
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+              Pipeline Stage
+            </span>
+            {isTerminal && (
+              <span
+                className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                  currentStage === "won"
+                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                    : "bg-red-500/10 text-red-500 border border-red-500/20"
+                }`}
+              >
+                {currentStage === "won" ? "Won Deal" : "Lost Lead"}
+              </span>
+            )}
+          </div>
+          <p className="text-sm font-bold text-ink font-sans">
+            {getStageConfig(currentStage).label}
           </p>
         </div>
 
-        {/* Action Controls for Active Stages */}
+        {/* Transition Action Buttons */}
         {!isTerminal && (
           <div className="flex items-center gap-2 flex-wrap">
             {prevActiveStage && (
@@ -290,9 +352,9 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
         <div
           className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
             currentStage === "won"
-              ? "bg-emerald-500/20 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs"
+              ? "bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs"
               : currentStage === "lost"
-              ? "bg-red-500/20 border-red-500 text-red-500 font-bold shadow-xs"
+              ? "bg-red-500/15 border-red-500 text-red-500 font-bold shadow-xs"
               : "bg-inset/30 border-line/40 text-ink-subtle/60 font-normal"
           }`}
         >
@@ -301,170 +363,148 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
               ? "Won"
               : currentStage === "lost"
               ? "Lost"
-              : "Won / Lost"}
+              : "Closed"}
           </span>
           <span className="text-[9px] text-ink-subtle hidden sm:block truncate w-full">
             {currentStage === "won"
-              ? "Deal Handoff"
+              ? "Deal won"
               : currentStage === "lost"
-              ? "Closed Lost"
-              : "Terminal State"}
+              ? "Deal lost"
+              : "Terminal"}
           </span>
         </div>
       </div>
 
-      {/* Terminal Details View when WON or LOST */}
+      {/* Won Details Banner (if already WON) */}
       {currentStage === "won" && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-            <Trophy className="h-4 w-4 shrink-0" />
-            <span>Lead Won &amp; Ready for Booking Handoff 🎉</span>
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-2 text-xs">
+          <div className="flex items-center justify-between font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="flex items-center gap-1.5">
+              <Trophy className="h-4 w-4" />
+              Won Deal Snapshot
+            </span>
+            {lead.won_at && (
+              <span className="text-[11px] font-mono font-normal">
+                {new Date(lead.won_at).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs pt-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-emerald-500/20 text-ink">
             <div>
-              <span className="text-ink-subtle block text-[11px]">
-                Agreed Deal Price
+              <span className="text-ink-subtle">Purchased Car: </span>
+              <span className="font-bold">
+                {lead.won_car
+                  ? `${lead.won_car.year} ${lead.won_car.make} ${lead.won_car.model}`
+                  : "Vehicle Selected"}
               </span>
-              <span className="font-bold font-mono text-ink">
+            </div>
+            <div>
+              <span className="text-ink-subtle font-mono">Agreed Price: </span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">
                 {formatCurrency(lead.won_price)}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-ink-subtle block text-[11px]">
-                Won Car Reference ID
-              </span>
-              <span className="font-mono text-ink text-[11px] truncate block">
-                {lead.won_car_id || "N/A"}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-ink-subtle block text-[11px]">
-                Won Date
-              </span>
-              <span className="font-medium text-ink">
-                {lead.won_at
-                  ? new Date(lead.won_at).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "N/A"}
               </span>
             </div>
           </div>
         </div>
       )}
 
+      {/* Lost Details Banner (if already LOST) */}
       {currentStage === "lost" && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold text-red-500">
-            <XCircle className="h-4 w-4 shrink-0" />
-            <span>Lead Marked as Lost</span>
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 space-y-2 text-xs">
+          <div className="flex items-center justify-between font-semibold text-red-500">
+            <span className="flex items-center gap-1.5">
+              <XCircle className="h-4 w-4" />
+              Lost Lead Reason
+            </span>
+            {lead.lost_at && (
+              <span className="text-[11px] font-mono font-normal">
+                {new Date(lead.lost_at).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
-            <div>
-              <span className="text-ink-subtle block text-[11px]">
-                Reason for Loss
-              </span>
-              <span className="font-bold text-ink">
-                {lead.lost_reason || "Not specified"}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-ink-subtle block text-[11px]">
-                Lost Date
-              </span>
-              <span className="font-medium text-ink">
-                {lead.lost_at
-                  ? new Date(lead.lost_at).toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                      year: "numeric",
-                    })
-                  : "N/A"}
-              </span>
-            </div>
-          </div>
+          <p className="text-ink font-medium pt-1 border-t border-red-500/20">
+            &ldquo;{lead.lost_reason || "No reason specified"}&rdquo;
+          </p>
         </div>
       )}
 
       {/* Modal 1: Mark as Won */}
       {isWonOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl border border-line bg-card p-5 shadow-xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 pointer-events-auto">
+          <div className="w-full max-w-md rounded-2xl border border-line bg-card p-5 shadow-xl space-y-4 pointer-events-auto">
             <div className="flex items-center justify-between border-b border-line pb-3">
               <h4 className="text-sm font-bold text-ink flex items-center gap-2">
                 <Trophy className="h-4 w-4 text-emerald-500" />
-                Mark Lead as Won
+                Close Deal as Won
               </h4>
               <button
                 type="button"
                 onClick={() => setIsWonOpen(false)}
-                className="text-ink-subtle hover:text-ink transition-colors p-1"
+                className="text-ink-subtle hover:text-ink transition-colors p-1 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <form onSubmit={handleWonSubmit} className="space-y-4">
+              {/* Select Car from In-Stock vehicles */}
               <div className="space-y-1">
                 <label className="text-xs font-medium text-ink-muted">
-                  Select Purchased Car (In-Stock Inventory) *
+                  Select Purchased Car *
                 </label>
-                {isLoadingCars ? (
-                  <div className="py-3 text-center text-xs text-ink-subtle flex items-center justify-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-accent" />
-                    Loading available cars…
+                {isCarsLoading ? (
+                  <div className="py-2 text-xs text-ink-subtle flex items-center gap-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Loading available vehicles…
                   </div>
-                ) : inStockCars.length === 0 ? (
-                  <p className="text-xs text-amber-500 py-1">
-                    No in-stock vehicles available in inventory.
+                ) : !inStockCars?.data || inStockCars.data.length === 0 ? (
+                  <p className="text-xs text-amber-500 font-medium py-1">
+                    No in-stock vehicles available to link.
                   </p>
                 ) : (
                   <select
                     value={selectedCarId}
-                    onChange={(e) => handleCarSelect(e.target.value)}
+                    onChange={(e) => setSelectedCarId(e.target.value)}
                     required
                     className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none"
                   >
-                    <option value="">-- Choose a Car --</option>
-                    {inStockCars.map((car) => (
+                    <option value="">-- Pick an in-stock car --</option>
+                    {inStockCars.data.map((car) => (
                       <option key={car.id} value={car.id}>
-                        {car.year} {car.make} {car.model} ({car.reg_number}) —
-                        Asking: ₹
-                        {car.selling_price
-                          ? Number(car.selling_price).toLocaleString("en-IN")
-                          : "N/A"}
+                        {car.year} {car.make} {car.model} — (Reg:{" "}
+                        {car.reg_number})
                       </option>
                     ))}
                   </select>
                 )}
               </div>
 
+              {/* Agreed Final Deal Price */}
               <div className="space-y-1">
                 <label className="text-xs font-medium text-ink-muted">
-                  Agreed Final Selling Price (₹) *
+                  Agreed Deal Price (₹) *
                 </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-ink-subtle text-xs">
-                    ₹
-                  </span>
-                  <input
-                    type="text"
-                    required
-                    value={wonPrice}
-                    onChange={(e) => setWonPrice(e.target.value)}
-                    placeholder="e.g. 650000.00"
-                    className="w-full rounded-xl border border-line bg-inset py-2.5 pl-8 pr-3 text-xs font-mono text-ink focus:border-accent focus:outline-none"
-                  />
-                </div>
+                <input
+                  type="number"
+                  required
+                  value={wonPrice}
+                  onChange={(e) => setWonPrice(e.target.value)}
+                  placeholder="e.g. 750000"
+                  className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
+                />
               </div>
 
+              {/* Optional Notes */}
               <div className="space-y-1">
                 <label className="text-xs font-medium text-ink-muted">
                   Closing Notes (Optional)
@@ -473,7 +513,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                   rows={2}
                   value={wonNotes}
                   onChange={(e) => setWonNotes(e.target.value)}
-                  placeholder="e.g. Final deal agreed after test drive, customer bringing token tomorrow..."
+                  placeholder="e.g. Customer paid via bank transfer, delivery scheduled..."
                   className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none"
                 />
               </div>
@@ -482,7 +522,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 <button
                   type="button"
                   onClick={() => setIsWonOpen(false)}
-                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
+                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -491,7 +531,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                   disabled={
                     changeStageMutation.isPending || !selectedCarId || !wonPrice
                   }
-                  className="flex items-center gap-1.5 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                 >
                   {changeStageMutation.isPending && (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -506,8 +546,8 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
       {/* Modal 2: Mark as Lost */}
       {isLostOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl border border-line bg-card p-5 shadow-xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 pointer-events-auto">
+          <div className="w-full max-w-md rounded-2xl border border-line bg-card p-5 shadow-xl space-y-4 font-sans pointer-events-auto">
             <div className="flex items-center justify-between border-b border-line pb-3">
               <h4 className="text-sm font-bold text-ink flex items-center gap-2">
                 <XCircle className="h-4 w-4 text-red-500" />
@@ -516,34 +556,53 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
               <button
                 type="button"
                 onClick={() => setIsLostOpen(false)}
-                className="text-ink-subtle hover:text-ink transition-colors p-1"
+                className="text-ink-subtle hover:text-ink transition-colors p-1 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <form onSubmit={handleLostSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-ink-muted">
-                  Reason for Loss *
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-ink">
+                  Reason for Loss <span className="text-danger">*</span>
                 </label>
-                <select
-                  value={selectedReasonOption}
-                  onChange={(e) => setSelectedReasonOption(e.target.value)}
-                  className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none"
-                >
-                  {COMMON_LOST_REASONS.map((reason) => (
-                    <option key={reason} value={reason}>
-                      {reason}
-                    </option>
-                  ))}
-                </select>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {COMMON_LOST_REASONS.map((reason) => {
+                    const isSelected = selectedReasonOption === reason;
+                    const config = getLostReasonConfig(reason);
+                    const Icon = config.icon;
+
+                    return (
+                      <button
+                        key={reason}
+                        type="button"
+                        onClick={() => setSelectedReasonOption(reason)}
+                        className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-red-500/10 border-red-500/50 text-ink ring-1 ring-red-500/30 shadow-xs"
+                            : "bg-inset/40 border-line/60 text-ink-muted hover:border-line hover:text-ink hover:bg-inset"
+                        }`}
+                      >
+                        <div
+                          className={`flex h-7 w-7 items-center justify-center rounded-lg ${config.colorBg} ${config.colorText} shrink-0`}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                        </div>
+                        <span className="text-xs font-medium leading-tight truncate">
+                          {reason}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {selectedReasonOption === "Other" && (
-                <div className="space-y-1">
+                <div className="space-y-1 animate-in fade-in duration-200">
                   <label className="text-xs font-medium text-ink-muted">
-                    Specify Reason *
+                    Specify Reason <span className="text-danger">*</span>
                   </label>
                   <input
                     type="text"
@@ -573,14 +632,14 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 <button
                   type="button"
                   onClick={() => setIsLostOpen(false)}
-                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
+                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={changeStageMutation.isPending}
-                  className="flex items-center gap-1.5 rounded-xl bg-red-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-xl bg-red-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                 >
                   {changeStageMutation.isPending && (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

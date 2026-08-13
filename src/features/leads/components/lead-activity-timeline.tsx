@@ -1,13 +1,14 @@
+/* eslint-disable security/detect-object-injection */
 "use client";
 
 import { useState } from "react";
-import { useLeadActivities, useLogActivity } from "../hooks/use-lead-activities";
+import Image from "next/image";
+import {
+  useLeadActivities,
+  useLogActivity,
+} from "../hooks/use-lead-activities";
 import type { LeadActivityType } from "../types/lead-types";
 import {
-  PhoneCall,
-  MessageCircle,
-  MapPin,
-  FileText,
   TrendingUp,
   Flame,
   UserCheck,
@@ -26,30 +27,36 @@ interface LeadActivityTimelineProps {
 
 const TYPE_CONFIG: Record<
   LeadActivityType,
-  { label: string; icon: LucideIcon; iconBg: string; textClass: string }
+  {
+    label: string;
+    icon?: LucideIcon;
+    imageSrc?: string;
+    iconBg: string;
+    textClass: string;
+  }
 > = {
   call: {
     label: "Phone Call",
-    icon: PhoneCall,
-    iconBg: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    imageSrc: "/icons/phonecall-icon.png",
+    iconBg: "bg-blue-500/10 border-blue-500/20",
     textClass: "text-blue-500",
   },
   whatsapp: {
     label: "WhatsApp",
-    icon: MessageCircle,
-    iconBg: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    imageSrc: "/icons/whatsappIcon.png",
+    iconBg: "bg-emerald-500/10 border-emerald-500/20",
     textClass: "text-emerald-500",
   },
   visit: {
     label: "Showroom Visit",
-    icon: MapPin,
-    iconBg: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+    imageSrc: "/icons/location-visit.png",
+    iconBg: "bg-purple-500/10 border-purple-500/20",
     textClass: "text-purple-500",
   },
   note: {
     label: "Note Added",
-    icon: FileText,
-    iconBg: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    imageSrc: "/icons/Note-icon.png",
+    iconBg: "bg-amber-500/10 border-amber-500/20",
     textClass: "text-amber-500",
   },
   stage_change: {
@@ -72,6 +79,13 @@ const TYPE_CONFIG: Record<
   },
 };
 
+function getTypeConfig(type: LeadActivityType) {
+  if (type && Object.prototype.hasOwnProperty.call(TYPE_CONFIG, type)) {
+    return TYPE_CONFIG[type];
+  }
+  return TYPE_CONFIG.note;
+}
+
 export function LeadActivityTimeline({
   leadId,
   customerPhone,
@@ -79,9 +93,9 @@ export function LeadActivityTimeline({
   const { data: activities, isLoading, isError } = useLeadActivities(leadId);
   const logActivityMutation = useLogActivity(leadId);
 
-  const [activeModalType, setActiveModalType] = useState<"visit" | "note" | null>(
-    null
-  );
+  const [activeModalType, setActiveModalType] = useState<
+    "visit" | "note" | null
+  >(null);
   const [noteInput, setNoteInput] = useState("");
 
   const handleCall = () => {
@@ -170,9 +184,15 @@ export function LeadActivityTimeline({
             type="button"
             onClick={handleCall}
             disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-xs font-semibold text-blue-500 hover:bg-blue-500/20 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center justify-center gap-2 rounded-xl border border-blue-500/30 bg-blue-500/10 px-3 py-2 text-xs font-semibold text-blue-500 hover:bg-blue-500/20 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
           >
-            <PhoneCall className="h-3.5 w-3.5" />
+            <Image
+              src="/icons/phonecall-icon.png"
+              alt="Phone Call"
+              width={18}
+              height={18}
+              className="h-4.5 w-4.5 object-contain"
+            />
             <span>Call</span>
           </button>
 
@@ -180,9 +200,15 @@ export function LeadActivityTimeline({
             type="button"
             onClick={handleWhatsApp}
             disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-500 hover:bg-emerald-500/20 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center justify-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-500 hover:bg-emerald-500/20 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
           >
-            <MessageCircle className="h-3.5 w-3.5" />
+            <Image
+              src="/icons/whatsappIcon.png"
+              alt="WhatsApp"
+              width={18}
+              height={18}
+              className="h-4.5 w-4.5 object-contain"
+            />
             <span>WhatsApp</span>
           </button>
 
@@ -190,9 +216,15 @@ export function LeadActivityTimeline({
             type="button"
             onClick={() => handleOpenNoteModal("visit")}
             disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/30 bg-purple-500/10 px-3 py-2 text-xs font-semibold text-purple-500 hover:bg-purple-500/20 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center justify-center gap-2 rounded-xl border border-purple-500/30 bg-purple-500/10 px-3 py-2 text-xs font-semibold text-purple-500 hover:bg-purple-500/20 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
           >
-            <MapPin className="h-3.5 w-3.5" />
+            <Image
+              src="/icons/location-visit.png"
+              alt="Visit"
+              width={18}
+              height={18}
+              className="h-4.5 w-4.5 object-contain"
+            />
             <span>Visit</span>
           </button>
 
@@ -200,9 +232,15 @@ export function LeadActivityTimeline({
             type="button"
             onClick={() => handleOpenNoteModal("note")}
             disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-500 hover:bg-amber-500/20 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center justify-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-500 hover:bg-amber-500/20 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
           >
-            <FileText className="h-3.5 w-3.5" />
+            <Image
+              src="/icons/Note-icon.png"
+              alt="Note"
+              width={18}
+              height={18}
+              className="h-4.5 w-4.5 object-contain"
+            />
             <span>Note</span>
           </button>
         </div>
@@ -220,12 +258,13 @@ export function LeadActivityTimeline({
         </p>
       ) : !activities || activities.length === 0 ? (
         <div className="rounded-xl border border-dashed border-line bg-inset/50 p-6 text-center text-xs text-ink-subtle">
-          No activities logged yet. Use the quick buttons above to record a call or note.
+          No activities logged yet. Use the quick buttons above to record a call
+          or note.
         </div>
       ) : (
         <div className="relative border-l border-line/70 pl-4 space-y-4 my-2 ml-2">
           {activities.map((item) => {
-            const config = TYPE_CONFIG[item.type] || TYPE_CONFIG.note;
+            const config = getTypeConfig(item.type);
             const Icon = config.icon;
 
             const dateStr = new Date(item.created_at).toLocaleString("en-IN", {
@@ -239,9 +278,19 @@ export function LeadActivityTimeline({
               <div key={item.id} className="relative group">
                 {/* Timeline Dot Icon */}
                 <div
-                  className={`absolute -left-[27px] top-0 flex h-6 w-6 items-center justify-center rounded-full border ${config.iconBg} shrink-0`}
+                  className={`absolute -left-6.75 top-0 flex h-6 w-6 items-center justify-center rounded-full border ${config.iconBg} bg-card overflow-hidden shrink-0 shadow-xs`}
                 >
-                  <Icon className="h-3 w-3" />
+                  {config.imageSrc ? (
+                    <Image
+                      src={config.imageSrc}
+                      alt={config.label}
+                      width={16}
+                      height={16}
+                      className="h-3.5 w-3.5 object-contain"
+                    />
+                  ) : Icon ? (
+                    <Icon className="h-3 w-3" />
+                  ) : null}
                 </div>
 
                 <div className="space-y-1">
@@ -249,7 +298,9 @@ export function LeadActivityTimeline({
                     <span className={`font-semibold ${config.textClass}`}>
                       {config.label}
                     </span>
-                    <span className="text-[11px] text-ink-subtle">{dateStr}</span>
+                    <span className="text-[11px] text-ink-subtle">
+                      {dateStr}
+                    </span>
                   </div>
 
                   {item.note && (
@@ -279,12 +330,24 @@ export function LeadActivityTimeline({
               <h4 className="text-sm font-bold text-ink flex items-center gap-2">
                 {activeModalType === "visit" ? (
                   <>
-                    <MapPin className="h-4 w-4 text-purple-500" />
+                    <Image
+                      src="/icons/location-visit.png"
+                      alt="Visit"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 object-contain"
+                    />
                     Log Showroom Visit
                   </>
                 ) : (
                   <>
-                    <FileText className="h-4 w-4 text-amber-500" />
+                    <Image
+                      src="/icons/Note-icon.png"
+                      alt="Note"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 object-contain"
+                    />
                     Add Activity Note
                   </>
                 )}
@@ -292,7 +355,7 @@ export function LeadActivityTimeline({
               <button
                 type="button"
                 onClick={() => setActiveModalType(null)}
-                className="text-ink-subtle hover:text-ink transition-colors p-1"
+                className="text-ink-subtle hover:text-ink transition-colors p-1 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -320,7 +383,7 @@ export function LeadActivityTimeline({
                 <button
                   type="button"
                   onClick={() => setActiveModalType(null)}
-                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
+                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -328,7 +391,7 @@ export function LeadActivityTimeline({
                 <button
                   type="submit"
                   disabled={logActivityMutation.isPending}
-                  className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                 >
                   {logActivityMutation.isPending ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
