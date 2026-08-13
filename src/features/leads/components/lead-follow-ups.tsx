@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   useLeadFollowUps,
   useScheduleFollowUp,
-  useUpdateFollowUp,
 } from "../hooks/use-lead-follow-ups";
 import type {
   FollowUp,
@@ -12,6 +11,7 @@ import type {
   FollowUpDueState,
 } from "../types/lead-types";
 import { DatePicker } from "@/src/components/ui/date-picker";
+import { FollowUpOutcomeModal } from "./follow-up-outcome-modal";
 import {
   CalendarCheck,
   Clock,
@@ -21,7 +21,7 @@ import {
   Plus,
   Loader2,
   X,
-  RotateCcw,
+  ClipboardCheck,
 } from "lucide-react";
 
 interface LeadFollowUpsProps {
@@ -72,21 +72,13 @@ function getTodayISTDateString(): string {
 export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
   const { data: followUps, isLoading, isError } = useLeadFollowUps(leadId);
   const scheduleMutation = useScheduleFollowUp(leadId);
-  const updateMutation = useUpdateFollowUp(leadId);
 
   // Modals state
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [scheduleDate, setScheduleDate] = useState(getTodayISTDateString());
 
-  const [activeDoneFu, setActiveDoneFu] = useState<FollowUp | null>(null);
-  const [outcomeNote, setOutcomeNote] = useState("");
-  const [andScheduleNext, setAndScheduleNext] = useState(false);
-  const [nextDate, setNextDate] = useState(getTodayISTDateString());
-
-  const [activeRescheduleFu, setActiveRescheduleFu] = useState<FollowUp | null>(
-    null
-  );
-  const [rescheduleDate, setRescheduleDate] = useState(getTodayISTDateString());
+  // Outcome Modal State
+  const [selectedOutcomeFu, setSelectedOutcomeFu] = useState<FollowUp | null>(null);
 
   const handleScheduleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,66 +92,6 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
         },
       }
     );
-  };
-
-  const handleMarkDoneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeDoneFu) return;
-
-    updateMutation.mutate(
-      {
-        fuId: activeDoneFu.id,
-        payload: {
-          status: "done",
-          outcome_note: outcomeNote.trim() || undefined,
-        },
-      },
-      {
-        onSuccess: () => {
-          setActiveDoneFu(null);
-          setOutcomeNote("");
-
-          if (andScheduleNext) {
-            const isoDateTime = new Date(
-              `${nextDate}T10:00:00.000Z`
-            ).toISOString();
-            scheduleMutation.mutate({ due_at: isoDateTime });
-          }
-        },
-      }
-    );
-  };
-
-  const handleRescheduleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!activeRescheduleFu) return;
-
-    const isoDateTime = new Date(
-      `${rescheduleDate}T10:00:00.000Z`
-    ).toISOString();
-
-    updateMutation.mutate(
-      {
-        fuId: activeRescheduleFu.id,
-        payload: {
-          due_at: isoDateTime,
-        },
-      },
-      {
-        onSuccess: () => {
-          setActiveRescheduleFu(null);
-        },
-      }
-    );
-  };
-
-  const handleCancelFollowUp = (fu: FollowUp) => {
-    updateMutation.mutate({
-      fuId: fu.id,
-      payload: {
-        status: "cancelled",
-      },
-    });
   };
 
   const openFollowUps = followUps?.filter((f) => f.status === "open") || [];
@@ -199,41 +131,14 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
               {dueStateConfig.label}
             </span>
 
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveDoneFu(activeNextFollowUp);
-                  setOutcomeNote("");
-                  setAndScheduleNext(false);
-                }}
-                className="flex items-center gap-1 rounded-md bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/30 px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer"
-              >
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                <span>Mark Done</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveRescheduleFu(activeNextFollowUp);
-                  setRescheduleDate(getTodayISTDateString());
-                }}
-                className="p-1 rounded-md text-ink-subtle hover:text-ink hover:bg-card/60 transition-colors cursor-pointer"
-                title="Reschedule"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleCancelFollowUp(activeNextFollowUp)}
-                className="p-1 rounded-md text-ink-subtle hover:text-danger hover:bg-card/60 transition-colors cursor-pointer"
-                title="Cancel"
-              >
-                <XCircle className="h-3.5 w-3.5" />
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedOutcomeFu(activeNextFollowUp)}
+              className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+            >
+              <ClipboardCheck className="h-3.5 w-3.5" />
+              <span>Record Result</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-2 text-xs font-semibold text-ink">
@@ -296,28 +201,14 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setActiveDoneFu(fu);
-                          setOutcomeNote("");
-                          setAndScheduleNext(false);
-                        }}
-                        className="p-1 rounded text-emerald-500 hover:bg-emerald-500/10 transition-colors cursor-pointer"
-                        title="Mark Done"
-                      >
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleCancelFollowUp(fu)}
-                        className="p-1 rounded text-ink-subtle hover:text-danger hover:bg-card/60 transition-colors cursor-pointer"
-                        title="Cancel"
-                      >
-                        <XCircle className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOutcomeFu(fu)}
+                      className="flex items-center gap-1 rounded-md bg-accent/10 text-accent hover:bg-accent/20 px-2 py-1 text-xs font-semibold transition-colors cursor-pointer"
+                    >
+                      <ClipboardCheck className="h-3 w-3" />
+                      <span>Record Result</span>
+                    </button>
                   </div>
                 );
               }
@@ -365,7 +256,7 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
               <button
                 type="button"
                 onClick={() => setIsScheduleOpen(false)}
-                className="text-ink-subtle hover:text-ink transition-colors p-1"
+                className="text-ink-subtle hover:text-ink transition-colors p-1 cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -389,14 +280,14 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
                 <button
                   type="button"
                   onClick={() => setIsScheduleOpen(false)}
-                  className="rounded-lg border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
+                  className="rounded-lg border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={scheduleMutation.isPending}
-                  className="flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-inverse shadow-xs hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-inverse shadow-xs hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                 >
                   {scheduleMutation.isPending && (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -409,140 +300,12 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
         </div>
       )}
 
-      {/* Modal 2: Mark Done & Set Next */}
-      {activeDoneFu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-xl border border-line bg-card p-5 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-line pb-3">
-              <h4 className="text-sm font-bold text-ink flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                Complete Follow-up
-              </h4>
-              <button
-                type="button"
-                onClick={() => setActiveDoneFu(null)}
-                className="text-ink-subtle hover:text-ink transition-colors p-1"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleMarkDoneSubmit} className="space-y-4">
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-ink-muted">
-                  Outcome Note (Optional)
-                </label>
-                <textarea
-                  rows={2}
-                  value={outcomeNote}
-                  onChange={(e) => setOutcomeNote(e.target.value)}
-                  placeholder="e.g. Customer requested quote, wants to visit Saturday..."
-                  className="w-full rounded-lg border border-line bg-inset p-3 text-xs text-ink placeholder:text-ink-subtle/60 focus:border-accent focus:outline-none"
-                />
-              </div>
-
-              {/* Loop (§9): Checkbox to schedule next follow-up immediately */}
-              <div className="space-y-2 pt-2 border-t border-line/50">
-                <label className="flex items-center gap-2 text-xs font-semibold text-ink cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={andScheduleNext}
-                    onChange={(e) => setAndScheduleNext(e.target.checked)}
-                    className="h-4 w-4 rounded border-line text-accent focus:ring-accent"
-                  />
-                  <span>Schedule next follow-up now</span>
-                </label>
-
-                {andScheduleNext && (
-                  <div className="pl-6 pt-1">
-                    <DatePicker
-                      value={nextDate}
-                      onChange={(d) => setNextDate(d)}
-                      align="left"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveDoneFu(null)}
-                  className="rounded-lg border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={updateMutation.isPending}
-                  className="flex items-center gap-1.5 rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {updateMutation.isPending && (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  )}
-                  <span>Complete</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal 3: Reschedule */}
-      {activeRescheduleFu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
-          <div className="w-full max-w-sm rounded-xl border border-line bg-card p-5 shadow-xl space-y-4">
-            <div className="flex items-center justify-between border-b border-line pb-3">
-              <h4 className="text-sm font-bold text-ink flex items-center gap-2">
-                <RotateCcw className="h-4 w-4 text-accent" />
-                Reschedule Follow-up
-              </h4>
-              <button
-                type="button"
-                onClick={() => setActiveRescheduleFu(null)}
-                className="text-ink-subtle hover:text-ink transition-colors p-1"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleRescheduleSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-ink-muted">
-                  New Follow-up Date (IST)
-                </label>
-                <div>
-                  <DatePicker
-                    value={rescheduleDate}
-                    onChange={(d) => setRescheduleDate(d)}
-                    align="left"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveRescheduleFu(null)}
-                  className="rounded-lg border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={updateMutation.isPending}
-                  className="flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-inverse shadow-xs hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {updateMutation.isPending && (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  )}
-                  <span>Save Reschedule</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Outcome Modal */}
+      <FollowUpOutcomeModal
+        isOpen={!!selectedOutcomeFu}
+        onClose={() => setSelectedOutcomeFu(null)}
+        followUp={selectedOutcomeFu}
+      />
     </div>
   );
 }

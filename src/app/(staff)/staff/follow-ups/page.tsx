@@ -3,17 +3,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useActionFollowUps } from "@/src/features/leads/hooks/use-lead-follow-ups";
-import type { LeadPriority } from "@/src/features/leads/types/lead-types";
+import type { LeadPriority, FollowUp } from "@/src/features/leads/types/lead-types";
+import { FollowUpOutcomeModal } from "@/src/features/leads/components/follow-up-outcome-modal";
 import {
-  PhoneCall,
-  MessageCircle,
   ArrowRight,
   Clock,
   CheckCircle2,
   Loader2,
   Calendar,
   User,
+  ClipboardCheck,
 } from "lucide-react";
 
 type BucketType = "today" | "overdue" | "upcoming";
@@ -48,8 +49,26 @@ const PRIORITY_CONFIG: Record<
   },
 };
 
+const STAGE_LABELS: Record<string, string> = {
+  new: "New",
+  contacted: "Contacted",
+  test_drive: "Test Drive",
+  discussion: "Discussion",
+  won: "Won",
+  lost: "Lost",
+};
+
+function getStageLabel(stage?: string | null): string {
+  if (!stage) return "New";
+  if (Object.prototype.hasOwnProperty.call(STAGE_LABELS, stage)) {
+    return STAGE_LABELS[stage as keyof typeof STAGE_LABELS];
+  }
+  return stage;
+}
+
 export default function StaffFollowUpsPage() {
   const [activeBucket, setActiveBucket] = useState<BucketType>("today");
+  const [selectedOutcomeFu, setSelectedOutcomeFu] = useState<FollowUp | null>(null);
 
   const { data: todayList } = useActionFollowUps("today");
   const { data: overdueList } = useActionFollowUps("overdue");
@@ -178,6 +197,7 @@ export default function StaffFollowUpsPage() {
             const leadPriority = fu.lead?.priority || "warm";
             const priority =
               PRIORITY_CONFIG[leadPriority] || PRIORITY_CONFIG.warm;
+            const stageLabel = getStageLabel(fu.lead?.stage);
 
             const dueStr = new Date(fu.due_at).toLocaleDateString("en-IN", {
               day: "numeric",
@@ -191,6 +211,7 @@ export default function StaffFollowUpsPage() {
                 className="flex flex-col justify-between rounded-xl border border-line bg-card p-4 transition-all hover:border-accent/40 hover:shadow-md space-y-3"
               >
                 <div className="space-y-2.5">
+                  {/* Header: Customer Info + Priority & Stage Badges */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-inset border border-line text-ink-subtle shrink-0">
@@ -206,11 +227,17 @@ export default function StaffFollowUpsPage() {
                       </div>
                     </div>
 
-                    <span
-                      className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${priority.bgClass} ${priority.textClass} ${priority.borderClass} shrink-0`}
-                    >
-                      {priority.label}
-                    </span>
+                    {/* Badge Group: Priority (Heat Color) + Stage (Neutral Pill) */}
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span
+                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${priority.bgClass} ${priority.textClass} ${priority.borderClass}`}
+                      >
+                        {priority.label}
+                      </span>
+                      <span className="inline-flex items-center rounded-md bg-surface border border-line px-2 py-0.5 text-[10px] font-medium text-ink shadow-2xs">
+                        {stageLabel}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-1.5 text-xs text-ink-subtle bg-inset/50 rounded-md p-2 border border-line/40 font-mono">
@@ -219,40 +246,72 @@ export default function StaffFollowUpsPage() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-line/50 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-line/50 flex items-center justify-between gap-1.5 flex-wrap">
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleCall(customerPhone)}
-                      className="flex items-center gap-1 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer"
+                      title="Call Customer"
                     >
-                      <PhoneCall className="h-3.5 w-3.5" />
+                      <Image
+                        src="/icons/phonecall-icon.png"
+                        alt="Call"
+                        width={16}
+                        height={16}
+                        className="h-4 w-4 object-contain shrink-0"
+                      />
                       <span>Call</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => handleWhatsApp(customerPhone)}
-                      className="flex items-center gap-1 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer"
+                      title="WhatsApp Customer"
                     >
-                      <MessageCircle className="h-3.5 w-3.5" />
+                      <Image
+                        src="/icons/whatsappIcon.png"
+                        alt="WhatsApp"
+                        width={16}
+                        height={16}
+                        className="h-4 w-4 object-contain shrink-0"
+                      />
                       <span>WhatsApp</span>
                     </button>
                   </div>
 
-                  <Link
-                    href={`/staff/leads/${fu.lead_id}`}
-                    className="flex items-center gap-1 text-xs font-semibold text-accent hover:underline shrink-0"
-                  >
-                    <span>View</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOutcomeFu(fu)}
+                      className="flex items-center gap-1.5 rounded-lg bg-accent/15 text-accent hover:bg-accent/25 px-2.5 py-1 text-xs font-bold transition-colors cursor-pointer"
+                    >
+                      <ClipboardCheck className="h-3.5 w-3.5 shrink-0" />
+                      <span>Record Result</span>
+                    </button>
+
+                    <Link
+                      href={`/staff/leads/${fu.lead_id}`}
+                      className="flex items-center gap-0.5 text-xs font-semibold text-ink-subtle hover:text-ink shrink-0"
+                    >
+                      <span>View</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
       )}
+
+      {/* Outcome Modal */}
+      <FollowUpOutcomeModal
+        isOpen={!!selectedOutcomeFu}
+        onClose={() => setSelectedOutcomeFu(null)}
+        followUp={selectedOutcomeFu}
+      />
     </div>
   );
 }
