@@ -153,57 +153,14 @@ export default function StaffDashboardPage() {
 
       {/* 3. Main Dashboard Layout (Grid) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Mobile View: Clock-in Check-in/Check-out Box */}
+        <div className="block lg:hidden">
+          <ClockInWidget />
+        </div>
+
         {/* Left Column (Main Actions & Lead Summary) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Quick Actions Panel */}
-          <div className="bg-card border border-line rounded-xl p-5 shadow-bento space-y-3">
-            <div className="flex items-center justify-between border-b border-line/50 pb-2.5">
-              <h3 className="text-xs font-bold text-ink font-sans tracking-tight uppercase">
-                Staff Quick Workstation
-              </h3>
-              <span className="text-[10px] font-mono text-ink-subtle">
-                Shortcuts
-              </span>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {/* Action 1: Showroom Stock */}
-              <Link
-                href="/staff/stock"
-                className="flex flex-col items-start p-3.5 rounded-lg border border-line bg-inset hover:bg-card hover:border-accent/40 transition-all text-left space-y-2 cursor-pointer group"
-              >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-light text-accent">
-                  <Car className="h-4 w-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-ink font-sans group-hover:text-accent transition-colors">
-                    Browse Vehicle Stock
-                  </h4>
-                  <p className="text-[10px] text-ink-muted">
-                    View active cars &amp; prices
-                  </p>
-                </div>
-              </Link>
-
-              {/* Action 2: Booking Tokens */}
-              <Link
-                href="/staff/booking"
-                className="flex flex-col items-start p-3.5 rounded-lg border border-line bg-inset hover:bg-card hover:border-accent/40 transition-all text-left space-y-2 cursor-pointer group"
-              >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-light text-accent">
-                  <CalendarCheck className="h-4 w-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-ink font-sans group-hover:text-accent transition-colors">
-                    Booking Receipts
-                  </h4>
-                  <p className="text-[10px] text-ink-muted">
-                    Track tokens &amp; deliveries
-                  </p>
-                </div>
-              </Link>
-            </div>
-          </div>
 
           {/* Active Customer Enquiries List Panel */}
           <div className="bg-card border border-line rounded-xl p-5 shadow-bento space-y-4">
