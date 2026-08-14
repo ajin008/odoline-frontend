@@ -48,7 +48,7 @@ export function StaffMyProfile() {
     : "ST";
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 font-sans select-none text-ink">
+    <div className="w-full space-y-6 font-sans select-none text-ink">
       {/* 1. Clean Native Profile Header */}
       <div className="rounded-2xl border border-line bg-card p-5 sm:p-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5 text-center sm:text-left">

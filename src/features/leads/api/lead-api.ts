@@ -10,6 +10,7 @@ import type {
   UpdateFollowUpPayload,
   ChangeStagePayload,
   LeadStageHistory,
+  DashboardFunnelData,
 } from "../types/lead-types";
 import type { Car } from "@/src/features/cars/api/cars-api";
 
@@ -142,6 +143,12 @@ export const leadApi = {
   /** DELETE /api/v1/leads/:id/cars/:carId — Unlink an interested car */
   async unlinkCar(id: string, carId: string): Promise<{ removed: boolean }> {
     const res = await apiClient.delete(endpoints.leads.car(id, carId));
+    return res.data.data;
+  },
+
+  /** GET /api/v1/leads/dashboard/funnel — Owner dashboard funnel & conversion stats */
+  async getDashboardFunnel(): Promise<DashboardFunnelData> {
+    const res = await apiClient.get(endpoints.leads.dashboardFunnel);
     return res.data.data;
   },
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { User, Calendar, Settings } from "lucide-react";
+import { User, Calendar } from "lucide-react";
 import { StaffMyProfile } from "@/src/features/team/components/staff-my-profile";
 import { StaffAttendanceHeatmap } from "@/src/features/team/components/staff-attendance-heatmap";
 
@@ -16,15 +16,13 @@ export default function StaffSettingPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 border border-accent/20 text-accent">
-              <Settings className="h-4 w-4" />
-            </div>
             <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
               Staff Settings &amp; Profile
             </h1>
           </div>
           <p className="text-xs text-ink-subtle">
-            Manage your personal profile, department shift schedule, and monthly attendance heatmap.
+            Manage your personal profile, department shift schedule, and monthly
+            attendance heatmap.
           </p>
         </div>
       </div>

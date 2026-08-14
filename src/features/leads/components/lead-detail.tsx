@@ -92,9 +92,9 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
           <div className="h-6 w-48 animate-pulse rounded-lg bg-inset border border-line" />
         </div>
         <div className="h-28 animate-pulse rounded-2xl bg-inset border border-line" />
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-          <div className="h-65 animate-pulse rounded-2xl bg-inset border border-line lg:col-span-2" />
-          <div className="h-65 animate-pulse rounded-2xl bg-inset border border-line" />
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+          <div className="h-65 animate-pulse rounded-2xl bg-inset border border-line lg:col-span-7" />
+          <div className="h-65 animate-pulse rounded-2xl bg-inset border border-line lg:col-span-5" />
         </div>
       </div>
     );
@@ -153,31 +153,31 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
 
   return (
     <div className="w-full space-y-5 font-sans select-none">
-      {/* Top Bar Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-4">
+      {/* Top Bar Navigation (Native Mobile App Header feel) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-3 sm:pb-4">
         <div className="flex items-center gap-3">
           <Link
             href="/staff/leads"
-            className="flex h-9 w-9 items-center justify-center rounded-lg bg-card border border-line text-ink-subtle hover:bg-hover hover:text-ink transition-colors shrink-0"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle hover:bg-hover hover:text-ink transition-colors shrink-0 shadow-xs"
           >
             <ArrowLeft className="h-4.5 w-4.5" />
           </Link>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-ink font-sans truncate">
                 {customerName}
               </h1>
               <span
-                className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${priority.bgClass} ${priority.textClass} ${priority.borderClass}`}
+                className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider ${priority.bgClass} ${priority.textClass} ${priority.borderClass}`}
               >
                 {priority.label}
               </span>
-              <span className="inline-flex items-center rounded-md bg-surface border border-line px-2 py-0.5 text-xs font-medium text-ink">
+              <span className="inline-flex items-center rounded-md bg-surface border border-line px-2 py-0.5 text-[11px] sm:text-xs font-medium text-ink">
                 {stageLabel}
               </span>
             </div>
-            <p className="text-xs text-ink-subtle mt-0.5">
-              Lead ID: <span className="font-mono">{lead.id}</span>
+            <p className="text-[11px] sm:text-xs text-ink-subtle mt-0.5 font-mono truncate">
+              ID: <span className="font-mono">{lead.id.length > 12 ? `${lead.id.slice(0, 8)}...` : lead.id}</span>
             </p>
           </div>
         </div>
@@ -186,10 +186,10 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
       {/* Buyer Stage Stepper Pipeline Component */}
       <LeadStageControl lead={lead} />
 
-      {/* Main Grid Section */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        {/* Left Column: Customer Details, Budget, and Interested Vehicles */}
-        <div className="space-y-5 lg:col-span-2">
+      {/* Main Grid Section (60/40 Ratio on Desktop & Tablet Views) */}
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+        {/* Left Column: Customer Details, Budget, and Interested Vehicles (60% Width) */}
+        <div className="space-y-5 lg:col-span-7">
           {/* Customer Information Card */}
           <div className="rounded-xl border border-line bg-card p-5 space-y-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted flex items-center gap-2">
@@ -277,8 +277,8 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
           />
         </div>
 
-        {/* Right Column: Follow-ups Schedule & Activity Timeline */}
-        <div className="space-y-5">
+        {/* Right Column: Follow-ups Schedule & Activity Timeline (40% Width) */}
+        <div className="space-y-5 lg:col-span-5">
           {/* Follow-up Schedule Section */}
           <LeadFollowUps leadId={lead.id} nextFollowUp={lead.next_follow_up} />
 

@@ -14,41 +14,65 @@ export interface StaffNavItem {
   mobile?: boolean;
 }
 
-export const staffNavItems: StaffNavItem[] = [
+export interface StaffNavSection {
+  id: string;
+  items: StaffNavItem[];
+}
+
+export const staffNavSections: StaffNavSection[] = [
   {
-    href: "/staff/dashboard",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    mobile: true,
+    id: "main",
+    items: [
+      {
+        href: "/staff/dashboard",
+        label: "Dashboard",
+        icon: LayoutDashboard,
+        mobile: true,
+      },
+      {
+        href: "/staff/stock",
+        label: "Stock",
+        icon: Car,
+        mobile: true,
+      },
+    ],
   },
   {
-    href: "/staff/stock",
-    label: "Stock",
-    icon: Car,
-    mobile: true,
+    id: "crm",
+    items: [
+      {
+        href: "/staff/leads",
+        label: "Leads",
+        icon: Users,
+        mobile: true,
+      },
+      {
+        href: "/staff/follow-ups",
+        label: "Follow-ups",
+        icon: Clock,
+        mobile: true,
+      },
+      {
+        href: "/staff/booking",
+        label: "Booking",
+        icon: CalendarCheck,
+        mobile: true,
+      },
+    ],
   },
   {
-    href: "/staff/leads",
-    label: "Leads",
-    icon: Users,
-    mobile: true,
-  },
-  {
-    href: "/staff/follow-ups",
-    label: "Follow-ups",
-    icon: Clock,
-    mobile: true,
-  },
-  {
-    href: "/staff/booking",
-    label: "Booking",
-    icon: CalendarCheck,
-    mobile: true,
-  },
-  {
-    href: "/staff/setting",
-    label: "Setting",
-    icon: Settings,
-    mobile: true,
+    id: "settings",
+    items: [
+      {
+        href: "/staff/setting",
+        label: "Setting",
+        icon: Settings,
+        mobile: true,
+      },
+    ],
   },
 ];
+
+export const staffNavItems: StaffNavItem[] = staffNavSections.flatMap(
+  (section) => section.items
+);

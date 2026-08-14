@@ -76,6 +76,7 @@ export const endpoints = {
     stageHistory: (id: string) => `/leads/${id}/stage-history`,
     cars: (id: string) => `/leads/${id}/cars`,
     car: (id: string, carId: string) => `/leads/${id}/cars/${carId}`,
+    dashboardFunnel: "/leads/dashboard/funnel",
   },
 
   followUps: {

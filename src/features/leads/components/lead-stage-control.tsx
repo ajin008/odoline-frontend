@@ -234,100 +234,167 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
   };
 
   return (
-    <div className="rounded-xl border border-line bg-card p-5 space-y-4 font-sans select-none">
-      {/* Header Info & Stage Transition Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+    <div className="font-sans select-none space-y-4">
+      {/* ========================================================================= */}
+      {/* MOBILE APP STAGE CARD (Mobile View ONLY: < 640px)                         */}
+      {/* ========================================================================= */}
+      <div className="flex flex-col gap-3 sm:hidden rounded-2xl border border-line bg-card p-4 shadow-xs">
+        {/* Header Info */}
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-ink-subtle block">
               Pipeline Stage
             </span>
-            {isTerminal && (
+            <p className="text-sm font-extrabold text-ink">
+              {getStageConfig(currentStage).label}
+            </p>
+          </div>
+
+          <div>
+            {isTerminal ? (
               <span
                 className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                   currentStage === "won"
-                    ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                    : "bg-red-500/10 text-red-500 border border-red-500/20"
+                    ? "bg-emerald-500/10 text-emerald-500"
+                    : "bg-red-500/10 text-red-500"
                 }`}
               >
-                {currentStage === "won" ? "Won Deal" : "Lost Lead"}
+                {currentStage === "won" ? "Won Deal 🎉" : "Lost Lead"}
+              </span>
+            ) : (
+              <span className="inline-flex items-center rounded-lg bg-accent/10 border border-accent/20 px-2.5 py-0.5 text-[11px] font-bold text-accent font-mono">
+                Step {activeIndex + 1} of 5
               </span>
             )}
           </div>
-          <p className="text-sm font-bold text-ink font-sans">
-            {getStageConfig(currentStage).label}
-          </p>
         </div>
 
-        {/* Transition Action Buttons */}
+        {/* 5-Segment Visual Track Indicator */}
+        <div className="grid grid-cols-5 gap-1.5 py-0.5">
+          {ACTIVE_STAGES.map((stg, idx) => {
+            const isCurrent = currentStage === stg;
+            const isPassed = activeIndex > idx && !isTerminal;
+
+            return (
+              <div
+                key={stg}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  isCurrent
+                    ? "bg-accent shadow-xs"
+                    : isPassed
+                    ? "bg-accent/40"
+                    : "bg-inset border border-line/60"
+                }`}
+              />
+            );
+          })}
+          <div
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              currentStage === "won"
+                ? "bg-emerald-500"
+                : currentStage === "lost"
+                ? "bg-rose-500"
+                : "bg-inset border border-line/60"
+            }`}
+          />
+        </div>
+
+        {/* Mobile Action Buttons */}
         {!isTerminal && (
-          <>
-            {/* Mobile Action Buttons (Full Touch Friendly Layout) */}
-            <div className="flex flex-col gap-2 sm:hidden pt-1 w-full">
-              {nextActiveStage && (
+          <div className="space-y-2 pt-1">
+            {nextActiveStage && (
+              <button
+                type="button"
+                onClick={handleAdvanceStage}
+                disabled={changeStageMutation.isPending}
+                className="flex items-center justify-center gap-2 w-full rounded-xl bg-accent px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:opacity-90 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {changeStageMutation.isPending && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
+                <span>Move to {getStageConfig(nextActiveStage).shortLabel}</span>
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            )}
+
+            <div className="grid grid-cols-3 gap-2">
+              {prevActiveStage ? (
                 <button
                   type="button"
-                  onClick={handleAdvanceStage}
+                  onClick={handlePrevStage}
                   disabled={changeStageMutation.isPending}
-                  className="flex items-center justify-center gap-2 w-full rounded-lg bg-accent px-4 py-2.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                  className="flex items-center justify-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover py-2 px-1 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50 truncate"
                 >
-                  {changeStageMutation.isPending && (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  )}
-                  <span>
-                    Move to {getStageConfig(nextActiveStage).shortLabel}
-                  </span>
-                  <ChevronRight className="h-4 w-4" />
+                  <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{getStageConfig(prevActiveStage).shortLabel}</span>
                 </button>
+              ) : (
+                <div />
               )}
 
-              <div className="grid grid-cols-2 gap-2 w-full">
-                {prevActiveStage ? (
-                  <button
-                    type="button"
-                    onClick={handlePrevStage}
-                    disabled={changeStageMutation.isPending}
-                    className="flex items-center justify-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover px-3 py-2 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    <ChevronLeft className="h-3.5 w-3.5" />
-                    <span className="truncate">{getStageConfig(prevActiveStage).shortLabel}</span>
-                  </button>
-                ) : <div />}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsWonOpen(true);
+                  setSelectedCarId("");
+                  setWonPrice("");
+                  setWonNotes("");
+                }}
+                className="flex items-center justify-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-1 text-xs font-bold shadow-xs cursor-pointer"
+              >
+                <Trophy className="h-3.5 w-3.5 stroke-[2.5px] shrink-0" />
+                <span>Won</span>
+              </button>
 
-                <div className="flex items-center gap-1.5 w-full">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsWonOpen(true);
-                      setSelectedCarId("");
-                      setWonPrice("");
-                      setWonNotes("");
-                    }}
-                    className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-xs font-bold shadow-xs cursor-pointer"
-                  >
-                    <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
-                    <span>Won</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLostOpen(true);
-                      setSelectedReasonOption(COMMON_LOST_REASONS[0]);
-                      setCustomReason("");
-                      setLostNotes("");
-                    }}
-                    className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white py-2 text-xs font-bold shadow-xs cursor-pointer"
-                  >
-                    <XCircle className="h-3.5 w-3.5 stroke-[2.5px]" />
-                    <span>Lost</span>
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLostOpen(true);
+                  setSelectedReasonOption(COMMON_LOST_REASONS[0]);
+                  setCustomReason("");
+                  setLostNotes("");
+                }}
+                className="flex items-center justify-center gap-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white py-2 px-1 text-xs font-bold shadow-xs cursor-pointer"
+              >
+                <XCircle className="h-3.5 w-3.5 stroke-[2.5px] shrink-0" />
+                <span>Lost</span>
+              </button>
             </div>
+          </div>
+        )}
+      </div>
 
-            {/* Desktop Action Buttons Row */}
-            <div className="hidden sm:flex items-center gap-2 flex-wrap">
+      {/* ========================================================================= */}
+      {/* DESKTOP STAGE CONTROL (Desktop View ONLY: >= 640px)                       */}
+      {/* ========================================================================= */}
+      <div className="hidden sm:block rounded-xl border-none bg-card p-5 space-y-4">
+        {/* Header Info & Stage Transition Buttons */}
+        <div className="flex flex-row items-center justify-between gap-3 border-b border-line/40 pb-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                Pipeline Stage
+              </span>
+              {isTerminal && (
+                <span
+                  className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                    currentStage === "won"
+                      ? "bg-emerald-500/10 text-emerald-500"
+                      : "bg-red-500/10 text-red-500"
+                  }`}
+                >
+                  {currentStage === "won" ? "Won Deal" : "Lost Lead"}
+                </span>
+              )}
+            </div>
+            <p className="text-sm font-bold text-ink font-sans">
+              {getStageConfig(currentStage).label}
+            </p>
+          </div>
+
+          {/* Transition Action Buttons Row */}
+          {!isTerminal && (
+            <div className="flex items-center gap-2 flex-wrap">
               {prevActiveStage && (
                 <button
                   type="button"
@@ -385,91 +452,11 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 <span>Mark Lost</span>
               </button>
             </div>
-          </>
-        )}
-      </div>
-
-      {/* Mobile Pipeline Stepper & Progress Bar */}
-      <div className="flex flex-col space-y-2.5 sm:hidden pt-2 border-t border-line/50">
-        {/* Progress Bar */}
-        <div className="space-y-1">
-          <div className="flex items-center justify-between text-[11px] font-mono font-medium text-ink-subtle">
-            <span>Pipeline Stage</span>
-            <span className="font-bold text-accent">
-              {currentStage === "won"
-                ? "100% (Won)"
-                : currentStage === "lost"
-                ? "Closed (Lost)"
-                : `${Math.round(((activeIndex + 1) / 4) * 100)}% (${activeIndex + 1}/4)`}
-            </span>
-          </div>
-          <div className="h-1.5 w-full rounded-full bg-inset border border-line/40 overflow-hidden">
-            <div
-              className={`h-full transition-all duration-300 ${
-                currentStage === "won"
-                  ? "bg-emerald-500"
-                  : currentStage === "lost"
-                  ? "bg-rose-500"
-                  : "bg-accent"
-              }`}
-              style={{
-                width:
-                  currentStage === "won"
-                    ? "100%"
-                    : currentStage === "lost"
-                    ? "100%"
-                    : `${((activeIndex + 1) / 4) * 100}%`,
-              }}
-            />
-          </div>
+          )}
         </div>
 
-        {/* Scrollable Stage Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none max-w-full">
-          {ACTIVE_STAGES.map((stg, idx) => {
-            const isCurrent = currentStage === stg;
-            const isPassed = activeIndex > idx && !isTerminal;
-
-            return (
-              <div
-                key={stg}
-                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold whitespace-nowrap shrink-0 border transition-all ${
-                  isCurrent
-                    ? "bg-accent text-inverse border-accent font-bold shadow-xs"
-                    : isPassed
-                    ? "bg-inset/80 border-line text-ink"
-                    : "bg-inset/30 border-line/40 text-ink-subtle/60"
-                }`}
-              >
-                {isPassed && <Check className="h-3 w-3 text-emerald-500 shrink-0 stroke-[2.5px]" />}
-                <span>{getStageConfig(stg).shortLabel}</span>
-              </div>
-            );
-          })}
-
-          {/* Terminal Pill */}
-          <div
-            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold whitespace-nowrap shrink-0 border transition-all ${
-              currentStage === "won"
-                ? "bg-emerald-600 text-white border-emerald-600 font-bold shadow-xs"
-                : currentStage === "lost"
-                ? "bg-rose-600 text-white border-rose-600 font-bold shadow-xs"
-                : "bg-inset/30 border-line/40 text-ink-subtle/60"
-            }`}
-          >
-            <span>
-              {currentStage === "won"
-                ? "Won Deal 🎉"
-                : currentStage === "lost"
-                ? "Lost Lead"
-                : "Closed"}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop Stepper Pipeline Bar */}
-      <div className="hidden sm:grid grid-cols-5 gap-1.5 sm:gap-2">
+        {/* Desktop Stepper Pipeline Bar */}
+        <div className="hidden sm:grid grid-cols-5 gap-1.5 sm:gap-2">
         {ACTIVE_STAGES.map((stg, idx) => {
           const isCurrent = currentStage === stg;
           const isPassed = activeIndex > idx && !isTerminal;
@@ -477,18 +464,27 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
           return (
             <div
               key={stg}
-              className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
+              className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-center transition-all ${
                 isCurrent
-                  ? "bg-accent/15 border-accent text-accent font-bold shadow-xs scale-[1.02]"
+                  ? "bg-accent text-white shadow-xs font-bold scale-[1.02]"
                   : isPassed
-                  ? "bg-inset/60 border-line/60 text-ink font-medium"
-                  : "bg-inset/30 border-line/40 text-ink-subtle/60 font-normal"
+                  ? "bg-accent/10 text-accent font-semibold"
+                  : "bg-inset/40 border border-line/60 text-ink-subtle/70 font-normal"
               }`}
             >
-              <span className="text-xs font-semibold truncate w-full">
-                {getStageConfig(stg).shortLabel}
-              </span>
-              <span className="text-[9px] text-ink-subtle hidden sm:block truncate w-full">
+              <div className="flex items-center gap-1">
+                {isPassed && (
+                  <Check className="h-3 w-3 text-accent shrink-0 stroke-[2.5px]" />
+                )}
+                <span className="text-xs font-bold truncate">
+                  {getStageConfig(stg).shortLabel}
+                </span>
+              </div>
+              <span
+                className={`text-[9px] hidden sm:block truncate w-full ${
+                  isCurrent ? "text-white/80" : "text-ink-subtle"
+                }`}
+              >
                 {getStageConfig(stg).description}
               </span>
             </div>
@@ -497,22 +493,26 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
         {/* Terminal Stage Column (Won / Lost) */}
         <div
-          className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all ${
+          className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-center transition-all ${
             currentStage === "won"
-              ? "bg-emerald-500/15 border-emerald-500 text-emerald-600 dark:text-emerald-400 font-bold shadow-xs"
+              ? "bg-emerald-600 text-white font-bold shadow-xs scale-[1.02]"
               : currentStage === "lost"
-              ? "bg-red-500/15 border-red-500 text-red-500 font-bold shadow-xs"
-              : "bg-inset/30 border-line/40 text-ink-subtle/60 font-normal"
+              ? "bg-rose-600 text-white font-bold shadow-xs scale-[1.02]"
+              : "bg-inset/40 border border-line/60 text-ink-subtle/70 font-normal"
           }`}
         >
-          <span className="text-xs font-semibold truncate w-full">
+          <span className="text-xs font-bold truncate w-full">
             {currentStage === "won"
               ? "Won"
               : currentStage === "lost"
               ? "Lost"
               : "Closed"}
           </span>
-          <span className="text-[9px] text-ink-subtle hidden sm:block truncate w-full">
+          <span
+            className={`text-[9px] hidden sm:block truncate w-full ${
+              isTerminal ? "text-white/80" : "text-ink-subtle"
+            }`}
+          >
             {currentStage === "won"
               ? "Deal won"
               : currentStage === "lost"
@@ -520,6 +520,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
               : "Terminal"}
           </span>
         </div>
+      </div>
       </div>
 
       {/* Won Details Banner (if already WON) */}

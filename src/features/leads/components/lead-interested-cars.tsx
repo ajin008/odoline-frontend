@@ -12,6 +12,8 @@ import {
   ExternalLink,
   Loader2,
   X,
+  Search,
+  CheckCircle2,
 } from "lucide-react";
 
 interface LeadInterestedCarsProps {
@@ -39,6 +41,7 @@ export function LeadInterestedCars({
   // Modal & selection state
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [selectedCarId, setSelectedCarId] = useState("");
+  const [pickerSearch, setPickerSearch] = useState("");
   const [confirmUnlinkCar, setConfirmUnlinkCar] = useState<Car | null>(null);
 
   // In-stock cars query for picker modal
@@ -56,6 +59,17 @@ export function LeadInterestedCars({
     (c) => !linkedCars.some((lc) => lc.id === c.id)
   );
 
+  const filteredInStockCars = unlinkedInStockCars.filter((c) => {
+    if (!pickerSearch.trim()) return true;
+    const q = pickerSearch.toLowerCase();
+    return (
+      c.make.toLowerCase().includes(q) ||
+      c.model.toLowerCase().includes(q) ||
+      c.reg_number.toLowerCase().includes(q) ||
+      `${c.year}`.includes(q)
+    );
+  });
+
   const handleLinkSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCarId) return;
@@ -66,6 +80,7 @@ export function LeadInterestedCars({
         onSuccess: () => {
           setIsAddOpen(false);
           setSelectedCarId("");
+          setPickerSearch("");
         },
       }
     );
@@ -100,8 +115,9 @@ export function LeadInterestedCars({
           onClick={() => {
             setIsAddOpen(true);
             setSelectedCarId("");
+            setPickerSearch("");
           }}
-          className="flex items-center gap-1.5 rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+          className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
         >
           <Plus className="h-3.5 w-3.5" />
           <span>Add Vehicle</span>
@@ -126,21 +142,17 @@ export function LeadInterestedCars({
                 key={car.id}
                 className="group relative flex items-start gap-3 rounded-xl border border-line bg-inset/30 p-3 transition-all hover:border-accent/40 hover:bg-inset/60"
               >
-                {/* Thumbnail Photo or Car Badge */}
-                <div className="h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-inset border border-line relative">
-                  {photoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
+                {/* Thumbnail Photo (if photo exists) */}
+                {photoUrl && (
+                  <div className="h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-inset border border-line relative">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={photoUrl}
                       alt={`${car.make} ${car.model}`}
                       className="h-full w-full object-cover"
                     />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-ink-subtle">
-                      <CarIcon className="h-6 w-6 opacity-60" />
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* Car Details & Asking Price ONLY */}
                 <div className="min-w-0 flex-1 space-y-1">
@@ -190,7 +202,7 @@ export function LeadInterestedCars({
         </div>
       )}
 
-      {/* Modal 1: Add Interested Car Picker */}
+      {/* Modal 1: Add Interested Car Picker (Custom UI/UX) */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
           <div className="w-full max-w-md rounded-2xl border border-line bg-card p-5 shadow-xl space-y-4">
@@ -209,34 +221,88 @@ export function LeadInterestedCars({
             </div>
 
             <form onSubmit={handleLinkSubmit} className="space-y-4">
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <label className="text-xs font-medium text-ink-muted">
                   Select In-Stock Vehicle *
                 </label>
+
+                {/* Quick Search Input */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-ink-subtle" />
+                  <input
+                    type="text"
+                    placeholder="Search make, model, or reg no…"
+                    value={pickerSearch}
+                    onChange={(e) => setPickerSearch(e.target.value)}
+                    className="w-full rounded-lg border border-line bg-inset py-2 pl-8 pr-3 text-xs text-ink placeholder:text-ink-subtle focus:border-accent focus:outline-none"
+                  />
+                </div>
+
                 {isLoadingCars ? (
-                  <div className="py-4 text-center text-xs text-ink-subtle flex items-center justify-center gap-2">
+                  <div className="py-8 text-center text-xs text-ink-subtle flex items-center justify-center gap-2">
                     <Loader2 className="h-4 w-4 animate-spin text-accent" />
                     Loading in-stock cars…
                   </div>
                 ) : unlinkedInStockCars.length === 0 ? (
-                  <p className="text-xs text-amber-500 py-2">
+                  <p className="text-xs text-amber-500 py-4 text-center border border-dashed border-amber-500/30 rounded-lg bg-amber-500/5">
                     No unlinked in-stock vehicles available.
                   </p>
+                ) : filteredInStockCars.length === 0 ? (
+                  <p className="text-xs text-ink-subtle py-4 text-center border border-dashed border-line rounded-lg bg-inset/40">
+                    No vehicles match &quot;{pickerSearch}&quot;.
+                  </p>
                 ) : (
-                  <select
-                    value={selectedCarId}
-                    onChange={(e) => setSelectedCarId(e.target.value)}
-                    required
-                    className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none"
-                  >
-                    <option value="">-- Select Vehicle --</option>
-                    {unlinkedInStockCars.map((car) => (
-                      <option key={car.id} value={car.id}>
-                        {car.year} {car.make} {car.model} ({car.reg_number}) —
-                        Asking: {formatAskingPrice(car.selling_price)}
-                      </option>
-                    ))}
-                  </select>
+                  /* Custom Scrollable Card Selector */
+                  <div className="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                    {filteredInStockCars.map((car) => {
+                      const isSelected = selectedCarId === car.id;
+                      return (
+                        <div
+                          key={car.id}
+                          onClick={() => setSelectedCarId(car.id)}
+                          className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
+                            isSelected
+                              ? "border-accent bg-accent/10 text-ink shadow-xs"
+                              : "border-line bg-inset/40 hover:bg-inset hover:border-line/80 text-ink"
+                          }`}
+                        >
+                          <div className="space-y-0.5 min-w-0 pr-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-bold text-ink truncate">
+                                {car.year} {car.make} {car.model}
+                              </span>
+                              <span className="inline-flex items-center rounded-md bg-surface border border-line px-1.5 py-0.5 text-[10px] font-mono text-ink-subtle">
+                                {car.reg_number}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-ink-subtle font-mono truncate">
+                              {car.fuel_type || "Petrol"}
+                              {car.km_driven
+                                ? ` • ${car.km_driven.toLocaleString("en-IN")} km`
+                                : ""}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="text-xs font-bold text-accent font-mono">
+                              {formatAskingPrice(car.selling_price)}
+                            </span>
+                            <div
+                              className={`flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${
+                                isSelected
+                                  ? "border-accent bg-accent text-white"
+                                  : "border-line/80 bg-card"
+                              }`}
+                            >
+                              {isSelected && (
+                                <CheckCircle2 className="h-3 w-3 stroke-[3]" />
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
 
@@ -244,14 +310,14 @@ export function LeadInterestedCars({
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
+                  className="rounded-lg border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={linkMutation.isPending || !selectedCarId}
-                  className="flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
                 >
                   {linkMutation.isPending && (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -295,7 +361,7 @@ export function LeadInterestedCars({
               <button
                 type="button"
                 onClick={() => setConfirmUnlinkCar(null)}
-                className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors"
+                className="rounded-lg border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -303,7 +369,7 @@ export function LeadInterestedCars({
                 type="button"
                 onClick={handleUnlinkConfirm}
                 disabled={unlinkMutation.isPending}
-                className="flex items-center gap-1.5 rounded-xl bg-danger px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-danger px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
               >
                 {unlinkMutation.isPending && (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />

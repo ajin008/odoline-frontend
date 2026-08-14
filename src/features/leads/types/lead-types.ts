@@ -149,3 +149,29 @@ export interface CreateLeadPayload {
   remark?: string | null;
   first_follow_up_at?: string | null;
 }
+
+export interface FunnelCounts {
+  new: number;
+  contacted: number;
+  test_drive: number;
+  discussion: number;
+  won: number;
+  lost: number;
+}
+
+export interface ConversionStats {
+  won_this_month: number;
+  lost_this_month: number;
+  conversion_rate: number;
+}
+
+export interface LeadTotals {
+  total_open: number;
+  total_leads: number;
+}
+
+export interface DashboardFunnelData {
+  funnel: FunnelCounts;
+  conversion: ConversionStats;
+  totals: LeadTotals;
+}

@@ -14,9 +14,23 @@ import {
   Filter,
   Search,
   X,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 
 type LeadStatusTab = "active" | "won" | "lost";
+
+const PRIORITY_OPTIONS: {
+  label: string;
+  value: LeadPriority | "all";
+  dotColor?: string;
+}[] = [
+  { label: "All Priorities", value: "all" },
+  { label: "Very Hot", value: "very_hot", dotColor: "bg-red-500" },
+  { label: "Hot", value: "hot", dotColor: "bg-amber-500" },
+  { label: "Warm", value: "warm", dotColor: "bg-yellow-500" },
+  { label: "Cold", value: "cold", dotColor: "bg-blue-500" },
+];
 
 const PRIORITY_CHIPS: { label: string; value: LeadPriority | "all" }[] = [
   { label: "All Priorities", value: "all" },
@@ -31,6 +45,21 @@ export function LeadList() {
   const [selectedPriority, setSelectedPriority] = useState<
     LeadPriority | undefined
   >(undefined);
+  const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
+  const priorityDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        priorityDropdownRef.current &&
+        !priorityDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsPriorityDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Search input & 350ms debounced value
   const [searchInput, setSearchInput] = useState("");
@@ -89,12 +118,12 @@ export function LeadList() {
     <div className="space-y-4 font-sans select-none">
       {/* 1. Header Control Section */}
       <div className="space-y-3 border-b border-line/60 pb-3">
-        {/* Row 1: Status Subtabs (Compact w-fit border container) */}
-        <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line w-fit">
+        {/* Row 1: Status Subtabs (Full-width 3-column grid on mobile, compact on desktop) */}
+        <div className="w-full sm:w-auto grid grid-cols-3 sm:flex sm:inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line">
           <button
             type="button"
             onClick={() => handleTabChange("active")}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full sm:w-auto text-center ${
               activeTab === "active"
                 ? "bg-accent text-inverse shadow-xs font-bold"
                 : "text-ink-subtle hover:text-ink hover:bg-card/50"
@@ -109,7 +138,7 @@ export function LeadList() {
           <button
             type="button"
             onClick={() => handleTabChange("won")}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full sm:w-auto text-center ${
               activeTab === "won"
                 ? "bg-emerald-600 text-white shadow-xs font-bold"
                 : "text-ink-subtle hover:text-ink hover:bg-card/50"
@@ -124,7 +153,7 @@ export function LeadList() {
           <button
             type="button"
             onClick={() => handleTabChange("lost")}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-2.5 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full sm:w-auto text-center ${
               activeTab === "lost"
                 ? "bg-rose-600 text-white shadow-xs font-bold"
                 : "text-ink-subtle hover:text-ink hover:bg-card/50"
@@ -137,8 +166,8 @@ export function LeadList() {
           </button>
         </div>
 
-        {/* Row 2: Search Bar & Priority Filter */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Row 2: Search Bar & Priority Select Dropdown */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           {/* Debounced Search Bar */}
           <div className="relative flex-1 sm:w-64 lg:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-subtle pointer-events-none shrink-0" />
@@ -164,42 +193,111 @@ export function LeadList() {
             )}
           </div>
 
-          {/* Priority Chips Row - VISIBLE ON ACTIVE TAB ONLY */}
+          {/* Priority Controls - VISIBLE ON ACTIVE TAB ONLY */}
           {activeTab === "active" && (
-            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full py-0.5 scrollbar-none shrink-0">
-              <span className="text-[11px] font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
-                <Filter className="h-3 w-3 text-accent" />
-                Priority:
-              </span>
-
-              {PRIORITY_CHIPS.map((chip) => {
-                const isSelected =
-                  chip.value === "all"
-                    ? selectedPriority === undefined
-                    : selectedPriority === chip.value;
-
-                return (
-                  <button
-                    key={chip.value}
-                    type="button"
-                    onClick={() =>
-                      setSelectedPriority(
-                        chip.value === "all"
-                          ? undefined
-                          : (chip.value as LeadPriority)
-                      )
-                    }
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                      isSelected
-                        ? "bg-accent/15 border border-accent text-accent shadow-xs font-bold"
-                        : "bg-card border border-line text-ink-subtle hover:text-ink hover:border-line/80 font-medium"
+            <>
+              {/* Mobile View ONLY: Custom Priority Dropdown (No emojis) */}
+              <div ref={priorityDropdownRef} className="relative w-full sm:hidden shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsPriorityDropdownOpen((prev) => !prev)}
+                  className="w-full h-9 rounded-xl border border-line bg-card px-3 py-1.5 text-xs font-semibold text-ink flex items-center justify-between shadow-xs transition-colors hover:border-line/80 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <Filter className="h-3.5 w-3.5 text-accent shrink-0" />
+                    <span className="truncate">
+                      {selectedPriority
+                        ? PRIORITY_OPTIONS.find((p) => p.value === selectedPriority)?.label
+                        : "All Priorities"}
+                    </span>
+                  </div>
+                  <ChevronDown
+                    className={`h-4 w-4 text-ink-subtle transition-transform duration-200 shrink-0 ${
+                      isPriorityDropdownOpen ? "rotate-180 text-accent" : ""
                     }`}
-                  >
-                    {chip.label}
-                  </button>
-                );
-              })}
-            </div>
+                  />
+                </button>
+
+                {isPriorityDropdownOpen && (
+                  <div className="absolute left-0 right-0 top-full mt-1.5 z-40 rounded-xl border border-line bg-card p-1.5 shadow-lg space-y-0.5 animate-in fade-in-50 zoom-in-95">
+                    {PRIORITY_OPTIONS.map((opt) => {
+                      const isSelected =
+                        opt.value === "all"
+                          ? selectedPriority === undefined
+                          : selectedPriority === opt.value;
+
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            setSelectedPriority(
+                              opt.value === "all"
+                                ? undefined
+                                : (opt.value as LeadPriority)
+                            );
+                            setIsPriorityDropdownOpen(false);
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                            isSelected
+                              ? "bg-accent/10 text-accent font-bold"
+                              : "text-ink hover:bg-inset"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            {opt.dotColor && (
+                              <span
+                                className={`h-2 w-2 rounded-full ${opt.dotColor} shrink-0`}
+                              />
+                            )}
+                            <span>{opt.label}</span>
+                          </div>
+                          {isSelected && (
+                            <Check className="h-3.5 w-3.5 text-accent stroke-[2.5px]" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Desktop View ONLY: Priority Chips Row (Unchanged) */}
+              <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto max-w-full py-0.5 scrollbar-none shrink-0">
+                <span className="text-[11px] font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
+                  <Filter className="h-3 w-3 text-accent" />
+                  Priority:
+                </span>
+
+                {PRIORITY_CHIPS.map((chip) => {
+                  const isSelected =
+                    chip.value === "all"
+                      ? selectedPriority === undefined
+                      : selectedPriority === chip.value;
+
+                  return (
+                    <button
+                      key={chip.value}
+                      type="button"
+                      onClick={() =>
+                        setSelectedPriority(
+                          chip.value === "all"
+                            ? undefined
+                            : (chip.value as LeadPriority)
+                        )
+                      }
+                      className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                        isSelected
+                          ? "bg-accent/15 border border-accent text-accent shadow-xs font-bold"
+                          : "bg-card border border-line text-ink-subtle hover:text-ink hover:border-line/80 font-medium"
+                      }`}
+                    >
+                      {chip.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </div>

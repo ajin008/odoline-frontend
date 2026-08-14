@@ -13,7 +13,6 @@ import {
   CheckCircle2,
   Loader2,
   Calendar,
-  User,
   ClipboardCheck,
 } from "lucide-react";
 
@@ -115,21 +114,21 @@ export default function StaffFollowUpsPage() {
         </div>
       </div>
 
-      {/* Segmented Tab Controls */}
-      <div className="flex items-center gap-1.5 border-b border-line/60 pb-3">
+      {/* Segmented Tab Controls (Full Width 3-column grid on mobile, compact on desktop) */}
+      <div className="w-full sm:w-auto grid grid-cols-3 sm:flex sm:inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line">
         <button
           type="button"
           onClick={() => setActiveBucket("today")}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full text-center ${
             activeBucket === "today"
-              ? "bg-accent text-inverse shadow-xs"
-              : "bg-card border border-line text-ink-subtle hover:text-ink"
+              ? "bg-accent text-inverse shadow-xs font-bold"
+              : "text-ink-subtle hover:text-ink hover:bg-card/50"
           }`}
         >
-          <Clock className="h-3.5 w-3.5" />
+          <Clock className="h-3.5 w-3.5 shrink-0" />
           <span>Today</span>
           {todayList && todayList.length > 0 && (
-            <span className="ml-1 rounded-md bg-inverse/20 px-1.5 py-0.2 text-[10px] font-mono">
+            <span className="ml-0.5 rounded-md bg-inverse/20 px-1.5 py-0.2 text-[10px] font-mono">
               {todayList.length}
             </span>
           )}
@@ -138,16 +137,16 @@ export default function StaffFollowUpsPage() {
         <button
           type="button"
           onClick={() => setActiveBucket("overdue")}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full text-center ${
             activeBucket === "overdue"
-              ? "bg-red-500 text-white shadow-xs"
-              : "bg-card border border-line text-ink-subtle hover:text-ink"
+              ? "bg-red-500 text-white shadow-xs font-bold"
+              : "text-ink-subtle hover:text-ink hover:bg-card/50"
           }`}
         >
-          <Clock className="h-3.5 w-3.5" />
+          <Clock className="h-3.5 w-3.5 shrink-0" />
           <span>Overdue</span>
           {overdueCount > 0 && (
-            <span className="ml-1 rounded-md bg-red-500/20 text-red-500 font-bold px-1.5 py-0.2 text-[10px] font-mono">
+            <span className="ml-0.5 rounded-md bg-red-500/20 text-white font-bold px-1.5 py-0.2 text-[10px] font-mono">
               {overdueCount}
             </span>
           )}
@@ -156,13 +155,13 @@ export default function StaffFollowUpsPage() {
         <button
           type="button"
           onClick={() => setActiveBucket("upcoming")}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+          className={`flex items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full text-center ${
             activeBucket === "upcoming"
-              ? "bg-accent text-inverse shadow-xs"
-              : "bg-card border border-line text-ink-subtle hover:text-ink"
+              ? "bg-accent text-inverse shadow-xs font-bold"
+              : "text-ink-subtle hover:text-ink hover:bg-card/50"
           }`}
         >
-          <Calendar className="h-3.5 w-3.5" />
+          <Calendar className="h-3.5 w-3.5 shrink-0" />
           <span>Upcoming</span>
         </button>
       </div>
@@ -190,7 +189,7 @@ export default function StaffFollowUpsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="rounded-2xl border border-line bg-card overflow-hidden divide-y divide-line/60 shadow-xs">
           {currentQuery.map((fu) => {
             const customerName = fu.lead?.customer?.name || "Customer";
             const customerPhone = fu.lead?.customer?.phone || "N/A";
@@ -208,58 +207,69 @@ export default function StaffFollowUpsPage() {
             return (
               <div
                 key={fu.id}
-                className="flex flex-col justify-between rounded-xl border border-line bg-card p-4 transition-all hover:border-accent/40 hover:shadow-md space-y-3"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3.5 sm:p-4 transition-colors hover:bg-inset/50 font-sans"
               >
-                <div className="space-y-2.5">
-                  {/* Header: Customer Info + Priority & Stage Badges */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-inset border border-line text-ink-subtle shrink-0">
-                        <User className="h-4 w-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <h3 className="text-sm font-bold text-ink truncate">
+                {/* Left Column: Customer Avatar, Details, Badges & Due Date */}
+                <div className="flex items-start sm:items-center justify-between sm:justify-start gap-2.5 sm:gap-3 min-w-0 flex-1 w-full sm:w-auto">
+                  <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold shrink-0 text-xs sm:text-sm">
+                      {customerName.charAt(0).toUpperCase()}
+                    </div>
+
+                    <div className="min-w-0 space-y-0.5 flex-1">
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                        <Link
+                          href={`/staff/leads/${fu.lead_id}`}
+                          className="text-xs sm:text-sm font-bold text-ink hover:text-accent truncate"
+                        >
                           {customerName}
-                        </h3>
-                        <p className="text-xs text-ink-subtle font-mono truncate">
-                          {customerPhone}
-                        </p>
+                        </Link>
+                        <span
+                          className={`inline-flex items-center rounded-md border px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${priority.bgClass} ${priority.textClass} ${priority.borderClass}`}
+                        >
+                          {priority.label}
+                        </span>
+                        <span className="inline-flex items-center rounded-md bg-surface border border-line px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] font-medium text-ink">
+                          {stageLabel}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 text-[11px] sm:text-xs text-ink-subtle flex-wrap">
+                        <span className="font-mono font-medium">{customerPhone}</span>
+                        <span className="text-line">•</span>
+                        <span className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] text-ink-subtle">
+                          <Clock className="h-3 w-3 text-accent shrink-0" />
+                          Due: {dueStr}
+                        </span>
                       </div>
                     </div>
-
-                    {/* Badge Group: Priority (Heat Color) + Stage (Neutral Pill) */}
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span
-                        className={`inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${priority.bgClass} ${priority.textClass} ${priority.borderClass}`}
-                      >
-                        {priority.label}
-                      </span>
-                      <span className="inline-flex items-center rounded-md bg-surface border border-line px-2 py-0.5 text-[10px] font-medium text-ink shadow-2xs">
-                        {stageLabel}
-                      </span>
-                    </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs text-ink-subtle bg-inset/50 rounded-md p-2 border border-line/40 font-mono">
-                    <Clock className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Due: {dueStr}</span>
-                  </div>
+                  {/* Mobile Arrow Link (Visible top-right on mobile only) */}
+                  <Link
+                    href={`/staff/leads/${fu.lead_id}`}
+                    className="sm:hidden flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-card hover:bg-hover text-ink-subtle hover:text-ink transition-colors shrink-0"
+                    title="View Lead Details"
+                  >
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
 
-                <div className="pt-3 border-t border-line/50 flex items-center justify-between gap-1.5 flex-wrap">
+                {/* Right Column: Outreach Actions & Record Result Button */}
+                <div className="flex items-center gap-1.5 sm:gap-2 justify-between sm:justify-end shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-line/40 w-full sm:w-auto">
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => handleCall(customerPhone)}
-                      className="flex items-center gap-1.5 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer"
+                      className="flex items-center justify-center gap-1 rounded-lg bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 px-2.5 sm:px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
                       title="Call Customer"
                     >
                       <Image
                         src="/icons/phonecall-icon.png"
                         alt="Call"
-                        width={16}
-                        height={16}
-                        className="h-4 w-4 object-contain shrink-0"
+                        width={14}
+                        height={14}
+                        className="h-3.5 w-3.5 object-contain shrink-0"
                       />
                       <span>Call</span>
                     </button>
@@ -267,36 +277,37 @@ export default function StaffFollowUpsPage() {
                     <button
                       type="button"
                       onClick={() => handleWhatsApp(customerPhone)}
-                      className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold transition-colors cursor-pointer"
+                      className="flex items-center justify-center gap-1 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 px-2.5 sm:px-2.5 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
                       title="WhatsApp Customer"
                     >
                       <Image
                         src="/icons/whatsappIcon.png"
                         alt="WhatsApp"
-                        width={16}
-                        height={16}
-                        className="h-4 w-4 object-contain shrink-0"
+                        width={14}
+                        height={14}
+                        className="h-3.5 w-3.5 object-contain shrink-0"
                       />
                       <span>WhatsApp</span>
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-1 sm:flex-initial justify-end">
                     <button
                       type="button"
                       onClick={() => setSelectedOutcomeFu(fu)}
-                      className="flex items-center gap-1.5 rounded-lg bg-accent hover:opacity-90 active:scale-[0.98] text-inverse px-3 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
+                      className="flex items-center justify-center gap-1 rounded-lg bg-accent hover:opacity-90 active:scale-[0.98] text-inverse px-3 sm:px-3 py-1.5 text-xs font-bold shadow-xs transition-all cursor-pointer w-full sm:w-auto shrink-0"
                     >
                       <ClipboardCheck className="h-3.5 w-3.5 shrink-0" />
                       <span>Record Result</span>
                     </button>
 
+                    {/* Desktop Arrow Link (Visible on sm: screens and up) */}
                     <Link
                       href={`/staff/leads/${fu.lead_id}`}
-                      className="flex items-center gap-0.5 text-xs font-semibold text-ink-subtle hover:text-ink shrink-0"
+                      className="hidden sm:flex h-8 w-8 items-center justify-center rounded-lg border border-line bg-card hover:bg-hover text-ink-subtle hover:text-ink transition-colors shrink-0"
+                      title="View Lead Details"
                     >
-                      <span>View</span>
-                      <ArrowRight className="h-3 w-3" />
+                      <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
                 </div>

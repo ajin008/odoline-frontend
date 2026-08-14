@@ -26,14 +26,16 @@
   /* System state colors */
   --state-danger: #dc2626;
   --state-danger-light: rgba(220, 38, 38, 0.09);
-  --state-success: #16a34a;
-  --state-success-light: rgba(22, 163, 74, 0.09);
+  --state-success: #00d66f;
+  --state-success-light: rgba(0, 214, 111, 0.09);
   --state-warning: #d97706;
   --state-warning-light: rgba(217, 119, 6, 0.09);
 
   /* Unified Font Stack Mapping — Satoshi for body/UI, Cabinet Grotesk for headings */
-  --font-sans: var(--font-satoshi), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-heading: var(--font-cabinet-grotesk), var(--font-satoshi), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-satoshi), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  --font-heading: var(--font-cabinet-grotesk), var(--font-satoshi),
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 
   /* Soft-Shadow Layering */
@@ -65,6 +67,16 @@
   --color-warning: var(--state-warning);
   --color-warning-light: var(--state-warning-light);
 
+  /* Custom Green Brand Overrides (#00d66f) */
+  --color-emerald-400: #00d66f;
+  --color-emerald-500: #00d66f;
+  --color-emerald-600: #00d66f;
+  --color-emerald-700: #00b35c;
+  --color-green-400: #00d66f;
+  --color-green-500: #00d66f;
+  --color-green-600: #00d66f;
+  --color-green-700: #00b35c;
+
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
   --font-mono: var(--font-mono);
@@ -84,8 +96,51 @@ body {
   font-family: var(--font-heading);
 }
 
+/* Border color reset for filled & bright action buttons */
+button:is(
+  [class*="bg-accent"],
+  [class*="bg-emerald"],
+  [class*="bg-rose"],
+  [class*="bg-red-600"],
+  [class*="bg-red-500"],
+  [class*="bg-blue"],
+  [class*="bg-indigo"],
+  [class*="bg-purple"],
+  [class*="bg-amber-500"],
+  [class*="bg-amber-600"],
+  [class*="bg-[#00d66f]"],
+  [class*="bg-danger"],
+  [class*="bg-black"],
+  [class*="bg-slate-900"],
+  [class*="bg-[#171819]"]
+),
+a:is(
+  [class*="bg-accent"],
+  [class*="bg-emerald"],
+  [class*="bg-rose"],
+  [class*="bg-red-600"],
+  [class*="bg-red-500"],
+  [class*="bg-blue"],
+  [class*="bg-indigo"],
+  [class*="bg-purple"],
+  [class*="bg-amber-500"],
+  [class*="bg-amber-600"],
+  [class*="bg-[#00d66f]"],
+  [class*="bg-danger"],
+  [class*="bg-black"],
+  [class*="bg-slate-900"],
+  [class*="bg-[#171819]"]
+) {
+  border-color: transparent !important;
+}
+
 /* Ensure clean font inheritance & prevent letter collision */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: inherit;
   letter-spacing: normal;
 }
