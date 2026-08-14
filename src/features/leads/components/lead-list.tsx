@@ -12,6 +12,8 @@ import {
   CheckCircle2,
   XCircle,
   Filter,
+  Search,
+  X,
 } from "lucide-react";
 
 type LeadStatusTab = "active" | "won" | "lost";
@@ -29,6 +31,17 @@ export function LeadList() {
   const [selectedPriority, setSelectedPriority] = useState<
     LeadPriority | undefined
   >(undefined);
+
+  // Search input & 350ms debounced value
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // When switching away from 'active' tab, clear priority filter
   const handleTabChange = (tab: LeadStatusTab) => {
@@ -48,6 +61,7 @@ export function LeadList() {
   } = useInfiniteLeads({
     status: activeTab,
     priority: activeTab === "active" ? selectedPriority : undefined,
+    search: debouncedSearch || undefined,
   });
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -73,14 +87,14 @@ export function LeadList() {
 
   return (
     <div className="space-y-4 font-sans select-none">
-      {/* 1. Status Subtabs & Priority Filter Controls - Responsive across Mobile, Tablet, and Desktop */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-line/60 pb-3">
-        {/* Status Subtabs */}
-        <div className="grid grid-cols-3 w-full sm:w-auto sm:inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line shrink-0">
+      {/* 1. Header Control Section */}
+      <div className="space-y-3 border-b border-line/60 pb-3">
+        {/* Row 1: Status Subtabs (Compact w-fit border container) */}
+        <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line w-fit">
           <button
             type="button"
             onClick={() => handleTabChange("active")}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "active"
                 ? "bg-accent text-inverse shadow-xs font-bold"
                 : "text-ink-subtle hover:text-ink hover:bg-card/50"
@@ -95,7 +109,7 @@ export function LeadList() {
           <button
             type="button"
             onClick={() => handleTabChange("won")}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "won"
                 ? "bg-emerald-600 text-white shadow-xs font-bold"
                 : "text-ink-subtle hover:text-ink hover:bg-card/50"
@@ -110,7 +124,7 @@ export function LeadList() {
           <button
             type="button"
             onClick={() => handleTabChange("lost")}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === "lost"
                 ? "bg-rose-600 text-white shadow-xs font-bold"
                 : "text-ink-subtle hover:text-ink hover:bg-card/50"
@@ -123,43 +137,71 @@ export function LeadList() {
           </button>
         </div>
 
-        {/* Priority Chips Row - VISIBLE ON ACTIVE TAB ONLY */}
-        {activeTab === "active" && (
-          <div className="flex items-center gap-1.5 overflow-x-auto max-w-full py-1 scrollbar-none shrink-0">
-            <span className="text-[11px] font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
-              <Filter className="h-3 w-3 text-accent" />
-              Priority:
-            </span>
-
-            {PRIORITY_CHIPS.map((chip) => {
-              const isSelected =
-                chip.value === "all"
-                  ? selectedPriority === undefined
-                  : selectedPriority === chip.value;
-
-              return (
-                <button
-                  key={chip.value}
-                  type="button"
-                  onClick={() =>
-                    setSelectedPriority(
-                      chip.value === "all"
-                        ? undefined
-                        : (chip.value as LeadPriority)
-                    )
-                  }
-                  className={`rounded-lg px-3 py-1 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                    isSelected
-                      ? "bg-accent/15 border border-accent text-accent shadow-xs font-bold"
-                      : "bg-card border border-line text-ink-subtle hover:text-ink hover:border-line/80 font-medium"
-                  }`}
-                >
-                  {chip.label}
-                </button>
-              );
-            })}
+        {/* Row 2: Search Bar & Priority Filter */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Debounced Search Bar */}
+          <div className="relative flex-1 sm:w-64 lg:w-80">
+            <Search className="absolute left-3 top-2.5 h-4 w-4 text-ink-subtle pointer-events-none" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search by name or phone..."
+              className="w-full rounded-xl border border-line bg-surface pl-9 pr-8 py-1.5 text-xs text-ink outline-none transition-colors focus:border-accent placeholder:text-ink-subtle/60"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchInput("");
+                  setDebouncedSearch("");
+                }}
+                className="absolute right-2.5 top-2 text-ink-subtle hover:text-ink transition-colors cursor-pointer p-0.5"
+                title="Clear search"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
-        )}
+
+          {/* Priority Chips Row - VISIBLE ON ACTIVE TAB ONLY */}
+          {activeTab === "active" && (
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full py-0.5 scrollbar-none shrink-0">
+              <span className="text-[11px] font-bold text-ink-muted uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
+                <Filter className="h-3 w-3 text-accent" />
+                Priority:
+              </span>
+
+              {PRIORITY_CHIPS.map((chip) => {
+                const isSelected =
+                  chip.value === "all"
+                    ? selectedPriority === undefined
+                    : selectedPriority === chip.value;
+
+                return (
+                  <button
+                    key={chip.value}
+                    type="button"
+                    onClick={() =>
+                      setSelectedPriority(
+                        chip.value === "all"
+                          ? undefined
+                          : (chip.value as LeadPriority)
+                      )
+                    }
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                      isSelected
+                        ? "bg-accent/15 border border-accent text-accent shadow-xs font-bold"
+                        : "bg-card border border-line text-ink-subtle hover:text-ink hover:border-line/80 font-medium"
+                    }`}
+                  >
+                    {chip.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 2. Loading State Skeleton */}
@@ -182,34 +224,59 @@ export function LeadList() {
           </div>
         </div>
       ) : leads.length === 0 ? (
-        /* 3. Empty States Per Status Tab */
-        <div className="rounded-xl border border-dashed border-line bg-card p-10 text-center max-w-md mx-auto my-6 select-none">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-inset text-ink-subtle border border-line mx-auto mb-3">
-            {activeTab === "won" ? (
-              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-            ) : activeTab === "lost" ? (
-              <XCircle className="h-5 w-5 text-rose-500" />
-            ) : (
-              <Users className="h-5 w-5 stroke-[1.5px]" />
-            )}
+        /* 3. Empty States Per Search Query or Status Tab */
+        debouncedSearch ? (
+          <div className="rounded-xl border border-dashed border-line bg-card p-10 text-center max-w-md mx-auto my-6 select-none space-y-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-inset text-ink-subtle border border-line mx-auto">
+              <Search className="h-5 w-5 text-accent" />
+            </div>
+            <p className="text-sm font-bold text-ink">
+              No leads match &ldquo;{debouncedSearch}&rdquo;
+            </p>
+            <p className="text-xs text-ink-subtle">
+              Try searching by another name or phone number, or clear your search query.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchInput("");
+                setDebouncedSearch("");
+              }}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-line bg-surface px-3 py-1.5 text-xs font-semibold text-accent hover:bg-hover transition-colors cursor-pointer"
+            >
+              <X className="h-3.5 w-3.5" />
+              Clear search
+            </button>
           </div>
-          <p className="text-sm font-semibold text-ink font-sans tracking-tight">
-            {activeTab === "active"
-              ? "No active leads"
-              : activeTab === "won"
-              ? "No won deals yet"
-              : "No lost leads"}
-          </p>
-          <p className="mt-1 text-xs text-ink-subtle font-sans">
-            {activeTab === "active"
-              ? selectedPriority
-                ? `No active leads matching '${selectedPriority.replace("_", " ")}' priority.`
-                : "All buyer leads have been closed or no leads have been created."
-              : activeTab === "won"
-              ? "Closed won buyer deals will appear here."
-              : "Closed lost leads will appear here."}
-          </p>
-        </div>
+        ) : (
+          <div className="rounded-xl border border-dashed border-line bg-card p-10 text-center max-w-md mx-auto my-6 select-none">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-inset text-ink-subtle border border-line mx-auto mb-3">
+              {activeTab === "won" ? (
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              ) : activeTab === "lost" ? (
+                <XCircle className="h-5 w-5 text-rose-500" />
+              ) : (
+                <Users className="h-5 w-5 stroke-[1.5px]" />
+              )}
+            </div>
+            <p className="text-sm font-semibold text-ink font-sans tracking-tight">
+              {activeTab === "active"
+                ? "No active leads"
+                : activeTab === "won"
+                ? "No won deals yet"
+                : "No lost leads"}
+            </p>
+            <p className="mt-1 text-xs text-ink-subtle font-sans">
+              {activeTab === "active"
+                ? selectedPriority
+                  ? `No active leads matching '${selectedPriority.replace("_", " ")}' priority.`
+                  : "All buyer leads have been closed or no leads have been created."
+                : activeTab === "won"
+                ? "Closed won buyer deals will appear here."
+                : "Closed lost leads will appear here."}
+            </p>
+          </div>
+        )
       ) : (
         /* 4. Leads Grid List */
         <div>

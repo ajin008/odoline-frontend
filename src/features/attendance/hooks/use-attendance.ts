@@ -41,6 +41,14 @@ export function useStaffHeatmap(staffId: string, month?: string) {
   });
 }
 
+export function useMyHeatmap(month?: string) {
+  return useQuery({
+    queryKey: queryKeys.attendance.meHeatmap(month),
+    queryFn: () => attendanceApi.getMyHeatmap(month),
+    staleTime: 30000,
+  });
+}
+
 export function useUpsertManualAttendance(selectedDate: string) {
   const queryClient = useQueryClient();
 

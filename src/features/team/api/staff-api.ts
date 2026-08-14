@@ -8,6 +8,11 @@ import type {
 } from "../types/staff-types";
 
 export const staffApi = {
+  async getMe(): Promise<StaffMember> {
+    const res = await apiClient.get(endpoints.staff.me);
+    return res.data.data;
+  },
+
   async getList(statusFilter: "active" | "inactive" | "all" = "active"): Promise<StaffMember[]> {
     const res = await apiClient.get(endpoints.staff.list, {
       params: { status: statusFilter },

@@ -266,7 +266,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 type="button"
                 onClick={handlePrevStage}
                 disabled={changeStageMutation.isPending}
-                className="flex items-center gap-1 rounded-xl border border-line px-3 py-1.5 text-xs font-semibold text-ink-subtle hover:text-ink hover:bg-hover transition-colors cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover px-3 py-1.5 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50"
               >
                 <ChevronLeft className="h-3.5 w-3.5" />
                 <span>{getStageConfig(prevActiveStage).shortLabel}</span>
@@ -278,7 +278,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 type="button"
                 onClick={handleAdvanceStage}
                 disabled={changeStageMutation.isPending}
-                className="flex items-center gap-1 rounded-xl bg-accent px-3 py-1.5 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                className="flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-1.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
               >
                 {changeStageMutation.isPending && (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -298,9 +298,9 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 setWonPrice("");
                 setWonNotes("");
               }}
-              className="flex items-center gap-1 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/30 px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
             >
-              <Trophy className="h-3.5 w-3.5" />
+              <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
               <span>Mark Won</span>
             </button>
 
@@ -312,9 +312,9 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 setCustomReason("");
                 setLostNotes("");
               }}
-              className="flex items-center gap-1 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
             >
-              <XCircle className="h-3.5 w-3.5" />
+              <XCircle className="h-3.5 w-3.5 stroke-[2.5px]" />
               <span>Mark Lost</span>
             </button>
           </div>
@@ -522,7 +522,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 <button
                   type="button"
                   onClick={() => setIsWonOpen(false)}
-                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
+                  className="rounded-lg border border-line bg-surface px-3.5 py-2 text-xs font-semibold text-ink hover:bg-hover transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -531,7 +531,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                   disabled={
                     changeStageMutation.isPending || !selectedCarId || !wonPrice
                   }
-                  className="flex items-center gap-1.5 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 px-4 py-2 text-xs font-bold text-white shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {changeStageMutation.isPending && (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -632,14 +632,14 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 <button
                   type="button"
                   onClick={() => setIsLostOpen(false)}
-                  className="rounded-xl border border-line px-3.5 py-2 text-xs font-medium text-ink hover:bg-hover transition-colors cursor-pointer"
+                  className="rounded-lg border border-line bg-surface px-3.5 py-2 text-xs font-semibold text-ink hover:bg-hover transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={changeStageMutation.isPending}
-                  className="flex items-center gap-1.5 rounded-xl bg-red-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:bg-rose-800 px-4 py-2 text-xs font-bold text-white shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {changeStageMutation.isPending && (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />

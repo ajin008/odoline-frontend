@@ -2,13 +2,16 @@ export interface StaffMember {
   id: string;
   name: string;
   phone: string;
-  role: "sales";
+  role: "sales" | "owner";
   position: string | null;
   gender: "male" | "female" | "other" | null;
   address: string | null;
   joined_on: string | null;
   department_id: string | null;
   department_name: string | null;
+  shift_start?: string | null;
+  shift_end?: string | null;
+  weekly_holiday?: string | null;
   photo_url: string | null;
   is_active: boolean;
   last_login_at: string | null;

@@ -39,6 +39,7 @@ export const leadApi = {
     params: {
       status?: "active" | "won" | "lost";
       priority?: "very_hot" | "hot" | "warm" | "cold";
+      search?: string;
       cursor?: string;
       limit?: number;
     } = {}
@@ -46,6 +47,9 @@ export const leadApi = {
     const queryParams: Record<string, string | number> = {};
     if (params.status) queryParams.status = params.status;
     if (params.priority) queryParams.priority = params.priority;
+    if (params.search && params.search.trim().length > 0) {
+      queryParams.search = params.search.trim();
+    }
     if (params.cursor) queryParams.cursor = params.cursor;
     if (params.limit) queryParams.limit = params.limit;
 

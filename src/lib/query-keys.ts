@@ -3,6 +3,7 @@
 export interface ListLeadsQueryParams {
   status?: "active" | "won" | "lost";
   priority?: "very_hot" | "hot" | "warm" | "cold";
+  search?: string;
   cursor?: string;
   limit?: number;
 }
@@ -48,6 +49,7 @@ export const queryKeys = {
 
   staff: {
     all: ["staff"] as const,
+    me: ["staff", "me"] as const,
     list: (status?: string) => ["staff", { status }] as const,
     detail: (id: string) => ["staff", id] as const,
   },
@@ -75,5 +77,7 @@ export const queryKeys = {
     overview: (date?: string) => ["attendance", "overview", date] as const,
     staffHeatmap: (staffId: string, month?: string) =>
       ["attendance", "staff", staffId, "heatmap", month] as const,
+    meHeatmap: (month?: string) =>
+      ["attendance", "me", "heatmap", month] as const,
   },
 } as const;

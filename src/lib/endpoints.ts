@@ -54,6 +54,7 @@ export const endpoints = {
   },
 
   staff: {
+    me: "/staff/me",
     list: "/staff",
     create: "/staff",
     detail: (id: string) => `/staff/${id}`,
@@ -95,6 +96,10 @@ export const endpoints = {
       month
         ? `/attendance/staff/${staffId}/heatmap?month=${month}`
         : `/attendance/staff/${staffId}/heatmap`,
+    meHeatmap: (month?: string) =>
+      month
+        ? `/attendance/me/heatmap?month=${month}`
+        : "/attendance/me/heatmap",
     manual: "/attendance/manual",
   },
 } as const;

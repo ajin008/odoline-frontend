@@ -9,3 +9,11 @@ export function useStaff(statusFilter: "active" | "inactive" | "all" = "active")
     staleTime: 2 * 60 * 1000,
   });
 }
+
+export function useMyProfile() {
+  return useQuery({
+    queryKey: queryKeys.staff.me,
+    queryFn: () => staffApi.getMe(),
+    staleTime: 60 * 1000,
+  });
+}

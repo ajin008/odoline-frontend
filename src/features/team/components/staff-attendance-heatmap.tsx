@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useStaffHeatmap } from "@/src/features/attendance/hooks/use-attendance";
+import { useStaffHeatmap, useMyHeatmap } from "@/src/features/attendance/hooks/use-attendance";
 import type {
   StaffHeatmapDayEntry,
   StaffHeatmapDayStatus,
@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 interface StaffAttendanceHeatmapProps {
-  staffId: string;
+  staffId?: string;
+  isMe?: boolean;
 }
 
 /**
@@ -107,16 +108,21 @@ function getStatusLabel(status: StaffHeatmapDayStatus): string {
 
 export function StaffAttendanceHeatmap({
   staffId,
+  isMe = false,
 }: StaffAttendanceHeatmapProps) {
   const todayMonth = getTodayISTMonthString();
   const [selectedMonth, setSelectedMonth] = useState<string>(todayMonth);
   const [activeDayHover, setActiveDayHover] =
     useState<StaffHeatmapDayEntry | null>(null);
 
-  const { data: heatmapData, isLoading, isError } = useStaffHeatmap(
-    staffId,
+  const staffHeatmapQuery = useStaffHeatmap(
+    staffId || "",
     selectedMonth
   );
+  const myHeatmapQuery = useMyHeatmap(selectedMonth);
+
+  const { data: heatmapData, isLoading, isError } =
+    isMe || !staffId ? myHeatmapQuery : staffHeatmapQuery;
 
   // Shift month +/- 1 month
   const handleShiftMonth = (delta: number) => {

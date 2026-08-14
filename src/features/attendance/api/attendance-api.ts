@@ -45,6 +45,12 @@ export const attendanceApi = {
     return res.data.data;
   },
 
+  /** Fetch monthly attendance heatmap for logged in staff member */
+  async getMyHeatmap(month?: string): Promise<StaffHeatmapData> {
+    const res = await apiClient.get(endpoints.attendance.meHeatmap(month));
+    return res.data.data;
+  },
+
   /** Owner manual attendance correction (upsert) */
   async upsertManual(payload: ManualAttendancePayload): Promise<unknown> {
     const res = await apiClient.put(endpoints.attendance.manual, payload);
