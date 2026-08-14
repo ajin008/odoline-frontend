@@ -13,6 +13,7 @@ import {
   XCircle,
   Loader2,
   X,
+  Check,
   ShoppingBag,
   Tag,
   CreditCard,
@@ -260,69 +261,215 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
         {/* Transition Action Buttons */}
         {!isTerminal && (
-          <div className="flex items-center gap-2 flex-wrap">
-            {prevActiveStage && (
+          <>
+            {/* Mobile Action Buttons (Full Touch Friendly Layout) */}
+            <div className="flex flex-col gap-2 sm:hidden pt-1 w-full">
+              {nextActiveStage && (
+                <button
+                  type="button"
+                  onClick={handleAdvanceStage}
+                  disabled={changeStageMutation.isPending}
+                  className="flex items-center justify-center gap-2 w-full rounded-lg bg-accent px-4 py-2.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                >
+                  {changeStageMutation.isPending && (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  )}
+                  <span>
+                    Move to {getStageConfig(nextActiveStage).shortLabel}
+                  </span>
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              )}
+
+              <div className="grid grid-cols-2 gap-2 w-full">
+                {prevActiveStage ? (
+                  <button
+                    type="button"
+                    onClick={handlePrevStage}
+                    disabled={changeStageMutation.isPending}
+                    className="flex items-center justify-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover px-3 py-2 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    <span className="truncate">{getStageConfig(prevActiveStage).shortLabel}</span>
+                  </button>
+                ) : <div />}
+
+                <div className="flex items-center gap-1.5 w-full">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsWonOpen(true);
+                      setSelectedCarId("");
+                      setWonPrice("");
+                      setWonNotes("");
+                    }}
+                    className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-xs font-bold shadow-xs cursor-pointer"
+                  >
+                    <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
+                    <span>Won</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsLostOpen(true);
+                      setSelectedReasonOption(COMMON_LOST_REASONS[0]);
+                      setCustomReason("");
+                      setLostNotes("");
+                    }}
+                    className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white py-2 text-xs font-bold shadow-xs cursor-pointer"
+                  >
+                    <XCircle className="h-3.5 w-3.5 stroke-[2.5px]" />
+                    <span>Lost</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop Action Buttons Row */}
+            <div className="hidden sm:flex items-center gap-2 flex-wrap">
+              {prevActiveStage && (
+                <button
+                  type="button"
+                  onClick={handlePrevStage}
+                  disabled={changeStageMutation.isPending}
+                  className="flex items-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover px-3 py-1.5 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                  <span>{getStageConfig(prevActiveStage).shortLabel}</span>
+                </button>
+              )}
+
+              {nextActiveStage && (
+                <button
+                  type="button"
+                  onClick={handleAdvanceStage}
+                  disabled={changeStageMutation.isPending}
+                  className="flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-1.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                >
+                  {changeStageMutation.isPending && (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  )}
+                  <span>
+                    Move to {getStageConfig(nextActiveStage).shortLabel}
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              )}
+
               <button
                 type="button"
-                onClick={handlePrevStage}
-                disabled={changeStageMutation.isPending}
-                className="flex items-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover px-3 py-1.5 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50"
+                onClick={() => {
+                  setIsWonOpen(true);
+                  setSelectedCarId("");
+                  setWonPrice("");
+                  setWonNotes("");
+                }}
+                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
               >
-                <ChevronLeft className="h-3.5 w-3.5" />
-                <span>{getStageConfig(prevActiveStage).shortLabel}</span>
+                <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
+                <span>Mark Won</span>
               </button>
-            )}
 
-            {nextActiveStage && (
               <button
                 type="button"
-                onClick={handleAdvanceStage}
-                disabled={changeStageMutation.isPending}
-                className="flex items-center gap-1.5 rounded-lg bg-accent px-3.5 py-1.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer disabled:opacity-50"
+                onClick={() => {
+                  setIsLostOpen(true);
+                  setSelectedReasonOption(COMMON_LOST_REASONS[0]);
+                  setCustomReason("");
+                  setLostNotes("");
+                }}
+                className="flex items-center gap-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
               >
-                {changeStageMutation.isPending && (
-                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                )}
-                <span>
-                  Move to {getStageConfig(nextActiveStage).shortLabel}
-                </span>
-                <ChevronRight className="h-3.5 w-3.5" />
+                <XCircle className="h-3.5 w-3.5 stroke-[2.5px]" />
+                <span>Mark Lost</span>
               </button>
-            )}
-
-            <button
-              type="button"
-              onClick={() => {
-                setIsWonOpen(true);
-                setSelectedCarId("");
-                setWonPrice("");
-                setWonNotes("");
-              }}
-              className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
-            >
-              <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
-              <span>Mark Won</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setIsLostOpen(true);
-                setSelectedReasonOption(COMMON_LOST_REASONS[0]);
-                setCustomReason("");
-                setLostNotes("");
-              }}
-              className="flex items-center gap-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
-            >
-              <XCircle className="h-3.5 w-3.5 stroke-[2.5px]" />
-              <span>Mark Lost</span>
-            </button>
-          </div>
+            </div>
+          </>
         )}
       </div>
 
-      {/* Stepper Pipeline Bar */}
-      <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+      {/* Mobile Pipeline Stepper & Progress Bar */}
+      <div className="flex flex-col space-y-2.5 sm:hidden pt-2 border-t border-line/50">
+        {/* Progress Bar */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between text-[11px] font-mono font-medium text-ink-subtle">
+            <span>Pipeline Stage</span>
+            <span className="font-bold text-accent">
+              {currentStage === "won"
+                ? "100% (Won)"
+                : currentStage === "lost"
+                ? "Closed (Lost)"
+                : `${Math.round(((activeIndex + 1) / 4) * 100)}% (${activeIndex + 1}/4)`}
+            </span>
+          </div>
+          <div className="h-1.5 w-full rounded-full bg-inset border border-line/40 overflow-hidden">
+            <div
+              className={`h-full transition-all duration-300 ${
+                currentStage === "won"
+                  ? "bg-emerald-500"
+                  : currentStage === "lost"
+                  ? "bg-rose-500"
+                  : "bg-accent"
+              }`}
+              style={{
+                width:
+                  currentStage === "won"
+                    ? "100%"
+                    : currentStage === "lost"
+                    ? "100%"
+                    : `${((activeIndex + 1) / 4) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Scrollable Stage Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none max-w-full">
+          {ACTIVE_STAGES.map((stg, idx) => {
+            const isCurrent = currentStage === stg;
+            const isPassed = activeIndex > idx && !isTerminal;
+
+            return (
+              <div
+                key={stg}
+                className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold whitespace-nowrap shrink-0 border transition-all ${
+                  isCurrent
+                    ? "bg-accent text-inverse border-accent font-bold shadow-xs"
+                    : isPassed
+                    ? "bg-inset/80 border-line text-ink"
+                    : "bg-inset/30 border-line/40 text-ink-subtle/60"
+                }`}
+              >
+                {isPassed && <Check className="h-3 w-3 text-emerald-500 shrink-0 stroke-[2.5px]" />}
+                <span>{getStageConfig(stg).shortLabel}</span>
+              </div>
+            );
+          })}
+
+          {/* Terminal Pill */}
+          <div
+            className={`flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold whitespace-nowrap shrink-0 border transition-all ${
+              currentStage === "won"
+                ? "bg-emerald-600 text-white border-emerald-600 font-bold shadow-xs"
+                : currentStage === "lost"
+                ? "bg-rose-600 text-white border-rose-600 font-bold shadow-xs"
+                : "bg-inset/30 border-line/40 text-ink-subtle/60"
+            }`}
+          >
+            <span>
+              {currentStage === "won"
+                ? "Won Deal 🎉"
+                : currentStage === "lost"
+                ? "Lost Lead"
+                : "Closed"}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Stepper Pipeline Bar */}
+      <div className="hidden sm:grid grid-cols-5 gap-1.5 sm:gap-2">
         {ACTIVE_STAGES.map((stg, idx) => {
           const isCurrent = currentStage === stg;
           const isPassed = activeIndex > idx && !isTerminal;

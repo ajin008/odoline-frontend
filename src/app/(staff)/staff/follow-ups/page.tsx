@@ -285,7 +285,7 @@ export default function StaffFollowUpsPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedOutcomeFu(fu)}
-                      className="flex items-center gap-1.5 rounded-lg bg-accent/15 text-accent hover:bg-accent/25 px-2.5 py-1 text-xs font-bold transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-lg bg-accent hover:opacity-90 active:scale-[0.98] text-inverse px-3 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
                     >
                       <ClipboardCheck className="h-3.5 w-3.5 shrink-0" />
                       <span>Record Result</span>

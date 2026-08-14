@@ -141,13 +141,13 @@ export function LeadList() {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Debounced Search Bar */}
           <div className="relative flex-1 sm:w-64 lg:w-80">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-ink-subtle pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-subtle pointer-events-none shrink-0" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by name or phone..."
-              className="w-full rounded-xl border border-line bg-surface pl-9 pr-8 py-1.5 text-xs text-ink outline-none transition-colors focus:border-accent placeholder:text-ink-subtle/60"
+              className="w-full h-9 rounded-xl border border-line bg-surface pl-9 pr-8 py-2 text-xs text-ink outline-none transition-colors focus:border-accent placeholder:text-ink-subtle/60"
             />
             {searchInput && (
               <button
@@ -156,7 +156,7 @@ export function LeadList() {
                   setSearchInput("");
                   setDebouncedSearch("");
                 }}
-                className="absolute right-2.5 top-2 text-ink-subtle hover:text-ink transition-colors cursor-pointer p-0.5"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink transition-colors cursor-pointer p-0.5 flex items-center justify-center"
                 title="Clear search"
               >
                 <X className="h-3.5 w-3.5" />

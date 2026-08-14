@@ -204,7 +204,7 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
                     <button
                       type="button"
                       onClick={() => setSelectedOutcomeFu(fu)}
-                      className="flex items-center gap-1 rounded-md bg-accent/10 text-accent hover:bg-accent/20 px-2 py-1 text-xs font-semibold transition-colors cursor-pointer"
+                      className="flex items-center gap-1 rounded-md bg-accent hover:opacity-90 text-inverse px-2.5 py-1 text-xs font-bold shadow-xs transition-all cursor-pointer"
                     >
                       <ClipboardCheck className="h-3 w-3" />
                       <span>Record Result</span>
