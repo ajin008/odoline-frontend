@@ -160,19 +160,22 @@ export interface FunnelCounts {
   lost: number;
 }
 
-export interface ConversionStats {
-  won_this_month: number;
-  lost_this_month: number;
-  conversion_rate: number;
+export interface DashboardFunnelPeriod {
+  period: string;
+  from: string | null;
+  to: string | null;
 }
 
-export interface LeadTotals {
+export interface DashboardFunnelMetrics {
+  new_in_period: number;
+  won_in_period: number;
+  lost_in_period: number;
+  conversion_rate: number;
   total_open: number;
-  total_leads: number;
 }
 
 export interface DashboardFunnelData {
+  period: DashboardFunnelPeriod;
+  metrics: DashboardFunnelMetrics;
   funnel: FunnelCounts;
-  conversion: ConversionStats;
-  totals: LeadTotals;
 }

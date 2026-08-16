@@ -65,7 +65,8 @@ export const queryKeys = {
     activities: (id: string) => ["leads", id, "activities"] as const,
     followUps: (id: string) => ["leads", id, "follow-ups"] as const,
     stageHistory: (id: string) => ["leads", id, "stage-history"] as const,
-    dashboardFunnel: ["leads", "dashboard", "funnel"] as const,
+    dashboardFunnel: (period?: string) =>
+      ["leads", "dashboard", "funnel", { period }] as const,
     unassigned: ["leads", "unassigned"] as const,
     staffLoad: ["leads", "staff-load"] as const,
   },

@@ -167,8 +167,12 @@ export const leadApi = {
   },
 
   /** GET /api/v1/leads/dashboard/funnel — Owner dashboard funnel & conversion stats */
-  async getDashboardFunnel(): Promise<DashboardFunnelData> {
-    const res = await apiClient.get(endpoints.leads.dashboardFunnel);
+  async getDashboardFunnel(period?: string): Promise<DashboardFunnelData> {
+    const url = period
+      ? `${endpoints.leads.dashboardFunnel}?period=${encodeURIComponent(period)}`
+      : endpoints.leads.dashboardFunnel;
+
+    const res = await apiClient.get(url);
     return res.data.data;
   },
 

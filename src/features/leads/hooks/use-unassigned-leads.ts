@@ -43,7 +43,7 @@ export function useAssignLead() {
         queryKey: queryKeys.leads.all,
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.leads.dashboardFunnel,
+        queryKey: queryKeys.leads.dashboardFunnel(),
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.leads.detail(variables.id),
@@ -104,7 +104,7 @@ export function useBulkAssign() {
         queryKey: queryKeys.leads.all,
       });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.leads.dashboardFunnel,
+        queryKey: queryKeys.leads.dashboardFunnel(),
       });
       queryClient.invalidateQueries({
         queryKey: queryKeys.leads.staffLoad,
