@@ -4,6 +4,7 @@ export interface ListLeadsQueryParams {
   status?: "active" | "won" | "lost";
   priority?: "very_hot" | "hot" | "warm" | "cold";
   search?: string;
+  assigned_to?: string;
   cursor?: string;
   limit?: number;
 }
@@ -65,6 +66,8 @@ export const queryKeys = {
     followUps: (id: string) => ["leads", id, "follow-ups"] as const,
     stageHistory: (id: string) => ["leads", id, "stage-history"] as const,
     dashboardFunnel: ["leads", "dashboard", "funnel"] as const,
+    unassigned: ["leads", "unassigned"] as const,
+    staffLoad: ["leads", "staff-load"] as const,
   },
 
   followUps: {

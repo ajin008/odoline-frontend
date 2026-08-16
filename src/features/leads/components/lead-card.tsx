@@ -16,6 +16,8 @@ import {
 interface LeadCardProps {
   lead: Lead;
   onClick?: () => void;
+  showAssignedRep?: boolean;
+  href?: string;
 }
 
 const PRIORITY_CONFIG: Record<
@@ -77,10 +79,11 @@ function formatCurrency(amountStr?: string | null): string {
   return `₹${num.toLocaleString("en-IN")}`;
 }
 
-export function LeadCard({ lead, onClick }: LeadCardProps) {
+export function LeadCard({ lead, onClick, showAssignedRep, href }: LeadCardProps) {
   const isWon = lead.stage === "won";
   const isLost = lead.stage === "lost";
   const priority = PRIORITY_CONFIG[lead.priority] || PRIORITY_CONFIG.warm;
+  const linkTarget = href || `/staff/leads/${lead.id}`;
 
   const customerName = lead.customer?.name || "Customer";
   const customerPhone = lead.customer?.phone || "N/A";
@@ -143,13 +146,13 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
 
           {/* Badges based on stage status */}
           {isWon ? (
-            <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-500 shrink-0">
-              <CheckCircle2 className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 shrink-0">
+              <CheckCircle2 className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
               <span>Won Deal</span>
             </span>
           ) : isLost ? (
-            <span className="inline-flex items-center gap-1 rounded-md border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-rose-500 shrink-0">
-              <XCircle className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1 rounded-md border border-rose-500/20 bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-rose-600 dark:text-rose-400 shrink-0">
+              <XCircle className="h-3 w-3 text-rose-600 dark:text-rose-400" />
               <span>Lost Lead</span>
             </span>
           ) : (
@@ -165,7 +168,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
         {isWon && (
           <div className="rounded-md border border-emerald-500/20 bg-emerald-500/5 p-2.5 space-y-1.5 text-xs">
             <div className="flex items-center justify-between gap-1">
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <span className="font-semibold text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
                 <CarIcon className="h-3.5 w-3.5" />
                 {lead.won_car
                   ? `${lead.won_car.year} ${lead.won_car.make} ${lead.won_car.model}`
@@ -180,7 +183,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
             )}
 
             {lead.won_price && (
-              <div className="flex items-center justify-between text-xs pt-1 border-t border-emerald-500/10">
+              <div className="flex items-center justify-between text-xs pt-1 border-t border-emerald-500/15">
                 <span className="text-ink-subtle">Deal Amount:</span>
                 <span className="font-bold text-ink font-mono">
                   {formatCurrency(lead.won_price)}
@@ -238,18 +241,27 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
         )}
       </div>
 
-      {/* Footer Date Line */}
-      <div className="mt-4 pt-3 border-t border-line/50 flex items-center justify-between text-[11px] text-ink-subtle">
-        <div className="flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          {isWon && wonDateStr ? (
-            <span>Closed Won {wonDateStr}</span>
-          ) : isLost && lostDateStr ? (
-            <span>Closed Lost {lostDateStr}</span>
-          ) : (
-            <span>Added {createdDateStr}</span>
-          )}
+      {/* Footer Date Line & Optional Assigned Rep Badge */}
+      <div className="mt-4 pt-3 border-t border-line/50 flex items-center justify-between gap-2 text-[11px] text-ink-subtle">
+        <div className="flex items-center gap-1 min-w-0">
+          <Calendar className="h-3 w-3 shrink-0" />
+          <span className="truncate">
+            {isWon && wonDateStr ? (
+              `Closed Won ${wonDateStr}`
+            ) : isLost && lostDateStr ? (
+              `Closed Lost ${lostDateStr}`
+            ) : (
+              `Added ${createdDateStr}`
+            )}
+          </span>
         </div>
+
+        {showAssignedRep && (
+          <span className="inline-flex items-center gap-1 font-medium text-ink-muted bg-inset px-2 py-0.5 rounded-md border border-line/60 shrink-0 max-w-[140px]">
+            <User className="h-3 w-3 text-ink-subtle shrink-0" />
+            <span className="truncate">{lead.assigned_rep?.name || "Unassigned"}</span>
+          </span>
+        )}
       </div>
     </div>
   );
@@ -259,7 +271,7 @@ export function LeadCard({ lead, onClick }: LeadCardProps) {
   }
 
   return (
-    <Link href={`/staff/leads/${lead.id}`} className="block h-full">
+    <Link href={linkTarget} className="block h-full">
       {cardContent}
     </Link>
   );

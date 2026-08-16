@@ -49,7 +49,7 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
       {/* Unified Right Workspace Panel (Modern Premium SaaS Layout) */}
       <div className="flex-1 flex flex-col bg-card rounded-none md:rounded-xl border-none md:border border-line shadow-none md:shadow-bento overflow-hidden h-full min-w-0">
         <OwnerNavbar />
-        <main className="flex-1 px-4 sm:px-6 py-5 overflow-y-auto pb-36 md:pb-6 overscroll-y-contain animate-in fade-in duration-300">
+        <main className="flex-1 px-4 sm:px-6 py-3 sm:py-4 overflow-y-auto pb-36 md:pb-6 overscroll-y-contain animate-in fade-in duration-300">
           {children}
         </main>
       </div>

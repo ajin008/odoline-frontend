@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import type { StaffMember } from "../types/staff-types";
-import { User, Building2, Briefcase, ChevronRight, Users } from "lucide-react";
+import { User, Building2, Briefcase, ChevronRight, Users, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
 
 interface StaffListProps {
   staffList: StaffMember[];
@@ -21,6 +23,17 @@ export function StaffList({
   onSelectStaff,
   onAddClick,
 }: StaffListProps) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopyPhone = (e: React.MouseEvent, phone: string, id: string) => {
+    e.stopPropagation();
+    const textToCopy = `+91${phone}`;
+    navigator.clipboard.writeText(textToCopy);
+    toast.success(`Copied ${textToCopy} to clipboard!`);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -134,8 +147,22 @@ export function StaffList({
               </span>
             </div>
 
-            {/* Call & WhatsApp Quick Action Buttons */}
+            {/* Copy, Call & WhatsApp Quick Action Buttons */}
             <div className="flex items-center gap-1.5 shrink-0">
+              {/* Copy Phone Action */}
+              <button
+                type="button"
+                onClick={(e) => handleCopyPhone(e, staff.phone, staff.id)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-line/70 bg-inset hover:bg-card hover:border-accent/40 transition-all cursor-pointer p-1.5"
+                title={`Copy +91 ${staff.phone}`}
+              >
+                {copiedId === staff.id ? (
+                  <Check className="h-4 w-4 text-emerald-500 stroke-[2.5px]" />
+                ) : (
+                  <Copy className="h-4 w-4 text-ink-subtle stroke-[2px]" />
+                )}
+              </button>
+
               {/* Direct Phone Call Action */}
               <a
                 href={`tel:+91${staff.phone}`}

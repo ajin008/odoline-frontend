@@ -203,7 +203,7 @@ export function OwnerFunnelDashboard() {
   ];
 
   return (
-    <div className="space-y-6 font-sans select-none">
+    <div className="space-y-4 font-sans select-none">
       {/* 1. Metric Conversion & Totals Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3.5">
         {conversionCards.map((card) => {

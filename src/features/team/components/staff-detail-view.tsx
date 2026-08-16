@@ -8,6 +8,7 @@ import { StaffModal } from "./staff-modal";
 import { ResetPinModal } from "./reset-pin-modal";
 import { StaffAttendanceHeatmap } from "./staff-attendance-heatmap";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   User,
@@ -24,6 +25,8 @@ import {
   AlertCircle,
   Camera,
   Loader2,
+  Copy,
+  Check,
 } from "lucide-react";
 
 interface StaffDetailViewProps {
@@ -39,6 +42,16 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
   const [isResetPinOpen, setIsResetPinOpen] = useState(false);
   const [isConfirmDeactivateOpen, setIsConfirmDeactivateOpen] = useState(false);
   const [isConfirmActivateOpen, setIsConfirmActivateOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyPhone = () => {
+    if (!staff?.phone) return;
+    const textToCopy = `+91${staff.phone}`;
+    navigator.clipboard.writeText(textToCopy);
+    toast.success(`Copied ${textToCopy} to clipboard!`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -202,20 +215,47 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
 
         {/* Detailed Info Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          {/* Phone Card with Call & WhatsApp Buttons */}
+          {/* Phone Card with Copy, Call & WhatsApp Buttons */}
           <div className="space-y-2 rounded-xl bg-inset p-4 border border-line/70 min-w-0">
             <span className="text-[10px] font-semibold text-ink-subtle uppercase tracking-wider flex items-center gap-1">
               <Phone className="h-3 w-3 text-accent shrink-0" />
               <span>Mobile Phone</span>
             </span>
             <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
-              <span className="font-mono font-bold text-ink text-sm shrink-0">
-                +91 {staff.phone}
-              </span>
+              <button
+                type="button"
+                onClick={handleCopyPhone}
+                className="font-mono font-bold text-ink text-sm shrink-0 flex items-center gap-1.5 hover:text-accent transition-colors cursor-pointer group"
+                title="Click to copy phone number"
+              >
+                <span>+91 {staff.phone}</span>
+                {copied ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5px]" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5 text-ink-subtle group-hover:text-accent transition-colors stroke-[2px]" />
+                )}
+              </button>
+
               <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+                {/* Copy Button */}
+                <button
+                  type="button"
+                  onClick={handleCopyPhone}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-accent hover:border-accent/40 active:scale-[0.98] transition-all font-bold text-xs shrink-0 cursor-pointer shadow-2xs"
+                  title={`Copy +91 ${staff.phone}`}
+                >
+                  {copied ? (
+                    <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5px]" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5 stroke-[2px]" />
+                  )}
+                  <span>{copied ? "Copied!" : "Copy"}</span>
+                </button>
+
+                {/* Call Button */}
                 <a
                   href={`tel:+91${staff.phone}`}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-ink hover:border-accent/40 transition-all font-bold text-xs shrink-0"
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-ink hover:border-accent/40 transition-all font-bold text-xs shrink-0 shadow-2xs"
                   title={`Call +91 ${staff.phone}`}
                 >
                   <Image
@@ -227,11 +267,13 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
                   />
                   <span>Call</span>
                 </a>
+
+                {/* WhatsApp Button */}
                 <a
                   href={`https://wa.me/91${staff.phone}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-emerald-600 hover:border-emerald-500/40 transition-all font-bold text-xs shrink-0"
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-emerald-600 hover:border-emerald-500/40 transition-all font-bold text-xs shrink-0 shadow-2xs"
                   title={`WhatsApp chat +91 ${staff.phone}`}
                 >
                   <Image

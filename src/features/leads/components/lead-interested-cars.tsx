@@ -19,6 +19,7 @@ import {
 interface LeadInterestedCarsProps {
   leadId: string;
   interestedCars?: Car[] | null;
+  readOnly?: boolean;
 }
 
 function formatAskingPrice(amountStr?: string | null): string {
@@ -34,6 +35,7 @@ function formatAskingPrice(amountStr?: string | null): string {
 export function LeadInterestedCars({
   leadId,
   interestedCars = [],
+  readOnly = false,
 }: LeadInterestedCarsProps) {
   const linkMutation = useLinkCar(leadId);
   const unlinkMutation = useUnlinkCar(leadId);
@@ -110,18 +112,20 @@ export function LeadInterestedCars({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setIsAddOpen(true);
-            setSelectedCarId("");
-            setPickerSearch("");
-          }}
-          className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          <span>Add Vehicle</span>
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => {
+              setIsAddOpen(true);
+              setSelectedCarId("");
+              setPickerSearch("");
+            }}
+            className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity cursor-pointer shrink-0"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Add Vehicle</span>
+          </button>
+        )}
       </div>
 
       {/* Linked Vehicles Grid / List */}
@@ -129,13 +133,18 @@ export function LeadInterestedCars({
         <div className="rounded-xl border border-dashed border-line bg-inset/40 p-6 text-center text-xs text-ink-subtle space-y-1">
           <p className="font-semibold text-ink">No Vehicles Linked Yet</p>
           <p className="text-[11px]">
-            Link inventory cars this customer is eyeing to track interest.
+            {readOnly
+              ? "No inventory cars linked to this lead."
+              : "Link inventory cars this customer is eyeing to track interest."}
           </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {linkedCars.map((car) => {
             const photoUrl = car.thumbnail_url || car.primary_photo_url || null;
+            const stockHref = readOnly
+              ? `/owner/inventory`
+              : `/staff/stock/${car.id}`;
 
             return (
               <div
@@ -158,7 +167,7 @@ export function LeadInterestedCars({
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-start justify-between gap-1 pr-6">
                     <Link
-                      href={`/staff/stock/${car.id}`}
+                      href={stockHref}
                       className="text-xs font-bold text-ink hover:text-accent truncate block"
                     >
                       {car.year} {car.make} {car.model}
@@ -178,7 +187,7 @@ export function LeadInterestedCars({
                     </span>
 
                     <Link
-                      href={`/staff/stock/${car.id}`}
+                      href={stockHref}
                       className="text-[10px] font-semibold text-ink-subtle hover:text-ink flex items-center gap-0.5"
                     >
                       <span>Stock</span>
@@ -188,14 +197,16 @@ export function LeadInterestedCars({
                 </div>
 
                 {/* Remove Action Button */}
-                <button
-                  type="button"
-                  onClick={() => setConfirmUnlinkCar(car)}
-                  className="absolute top-2.5 right-2.5 p-1 rounded-lg text-ink-subtle hover:text-danger hover:bg-card transition-colors cursor-pointer"
-                  title="Remove from lead"
-                >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </button>
+                {!readOnly && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmUnlinkCar(car)}
+                    className="absolute top-2.5 right-2.5 p-1 rounded-lg text-ink-subtle hover:text-danger hover:bg-card transition-colors cursor-pointer"
+                    title="Remove from lead"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
               </div>
             );
           })}

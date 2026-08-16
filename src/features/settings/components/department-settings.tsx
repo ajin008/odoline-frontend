@@ -107,25 +107,24 @@ export function DepartmentSettings() {
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* SUBTABS NAVIGATION (Placed directly BELOW the heading)        */}
-      {/* ------------------------------------------------------------- */}
-      <div className="flex items-center gap-1.5 overflow-x-auto rounded-xl bg-inset p-1.5 border border-line/40 w-fit no-scrollbar">
+      {/* Subtabs Navigation */}
+      <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-fit no-scrollbar shrink-0">
         <button
           type="button"
           onClick={() => setStatusFilter("active")}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold font-sans transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap ${
             statusFilter === "active"
               ? "bg-accent text-inverse shadow-xs"
               : "text-ink-muted hover:text-ink hover:bg-card/50"
           }`}
         >
           <CheckCircle2 className="h-3.5 w-3.5 stroke-[2.2px]" />
-          <span>Active </span>
+          <span>Active</span>
         </button>
         <button
           type="button"
           onClick={() => setStatusFilter("inactive")}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold font-sans transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap ${
             statusFilter === "inactive"
               ? "bg-accent text-inverse shadow-xs"
               : "text-ink-muted hover:text-ink hover:bg-card/50"
@@ -137,7 +136,7 @@ export function DepartmentSettings() {
         <button
           type="button"
           onClick={() => setStatusFilter("all")}
-          className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-bold font-sans transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap ${
             statusFilter === "all"
               ? "bg-accent text-inverse shadow-xs"
               : "text-ink-muted hover:text-ink hover:bg-card/50"
@@ -152,9 +151,10 @@ export function DepartmentSettings() {
       {/* DEPARTMENT CARDS GRID LIST                                   */}
       {/* ------------------------------------------------------------- */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="h-44 rounded-xl bg-inset border border-line animate-pulse" />
-          <div className="h-44 rounded-xl bg-inset border border-line animate-pulse" />
+        <div className="grid grid-cols-1 min-[540px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+          <div className="h-36 rounded-xl bg-inset border border-line animate-pulse" />
+          <div className="h-36 rounded-xl bg-inset border border-line animate-pulse" />
+          <div className="h-36 rounded-xl bg-inset border border-line animate-pulse" />
         </div>
       ) : departments.length === 0 ? (
         /* Empty State */
@@ -181,37 +181,35 @@ export function DepartmentSettings() {
           </button>
         </div>
       ) : (
-        /* Bento Cards Grid */
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        /* Dynamic Compact Cards Grid */
+        <div className="grid grid-cols-1 min-[540px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
           {departments.map((dept) => (
             <div
               key={dept.id}
-              className={`bg-card border rounded-xl p-5 shadow-bento transition-all duration-200 flex flex-col justify-between space-y-4 hover:border-accent/40 ${
+              className={`bg-card border rounded-xl p-3.5 sm:p-4 shadow-xs transition-all duration-200 flex flex-col justify-between space-y-3 hover:border-accent/40 ${
                 dept.is_active
                   ? "border-line"
                   : "border-line/60 bg-inset/30 opacity-80"
               }`}
             >
               {/* Card Header: Icon, Name, Status Badge & Actions */}
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="h-10 w-10 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0">
-                    <Building2 className="h-5 w-5 stroke-[2px]" />
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start gap-2.5 min-w-0">
+                  <div className="h-8 w-8 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center text-accent shrink-0 mt-0.5">
+                    <Building2 className="h-4 w-4 stroke-[2px]" />
                   </div>
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold text-ink font-sans truncate">
-                        {dept.name}
-                      </h3>
-                    </div>
+                  <div className="min-w-0 space-y-0.5">
+                    <h3 className="text-xs sm:text-sm font-bold text-ink font-sans leading-tight line-clamp-2">
+                      {dept.name}
+                    </h3>
                     <div>
                       {dept.is_active ? (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+                        <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           <span>ACTIVE</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 border border-amber-500/20">
+                        <span className="inline-flex items-center gap-1 text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
                           <span>INACTIVE</span>
                         </span>
@@ -225,7 +223,7 @@ export function DepartmentSettings() {
                   <button
                     type="button"
                     onClick={() => handleOpenEdit(dept)}
-                    className="p-2 rounded-lg text-ink-muted hover:text-ink bg-inset border border-line/40 hover:bg-card transition-colors cursor-pointer"
+                    className="p-1.5 rounded-lg text-ink-muted hover:text-ink bg-inset border border-line/40 hover:bg-card transition-colors cursor-pointer"
                     title="Edit Department"
                   >
                     <Pencil className="h-3.5 w-3.5 stroke-[2px]" />
@@ -235,7 +233,7 @@ export function DepartmentSettings() {
                     <button
                       type="button"
                       onClick={() => setDeactivateTarget(dept)}
-                      className="p-2 rounded-lg text-rose-600 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-rose-600 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 transition-colors cursor-pointer"
                       title="Deactivate Department"
                     >
                       <Power className="h-3.5 w-3.5 stroke-[2.5px]" />
@@ -244,7 +242,7 @@ export function DepartmentSettings() {
                     <button
                       type="button"
                       onClick={() => setActivateTarget(dept)}
-                      className="p-2 rounded-lg text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors cursor-pointer"
+                      className="p-1.5 rounded-lg text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors cursor-pointer"
                       title="Reactivate Department"
                     >
                       <RefreshCw className="h-3.5 w-3.5 stroke-[2.5px]" />
@@ -253,33 +251,33 @@ export function DepartmentSettings() {
                 </div>
               </div>
 
-              {/* Card Body: Chips for Shift Timings, Weekly Off, Staff */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+              {/* Card Body: Shift Timings & Weekly Off Row Rows */}
+              <div className="space-y-1.5 pt-0.5">
                 {/* Shift Timings */}
-                <div className="bg-inset/70 border border-line/60 rounded-lg p-2.5 flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-accent shrink-0" />
-                  <div className="min-w-0">
-                    <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle leading-none">
-                      Shift Hours
-                    </span>
-                    <span className="text-xs font-mono font-bold text-ink mt-0.5 block truncate">
-                      {formatTime12h(dept.shift_start)} –{" "}
-                      {formatTime12h(dept.shift_end)}
+                <div className="bg-inset/70 border border-line/60 rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Clock className="h-3.5 w-3.5 text-accent shrink-0" />
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle">
+                      Shift
                     </span>
                   </div>
+                  <span className="font-mono font-bold text-ink text-[11px] shrink-0">
+                    {formatTime12h(dept.shift_start)} –{" "}
+                    {formatTime12h(dept.shift_end)}
+                  </span>
                 </div>
 
-                {/* Weekly Off */}
-                <div className="bg-inset/70 border border-line/60 rounded-lg p-2.5 flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-accent shrink-0" />
-                  <div className="min-w-0">
-                    <span className="block text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle leading-none">
-                      Weekly Holiday
-                    </span>
-                    <span className="text-xs font-sans font-bold text-ink mt-0.5 block truncate">
-                      {WEEKLY_HOLIDAY_LABELS[dept.weekly_holiday] || "Sunday"}
+                {/* Weekly Holiday */}
+                <div className="bg-inset/70 border border-line/60 rounded-lg px-2.5 py-1.5 flex items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <Calendar className="h-3.5 w-3.5 text-accent shrink-0" />
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle">
+                      Off Day
                     </span>
                   </div>
+                  <span className="font-sans font-bold text-ink text-[11px] shrink-0">
+                    {WEEKLY_HOLIDAY_LABELS[dept.weekly_holiday] || "Sunday"}
+                  </span>
                 </div>
               </div>
 
@@ -288,9 +286,9 @@ export function DepartmentSettings() {
                 <span className="text-ink-subtle text-[11px] font-medium font-sans">
                   Assigned Personnel
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-xs font-mono font-bold px-2.5 py-1 rounded-md bg-sky-500/10 text-sky-700 border border-sky-500/20">
-                  <Users className="h-3.5 w-3.5 text-accent shrink-0" />
-                  <span>{dept.active_staff_count ?? 0} active staff</span>
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/20">
+                  <Users className="h-3 w-3 text-accent shrink-0" />
+                  <span>{dept.active_staff_count ?? 0} active</span>
                 </span>
               </div>
             </div>

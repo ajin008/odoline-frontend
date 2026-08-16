@@ -55,11 +55,11 @@ export function TeamShell() {
   };
 
   return (
-    <div className="w-full space-y-6 select-none font-sans max-w-5xl">
+    <div className="w-full space-y-4 select-none font-sans max-w-5xl">
       {/* ------------------------------------------------------------- */}
       {/* TEAM HEADER & SUBTABS NAVIGATION (FIXED/STICKY AT TOP)        */}
       {/* ------------------------------------------------------------- */}
-      <div className="sticky -top-5 z-20 bg-card/95 backdrop-blur-md -mx-4 sm:-mx-6 px-4 sm:px-6 pt-5 pb-4 border-b border-line/40 space-y-4">
+      <div className="sticky -top-4 z-20 bg-card/95 backdrop-blur-md -mx-4 sm:-mx-6 px-4 sm:px-6 pt-1 sm:pt-2 pb-3 border-b border-line/40 space-y-2.5">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
             Team &amp; Attendance Hub
@@ -70,7 +70,7 @@ export function TeamShell() {
         </div>
 
         {/* Subtabs Bar below heading */}
-        <div className="flex gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-fit no-scrollbar">
+        <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-fit no-scrollbar shrink-0">
           {TEAM_TABS.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -79,7 +79,7 @@ export function TeamShell() {
                 key={tab.key}
                 onClick={() => handleTabChange(tab.key)}
                 className={[
-                  "flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+                  "flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
                   isActive
                     ? "bg-accent text-inverse shadow-xs"
                     : "text-ink-muted hover:text-ink",
@@ -98,9 +98,9 @@ export function TeamShell() {
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* ACTIVE SUBTAB CONTENT VIEW (SCROLLS INDEPENDENTLY)             */}
+      {/* ACTIVE SUBTAB CONTENT VIEW                                    */}
       {/* ------------------------------------------------------------- */}
-      <div className="pt-2">
+      <div className="pt-0.5">
         {/* OVERVIEW SUBTAB */}
         {activeTab === "overview" && <TeamOverview />}
 

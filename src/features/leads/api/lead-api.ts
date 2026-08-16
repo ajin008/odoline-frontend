@@ -24,6 +24,24 @@ export interface LeadsPage {
   pagination: LeadsPagination;
 }
 
+export interface StaffLoadItem {
+  staff_id: string;
+  name: string;
+  active_lead_count: number;
+}
+
+export interface BulkAssignPayload {
+  assigned_to: string;
+  lead_ids?: string[];
+  assign_all?: boolean;
+}
+
+export interface BulkAssignResponse {
+  assigned_count: number;
+  skipped_count: number;
+  assigned_lead_ids: string[];
+}
+
 export const leadApi = {
   /** POST /api/v1/leads — Create a new customer lead */
   async create(payload: CreateLeadPayload): Promise<Lead> {
@@ -41,6 +59,7 @@ export const leadApi = {
       status?: "active" | "won" | "lost";
       priority?: "very_hot" | "hot" | "warm" | "cold";
       search?: string;
+      assigned_to?: string;
       cursor?: string;
       limit?: number;
     } = {}
@@ -51,6 +70,7 @@ export const leadApi = {
     if (params.search && params.search.trim().length > 0) {
       queryParams.search = params.search.trim();
     }
+    if (params.assigned_to) queryParams.assigned_to = params.assigned_to;
     if (params.cursor) queryParams.cursor = params.cursor;
     if (params.limit) queryParams.limit = params.limit;
 
@@ -149,6 +169,32 @@ export const leadApi = {
   /** GET /api/v1/leads/dashboard/funnel — Owner dashboard funnel & conversion stats */
   async getDashboardFunnel(): Promise<DashboardFunnelData> {
     const res = await apiClient.get(endpoints.leads.dashboardFunnel);
+    return res.data.data;
+  },
+
+  /** GET /api/v1/leads/unassigned — Owner-only Unassigned Lead Queue */
+  async getUnassigned(): Promise<Lead[]> {
+    const res = await apiClient.get(endpoints.leads.unassigned);
+    return res.data.data;
+  },
+
+  /** GET /api/v1/leads/staff-load — Owner-only active sales staff lead load */
+  async getStaffLoad(): Promise<StaffLoadItem[]> {
+    const res = await apiClient.get(endpoints.leads.staffLoad);
+    return res.data.data;
+  },
+
+  /** POST /api/v1/leads/bulk-assign — Owner-only bulk lead assignment */
+  async bulkAssign(payload: BulkAssignPayload): Promise<BulkAssignResponse> {
+    const res = await apiClient.post(endpoints.leads.bulkAssign, payload);
+    return res.data.data;
+  },
+
+  /** PATCH /api/v1/leads/:id/assign — Owner-only Reassign lead to an active sales staff */
+  async assign(id: string, assignedTo: string): Promise<Lead> {
+    const res = await apiClient.patch(endpoints.leads.assign(id), {
+      assigned_to: assignedTo,
+    });
     return res.data.data;
   },
 };

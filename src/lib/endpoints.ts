@@ -77,6 +77,10 @@ export const endpoints = {
     cars: (id: string) => `/leads/${id}/cars`,
     car: (id: string, carId: string) => `/leads/${id}/cars/${carId}`,
     dashboardFunnel: "/leads/dashboard/funnel",
+    unassigned: "/leads/unassigned",
+    staffLoad: "/leads/staff-load",
+    bulkAssign: "/leads/bulk-assign",
+    assign: (id: string) => `/leads/${id}/assign`,
   },
 
   followUps: {

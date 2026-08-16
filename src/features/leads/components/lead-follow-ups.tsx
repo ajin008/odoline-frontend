@@ -27,6 +27,7 @@ import {
 interface LeadFollowUpsProps {
   leadId: string;
   nextFollowUp?: NextFollowUpInfo | null;
+  readOnly?: boolean;
 }
 
 const DUE_STATE_CONFIG: Record<
@@ -69,7 +70,11 @@ function getTodayISTDateString(): string {
   return `${year}-${month}-${day}`;
 }
 
-export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
+export function LeadFollowUps({
+  leadId,
+  nextFollowUp,
+  readOnly = false,
+}: LeadFollowUpsProps) {
   const { data: followUps, isLoading, isError } = useLeadFollowUps(leadId);
   const scheduleMutation = useScheduleFollowUp(leadId);
 
@@ -100,23 +105,42 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
     DUE_STATE_CONFIG[nextFollowUp?.due_state || "none"] ||
     DUE_STATE_CONFIG.none;
 
+  if (isLoading) {
+    return (
+      <div className="rounded-xl border border-line bg-card p-5 space-y-3 font-sans select-none">
+        <div className="h-4 w-32 animate-pulse rounded bg-inset" />
+        <div className="h-16 animate-pulse rounded-lg bg-inset" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="rounded-xl border border-danger/20 bg-state-danger-light p-4 text-xs font-medium text-danger font-sans select-none">
+        Failed to load follow-up reminders.
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-line bg-card p-5 space-y-4 font-sans select-none">
       {/* Header & Schedule Button */}
       <div className="flex items-center justify-between gap-2 border-b border-line/60 pb-3">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted flex items-center gap-2">
-          <Clock className="h-4 w-4 text-accent" />
-          Follow-up Schedule
+          <CalendarCheck className="h-4 w-4 text-accent" />
+          Follow-up Reminders
         </h3>
 
-        <button
-          type="button"
-          onClick={() => setIsScheduleOpen(true)}
-          className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
-        >
-          <Plus className="h-3.5 w-3.5" />
-          <span>Schedule</span>
-        </button>
+        {!readOnly && (
+          <button
+            type="button"
+            onClick={() => setIsScheduleOpen(true)}
+            className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Schedule</span>
+          </button>
+        )}
       </div>
 
       {/* Prominent Next Follow-up Banner */}
@@ -131,14 +155,16 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
               {dueStateConfig.label}
             </span>
 
-            <button
-              type="button"
-              onClick={() => setSelectedOutcomeFu(activeNextFollowUp)}
-              className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
-            >
-              <ClipboardCheck className="h-3.5 w-3.5" />
-              <span>Record Result</span>
-            </button>
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={() => setSelectedOutcomeFu(activeNextFollowUp)}
+                className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-inverse shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+              >
+                <ClipboardCheck className="h-3.5 w-3.5" />
+                <span>Record Result</span>
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-2 text-xs font-semibold text-ink">
@@ -201,14 +227,20 @@ export function LeadFollowUps({ leadId, nextFollowUp }: LeadFollowUpsProps) {
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setSelectedOutcomeFu(fu)}
-                      className="flex items-center gap-1 rounded-md bg-accent hover:opacity-90 text-inverse px-2.5 py-1 text-xs font-bold shadow-xs transition-all cursor-pointer"
-                    >
-                      <ClipboardCheck className="h-3 w-3" />
-                      <span>Record Result</span>
-                    </button>
+                    {!readOnly ? (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedOutcomeFu(fu)}
+                        className="flex items-center gap-1 rounded-md bg-accent hover:opacity-90 text-inverse px-2.5 py-1 text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
+                      >
+                        <ClipboardCheck className="h-3 w-3" />
+                        <span>Record Result</span>
+                      </button>
+                    ) : (
+                      <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded shrink-0 uppercase tracking-wider">
+                        Pending Rep Action
+                      </span>
+                    )}
                   </div>
                 );
               }

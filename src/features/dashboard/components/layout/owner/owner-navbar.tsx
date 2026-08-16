@@ -25,6 +25,7 @@ export function OwnerNavbar() {
 
   // Determine active route state for clean breadcrumb context
   const isDashboard = pathname === "/owner/dashboard";
+  const isSales = pathname.startsWith("/owner/sales");
   const isInventory = pathname.startsWith("/owner/inventory") || pathname.startsWith("/owner/cars");
   const isSettings = pathname.startsWith("/owner/settings");
   const isTeam = pathname.startsWith("/owner/team");
@@ -67,6 +68,12 @@ export function OwnerNavbar() {
                 <span>Console</span>
               </Link>
               <ChevronRight className="h-3 w-3 text-ink-subtle/50 shrink-0" />
+
+              {isSales && (
+                <div className="flex items-center gap-1.5 font-bold text-ink">
+                  <span>Sales</span>
+                </div>
+              )}
 
               {isInventory && (
                 <div className="flex items-center gap-1.5 font-bold text-ink">

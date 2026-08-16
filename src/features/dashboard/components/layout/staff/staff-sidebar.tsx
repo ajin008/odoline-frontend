@@ -26,7 +26,8 @@ export function StaffSidebar() {
             <span className="font-heading text-[15px] font-semibold tracking-tight text-white leading-tight">
               Cars4
             </span>
-            <span className="text-[10px] font-mono text-emerald-400 font-bold tracking-wider uppercase">
+            <span className="text-[10px] font-mono text-emerald-400/90 font-medium tracking-wider uppercase flex items-center gap-1.5 mt-0.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
               Staff Terminal
             </span>
           </div>

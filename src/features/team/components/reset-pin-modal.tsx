@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { X, KeyRound, Loader2 } from "lucide-react";
+import { X, KeyRound, Loader2, Eye, EyeOff } from "lucide-react";
 import type { StaffMember } from "../types/staff-types";
 import { useStaffActions } from "../hooks/use-staff-actions";
 
@@ -26,6 +27,7 @@ export function ResetPinModal({
   onClose,
   staff,
 }: ResetPinModalProps) {
+  const [showPin, setShowPin] = useState(false);
   const { resetPin } = useStaffActions();
 
   const {
@@ -92,13 +94,28 @@ export function ResetPinModal({
             <label className="text-xs font-semibold text-ink-muted block">
               New 6-Digit PIN <span className="text-rose-500">*</span>
             </label>
-            <input
-              type="password"
-              maxLength={6}
-              placeholder="e.g. 123456"
-              {...register("new_pin")}
-              className="w-full rounded-lg border border-line bg-inset px-3.5 py-2 text-xs font-mono font-bold text-ink tracking-widest text-center focus:outline-none focus:border-accent"
-            />
+            <div className="relative">
+              <input
+                type={showPin ? "text" : "password"}
+                maxLength={6}
+                placeholder="e.g. 123456"
+                {...register("new_pin")}
+                className="w-full rounded-lg border border-line bg-inset pl-3.5 pr-10 py-2 text-xs font-mono font-bold text-ink tracking-widest text-center focus:outline-none focus:border-accent"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPin((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink transition-colors cursor-pointer p-1 rounded-md hover:bg-card/60 flex items-center justify-center"
+                title={showPin ? "Hide PIN" : "Show PIN"}
+                aria-label={showPin ? "Hide PIN" : "Show PIN"}
+              >
+                {showPin ? (
+                  <EyeOff className="h-4 w-4 stroke-[2px]" />
+                ) : (
+                  <Eye className="h-4 w-4 stroke-[2px]" />
+                )}
+              </button>
+            </div>
             {errors.new_pin && (
               <p className="text-[11px] font-semibold text-rose-500">
                 {errors.new_pin.message}

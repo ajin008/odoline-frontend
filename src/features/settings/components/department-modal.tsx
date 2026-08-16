@@ -8,6 +8,7 @@ import { X, Layers, Clock, Calendar, Loader2 } from "lucide-react";
 import type { Department } from "../types/department-types";
 import { WEEKLY_HOLIDAY_LABELS } from "../types/department-types";
 import { useDepartmentActions } from "../hooks/use-department-actions";
+import { FormSelect } from "@/src/components/ui/form-select";
 
 const departmentFormSchema = z
   .object({
@@ -192,28 +193,21 @@ export function DepartmentModal({
             </div>
           </div>
 
-          {/* Weekly Holiday Select */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5 text-ink-subtle" />
-              <span>Weekly Holiday</span> <span className="text-rose-500">*</span>
-            </label>
-            <select
-              {...register("weekly_holiday", { valueAsNumber: true })}
-              className="w-full rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-bold text-ink focus:outline-none focus:border-accent"
-            >
-              {Object.entries(WEEKLY_HOLIDAY_LABELS).map(([val, label]) => (
-                <option key={val} value={val}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            {errors.weekly_holiday && (
-              <p className="text-[11px] font-semibold text-rose-500">
-                {errors.weekly_holiday.message}
-              </p>
-            )}
-          </div>
+          {/* Weekly Holiday Custom Select */}
+          <FormSelect
+            label={
+              <span className="flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-accent" />
+                <span>Weekly Holiday</span> <span className="text-rose-500">*</span>
+              </span>
+            }
+            options={Object.entries(WEEKLY_HOLIDAY_LABELS).map(([val, label]) => ({
+              value: val,
+              label,
+            }))}
+            {...register("weekly_holiday", { valueAsNumber: true })}
+            error={errors.weekly_holiday?.message}
+          />
 
           {/* Modal Footer Actions */}
           <div className="pt-4 border-t border-line flex items-center justify-end gap-2.5">

@@ -7,6 +7,7 @@ import { useStaffActions } from "../hooks/use-staff-actions";
 import { StaffModal } from "./staff-modal";
 import { ResetPinModal } from "./reset-pin-modal";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
+import { toast } from "sonner";
 import {
   X,
   User,
@@ -21,6 +22,8 @@ import {
   RefreshCw,
   CheckCircle2,
   AlertCircle,
+  Copy,
+  Check,
 } from "lucide-react";
 
 interface StaffDetailModalProps {
@@ -40,6 +43,16 @@ export function StaffDetailModal({
   const [isResetPinOpen, setIsResetPinOpen] = useState(false);
   const [isConfirmDeactivateOpen, setIsConfirmDeactivateOpen] = useState(false);
   const [isConfirmActivateOpen, setIsConfirmActivateOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyPhone = () => {
+    if (!staff?.phone) return;
+    const textToCopy = `+91${staff.phone}`;
+    navigator.clipboard.writeText(textToCopy);
+    toast.success(`Copied ${textToCopy} to clipboard!`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (!isOpen || !staff) return null;
 
@@ -125,16 +138,33 @@ export function StaffDetailModal({
             {/* Quick Details Grid */}
             <div className="grid grid-cols-2 gap-3 text-xs">
               {/* Phone */}
-              <div className="space-y-1.5 rounded-lg bg-inset p-3 border border-line/70">
+              <div className="space-y-1.5 rounded-lg bg-inset p-3 border border-line/70 min-w-0">
                 <span className="text-[10px] font-semibold text-ink-subtle uppercase tracking-wider block flex items-center gap-1">
-                  <Phone className="h-3 w-3 text-accent" />
+                  <Phone className="h-3 w-3 text-accent shrink-0" />
                   <span>Mobile Phone</span>
                 </span>
-                <div className="flex items-center justify-between gap-1.5">
-                  <span className="font-mono font-bold text-ink text-[11px] truncate">
-                    +91 {staff.phone}
-                  </span>
+                <div className="flex items-center justify-between gap-1.5 min-w-0">
+                  <button
+                    type="button"
+                    onClick={handleCopyPhone}
+                    className="font-mono font-bold text-ink text-[11px] truncate flex items-center gap-1 hover:text-accent transition-colors cursor-pointer group"
+                    title="Click to copy phone number"
+                  >
+                    <span className="truncate">+91 {staff.phone}</span>
+                  </button>
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleCopyPhone}
+                      className="flex h-6 w-6 items-center justify-center rounded-md border border-line/70 bg-card hover:border-accent/40 hover:bg-inset transition-all cursor-pointer p-0.5"
+                      title={`Copy +91 ${staff.phone}`}
+                    >
+                      {copied ? (
+                        <Check className="h-3 w-3 text-emerald-500 stroke-[2.5px]" />
+                      ) : (
+                        <Copy className="h-3 w-3 text-ink-subtle stroke-[2px]" />
+                      )}
+                    </button>
                     <a
                       href={`tel:+91${staff.phone}`}
                       className="flex h-6 w-6 items-center justify-center rounded-md border border-line/70 bg-card hover:border-accent/40 hover:bg-inset transition-all cursor-pointer p-0.5"
@@ -145,7 +175,7 @@ export function StaffDetailModal({
                         alt="Call"
                         width={14}
                         height={14}
-                        className="object-contain"
+                        className="object-contain shrink-0"
                       />
                     </a>
                     <a
@@ -160,7 +190,7 @@ export function StaffDetailModal({
                         alt="WhatsApp"
                         width={14}
                         height={14}
-                        className="object-contain"
+                        className="object-contain shrink-0"
                       />
                     </a>
                   </div>

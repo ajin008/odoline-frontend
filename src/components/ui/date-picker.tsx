@@ -16,6 +16,8 @@ interface DatePickerProps {
   onChange: (dateStr: string) => void;
   className?: string;
   align?: "left" | "right" | "center";
+  fullWidth?: boolean;
+  placeholder?: string;
 }
 
 /**
@@ -84,7 +86,9 @@ export function DatePicker({
   value,
   onChange,
   className = "",
-  align = "right",
+  align = "left",
+  fullWidth = false,
+  placeholder,
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -235,29 +239,34 @@ export function DatePicker({
     });
   }
 
-  let alignClasses =
-    "left-1/2 -translate-x-1/2 sm:right-0 sm:left-auto sm:translate-x-0";
-  if (align === "left") {
-    alignClasses =
-      "left-1/2 -translate-x-1/2 sm:left-0 sm:right-auto sm:translate-x-0";
+  let alignClasses = "left-0 sm:left-0";
+  if (align === "right") {
+    alignClasses = "right-0 sm:right-0";
   } else if (align === "center") {
     alignClasses = "left-1/2 -translate-x-1/2";
   }
 
   return (
-    <div ref={containerRef} className={`relative inline-block ${className}`}>
+    <div
+      ref={containerRef}
+      className={`relative ${fullWidth ? "w-full block" : "inline-block"} ${className}`}
+    >
       {/* Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl bg-card border border-line shadow-xs hover:border-accent/40 active:scale-[0.99] text-ink transition-all cursor-pointer font-sans"
+        className={`flex items-center ${
+          fullWidth ? "w-full justify-between" : "gap-2.5"
+        } px-3.5 py-2.5 rounded-lg bg-inset border border-line shadow-xs hover:border-accent/40 focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/20 active:scale-[0.99] text-ink transition-all cursor-pointer font-sans`}
       >
-        <CalendarIcon className="h-4 w-4 text-accent stroke-[2.5px]" />
-        <span className="text-xs font-bold font-sans">
-          {formatReadableDate(selectedDateStr)}
-        </span>
+        <div className="flex items-center gap-2 min-w-0">
+          <CalendarIcon className="h-4 w-4 text-accent stroke-[2.5px] shrink-0" />
+          <span className="text-xs font-semibold font-sans text-ink truncate">
+            {value ? formatReadableDate(selectedDateStr) : (placeholder || "Select Date")}
+          </span>
+        </div>
         <ChevronDown
-          className={`h-3.5 w-3.5 text-ink-subtle transition-transform duration-200 ${
+          className={`h-3.5 w-3.5 text-ink-subtle shrink-0 transition-transform duration-200 ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -266,7 +275,7 @@ export function DatePicker({
       {/* Custom Bento Calendar Dropdown Popover */}
       {isOpen && (
         <div
-          className={`absolute top-full mt-2 z-50 w-[290px] max-w-[calc(100vw-2rem)] rounded-2xl border border-line bg-card p-4 shadow-bento animate-in fade-in zoom-in-95 duration-150 font-sans space-y-3 ${alignClasses}`}
+          className={`absolute top-full mt-1.5 z-50 w-[280px] sm:w-[290px] max-w-[calc(100vw-2.5rem)] rounded-2xl border border-line bg-card p-3.5 sm:p-4 shadow-2xl animate-in fade-in zoom-in-95 duration-150 font-sans space-y-3 ${alignClasses}`}
         >
           {/* Header Controls: Month Navigation & Today Shortcut */}
           <div className="flex items-center justify-between border-b border-line/60 pb-3">

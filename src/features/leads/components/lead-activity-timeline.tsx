@@ -23,6 +23,7 @@ import {
 interface LeadActivityTimelineProps {
   leadId: string;
   customerPhone?: string;
+  readOnly?: boolean;
 }
 
 const TYPE_CONFIG: Record<
@@ -89,6 +90,7 @@ function getTypeConfig(type: LeadActivityType) {
 export function LeadActivityTimeline({
   leadId,
   customerPhone,
+  readOnly = false,
 }: LeadActivityTimelineProps) {
   const { data: activities, isLoading, isError } = useLeadActivities(leadId);
   const logActivityMutation = useLogActivity(leadId);
@@ -175,76 +177,78 @@ export function LeadActivityTimeline({
       </div>
 
       {/* Quick Fast-Log Actions Bar - 2x2 Grid for Sidebar & All Screen Widths */}
-      <div className="space-y-1.5">
-        <span className="text-[11px] font-medium text-ink-subtle uppercase tracking-wider">
-          Quick Actions (1-Tap Log)
-        </span>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={handleCall}
-            disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/10 px-2.5 py-2 text-xs font-semibold text-blue-500 hover:bg-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
-          >
-            <Image
-              src="/icons/phonecall-icon.png"
-              alt="Phone Call"
-              width={16}
-              height={16}
-              className="h-4 w-4 object-contain shrink-0"
-            />
-            <span className="truncate">Call</span>
-          </button>
+      {!readOnly && (
+        <div className="space-y-1.5">
+          <span className="text-[11px] font-medium text-ink-subtle uppercase tracking-wider">
+            Quick Actions (1-Tap Log)
+          </span>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={handleCall}
+              disabled={logActivityMutation.isPending}
+              className="flex items-center justify-center gap-2 rounded-lg border border-blue-500/30 bg-blue-500/10 px-2.5 py-2 text-xs font-semibold text-blue-500 hover:bg-blue-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
+            >
+              <Image
+                src="/icons/phonecall-icon.png"
+                alt="Phone Call"
+                width={16}
+                height={16}
+                className="h-4 w-4 object-contain shrink-0"
+              />
+              <span className="truncate">Call</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={handleWhatsApp}
-            disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-2 text-xs font-semibold text-emerald-500 hover:bg-emerald-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
-          >
-            <Image
-              src="/icons/whatsappIcon.png"
-              alt="WhatsApp"
-              width={16}
-              height={16}
-              className="h-4 w-4 object-contain shrink-0"
-            />
-            <span className="truncate">WhatsApp</span>
-          </button>
+            <button
+              type="button"
+              onClick={handleWhatsApp}
+              disabled={logActivityMutation.isPending}
+              className="flex items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-2 text-xs font-semibold text-emerald-500 hover:bg-emerald-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
+            >
+              <Image
+                src="/icons/whatsappIcon.png"
+                alt="WhatsApp"
+                width={16}
+                height={16}
+                className="h-4 w-4 object-contain shrink-0"
+              />
+              <span className="truncate">WhatsApp</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => handleOpenNoteModal("visit")}
-            disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-2.5 py-2 text-xs font-semibold text-purple-500 hover:bg-purple-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
-          >
-            <Image
-              src="/icons/location-visit.png"
-              alt="Visit"
-              width={16}
-              height={16}
-              className="h-4 w-4 object-contain shrink-0"
-            />
-            <span className="truncate">Visit</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => handleOpenNoteModal("visit")}
+              disabled={logActivityMutation.isPending}
+              className="flex items-center justify-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-2.5 py-2 text-xs font-semibold text-purple-500 hover:bg-purple-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
+            >
+              <Image
+                src="/icons/location-visit.png"
+                alt="Visit"
+                width={16}
+                height={16}
+                className="h-4 w-4 object-contain shrink-0"
+              />
+              <span className="truncate">Visit</span>
+            </button>
 
-          <button
-            type="button"
-            onClick={() => handleOpenNoteModal("note")}
-            disabled={logActivityMutation.isPending}
-            className="flex items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-2 text-xs font-semibold text-amber-500 hover:bg-amber-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
-          >
-            <Image
-              src="/icons/Note-icon.png"
-              alt="Note"
-              width={16}
-              height={16}
-              className="h-4 w-4 object-contain shrink-0"
-            />
-            <span className="truncate">Note</span>
-          </button>
+            <button
+              type="button"
+              onClick={() => handleOpenNoteModal("note")}
+              disabled={logActivityMutation.isPending}
+              className="flex items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-2 text-xs font-semibold text-amber-500 hover:bg-amber-500/20 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer shadow-xs min-w-0"
+            >
+              <Image
+                src="/icons/Note-icon.png"
+                alt="Note"
+                width={16}
+                height={16}
+                className="h-4 w-4 object-contain shrink-0"
+              />
+              <span className="truncate">Note</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Timeline List Section */}
       {isLoading ? (

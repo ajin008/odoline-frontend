@@ -133,6 +133,7 @@ export interface Lead {
   created_at: string;
   updated_at: string;
   customer?: Customer;
+  assigned_rep?: { id: string; name: string } | null;
   next_follow_up?: NextFollowUpInfo | null;
   interested_cars?: import("@/src/features/cars/api/cars-api").Car[] | null;
   won_car?: import("@/src/features/cars/api/cars-api").Car | null;

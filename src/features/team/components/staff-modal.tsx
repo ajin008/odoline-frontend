@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/incompatible-library */
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -8,6 +9,8 @@ import Link from "next/link";
 import { useDepartments } from "@/src/features/settings/hooks/use-departments";
 import { useStaffActions } from "../hooks/use-staff-actions";
 import type { StaffMember } from "../types/staff-types";
+import { DatePicker } from "@/src/components/ui/date-picker";
+import { FormSelect } from "@/src/components/ui/form-select";
 import {
   X,
   UserPlus,
@@ -17,6 +20,8 @@ import {
   Calendar,
   Building2,
   Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
 const staffFormSchema = z.object({
@@ -42,7 +47,9 @@ interface StaffModalProps {
 
 export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
   const isEditing = Boolean(staff);
-  const { data: departments = [], isLoading: isDeptLoading } = useDepartments("active");
+  const [showPin, setShowPin] = useState(false);
+  const { data: departments = [], isLoading: isDeptLoading } =
+    useDepartments("active");
   const { createStaff, updateStaff } = useStaffActions();
 
   const {
@@ -50,6 +57,8 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
     handleSubmit,
     reset,
     setError,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<StaffFormData>({
     resolver: zodResolver(staffFormSchema),
@@ -65,7 +74,10 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
     },
   });
 
+  const joinedOnValue = watch("joined_on") || "";
+
   useEffect(() => {
+    setShowPin(false);
     if (staff) {
       reset({
         name: staff.name,
@@ -170,7 +182,10 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="p-6 space-y-4 max-h-[80vh] overflow-y-auto"
+        >
           {/* Name & Phone Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Full Name */}
@@ -221,15 +236,31 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
                 <Lock className="h-3.5 w-3.5 text-accent" />
-                <span>Assign 6-Digit PIN</span> <span className="text-rose-500">*</span>
+                <span>Assign 6-Digit PIN</span>{" "}
+                <span className="text-rose-500">*</span>
               </label>
-              <input
-                type="password"
-                maxLength={6}
-                placeholder="e.g. 123456"
-                {...register("pin")}
-                className="w-full rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-mono font-bold text-ink tracking-widest focus:outline-none focus:border-accent"
-              />
+              <div className="relative">
+                <input
+                  type={showPin ? "text" : "password"}
+                  maxLength={6}
+                  placeholder="e.g. 123456"
+                  {...register("pin")}
+                  className="w-full rounded-lg border border-line bg-inset pl-3.5 pr-10 py-2.5 text-xs font-mono font-bold text-ink tracking-widest focus:outline-none focus:border-accent"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink transition-colors cursor-pointer p-1 rounded-md hover:bg-card/60 flex items-center justify-center"
+                  title={showPin ? "Hide PIN" : "Show PIN"}
+                  aria-label={showPin ? "Hide PIN" : "Show PIN"}
+                >
+                  {showPin ? (
+                    <EyeOff className="h-4 w-4 stroke-[2px]" />
+                  ) : (
+                    <Eye className="h-4 w-4 stroke-[2px]" />
+                  )}
+                </button>
+              </div>
               {errors.pin && (
                 <p className="text-[11px] font-semibold text-rose-500">
                   {errors.pin.message}
@@ -253,74 +284,81 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
               />
             </div>
 
-            {/* Gender */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-ink-muted block">
-                Gender
-              </label>
-              <select
-                {...register("gender")}
-                className="w-full rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-bold text-ink focus:outline-none focus:border-accent"
-              >
-                <option value="">Select Gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+            {/* Custom Gender Dropdown */}
+            <FormSelect
+              label="Gender"
+              options={[
+                { value: "male", label: "Male" },
+                { value: "female", label: "Female" },
+                { value: "other", label: "Other" },
+              ]}
+              placeholder="Select Gender"
+              {...register("gender")}
+              error={errors.gender?.message}
+            />
           </div>
 
-          {/* Department Select (or Warning Alert if 0 Departments) */}
+          {/* Department Custom Dropdown (or Warning Alert if 0 Departments) */}
           <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
-              <Building2 className="h-3.5 w-3.5 text-accent" />
-              <span>Assigned Department</span>
-            </label>
-
             {isDeptLoading ? (
               <div className="h-10 rounded-lg bg-inset border border-line animate-pulse" />
             ) : departments.length === 0 ? (
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
-                <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <p className="font-bold">No active departments found.</p>
-                  <p className="text-[11px] text-amber-700 dark:text-amber-400">
-                    Create showroom departments first in{" "}
-                    <Link
-                      href="/owner/settings?tab=department"
-                      onClick={onClose}
-                      className="underline font-bold hover:text-amber-900"
-                    >
-                      Settings → Department
-                    </Link>.
-                  </p>
+              <>
+                <label className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
+                  <Building2 className="h-3.5 w-3.5 text-accent" />
+                  <span>Assigned Department</span>
+                </label>
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="font-bold">No active departments found.</p>
+                    <p className="text-[11px] text-amber-700 dark:text-amber-400">
+                      Create showroom departments first in{" "}
+                      <Link
+                        href="/owner/settings?tab=department"
+                        onClick={onClose}
+                        className="underline font-bold hover:text-amber-900"
+                      >
+                        Settings → Department
+                      </Link>
+                      .
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </>
             ) : (
-              <select
+              <FormSelect
+                label={
+                  <span className="flex items-center gap-1.5">
+                    <Building2 className="h-3.5 w-3.5 text-accent" />
+                    <span>Assigned Department</span>
+                  </span>
+                }
+                options={departments.map((dept) => ({
+                  value: dept.id,
+                  label: dept.name,
+                }))}
+                placeholder="No Department Assigned"
                 {...register("department_id")}
-                className="w-full rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-bold text-ink focus:outline-none focus:border-accent"
-              >
-                <option value="">No Department Assigned</option>
-                {departments.map((dept) => (
-                  <option key={dept.id} value={dept.id}>
-                    {dept.name}
-                  </option>
-                ))}
-              </select>
+                error={errors.department_id?.message}
+              />
             )}
           </div>
 
-          {/* Joined Date */}
+          {/* Date Joined Calendar Component */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
-              <Calendar className="h-3.5 w-3.5 text-ink-subtle" />
+              <Calendar className="h-3.5 w-3.5 text-accent" />
               <span>Date Joined</span>
             </label>
-            <input
-              type="date"
-              {...register("joined_on")}
-              className="w-full rounded-lg border border-line bg-inset px-3.5 py-2 text-xs font-mono font-bold text-ink focus:outline-none focus:border-accent"
+            <DatePicker
+              value={joinedOnValue}
+              onChange={(dateStr) =>
+                setValue("joined_on", dateStr, { shouldValidate: true })
+              }
+              align="left"
+              fullWidth
+              placeholder="Select date joined"
             />
           </div>
 
@@ -352,7 +390,9 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
               className="inline-flex items-center gap-2 rounded-lg bg-accent px-5 py-2 text-xs font-bold text-inverse hover:bg-accent-hover active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50"
             >
               {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-              <span>{isEditing ? "Save Staff Profile" : "Create Staff User"}</span>
+              <span>
+                {isEditing ? "Save Staff Profile" : "Create Staff User"}
+              </span>
             </button>
           </div>
         </form>

@@ -26,8 +26,8 @@
   /* System state colors */
   --state-danger: #dc2626;
   --state-danger-light: rgba(220, 38, 38, 0.09);
-  --state-success: #00d66f;
-  --state-success-light: rgba(0, 214, 111, 0.09);
+  --state-success: #10b981;
+  --state-success-light: rgba(16, 185, 129, 0.09);
   --state-warning: #d97706;
   --state-warning-light: rgba(217, 119, 6, 0.09);
 
@@ -67,15 +67,17 @@
   --color-warning: var(--state-warning);
   --color-warning-light: var(--state-warning-light);
 
-  /* Custom Green Brand Overrides (#00d66f) */
-  --color-emerald-400: #00d66f;
-  --color-emerald-500: #00d66f;
-  --color-emerald-600: #00d66f;
-  --color-emerald-700: #00b35c;
-  --color-green-400: #00d66f;
-  --color-green-500: #00d66f;
-  --color-green-600: #00d66f;
-  --color-green-700: #00b35c;
+  /* Refined Professional Emerald Palette */
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
 
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
