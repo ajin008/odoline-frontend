@@ -214,18 +214,18 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
         </div>
 
         {/* Detailed Info Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-3.5 sm:gap-4 text-xs">
           {/* Phone Card with Copy, Call & WhatsApp Buttons */}
-          <div className="space-y-2 rounded-xl bg-inset p-4 border border-line/70 min-w-0">
+          <div className="space-y-2 rounded-xl bg-inset p-3.5 sm:p-4 border border-line/70 min-w-0">
             <span className="text-[10px] font-semibold text-ink-subtle uppercase tracking-wider flex items-center gap-1">
               <Phone className="h-3 w-3 text-accent shrink-0" />
               <span>Mobile Phone</span>
             </span>
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-0.5 min-w-0">
               <button
                 type="button"
                 onClick={handleCopyPhone}
-                className="font-mono font-bold text-ink text-sm shrink-0 flex items-center gap-1.5 hover:text-accent transition-colors cursor-pointer group"
+                className="font-mono font-bold text-ink text-sm flex items-center gap-1.5 hover:text-accent transition-colors cursor-pointer group shrink-0"
                 title="Click to copy phone number"
               >
                 <span>+91 {staff.phone}</span>
@@ -236,36 +236,36 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
                 )}
               </button>
 
-              <div className="flex items-center gap-1.5 shrink-0 flex-wrap">
+              <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto min-w-0">
                 {/* Copy Button */}
                 <button
                   type="button"
                   onClick={handleCopyPhone}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-accent hover:border-accent/40 active:scale-[0.98] transition-all font-bold text-xs shrink-0 cursor-pointer shadow-2xs"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-accent hover:border-accent/40 active:scale-[0.98] transition-all font-bold text-xs cursor-pointer shadow-2xs min-w-0"
                   title={`Copy +91 ${staff.phone}`}
                 >
                   {copied ? (
-                    <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5px]" />
+                    <Check className="h-3.5 w-3.5 text-emerald-500 stroke-[2.5px] shrink-0" />
                   ) : (
-                    <Copy className="h-3.5 w-3.5 stroke-[2px]" />
+                    <Copy className="h-3.5 w-3.5 stroke-[2px] shrink-0" />
                   )}
-                  <span>{copied ? "Copied!" : "Copy"}</span>
+                  <span className="truncate">{copied ? "Copied!" : "Copy"}</span>
                 </button>
 
                 {/* Call Button */}
                 <a
                   href={`tel:+91${staff.phone}`}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-ink hover:border-accent/40 transition-all font-bold text-xs shrink-0 shadow-2xs"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-ink hover:border-accent/40 transition-all font-bold text-xs shadow-2xs min-w-0"
                   title={`Call +91 ${staff.phone}`}
                 >
                   <Image
                     src="/icons/phonecall-icon.png"
                     alt="Call"
-                    width={15}
-                    height={15}
+                    width={14}
+                    height={14}
                     className="object-contain shrink-0"
                   />
-                  <span>Call</span>
+                  <span className="truncate">Call</span>
                 </a>
 
                 {/* WhatsApp Button */}
@@ -273,17 +273,17 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
                   href={`https://wa.me/91${staff.phone}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-emerald-600 hover:border-emerald-500/40 transition-all font-bold text-xs shrink-0 shadow-2xs"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-card border border-line text-ink-muted hover:text-emerald-600 hover:border-emerald-500/40 transition-all font-bold text-xs shadow-2xs min-w-0"
                   title={`WhatsApp chat +91 ${staff.phone}`}
                 >
                   <Image
                     src="/icons/whatsappIcon.png"
                     alt="WhatsApp"
-                    width={15}
-                    height={15}
+                    width={14}
+                    height={14}
                     className="object-contain shrink-0"
                   />
-                  <span>WhatsApp</span>
+                  <span className="truncate">WhatsApp</span>
                 </a>
               </div>
             </div>
