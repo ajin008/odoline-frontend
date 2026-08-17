@@ -24,6 +24,7 @@ import {
   CartesianGrid,
   Cell,
 } from "recharts";
+import { CustomSelect } from "@/src/components/ui/custom-select";
 import { useDashboardFunnel } from "../hooks/use-dashboard-funnel";
 
 const ACCENT_SHADES = [
@@ -298,27 +299,17 @@ export function OwnerFunnelDashboard() {
       {/* PERIOD SELECTOR DROPDOWN & DATE RANGE HEADER BAR              */}
       {/* ------------------------------------------------------------- */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-card p-2.5 sm:p-3 rounded-xl border border-line/60">
-        {/* Period Dropdown Selector */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-ink-subtle text-xs font-semibold shrink-0">
-            <Filter className="h-3.5 w-3.5 text-accent" />
-            <span>Period Filter:</span>
-          </div>
-          <div className="relative">
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value as PeriodKey)}
-              className="appearance-none bg-inset border border-line/60 text-ink text-xs font-bold rounded-lg pl-3 pr-8 py-1.5 focus:outline-none focus:border-accent cursor-pointer transition-colors"
-            >
-              {PERIOD_OPTIONS.map((opt) => (
-                <option key={opt.key} value={opt.key}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-subtle" />
-          </div>
-        </div>
+        {/* Custom Period Dropdown Selector */}
+        <CustomSelect
+          options={PERIOD_OPTIONS.map((opt) => ({
+            value: opt.key,
+            label: opt.label,
+          }))}
+          value={period}
+          onChange={(val) => setPeriod(val as PeriodKey)}
+          icon={<Filter className="h-3.5 w-3.5 text-accent" />}
+          labelPrefix="Period Filter:"
+        />
 
         {/* Resolved Date Range Badge */}
         {resolvedDateLabel && (
@@ -394,13 +385,6 @@ export function OwnerFunnelDashboard() {
                 Stage progression ({resolvedDateLabel || periodTitleSuffix})
               </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-medium">
-            <span className="flex items-center gap-1.5 text-ink-muted bg-inset border border-line/50 px-2.5 py-1 rounded-md">
-              <span className="h-2 w-2 rounded-full bg-[#7c3aed]" />
-              Single Accent Color
-            </span>
           </div>
         </div>
 
