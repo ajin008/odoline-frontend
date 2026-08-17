@@ -12,7 +12,6 @@ import {
   AlertCircle,
   Calendar,
   BarChart3,
-  ChevronDown,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -87,7 +86,12 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   return null;
 }
 
-function CustomBarLabel({ x = 0, y = 0, width = 0, value }: CustomBarLabelProps) {
+function CustomBarLabel({
+  x = 0,
+  y = 0,
+  width = 0,
+  value,
+}: CustomBarLabelProps) {
   if (value === undefined || value === null) return null;
   return (
     <text
@@ -172,10 +176,13 @@ export function OwnerFunnelDashboard() {
       <div className="rounded-xl border border-rose-500/20 bg-rose-500/5 p-4 sm:p-5 font-sans select-none text-rose-600 space-y-3">
         <div className="flex items-center gap-2">
           <AlertCircle className="h-4.5 w-4.5 shrink-0" />
-          <h3 className="text-xs sm:text-sm font-bold">Failed to load CRM Funnel data</h3>
+          <h3 className="text-xs sm:text-sm font-bold">
+            Failed to load CRM Funnel data
+          </h3>
         </div>
         <p className="text-xs text-rose-600/80">
-          An error occurred while fetching funnel stats. Please check your connection and try again.
+          An error occurred while fetching funnel stats. Please check your
+          connection and try again.
         </p>
         <button
           type="button"
@@ -216,37 +223,55 @@ export function OwnerFunnelDashboard() {
       name: "New",
       fullLabel: "New Enquiries",
       count: funnel.new,
-      share: metrics.new_in_period > 0 ? Math.round((funnel.new / metrics.new_in_period) * 100) : 0,
+      share:
+        metrics.new_in_period > 0
+          ? Math.round((funnel.new / metrics.new_in_period) * 100)
+          : 0,
     },
     {
       name: "Contacted",
       fullLabel: "Contacted & Qualified",
       count: funnel.contacted,
-      share: metrics.new_in_period > 0 ? Math.round((funnel.contacted / metrics.new_in_period) * 100) : 0,
+      share:
+        metrics.new_in_period > 0
+          ? Math.round((funnel.contacted / metrics.new_in_period) * 100)
+          : 0,
     },
     {
       name: "Test Drive",
       fullLabel: "Test Drive Scheduled",
       count: funnel.test_drive,
-      share: metrics.new_in_period > 0 ? Math.round((funnel.test_drive / metrics.new_in_period) * 100) : 0,
+      share:
+        metrics.new_in_period > 0
+          ? Math.round((funnel.test_drive / metrics.new_in_period) * 100)
+          : 0,
     },
     {
       name: "Discussion",
       fullLabel: "Price Discussion / Offer",
       count: funnel.discussion,
-      share: metrics.new_in_period > 0 ? Math.round((funnel.discussion / metrics.new_in_period) * 100) : 0,
+      share:
+        metrics.new_in_period > 0
+          ? Math.round((funnel.discussion / metrics.new_in_period) * 100)
+          : 0,
     },
     {
       name: "Won",
       fullLabel: "Won (Closed Deal)",
       count: funnel.won,
-      share: metrics.new_in_period > 0 ? Math.round((funnel.won / metrics.new_in_period) * 100) : 0,
+      share:
+        metrics.new_in_period > 0
+          ? Math.round((funnel.won / metrics.new_in_period) * 100)
+          : 0,
     },
     {
       name: "Lost",
       fullLabel: "Lost / Closed",
       count: funnel.lost,
-      share: metrics.new_in_period > 0 ? Math.round((funnel.lost / metrics.new_in_period) * 100) : 0,
+      share:
+        metrics.new_in_period > 0
+          ? Math.round((funnel.lost / metrics.new_in_period) * 100)
+          : 0,
     },
   ];
 
@@ -255,7 +280,8 @@ export function OwnerFunnelDashboard() {
       label: "New Leads",
       value: metrics.new_in_period,
       icon: UserPlus,
-      color: "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
+      color:
+        "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
       subtitle: `Created in ${periodTitleSuffix}`,
       isLive: false,
     },
@@ -263,7 +289,8 @@ export function OwnerFunnelDashboard() {
       label: "Won Deals",
       value: metrics.won_in_period,
       icon: Trophy,
-      color: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+      color:
+        "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
       subtitle: `Closed won in ${periodTitleSuffix}`,
       isLive: false,
     },
@@ -271,7 +298,8 @@ export function OwnerFunnelDashboard() {
       label: "Lost Leads",
       value: metrics.lost_in_period,
       icon: XCircle,
-      color: "text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20",
+      color:
+        "text-rose-600 dark:text-rose-400 bg-rose-500/10 border-rose-500/20",
       subtitle: `Closed lost in ${periodTitleSuffix}`,
       isLive: false,
     },
@@ -279,7 +307,8 @@ export function OwnerFunnelDashboard() {
       label: "Conversion Rate",
       value: conversionPct,
       icon: Percent,
-      color: "text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20",
+      color:
+        "text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20",
       subtitle: "Won / (Won + Lost)",
       isLive: false,
     },
@@ -394,9 +423,12 @@ export function OwnerFunnelDashboard() {
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-inset text-ink-subtle mb-1">
               <Filter className="h-5 w-5 stroke-[1.5px]" />
             </div>
-            <h4 className="text-xs sm:text-sm font-bold text-ink">No Leads Created in This Period</h4>
+            <h4 className="text-xs sm:text-sm font-bold text-ink">
+              No Leads Created in This Period
+            </h4>
             <p className="text-[11px] text-ink-subtle max-w-xs">
-              No new customer leads were recorded in {periodTitleSuffix}. Try selecting a different period above.
+              No new customer leads were recorded in {periodTitleSuffix}. Try
+              selecting a different period above.
             </p>
           </div>
         ) : (
@@ -424,7 +456,11 @@ export function OwnerFunnelDashboard() {
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fontSize: 10, fill: "#64748b", fontFamily: "monospace" }}
+                  tick={{
+                    fontSize: 10,
+                    fill: "#64748b",
+                    fontFamily: "monospace",
+                  }}
                   allowDecimals={false}
                 />
                 <Tooltip
@@ -452,4 +488,3 @@ export function OwnerFunnelDashboard() {
     </div>
   );
 }
-
