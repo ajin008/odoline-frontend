@@ -10,81 +10,29 @@ import {
   Filter,
   RefreshCw,
   AlertCircle,
-  CheckCircle2,
   Calendar,
   BarChart3,
   ChevronDown,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Cell,
+} from "recharts";
 import { useDashboardFunnel } from "../hooks/use-dashboard-funnel";
-import type { LeadStage } from "../types/lead-types";
 
-interface StageConfig {
-  key: LeadStage;
-  stepNumber: string;
-  label: string;
-  isTerminal: boolean;
-  barColor: string;
-  badgeBg: string;
-  textColor: string;
-}
-
-// MANDATE: STAGE_CONFIGS MUST REMAIN IN STRICT JOURNEY ORDER (New -> Contacted -> Test Drive -> Discussion -> Won -> Lost)
-// DO NOT SORT BY COUNT!
-const STAGE_CONFIGS: StageConfig[] = [
-  {
-    key: "new",
-    stepNumber: "01",
-    label: "New Enquiries",
-    isTerminal: false,
-    barColor: "bg-blue-600 dark:bg-blue-500",
-    badgeBg: "bg-blue-500/10 border-blue-500/20 text-blue-600 dark:text-blue-400",
-    textColor: "text-blue-600 dark:text-blue-400",
-  },
-  {
-    key: "contacted",
-    stepNumber: "02",
-    label: "Contacted & Qualified",
-    isTerminal: false,
-    barColor: "bg-indigo-600 dark:bg-indigo-500",
-    badgeBg: "bg-indigo-500/10 border-indigo-500/20 text-indigo-600 dark:text-indigo-400",
-    textColor: "text-indigo-600 dark:text-indigo-400",
-  },
-  {
-    key: "test_drive",
-    stepNumber: "03",
-    label: "Test Drive Scheduled",
-    isTerminal: false,
-    barColor: "bg-purple-600 dark:bg-purple-500",
-    badgeBg: "bg-purple-500/10 border-purple-500/20 text-purple-600 dark:text-purple-400",
-    textColor: "text-purple-600 dark:text-purple-400",
-  },
-  {
-    key: "discussion",
-    stepNumber: "04",
-    label: "Price Discussion / Offer",
-    isTerminal: false,
-    barColor: "bg-amber-500 dark:bg-amber-400",
-    badgeBg: "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400",
-    textColor: "text-amber-600 dark:text-amber-400",
-  },
-  {
-    key: "won",
-    stepNumber: "05",
-    label: "Won (Closed Deal)",
-    isTerminal: true,
-    barColor: "bg-emerald-600 dark:bg-emerald-500",
-    badgeBg: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400",
-    textColor: "text-emerald-600 dark:text-emerald-400",
-  },
-  {
-    key: "lost",
-    stepNumber: "06",
-    label: "Lost / Closed",
-    isTerminal: true,
-    barColor: "bg-rose-600 dark:bg-rose-500",
-    badgeBg: "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400",
-    textColor: "text-rose-600 dark:text-rose-400",
-  },
+const ACCENT_SHADES = [
+  "#a78bfa", // violet-400
+  "#8b5cf6", // violet-500
+  "#7c3aed", // violet-600 (base accent)
+  "#6d28d9", // violet-700
+  "#5b21b6", // violet-800
+  "#4c1d95", // violet-900
 ];
 
 const PERIOD_OPTIONS = [
@@ -96,6 +44,62 @@ const PERIOD_OPTIONS = [
 ] as const;
 
 type PeriodKey = (typeof PERIOD_OPTIONS)[number]["key"];
+
+interface ChartDataItem {
+  name: string;
+  fullLabel: string;
+  count: number;
+  share: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: ChartDataItem;
+  }>;
+}
+
+interface CustomBarLabelProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  value?: number;
+}
+
+function CustomTooltip({ active, payload }: CustomTooltipProps) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="rounded-xl border border-line bg-card/95 backdrop-blur-md px-3.5 py-2.5 shadow-xl text-xs font-sans space-y-1">
+        <p className="font-bold text-ink text-xs">{data.fullLabel}</p>
+        <div className="flex items-center gap-3 text-[11px] font-mono text-ink-subtle">
+          <span>
+            Leads: <strong className="text-ink font-bold">{data.count}</strong>
+          </span>
+          <span>
+            Share: <strong className="text-ink font-bold">{data.share}%</strong>
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
+function CustomBarLabel({ x = 0, y = 0, width = 0, value }: CustomBarLabelProps) {
+  if (value === undefined || value === null) return null;
+  return (
+    <text
+      x={x + width / 2}
+      y={y - 8}
+      fill="currentColor"
+      textAnchor="middle"
+      className="font-mono text-xs font-bold text-ink fill-current"
+    >
+      {value}
+    </text>
+  );
+}
 
 export function OwnerFunnelDashboard() {
   const [period, setPeriod] = useState<PeriodKey>("this_month");
@@ -156,11 +160,7 @@ export function OwnerFunnelDashboard() {
 
         <div className="rounded-xl border border-line/50 bg-card p-4 space-y-3">
           <div className="h-5 w-44 rounded bg-inset" />
-          <div className="space-y-3 pt-1">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-9 rounded-md bg-inset w-full" />
-            ))}
-          </div>
+          <div className="h-64 rounded-md bg-inset w-full" />
         </div>
       </div>
     );
@@ -210,15 +210,44 @@ export function OwnerFunnelDashboard() {
       ? `${(metrics.conversion_rate * 100).toFixed(0)}%`
       : "0%";
 
-  const maxStageCount = Math.max(
-    funnel.new,
-    funnel.contacted,
-    funnel.test_drive,
-    funnel.discussion,
-    funnel.won,
-    funnel.lost,
-    1
-  );
+  const chartData = [
+    {
+      name: "New",
+      fullLabel: "New Enquiries",
+      count: funnel.new,
+      share: metrics.new_in_period > 0 ? Math.round((funnel.new / metrics.new_in_period) * 100) : 0,
+    },
+    {
+      name: "Contacted",
+      fullLabel: "Contacted & Qualified",
+      count: funnel.contacted,
+      share: metrics.new_in_period > 0 ? Math.round((funnel.contacted / metrics.new_in_period) * 100) : 0,
+    },
+    {
+      name: "Test Drive",
+      fullLabel: "Test Drive Scheduled",
+      count: funnel.test_drive,
+      share: metrics.new_in_period > 0 ? Math.round((funnel.test_drive / metrics.new_in_period) * 100) : 0,
+    },
+    {
+      name: "Discussion",
+      fullLabel: "Price Discussion / Offer",
+      count: funnel.discussion,
+      share: metrics.new_in_period > 0 ? Math.round((funnel.discussion / metrics.new_in_period) * 100) : 0,
+    },
+    {
+      name: "Won",
+      fullLabel: "Won (Closed Deal)",
+      count: funnel.won,
+      share: metrics.new_in_period > 0 ? Math.round((funnel.won / metrics.new_in_period) * 100) : 0,
+    },
+    {
+      name: "Lost",
+      fullLabel: "Lost / Closed",
+      count: funnel.lost,
+      share: metrics.new_in_period > 0 ? Math.round((funnel.lost / metrics.new_in_period) * 100) : 0,
+    },
+  ];
 
   const conversionCards = [
     {
@@ -348,18 +377,18 @@ export function OwnerFunnelDashboard() {
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* 2. MINIMALIST HORIZONTAL BAR FUNNEL CHART (FULLY RESPONSIVE) */}
+      {/* 2. RECHARTS MINIMALIST STAGE DISTRIBUTION COLUMN CHART        */}
       {/* ------------------------------------------------------------- */}
-      <div className="rounded-xl border border-line/60 bg-card p-4 sm:p-5 space-y-4">
+      <div className="rounded-xl border border-line/60 bg-card p-4 sm:p-6 space-y-4">
         {/* Header Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line/40 pb-3">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line/40 pb-4">
+          <div className="flex items-center gap-2.5">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 border border-accent/20 text-accent shrink-0">
               <BarChart3 className="h-4 w-4 stroke-[2px]" />
             </div>
             <div>
               <h3 className="text-xs sm:text-sm font-bold text-ink font-heading leading-tight">
-                Dealership Sales Funnel
+                Stage Distribution
               </h3>
               <p className="text-[11px] text-ink-subtle">
                 Stage progression ({resolvedDateLabel || periodTitleSuffix})
@@ -368,20 +397,16 @@ export function OwnerFunnelDashboard() {
           </div>
 
           <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-medium">
-            <span className="flex items-center gap-1 text-accent bg-accent/10 border border-accent/20 px-2 py-0.5 rounded-md">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse" />
-              Active (4)
-            </span>
-            <span className="flex items-center gap-1 text-ink-muted bg-inset border border-line/60 px-2 py-0.5 rounded-md">
-              <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-              Closed (2)
+            <span className="flex items-center gap-1.5 text-ink-muted bg-inset border border-line/50 px-2.5 py-1 rounded-md">
+              <span className="h-2 w-2 rounded-full bg-[#7c3aed]" />
+              Single Accent Color
             </span>
           </div>
         </div>
 
         {/* Empty State Banner when no leads in selected period */}
         {metrics.new_in_period === 0 ? (
-          <div className="flex flex-col items-center justify-center py-8 text-center space-y-1.5 select-none">
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-1.5 select-none">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-inset text-ink-subtle mb-1">
               <Filter className="h-5 w-5 stroke-[1.5px]" />
             </div>
@@ -391,71 +416,56 @@ export function OwnerFunnelDashboard() {
             </p>
           </div>
         ) : (
-          /* Minimalist Horizontal Bar Stack Chart */
-          <div className="space-y-3 pt-0.5">
-            <div className="space-y-2.5">
-              {STAGE_CONFIGS.map((config) => {
-                const count = funnel[config.key] ?? 0;
-                const barWidthPct =
-                  count > 0 ? Math.max((count / maxStageCount) * 100, 3) : 0;
-                const shareOfPeriodPct =
-                  metrics.new_in_period > 0
-                    ? Math.round((count / metrics.new_in_period) * 100)
-                    : 0;
-
-                return (
-                  <div key={config.key} className="space-y-1">
-                    {/* Stage Label & Details Row */}
-                    <div className="flex items-center justify-between text-xs gap-2">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-mono text-[10px] text-ink-subtle shrink-0">
-                          {config.stepNumber}
-                        </span>
-
-                        <span
-                          className={`text-[9px] font-bold uppercase px-1.5 py-0.2 rounded border shrink-0 ${config.badgeBg}`}
-                        >
-                          {config.isTerminal ? "Closed" : "Active"}
-                        </span>
-
-                        <span className="font-semibold text-ink font-sans text-xs truncate">
-                          {config.label}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2 font-mono shrink-0">
-                        <span className="text-[10px] text-ink-subtle hidden sm:inline">
-                          {shareOfPeriodPct}%
-                        </span>
-                        <span
-                          className={`text-[11px] font-bold px-2 py-0.2 rounded bg-inset border border-line/60 ${config.textColor}`}
-                        >
-                          {count}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Clean Minimalist Horizontal Bar */}
-                    <div className="relative h-4 sm:h-5 w-full rounded-md bg-inset overflow-hidden border border-line/30">
-                      <div
-                        className={`h-full rounded-md ${config.barColor} transition-all duration-300 ease-out`}
-                        style={{ width: `${barWidthPct}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Bottom Chart Axis Labels */}
-            <div className="flex justify-between text-[10px] font-mono text-ink-subtle px-1 pt-2 border-t border-line/40">
-              <span>0</span>
-              <span>{Math.round(maxStageCount * 0.5)}</span>
-              <span className="font-bold text-ink">{maxStageCount} max</span>
-            </div>
+          /* Recharts Minimalist Column Chart */
+          <div className="h-64 sm:h-72 w-full pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                margin={{ top: 24, right: 16, left: -16, bottom: 8 }}
+                barCategoryGap="25%"
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="var(--line, rgba(0,0,0,0.06))"
+                  opacity={0.5}
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 11, fill: "#64748b", fontWeight: 500 }}
+                  dy={6}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: "#64748b", fontFamily: "monospace" }}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  content={<CustomTooltip />}
+                  cursor={{ fill: "rgba(124, 58, 237, 0.04)" }}
+                />
+                <Bar
+                  dataKey="count"
+                  radius={[6, 6, 0, 0]}
+                  maxBarSize={44}
+                  label={<CustomBarLabel />}
+                >
+                  {chartData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={ACCENT_SHADES[index % ACCENT_SHADES.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         )}
       </div>
     </div>
   );
 }
+
