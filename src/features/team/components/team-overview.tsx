@@ -9,6 +9,7 @@ import { getTelUrl, getWhatsAppUrl } from "@/src/utils/phone";
 import { DatePicker } from "@/src/components/ui/date-picker";
 import { ManualAttendanceModal } from "./manual-attendance-modal";
 import { toast } from "sonner";
+import { formatLateness } from "@/src/lib/formatters";
 import {
   CheckCircle2,
   UserX,
@@ -431,7 +432,7 @@ export function TeamOverview() {
                       ) : staff.minutes_late && staff.minutes_late > 0 ? (
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
                           <Clock className="h-3 w-3 text-amber-600" />
-                          <span>{staff.minutes_late}m Late</span>
+                          <span>{formatLateness(staff.minutes_late)}</span>
                         </span>
                       ) : (
                         <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
@@ -615,7 +616,7 @@ export function TeamOverview() {
 
                         {staff.minutes_late && staff.minutes_late > 0 ? (
                           <span className="text-[10px] font-bold font-mono text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                            {staff.minutes_late}m Late
+                            {formatLateness(staff.minutes_late)}
                           </span>
                         ) : (
                           <span className="text-[10px] font-medium text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">

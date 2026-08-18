@@ -6,6 +6,7 @@ import type {
   StaffHeatmapDayEntry,
   StaffHeatmapDayStatus,
 } from "@/src/features/attendance/types/attendance-types";
+import { formatLateness } from "@/src/lib/formatters";
 import {
   Calendar,
   ChevronLeft,
@@ -318,7 +319,7 @@ export function StaffAttendanceHeatmap({
                 </div>
                 {activeDayHover.minutes_late ? (
                   <span className="text-[10px] font-bold text-amber-700 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                    {activeDayHover.minutes_late}m Late
+                    {formatLateness(activeDayHover.minutes_late)}
                   </span>
                 ) : null}
               </div>
