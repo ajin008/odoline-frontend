@@ -18,6 +18,7 @@ export interface CustomSelectProps<T extends string | number = string> {
   labelPrefix?: string;
   placeholder?: string;
   className?: string;
+  buttonClassName?: string;
   disabled?: boolean;
 }
 
@@ -29,6 +30,7 @@ export function CustomSelect<T extends string | number = string>({
   labelPrefix,
   placeholder = "Select an option",
   className = "",
+  buttonClassName = "",
   disabled = false,
 }: CustomSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -86,11 +88,12 @@ export function CustomSelect<T extends string | number = string>({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         className={[
-          "group flex items-center justify-between gap-2.5 rounded-lg border bg-inset px-3 py-1.5 text-xs font-bold transition-all duration-200 outline-none cursor-pointer",
+          "group flex items-center justify-between gap-2.5 rounded-xl border bg-surface px-3 h-8.5 text-xs font-semibold transition-all duration-200 outline-none cursor-pointer w-full",
           isOpen
             ? "border-accent bg-card ring-2 ring-accent/20 text-ink shadow-xs"
             : "border-line/60 hover:border-line hover:bg-card text-ink",
           disabled ? "opacity-50 cursor-not-allowed" : "",
+          buttonClassName,
         ].join(" ")}
       >
         <div className="flex items-center gap-1.5 min-w-0">

@@ -6,6 +6,7 @@ import { useInfiniteLeads } from "../hooks/use-infinite-leads";
 import { useStaff } from "@/src/features/team/hooks/use-staff";
 import { LeadCard } from "./lead-card";
 import type { LeadPriority } from "../types/lead-types";
+import { CustomSelect } from "@/src/components/ui/custom-select";
 import {
   Users,
   User,
@@ -166,9 +167,9 @@ export function LeadList({
         </div>
 
         {/* Row 2: Search Bar & Staff Filter & Priority Dropdown */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-0.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-0.5">
           {/* Debounced Search Bar */}
-          <div className="relative flex-1 sm:w-64 lg:w-80">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-subtle pointer-events-none shrink-0" />
             <input
               type="text"
@@ -190,25 +191,22 @@ export function LeadList({
           </div>
 
           {/* Filters Group: Staff Filter & Priority Select Dropdown */}
-          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
             {/* Owner Staff Filter Dropdown */}
             {showStaffFilter && (
-              <div className="relative shrink-0 w-full sm:w-48">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-subtle pointer-events-none shrink-0" />
-                <select
-                  value={selectedStaffId || ""}
-                  onChange={(e) => setSelectedStaffId(e.target.value || undefined)}
-                  className="w-full h-8.5 appearance-none rounded-xl border border-line/60 bg-surface pl-9 pr-8 text-xs font-semibold text-ink transition-colors hover:border-line focus:border-accent focus:outline-none cursor-pointer"
-                >
-                  <option value="">All staff</option>
-                  {staffList.map((staff) => (
-                    <option key={staff.id} value={staff.id}>
-                      {staff.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-subtle" />
-              </div>
+              <CustomSelect
+                options={[
+                  { value: "", label: "All staff" },
+                  ...staffList.map((staff) => ({
+                    value: staff.id,
+                    label: staff.name,
+                  })),
+                ]}
+                value={selectedStaffId || ""}
+                onChange={(val) => setSelectedStaffId(val ? String(val) : undefined)}
+                icon={<User className="h-3.5 w-3.5" />}
+                className="w-full sm:w-44"
+              />
             )}
 
             {/* Priority Select Dropdown (Active Tab Only) */}
