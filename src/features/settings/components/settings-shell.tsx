@@ -64,8 +64,8 @@ export function SettingsShell() {
                 className={[
                   "flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
                   isActive
-                    ? "bg-accent text-inverse shadow-xs"
-                    : "text-ink-muted hover:text-ink",
+                    ? "bg-accent text-inverse font-bold"
+                    : "text-ink-muted hover:text-ink font-medium",
                 ].join(" ")}
               >
                 <Icon

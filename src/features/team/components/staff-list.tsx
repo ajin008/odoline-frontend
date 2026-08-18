@@ -78,7 +78,7 @@ export function StaffList({
         <div
           key={staff.id}
           onClick={() => onSelectStaff(staff)}
-          className="relative group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-line/90 bg-card hover:border-accent/40 hover:bg-card-hover shadow-bento transition-all cursor-pointer"
+          className="relative group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-line/60 bg-card hover:border-line transition-all cursor-pointer"
         >
           {/* Left: Avatar + Name + Position */}
           <div className="flex items-center gap-3.5 min-w-0 flex-1 pr-16 sm:pr-0">
@@ -101,7 +101,7 @@ export function StaffList({
               {/* Green dot indicator for active staff */}
               {staff.is_active && (
                 <span
-                  className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-card shadow-xs"
+                  className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-card"
                   title="Active Staff Member"
                 />
               )}

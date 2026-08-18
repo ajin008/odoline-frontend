@@ -42,24 +42,14 @@ export function ProfileSettings() {
     );
   }
 
-  const formattedLastLogin = user?.last_login_at
-    ? new Date(user.last_login_at).toLocaleString("en-IN", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "Active Session";
-
   return (
-    <div className="space-y-6 select-none font-sans max-w-2xl">
+    <div className="space-y-6 select-none font-sans max-w-4xl">
       {/* ------------------------------------------------------------- */}
       {/* PART 1: USER PROFILE (READONLY WITH PHOTO ACTION)             */}
       {/* ------------------------------------------------------------- */}
-      <div className="rounded-xl border border-line bg-card p-4 sm:p-6 space-y-5">
+      <div className="rounded-xl border border-line/60 bg-card p-5 sm:p-6 space-y-6">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line pb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-line/40 pb-5">
           <div className="flex items-center gap-3.5">
             {/* Interactive Profile Photo Avatar */}
             <div className="relative group shrink-0">
@@ -75,7 +65,7 @@ export function ProfileSettings() {
                   !updatePhotoMutation.isPending &&
                   fileInputRef.current?.click()
                 }
-                className="relative flex h-14 w-14 items-center justify-center rounded-lg bg-accent text-inverse overflow-hidden border border-line cursor-pointer transition-all hover:opacity-90 shadow-xs"
+                className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-xl overflow-hidden shrink-0 cursor-pointer transition-all hover:opacity-90"
                 title="Click to upload or change profile photo"
               >
                 {user?.photo_url ? (
@@ -100,94 +90,85 @@ export function ProfileSettings() {
               </div>
             </div>
 
-            <div>
+            <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="text-sm font-bold text-ink tracking-tight font-sans">
+                <h3 className="text-base font-bold text-ink tracking-tight font-sans">
                   {user?.name || "User Account Profile"}
                 </h3>
-                <span className="text-[10px] font-sans font-bold uppercase tracking-wider bg-accent/15 text-accent border border-accent/30 px-2 py-0.5 rounded-md">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-accent/10 text-accent border border-accent/20 px-2 py-0.5 rounded-md">
                   {user?.role || "Owner"}
                 </span>
               </div>
-              <p className="text-xs text-ink-subtle mt-0.5">
+              <p className="text-xs text-ink-muted">
                 Click photo avatar to update profile picture
               </p>
             </div>
           </div>
 
-          {/* Bright, High-Contrast Active Session Badge */}
-          <span className="text-[11px] font-bold text-white bg-emerald-600 border border-emerald-500 px-2.5 py-1 rounded-md inline-flex items-center gap-1.5 self-start sm:self-auto">
-            <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+          {/* Clean SaaS Active Session Badge */}
+          <span className="text-xs font-semibold text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg inline-flex items-center gap-1.5 self-start sm:self-auto">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Active Session
           </span>
         </div>
 
-        {/* Readonly Form Fields */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Readonly Form Fields Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {/* Full Name */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted block">
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
               Full Name
             </label>
-            <div className="rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
+            <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
               <span>{user?.name || "—"}</span>
               <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
             </div>
           </div>
 
           {/* Phone Number */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted block">
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
               Phone Number
             </label>
-            <div className="rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
+            <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-ink-subtle" />
-                <span>+91 {user?.phone || "—"}</span>
+                <Phone className="h-3.5 w-3.5 text-accent shrink-0" />
+                <span className="font-mono">+91 {user?.phone || "—"}</span>
               </div>
               <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
             </div>
           </div>
 
           {/* Access Role */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted block">
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
               Access Privileges
             </label>
-            <div className="rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
+            <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="h-3.5 w-3.5 text-accent" />
-                <span className="capitalize font-semibold">{user?.role} Access</span>
+                <ShieldCheck className="h-3.5 w-3.5 text-accent shrink-0" />
+                <span className="capitalize">{user?.role} Access</span>
               </div>
-              <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
-            </div>
-          </div>
-
-          {/* Last Login */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted block">
-              Last Authentication
-            </label>
-            <div className="rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-medium text-ink-muted flex items-center justify-between">
-              <span className="truncate">{formattedLastLogin}</span>
               <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
             </div>
           </div>
         </div>
 
         {/* Change PIN Action Row */}
-        <div className="pt-3 border-t border-line flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+        <div className="pt-4 border-t border-line/40 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs text-ink-muted">
-            <KeyRound className="h-4 w-4 text-ink-subtle" />
-            <span className="font-semibold text-ink-muted">Security PIN</span>
+            <KeyRound className="h-4 w-4 text-accent shrink-0" />
+            <span className="font-medium text-ink-muted">
+              Security PIN used for quick authentication &amp; terminal actions
+            </span>
           </div>
 
           <button
             type="button"
             onClick={() => setIsPinModalOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-inverse hover:bg-accent-hover active:scale-[0.98] transition-all duration-200 w-full sm:w-auto justify-center cursor-pointer"
+            className="h-8.5 px-4 rounded-xl bg-accent text-inverse hover:bg-accent-hover font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer w-full sm:w-auto shrink-0"
           >
-            <KeyRound className="h-3.5 w-3.5 stroke-[2.5px]" />
+            <KeyRound className="h-3.5 w-3.5" />
             <span>Change Security PIN</span>
           </button>
         </div>
@@ -201,67 +182,69 @@ export function ProfileSettings() {
       {/* ------------------------------------------------------------- */}
       {/* PART 2: SHOWROOM INFORMATION (READONLY)                       */}
       {/* ------------------------------------------------------------- */}
-      <div className="rounded-xl border border-line bg-card p-4 sm:p-6 space-y-5">
+      <div className="rounded-xl border border-line/60 bg-card p-5 sm:p-6 space-y-6">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line pb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line/40 pb-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-inset border border-line text-accent shrink-0">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent shrink-0">
               <Building2 className="h-4.5 w-4.5 stroke-[2.5px]" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-ink tracking-tight font-sans">
                 Showroom Registry Information
               </h3>
-              <p className="text-xs text-ink-subtle mt-0.5">
+              <p className="text-xs text-ink-muted mt-0.5">
                 Official dealership identity &amp; primary contact details
               </p>
             </div>
           </div>
 
-          <span className="text-[10px] font-sans font-semibold uppercase tracking-wider border border-line px-2 py-0.5 rounded-md bg-inset text-ink-subtle self-start sm:self-auto">
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wider border border-line/60 px-2 py-0.5 rounded-md bg-inset text-ink-subtle self-start sm:self-auto">
             Read-Only
           </span>
         </div>
 
-        {/* Readonly Showroom Fields Stacked Row by Row */}
-        <div className="space-y-4">
+        {/* Readonly Showroom Fields Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Showroom Name */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted block">
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
               Showroom Name
             </label>
-            <div className="rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-bold text-ink flex items-center justify-between">
+            <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
               <span>{config?.showroom_name || "Cars4 Showroom"}</span>
               <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
             </div>
           </div>
 
-          {/* Showroom Address */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted block">
-              Primary Address
+          {/* Showroom Phone */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
+              Contact Phone
             </label>
-            <div className="rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
-              <div className="flex items-start gap-2.5 flex-1 pr-2">
-                <MapPin className="h-3.5 w-3.5 text-ink-subtle shrink-0 mt-0.5" />
-                <span className="leading-relaxed break-words flex-1">
-                  {config?.showroom_address || "—"}
+            <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Phone className="h-3.5 w-3.5 text-accent shrink-0" />
+                <span className="font-mono">
+                  {config?.showroom_phone1
+                    ? `+91 ${config.showroom_phone1}`
+                    : "—"}
                 </span>
               </div>
               <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
             </div>
           </div>
 
-          {/* Showroom Phone */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-ink-muted block">
-              Contact Phone
+          {/* Showroom Address (Wide Spanning Field) */}
+          <div className="space-y-1 sm:col-span-2">
+            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block flex items-center gap-1">
+              <MapPin className="h-3 w-3 text-accent shrink-0" />
+              <span>Primary Address</span>
             </label>
-            <div className="rounded-lg border border-line bg-inset px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-ink-subtle" />
-                <span>{config?.showroom_phone1 ? `+91 ${config.showroom_phone1}` : "—"}</span>
-              </div>
+            <div className="rounded-xl border border-line/60 bg-surface px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
+              <span className="leading-relaxed break-words flex-1 pr-2">
+                {config?.showroom_address || "—"}
+              </span>
               <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
             </div>
           </div>

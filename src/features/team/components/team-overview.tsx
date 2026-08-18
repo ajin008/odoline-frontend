@@ -105,44 +105,38 @@ export function TeamOverview() {
       {/* ------------------------------------------------------------- */}
       {/* 1. DATE FILTER HEADER & NAVIGATION BAR                         */}
       {/* ------------------------------------------------------------- */}
-      <div className="bg-card border border-line rounded-xl p-3.5 sm:p-4 shadow-bento flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
-        <div className="space-y-0.5 sm:space-y-1">
-          <div className="flex items-center justify-between sm:justify-start gap-2">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-accent shrink-0" />
-              <h2 className="text-xs sm:text-sm font-bold text-ink font-sans">
-                {formatReadableDate(selectedDate)}
-              </h2>
-            </div>
-            {selectedDate === todayIst && (
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 border border-emerald-500/30">
-                TODAY
-              </span>
-            )}
-            {isFutureDate && (
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-700 border border-rose-500/30">
-                FUTURE
-              </span>
-            )}
+      <div className="bg-card border border-line/60 rounded-xl p-2.5 sm:p-3 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-accent shrink-0" />
+            <h2 className="text-xs sm:text-sm font-bold text-ink font-sans">
+              {formatReadableDate(selectedDate)}
+            </h2>
           </div>
-          <p className="text-[11px] sm:text-xs text-ink-subtle hidden sm:block">
-            Select date to view historical showroom attendance &amp; punctuality
-            logs. Click any staff row to edit attendance.
-          </p>
+          {selectedDate === todayIst && (
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+              TODAY
+            </span>
+          )}
+          {isFutureDate && (
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-600 border border-rose-500/20">
+              FUTURE
+            </span>
+          )}
         </div>
 
-        {/* Custom Bento DatePicker & Day Stepping Controls */}
+        {/* Custom DatePicker & Day Stepping Controls */}
         <div className="flex items-center gap-1.5 justify-between sm:justify-end w-full sm:w-auto">
           <button
             type="button"
             onClick={() => handleShiftDate(-1)}
-            className="p-2 rounded-xl bg-card border border-line hover:border-accent/40 active:scale-95 text-ink-muted hover:text-ink transition-all cursor-pointer shadow-xs shrink-0"
+            className="h-8.5 w-8.5 flex items-center justify-center rounded-xl bg-surface border border-line/60 hover:border-line active:scale-95 text-ink-muted hover:text-ink transition-colors cursor-pointer shrink-0"
             title="Previous Day"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
 
-          {/* Premium Custom Calendar Popover (Mobile Center Bounded / Tab Right Aligned) */}
+          {/* Premium Custom Calendar Popover */}
           <div className="flex-1 sm:flex-initial flex justify-center sm:justify-end">
             <DatePicker
               value={selectedDate}
@@ -154,7 +148,7 @@ export function TeamOverview() {
           <button
             type="button"
             onClick={() => handleShiftDate(1)}
-            className="p-2 rounded-xl bg-card border border-line hover:border-accent/40 active:scale-95 text-ink-muted hover:text-ink transition-all cursor-pointer shadow-xs shrink-0"
+            className="h-8.5 w-8.5 flex items-center justify-center rounded-xl bg-surface border border-line/60 hover:border-line active:scale-95 text-ink-muted hover:text-ink transition-colors cursor-pointer shrink-0"
             title="Next Day"
           >
             <ChevronRight className="h-4 w-4" />
@@ -164,10 +158,11 @@ export function TeamOverview() {
             <button
               type="button"
               onClick={() => setSelectedDate(todayIst)}
-              className="p-2 rounded-xl bg-accent/15 text-accent border border-accent/30 hover:bg-accent/25 transition-all cursor-pointer shadow-xs shrink-0"
+              className="h-8.5 px-3 flex items-center justify-center gap-1 rounded-xl bg-accent/10 text-accent border border-accent/20 hover:bg-accent/20 transition-colors cursor-pointer text-xs font-bold shrink-0"
               title="Reset to Today"
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Today</span>
             </button>
           )}
         </div>
@@ -176,45 +171,27 @@ export function TeamOverview() {
       {/* ------------------------------------------------------------- */}
       {/* 2. ATTENDANCE SUMMARY COUNTS BAR                              */}
       {/* ------------------------------------------------------------- */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-4">
         {/* Count Card 1: Present */}
         <div
           onClick={() => setActiveListTab("present")}
-          className={`rounded-xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 shadow-bento transition-all cursor-pointer text-center sm:text-left ${
+          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border transition-all cursor-pointer text-center sm:text-left ${
             activeListTab === "present"
-              ? "bg-[#171819] text-white border-none"
-              : "bg-card border border-line hover:border-accent/40 text-ink"
+              ? "border-emerald-500/40 bg-emerald-500/5 text-ink"
+              : "bg-card border-line/60 hover:border-line text-ink"
           }`}
         >
-          <div
-            className={`flex items-center justify-center sm:justify-between ${
-              activeListTab === "present" ? "text-emerald-400" : "text-emerald-600"
-            }`}
-          >
-            <span
-              className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate ${
-                activeListTab === "present" ? "text-white/80" : "text-ink-muted"
-              }`}
-            >
+          <div className="flex items-center justify-center sm:justify-between text-emerald-600">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-ink-muted">
               Present
             </span>
-            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block" />
+            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-emerald-500" />
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
-            <span
-              className={`text-xl sm:text-2xl font-bold font-mono ${
-                activeListTab === "present" ? "text-white" : "text-ink"
-              }`}
-            >
+            <span className="text-xl sm:text-2xl font-bold font-mono text-ink">
               {isLoading ? "…" : counts.present}
             </span>
-            <span
-              className={`text-[9px] sm:text-[11px] hidden sm:inline ${
-                activeListTab === "present"
-                  ? "text-white/70"
-                  : "text-ink-subtle"
-              }`}
-            >
+            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-ink-subtle">
               Clocked-in
             </span>
           </div>
@@ -223,39 +200,23 @@ export function TeamOverview() {
         {/* Count Card 2: Absent */}
         <div
           onClick={() => setActiveListTab("absent")}
-          className={`rounded-xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 shadow-bento transition-all cursor-pointer text-center sm:text-left ${
+          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border transition-all cursor-pointer text-center sm:text-left ${
             activeListTab === "absent"
-              ? "bg-[#171819] text-white border-none"
-              : "bg-card border border-line hover:border-rose-500/30 text-ink"
+              ? "border-rose-500/40 bg-rose-500/5 text-ink"
+              : "bg-card border-line/60 hover:border-line text-ink"
           }`}
         >
-          <div
-            className={`flex items-center justify-center sm:justify-between ${
-              activeListTab === "absent" ? "text-rose-400" : "text-rose-600"
-            }`}
-          >
-            <span
-              className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate ${
-                activeListTab === "absent" ? "text-white/80" : "text-ink-muted"
-              }`}
-            >
+          <div className="flex items-center justify-center sm:justify-between text-rose-600">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-ink-muted">
               Absent
             </span>
-            <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block" />
+            <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-rose-500" />
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
-            <span
-              className={`text-xl sm:text-2xl font-bold font-mono ${
-                activeListTab === "absent" ? "text-white" : "text-ink"
-              }`}
-            >
+            <span className="text-xl sm:text-2xl font-bold font-mono text-ink">
               {isLoading ? "…" : counts.absent}
             </span>
-            <span
-              className={`text-[9px] sm:text-[11px] hidden sm:inline ${
-                activeListTab === "absent" ? "text-white/70" : "text-ink-subtle"
-              }`}
-            >
+            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-ink-subtle">
               Excl. off
             </span>
           </div>
@@ -264,39 +225,23 @@ export function TeamOverview() {
         {/* Count Card 3: Late Coming */}
         <div
           onClick={() => setActiveListTab("late")}
-          className={`rounded-xl p-2.5 sm:p-4 space-y-1 sm:space-y-2 shadow-bento transition-all cursor-pointer text-center sm:text-left ${
+          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border transition-all cursor-pointer text-center sm:text-left ${
             activeListTab === "late"
-              ? "bg-[#171819] text-white border-none"
-              : "bg-card border border-line hover:border-amber-500/30 text-ink"
+              ? "border-amber-500/40 bg-amber-500/5 text-ink"
+              : "bg-card border-line/60 hover:border-line text-ink"
           }`}
         >
-          <div
-            className={`flex items-center justify-center sm:justify-between ${
-              activeListTab === "late" ? "text-amber-400" : "text-amber-600"
-            }`}
-          >
-            <span
-              className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate ${
-                activeListTab === "late" ? "text-white/80" : "text-ink-muted"
-              }`}
-            >
+          <div className="flex items-center justify-center sm:justify-between text-amber-600">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-ink-muted">
               Late
             </span>
-            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block" />
+            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-amber-500" />
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
-            <span
-              className={`text-xl sm:text-2xl font-bold font-mono ${
-                activeListTab === "late" ? "text-white" : "text-ink"
-              }`}
-            >
+            <span className="text-xl sm:text-2xl font-bold font-mono text-ink">
               {isLoading ? "…" : counts.late}
             </span>
-            <span
-              className={`text-[9px] sm:text-[11px] hidden sm:inline ${
-                activeListTab === "late" ? "text-white/70" : "text-ink-subtle"
-              }`}
-            >
+            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-ink-subtle">
               Subset present
             </span>
           </div>
@@ -306,7 +251,7 @@ export function TeamOverview() {
       {/* ------------------------------------------------------------- */}
       {/* 3. STAFF LIST SECTION WITH SUB-TAB CONTROL & CLICK TO EDIT    */}
       {/* ------------------------------------------------------------- */}
-      <div className="bg-card border border-line rounded-xl shadow-bento overflow-hidden">
+      <div className="bg-card border border-line/60 rounded-xl overflow-hidden">
         {/* Sub-Tab Selector Header */}
         <div className="p-3 sm:px-5 sm:py-3.5 bg-inset border-b border-line flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
@@ -325,8 +270,8 @@ export function TeamOverview() {
               onClick={() => setActiveListTab("present")}
               className={`px-3.5 py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center whitespace-nowrap ${
                 activeListTab === "present"
-                  ? "bg-accent text-inverse shadow-xs"
-                  : "text-ink-muted hover:text-ink"
+                  ? "bg-accent text-inverse font-bold"
+                  : "text-ink-muted hover:text-ink font-medium"
               }`}
             >
               Present ({counts.present})
@@ -337,8 +282,8 @@ export function TeamOverview() {
               onClick={() => setActiveListTab("absent")}
               className={`px-3.5 py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center whitespace-nowrap ${
                 activeListTab === "absent"
-                  ? "bg-accent text-inverse shadow-xs"
-                  : "text-ink-muted hover:text-ink"
+                  ? "bg-accent text-inverse font-bold"
+                  : "text-ink-muted hover:text-ink font-medium"
               }`}
             >
               Absent ({counts.absent})
@@ -349,8 +294,8 @@ export function TeamOverview() {
               onClick={() => setActiveListTab("late")}
               className={`px-3.5 py-1.5 text-xs font-bold font-sans rounded-lg transition-all cursor-pointer text-center whitespace-nowrap ${
                 activeListTab === "late"
-                  ? "bg-accent text-inverse shadow-xs"
-                  : "text-ink-muted hover:text-ink"
+                  ? "bg-accent text-inverse font-bold"
+                  : "text-ink-muted hover:text-ink font-medium"
               }`}
             >
               Late ({counts.late})
@@ -397,10 +342,10 @@ export function TeamOverview() {
                 {/* MOBILE VIEW CARD (sm:hidden) */}
                 <div
                   onClick={() => handleRowClick(staff)}
-                  className={`sm:hidden rounded-xl border border-line bg-card p-3 space-y-3 shadow-xs transition-all ${
+                  className={`sm:hidden rounded-xl border border-line/60 bg-card p-3 space-y-3 transition-all ${
                     isFutureDate
                       ? "opacity-75 cursor-not-allowed"
-                      : "cursor-pointer hover:border-accent/40"
+                      : "cursor-pointer hover:border-line"
                   }`}
                 >
                   {/* Card Top: Staff Name, Dept & Status Badge */}
@@ -469,7 +414,7 @@ export function TeamOverview() {
                       <a
                         href={getTelUrl(staff.phone)}
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-card border border-line/80 text-[11px] font-bold text-ink hover:bg-inset shadow-xs"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-card border border-line/80 text-[11px] font-bold text-ink hover:bg-inset"
                       >
                         <Image
                           src="/icons/phonecall-icon.png"
@@ -486,7 +431,7 @@ export function TeamOverview() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-bold text-emerald-700 hover:bg-emerald-500/20 shadow-xs"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[11px] font-bold text-emerald-700 hover:bg-emerald-500/20"
                       >
                         <Image
                           src="/icons/whatsappIcon.png"

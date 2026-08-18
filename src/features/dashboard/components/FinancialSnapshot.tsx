@@ -2,11 +2,55 @@
 
 import Link from "next/link";
 import { TrendingUp, Coins, ArrowUpRight, Vault } from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Cell,
+  LabelList,
+} from "recharts";
 import { useDashboardStats } from "../hooks/use-dashboard-stats";
 import {
   formatCompactCurrency,
   formatFullCurrency,
 } from "@/src/utils/currency";
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    payload: {
+      fullName: string;
+      value: number;
+      sub: string;
+      fill: string;
+    };
+  }>;
+}
+
+function FinancialTooltip({ active, payload }: CustomTooltipProps) {
+  if (active && payload && payload.length) {
+    const item = payload[0].payload;
+    return (
+      <div className="rounded-xl border border-line/80 bg-card p-3 shadow-xl font-sans text-xs space-y-1 select-none">
+        <div className="flex items-center gap-2">
+          <span
+            className="h-2.5 w-2.5 rounded-full shrink-0"
+            style={{ backgroundColor: item.fill }}
+          />
+          <span className="font-bold text-ink">{item.fullName}</span>
+        </div>
+        <p className="font-mono font-bold text-sm text-ink">
+          {formatFullCurrency(item.value)}
+        </p>
+        <p className="text-[10px] text-ink-subtle">{item.sub}</p>
+      </div>
+    );
+  }
+  return null;
+}
 
 export function FinancialSnapshot() {
   const { data, isLoading, isError } = useDashboardStats();
@@ -19,13 +63,34 @@ export function FinancialSnapshot() {
   const profit = Math.max(0, stockValueNum - capitalTiedUpNum);
   const roiPct = capitalTiedUpNum > 0 ? (profit / capitalTiedUpNum) * 100 : 0;
 
-  const total = Math.max(stockValueNum, 1);
-  const costSharePct = Math.min(100, Math.max(0, (capitalTiedUpNum / total) * 100));
+  const chartData = [
+    {
+      name: "Invested",
+      fullName: "Invested Capital",
+      value: capitalTiedUpNum,
+      sub: "Purchase + Refurbish Cost",
+      fill: "#6366f1", // Accent indigo
+    },
+    {
+      name: "Stock Value",
+      fullName: "Total Stock Value",
+      value: stockValueNum,
+      sub: "Asking Price Total",
+      fill: "#8b5cf6", // Deep purple
+    },
+    {
+      name: "Gross Profit",
+      fullName: "Expected Gross Profit",
+      value: profit,
+      sub: `Expected Margin (+${roiPct.toFixed(0)}%)`,
+      fill: "#10b981", // Muted emerald green
+    },
+  ];
 
   return (
-    <div className="flex flex-col justify-between h-full w-full rounded-xl border border-line bg-card p-4 space-y-3.5 select-none font-sans transition-all hover:border-accent/40">
+    <div className="flex flex-col justify-between h-full w-full rounded-xl border border-line/60 bg-card p-4 space-y-4 select-none font-sans transition-all hover:border-line">
       {/* 1. Header Bar */}
-      <div className="flex items-center justify-between border-b border-line/40 pb-2.5">
+      <div className="flex items-center justify-between border-b border-line/40 pb-3">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shrink-0">
             <Coins className="h-4 w-4 stroke-[2.25px]" />
@@ -47,16 +112,16 @@ export function FinancialSnapshot() {
       {/* 2. Full-Width 3-Column Core Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
         {/* Metric 1: Total Invested (Purchase + Refurbish) */}
-        <div className="rounded-lg border border-line/50 bg-inset p-3 space-y-1 w-full">
+        <div className="rounded-xl border border-line/60 bg-inset p-3 space-y-1 w-full">
           <div className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
-            <Vault className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+            <Vault className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
             <span className="truncate">Invested Capital</span>
           </div>
           {isLoading ? (
             <div className="h-6 w-20 animate-pulse rounded bg-line/20" />
           ) : (
             <p
-              className="font-heading text-base sm:text-lg font-bold text-ink tracking-tight truncate"
+              className="font-mono text-base sm:text-lg font-bold text-ink tracking-tight truncate"
               title={formatFullCurrency(capitalTiedUpNum)}
             >
               {formatCompactCurrency(capitalTiedUpNum)}
@@ -68,7 +133,7 @@ export function FinancialSnapshot() {
         </div>
 
         {/* Metric 2: Total Stock Value */}
-        <div className="rounded-lg border border-line/50 bg-inset p-3 space-y-1 w-full">
+        <div className="rounded-xl border border-line/60 bg-inset p-3 space-y-1 w-full">
           <div className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
             <Coins className="h-3.5 w-3.5 text-purple-500 shrink-0" />
             <span className="truncate">Total Stock Value</span>
@@ -77,7 +142,7 @@ export function FinancialSnapshot() {
             <div className="h-6 w-20 animate-pulse rounded bg-line/20" />
           ) : (
             <p
-              className="font-heading text-base sm:text-lg font-bold text-ink tracking-tight truncate"
+              className="font-mono text-base sm:text-lg font-bold text-ink tracking-tight truncate"
               title={formatFullCurrency(stockValueNum)}
             >
               {formatCompactCurrency(stockValueNum)}
@@ -89,7 +154,7 @@ export function FinancialSnapshot() {
         </div>
 
         {/* Metric 3: Expected Gross Profit */}
-        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 space-y-1 w-full">
+        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 space-y-1 w-full">
           <div className="flex items-center justify-between text-xs font-medium text-emerald-700">
             <span className="truncate">Gross Profit</span>
             {roiPct > 0 && (
@@ -103,7 +168,7 @@ export function FinancialSnapshot() {
             <div className="h-6 w-20 animate-pulse rounded bg-emerald-500/20" />
           ) : (
             <p
-              className="font-heading text-base sm:text-lg font-bold text-emerald-600 tracking-tight truncate"
+              className="font-mono text-base sm:text-lg font-bold text-emerald-600 tracking-tight truncate"
               title={formatFullCurrency(profit)}
             >
               +{formatCompactCurrency(profit)}
@@ -115,25 +180,64 @@ export function FinancialSnapshot() {
         </div>
       </div>
 
-      {/* 3. Visual Capital Range Spread Bar */}
-      <div className="rounded-lg border border-line/60 bg-inset/50 p-3 space-y-1.5 w-full">
-        <div className="flex items-center justify-between text-[11px] font-mono">
-          <span className="text-ink-muted">
-            Cost ({costSharePct.toFixed(0)}%)
-          </span>
-          <span className="text-emerald-600 font-bold">
-            Profit Margin ({(100 - costSharePct).toFixed(0)}%)
-          </span>
+      {/* 3. Recharts BarChart Visualization Section */}
+      <div className="rounded-xl border border-line/60 bg-inset/50 p-3 pt-4 space-y-2 w-full">
+        <div className="flex items-center justify-between text-[11px] font-mono font-bold text-ink-subtle px-1">
+          <span>FINANCIAL SPREAD</span>
+          {roiPct > 0 && (
+            <span className="text-emerald-600 font-bold">
+              +{roiPct.toFixed(0)}% ROI Margin
+            </span>
+          )}
         </div>
-        <div className="h-2.5 w-full rounded-full bg-line/30 overflow-hidden flex">
-          <div
-            className="h-full bg-blue-500 transition-all duration-500"
-            style={{ width: `${costSharePct}%` }}
-          />
-          <div
-            className="h-full bg-emerald-500 transition-all duration-500"
-            style={{ width: `${100 - costSharePct}%` }}
-          />
+
+        <div className="h-44 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 22, right: 10, left: 0, bottom: 5 }}
+            >
+              <XAxis
+                dataKey="name"
+                tick={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  fill: "#6b7280",
+                }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                tickFormatter={(val) => formatCompactCurrency(Number(val))}
+                tick={{ fontSize: 10, fill: "#9ca3af" }}
+                axisLine={false}
+                tickLine={false}
+                width={52}
+              />
+              <Tooltip
+                content={<FinancialTooltip />}
+                cursor={{ fill: "rgba(0, 0, 0, 0.04)" }}
+              />
+              <Bar
+                dataKey="value"
+                radius={[6, 6, 0, 0]}
+                barSize={38}
+                isAnimationActive={true}
+              >
+                <LabelList
+                  dataKey="value"
+                  position="top"
+                  formatter={(val: unknown) =>
+                    formatCompactCurrency(Number(val))
+                  }
+                  style={{ fontSize: "11px", fontWeight: 700, fill: "#4b5563" }}
+                />
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

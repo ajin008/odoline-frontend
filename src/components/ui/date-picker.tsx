@@ -257,7 +257,7 @@ export function DatePicker({
         onClick={() => setIsOpen(!isOpen)}
         className={`flex items-center ${
           fullWidth ? "w-full justify-between" : "gap-2.5"
-        } px-3.5 py-2.5 rounded-lg bg-inset border border-line shadow-xs hover:border-accent/40 focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/20 active:scale-[0.99] text-ink transition-all cursor-pointer font-sans`}
+        } h-8.5 px-3 rounded-xl bg-surface border border-line/60 hover:border-line focus:border-accent focus:bg-card focus:ring-2 focus:ring-accent/20 active:scale-[0.99] text-ink transition-all cursor-pointer font-sans`}
       >
         <div className="flex items-center gap-2 min-w-0">
           <CalendarIcon className="h-4 w-4 text-accent stroke-[2.5px] shrink-0" />

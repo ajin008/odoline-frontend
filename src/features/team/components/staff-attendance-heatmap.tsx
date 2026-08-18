@@ -66,17 +66,17 @@ const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 function getStatusStyle(status: StaffHeatmapDayStatus): string {
   switch (status) {
     case "full":
-      return "bg-emerald-600 text-white font-bold shadow-xs hover:bg-emerald-700";
+      return "bg-emerald-600 text-white font-bold hover:bg-emerald-700";
     case "half":
       return "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-500/40 hover:bg-emerald-500/30";
     case "late":
-      return "bg-amber-500 text-white font-bold shadow-xs hover:bg-amber-600";
+      return "bg-amber-500 text-white font-bold hover:bg-amber-600";
     case "incomplete":
-      return "bg-purple-600 text-white font-bold shadow-xs hover:bg-purple-700";
+      return "bg-purple-600 text-white font-bold hover:bg-purple-700";
     case "absent":
-      return "bg-rose-600 text-white font-bold shadow-xs hover:bg-rose-700";
+      return "bg-rose-600 text-white font-bold hover:bg-rose-700";
     case "holiday":
-      return "bg-[#171819] text-white/60 font-bold border border-line/40";
+      return "bg-inset text-ink-subtle font-semibold border border-line/60";
     case "future":
     default:
       return "bg-inset border border-line/40 text-ink-subtle/40 opacity-50 cursor-not-allowed";
@@ -147,7 +147,7 @@ export function StaffAttendanceHeatmap({
   const emptyPaddingCells = Array.from({ length: startingDayOfWeek });
 
   return (
-    <div className="space-y-4 rounded-xl border border-line/90 bg-card p-5 shadow-bento font-sans select-none">
+    <div className="space-y-4 rounded-xl border border-line/60 bg-card p-5 font-sans select-none">
       {/* ------------------------------------------------------------- */}
       {/* 1. HEADER & MONTH PICKER CONTROLS                             */}
       {/* ------------------------------------------------------------- */}

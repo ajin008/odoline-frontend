@@ -81,8 +81,8 @@ export function TeamShell() {
                 className={[
                   "flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
                   isActive
-                    ? "bg-accent text-inverse shadow-xs"
-                    : "text-ink-muted hover:text-ink",
+                    ? "bg-accent text-inverse font-bold"
+                    : "text-ink-muted hover:text-ink font-medium",
                 ].join(" ")}
               >
                 <Icon
@@ -121,7 +121,7 @@ export function TeamShell() {
                   <button
                     type="button"
                     onClick={() => setIsAddModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-inverse hover:bg-accent-hover active:scale-[0.98] transition-all cursor-pointer shadow-xs"
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-inverse hover:bg-accent-hover active:scale-[0.98] transition-all cursor-pointer"
                   >
                     <UserPlus className="h-4 w-4 stroke-[2.5px]" />
                     <span>Add Staff</span>
