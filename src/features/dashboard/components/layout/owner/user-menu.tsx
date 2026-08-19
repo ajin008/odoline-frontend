@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 // components/layout/owner/user-menu.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import {
   LogOut,
   ChevronDown,
@@ -11,6 +13,9 @@ import {
   Settings,
   Users,
   ShieldCheck,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { useMe } from "@/src/features/auth/hooks/use-me";
 import { useLogout } from "@/src/features/auth/hooks/use-logout";
@@ -28,9 +33,15 @@ function getInitials(name?: string) {
 export function UserMenu() {
   const { data: user } = useMe();
   const { logout } = useLogout();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isOwner = user?.role === "owner";
   const initials = getInitials(user?.name);
@@ -234,6 +245,65 @@ export function UserMenu() {
                 </div>
               </Link>
             )}
+          </div>
+
+          <div className="my-1 border-t border-line/60" />
+
+          {/* Theme / Appearance Segmented Control */}
+          <div className="px-2 py-1.5 space-y-1.5">
+            <div className="flex items-center justify-between text-[11px] font-semibold text-ink-muted px-0.5">
+              <span>Appearance</span>
+              <span className="text-[10px] font-mono text-ink-subtle capitalize">
+                {mounted ? theme : "system"}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-1 p-1 rounded-xl bg-inset border border-line/50">
+              <button
+                type="button"
+                onClick={() => setTheme("light")}
+                title="Light Theme"
+                className={[
+                  "flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+                  mounted && theme === "light"
+                    ? "bg-card text-accent font-bold shadow-2xs border border-line/40"
+                    : "text-ink-subtle hover:text-ink hover:bg-card/50",
+                ].join(" ")}
+              >
+                <Sun className="h-3.5 w-3.5 stroke-[2px]" />
+                <span className="text-[11px]">Light</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTheme("dark")}
+                title="Dark Theme"
+                className={[
+                  "flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+                  mounted && theme === "dark"
+                    ? "bg-card text-accent font-bold shadow-2xs border border-line/40"
+                    : "text-ink-subtle hover:text-ink hover:bg-card/50",
+                ].join(" ")}
+              >
+                <Moon className="h-3.5 w-3.5 stroke-[2px]" />
+                <span className="text-[11px]">Dark</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTheme("system")}
+                title="System Preference"
+                className={[
+                  "flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+                  mounted && theme === "system"
+                    ? "bg-card text-accent font-bold shadow-2xs border border-line/40"
+                    : "text-ink-subtle hover:text-ink hover:bg-card/50",
+                ].join(" ")}
+              >
+                <Monitor className="h-3.5 w-3.5 stroke-[2px]" />
+                <span className="text-[11px]">System</span>
+              </button>
+            </div>
           </div>
 
           <div className="my-1 border-t border-line/60" />
