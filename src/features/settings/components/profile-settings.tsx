@@ -2,7 +2,10 @@
 
 import { useState, useRef } from "react";
 import { useMe } from "@/src/features/auth/hooks/use-me";
-import { useUpdatePhoto } from "@/src/features/auth/hooks/use-update-photo";
+import {
+  useUpdatePhoto,
+  useRemovePhoto,
+} from "@/src/features/auth/hooks/use-update-photo";
 import { useConfig } from "../hooks/use-config";
 import { ChangePinModal } from "./change-pin-modal";
 import {
@@ -15,6 +18,7 @@ import {
   MapPin,
   Camera,
   Loader2,
+  Trash2,
 } from "lucide-react";
 
 export function ProfileSettings() {
@@ -23,6 +27,7 @@ export function ProfileSettings() {
   const { data: user, isLoading: isUserLoading } = useMe();
   const { data: config, isLoading: isConfigLoading } = useConfig();
   const updatePhotoMutation = useUpdatePhoto();
+  const removePhotoMutation = useRemovePhoto();
 
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,6 +68,7 @@ export function ProfileSettings() {
               <div
                 onClick={() =>
                   !updatePhotoMutation.isPending &&
+                  !removePhotoMutation.isPending &&
                   fileInputRef.current?.click()
                 }
                 className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-xl overflow-hidden shrink-0 cursor-pointer transition-all hover:opacity-90"
@@ -81,13 +87,33 @@ export function ProfileSettings() {
 
                 {/* Hover overlay indicator */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                  {updatePhotoMutation.isPending ? (
+                  {updatePhotoMutation.isPending ||
+                  removePhotoMutation.isPending ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <Camera className="h-5 w-5 stroke-[2.5px]" />
                   )}
                 </div>
               </div>
+
+              {/* Quick Remove Trash Icon Badge */}
+              {user?.photo_url && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removePhotoMutation.mutate();
+                  }}
+                  disabled={
+                    removePhotoMutation.isPending ||
+                    updatePhotoMutation.isPending
+                  }
+                  className="absolute -top-1 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-50"
+                  title="Remove profile photo"
+                >
+                  <Trash2 className="h-3 w-3 stroke-[2.5px]" />
+                </button>
+              )}
             </div>
 
             <div className="space-y-1">
@@ -102,6 +128,27 @@ export function ProfileSettings() {
               <p className="text-xs text-ink-muted">
                 Click photo avatar to update profile picture
               </p>
+
+              {user?.photo_url && (
+                <div className="pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => removePhotoMutation.mutate()}
+                    disabled={
+                      removePhotoMutation.isPending ||
+                      updatePhotoMutation.isPending
+                    }
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-500 hover:text-rose-600 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {removePhotoMutation.isPending ? (
+                      <Loader2 className="h-3 w-3 animate-spin text-rose-500" />
+                    ) : (
+                      <Trash2 className="h-3 w-3 stroke-[2.5px]" />
+                    )}
+                    <span>Remove current photo</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

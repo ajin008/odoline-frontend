@@ -103,7 +103,11 @@ export function CustomSelect<T extends string | number = string>({
               {labelPrefix}
             </span>
           )}
-          <span className="truncate text-ink">
+          <span
+            className={`truncate ${
+              selectedOption ? "text-ink font-bold" : "text-ink-subtle font-normal"
+            }`}
+          >
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
@@ -120,7 +124,7 @@ export function CustomSelect<T extends string | number = string>({
       {isOpen && (
         <div
           role="listbox"
-          className="absolute left-0 top-full mt-1.5 z-50 min-w-[180px] max-h-60 overflow-y-auto rounded-xl border border-line bg-card p-1 shadow-xl animate-in fade-in-50 zoom-in-95 duration-150 space-y-0.5"
+          className="absolute left-0 top-full mt-1.5 z-50 w-full min-w-[180px] max-h-60 overflow-y-auto rounded-xl border border-line bg-card p-1 shadow-xl animate-in fade-in-50 zoom-in-95 duration-150 space-y-0.5"
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;

@@ -8,11 +8,16 @@ import {
   Loader2,
   UploadCloud,
   FileText,
-  ChevronDown,
+  Wrench,
+  ExternalLink,
 } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { toast } from "sonner";
 import { useAddRefurbItem } from "../../hooks/use-refurbishment";
+import {
+  CustomSelect,
+  type CustomSelectOption,
+} from "@/src/components/ui/custom-select";
 
 interface AddRefurbItemFormProps {
   carId: string;
@@ -25,6 +30,21 @@ const PREDEFINED_CHIPS = [
   "Battery Replacement",
   "Engine Service",
   "Interior Dry Cleaning",
+];
+
+const VENDOR_OPTIONS: CustomSelectOption<"inhouse" | "outside">[] = [
+  {
+    value: "inhouse",
+    label: "Inhouse Workshop",
+    icon: <Wrench className="h-3.5 w-3.5 text-accent" />,
+    description: "Internal team repair log",
+  },
+  {
+    value: "outside",
+    label: "Outside Vendor",
+    icon: <ExternalLink className="h-3.5 w-3.5 text-amber-500" />,
+    description: "Third-party garage or supplier",
+  },
 ];
 
 export function AddRefurbItemForm({ carId }: AddRefurbItemFormProps) {
@@ -146,24 +166,18 @@ export function AddRefurbItemForm({ carId }: AddRefurbItemFormProps) {
             />
           </div>
 
-          {/* Vendor Type Dropdown */}
+          {/* Vendor Type Custom Dropdown */}
           <div>
             <label className="block text-[10px] font-bold text-ink-muted uppercase font-mono mb-1">
               Vendor Source
             </label>
-            <div className="relative">
-              <select
-                value={vendorType}
-                onChange={(e) =>
-                  setVendorType(e.target.value as "inhouse" | "outside")
-                }
-                className="w-full min-h-[44px] appearance-none rounded-xl border border-line bg-inset px-3.5 py-2.5 pr-8 text-xs text-ink focus:outline-none focus:border-accent focus:bg-card transition-all cursor-pointer"
-              >
-                <option value="inhouse">Inhouse Workshop</option>
-                <option value="outside">Outside Vendor</option>
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-muted" />
-            </div>
+            <CustomSelect
+              options={VENDOR_OPTIONS}
+              value={vendorType}
+              onChange={(val) => setVendorType(val)}
+              className="w-full"
+              buttonClassName="w-full min-h-[44px] bg-inset text-xs font-bold text-ink rounded-xl border border-line hover:border-line hover:bg-card transition-all"
+            />
           </div>
 
           {/* Submit Button */}

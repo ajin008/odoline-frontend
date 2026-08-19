@@ -20,6 +20,7 @@ import {
   useBulkAssign,
 } from "../hooks/use-unassigned-leads";
 import { useStaff } from "@/src/features/team/hooks/use-staff";
+import { CustomSelect } from "@/src/components/ui/custom-select";
 import type { LeadPriority } from "../types/lead-types";
 
 const PRIORITY_CONFIG: Record<
@@ -430,30 +431,21 @@ export function UnassignedLeadsQueue() {
               </div>
 
               {/* Right Column: Per-card Single Assign Dropdown */}
-              <div className="relative shrink-0 w-full sm:w-56">
-                <select
+              <div className="shrink-0 w-full sm:w-56">
+                <CustomSelect
+                  options={repPickerOptions.map((staff) => ({
+                    value: staff.id,
+                    label: staff.name,
+                    description: `${staff.activeCount} active lead${staff.activeCount === 1 ? "" : "s"}`,
+                    icon: <UserCheck className="h-3.5 w-3.5 text-accent" />,
+                  }))}
                   value=""
                   disabled={isCurrentlyAssigning || bulkAssignMutation.isPending}
-                  onChange={(e) => handleAssignSingle(lead.id, e.target.value)}
-                  className="w-full appearance-none rounded-xl border border-line bg-surface py-2 pl-3 pr-8 text-xs font-semibold text-ink transition-colors hover:border-accent focus:border-accent focus:outline-none cursor-pointer disabled:opacity-50"
-                >
-                  <option value="" disabled>
-                    {isCurrentlyAssigning ? "Assigning..." : "Assign to sales rep..."}
-                  </option>
-                  {repPickerOptions.map((staff) => (
-                    <option key={staff.id} value={staff.id}>
-                      {staff.label}
-                    </option>
-                  ))}
-                </select>
-
-                <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ink-subtle">
-                  {isCurrentlyAssigning ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-accent" />
-                  ) : (
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  )}
-                </div>
+                  onChange={(staffId) => handleAssignSingle(lead.id, staffId)}
+                  placeholder={isCurrentlyAssigning ? "Assigning..." : "Assign to sales rep..."}
+                  className="w-full"
+                  buttonClassName="w-full h-9 bg-surface text-xs font-semibold text-ink rounded-xl border border-line hover:border-accent"
+                />
               </div>
             </div>
           );

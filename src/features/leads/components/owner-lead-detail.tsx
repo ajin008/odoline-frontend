@@ -11,6 +11,10 @@ import { LeadFollowUps } from "./lead-follow-ups";
 import { LeadInterestedCars } from "./lead-interested-cars";
 import type { LeadPriority } from "../types/lead-types";
 import {
+  CustomSelect,
+  type CustomSelectOption,
+} from "@/src/components/ui/custom-select";
+import {
   ArrowLeft,
   User,
   Phone,
@@ -305,7 +309,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
             className="flex items-center gap-1 text-xs font-bold text-accent hover:underline cursor-pointer"
           >
             <span>
-              {isAuditExpanded ? "Hide Audit History" : "View Audit History"}
+              {isAuditExpanded ? "Hide Stage History" : "View Stage History"}
             </span>
             {isAuditExpanded ? (
               <ChevronUp className="h-3.5 w-3.5" />
@@ -606,22 +610,22 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
 
             <form onSubmit={handleAssignSubmit} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-medium text-ink-muted">
+                <label className="text-xs font-semibold text-ink-muted">
                   Select Active Sales Representative *
                 </label>
-                <select
+                <CustomSelect
+                  options={staffList.map((staff) => ({
+                    value: staff.id,
+                    label: staff.name,
+                    description: staff.position || "Sales Executive",
+                    icon: <User className="h-3.5 w-3.5 text-accent" />,
+                  }))}
                   value={selectedStaffId}
-                  onChange={(e) => setSelectedStaffId(e.target.value)}
-                  className="w-full rounded-xl border border-line bg-inset p-2.5 text-xs font-semibold text-ink focus:border-accent focus:outline-none cursor-pointer"
-                  required
-                >
-                  <option value="">Select sales staff member...</option>
-                  {staffList.map((staff) => (
-                    <option key={staff.id} value={staff.id}>
-                      {staff.name} ({staff.position || "Sales Exec"})
-                    </option>
-                  ))}
-                </select>
+                  onChange={(val) => setSelectedStaffId(val)}
+                  placeholder="Select sales staff member..."
+                  className="w-full"
+                  buttonClassName="w-full h-10 bg-inset text-xs font-bold text-ink rounded-xl border border-line hover:border-line hover:bg-card transition-all"
+                />
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">

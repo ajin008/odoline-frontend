@@ -85,11 +85,11 @@ export function RefurbPricingSummary({
         </div>
 
         {/* 3. Landing Price (Break-Even) Card */}
-        <div className="flex flex-col justify-between rounded-lg border border-ink bg-ink p-3.5 text-inverse shadow-sm">
-          <p className="text-[10px] font-mono font-semibold uppercase text-inverse/70">
+        <div className="flex flex-col justify-between rounded-lg border border-accent/40 bg-accent/10 dark:bg-accent/15 p-3.5 shadow-xs">
+          <p className="text-[10px] font-mono font-semibold uppercase text-accent">
             = Landing Price
           </p>
-          <p className="text-sm font-bold text-inverse mt-1 font-mono">
+          <p className="text-sm font-bold text-ink mt-1 font-mono">
             ₹{formatCurrency(landingNum)}
           </p>
         </div>

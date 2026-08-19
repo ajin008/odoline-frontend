@@ -36,3 +36,21 @@ export function useUpdatePhoto() {
     },
   });
 }
+
+export function useRemovePhoto() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      return await authApi.removePhoto();
+    },
+    onSuccess: (updatedUser) => {
+      toast.success("Profile photo removed successfully");
+      queryClient.setQueryData(queryKeys.me, updatedUser);
+      queryClient.invalidateQueries({ queryKey: queryKeys.me });
+    },
+    onError: () => {
+      toast.error("Failed to remove profile photo.");
+    },
+  });
+}

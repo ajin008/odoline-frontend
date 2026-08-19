@@ -26,4 +26,8 @@ export const authApi = {
     });
     return res.data.data;
   },
+  async removePhoto(): Promise<AuthUser> {
+    const res = await apiClient.delete(endpoints.auth.updatePhoto);
+    return res.data.data;
+  },
 };

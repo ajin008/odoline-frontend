@@ -3,11 +3,24 @@
 
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Car, User, ArrowRight, Loader2, Check } from "lucide-react";
+import {
+  Car,
+  User,
+  ArrowRight,
+  Loader2,
+  Check,
+  Fuel,
+  Sliders,
+  Flame,
+  Zap,
+  Leaf,
+  Cog,
+  Cpu,
+} from "lucide-react";
 
 import { FormInput } from "@/src/components/ui/form-input";
-import { FormSelect } from "@/src/components/ui/form-select";
 import { FormTextarea } from "@/src/components/ui/form-textarea";
+import { CustomSelect, type CustomSelectOption } from "@/src/components/ui/custom-select";
 import {
   createCarSchema,
   type CreateCarFormInput,
@@ -17,11 +30,20 @@ import { useCreateCar } from "../hooks/use-create-car";
 import { useUpdateCar } from "../hooks/use-update-car";
 import type { Car as CarType } from "../api/cars-api";
 
-import {
-  INDIAN_CAR_BRANDS,
-  TRANSMISSION_OPTIONS,
-  FUEL_TYPE_OPTIONS,
-} from "../type/info";
+import { INDIAN_CAR_BRANDS } from "../type/info";
+
+const fuelOptions: CustomSelectOption<string>[] = [
+  { value: "petrol", label: "Petrol", icon: <Fuel className="h-3.5 w-3.5" /> },
+  { value: "diesel", label: "Diesel", icon: <Fuel className="h-3.5 w-3.5 text-amber-500" /> },
+  { value: "cng", label: "CNG", icon: <Flame className="h-3.5 w-3.5 text-emerald-500" /> },
+  { value: "electric", label: "Electric (EV)", icon: <Zap className="h-3.5 w-3.5 text-purple-500" /> },
+  { value: "hybrid", label: "Petrol Hybrid", icon: <Leaf className="h-3.5 w-3.5 text-teal-500" /> },
+];
+
+const transmissionOptions: CustomSelectOption<string>[] = [
+  { value: "manual", label: "Manual (M/T)", icon: <Cog className="h-3.5 w-3.5 text-accent" /> },
+  { value: "automatic", label: "Automatic (A/T)", icon: <Cpu className="h-3.5 w-3.5 text-accent" /> },
+];
 
 // Groups digits Indian-style (last 3, then pairs): "1234567" -> "12,34,567".
 function groupIndianDigits(digits: string): string {
@@ -218,22 +240,66 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
             {...register("color")}
           />
 
-          <FormSelect
-            label="Fuel Type"
-            placeholder="Select fuel setup"
-            options={FUEL_TYPE_OPTIONS}
-            error={errors.fuel_type?.message}
-            defaultValue=""
-            {...register("fuel_type")}
+          <Controller
+            name="fuel_type"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <div className="space-y-1.5 font-sans">
+                <label className="block text-xs font-semibold text-ink-muted">
+                  Fuel Type
+                </label>
+                <CustomSelect
+                  options={fuelOptions}
+                  value={value ?? ""}
+                  onChange={onChange}
+                  placeholder="Select fuel setup"
+                  icon={<Fuel className="h-4 w-4 text-accent" />}
+                  className="w-full"
+                  buttonClassName={[
+                    "w-full h-10 px-3.5 py-2.5 rounded-lg border bg-inset text-xs transition-all duration-200 cursor-pointer font-bold",
+                    errors.fuel_type?.message
+                      ? "border-rose-500 text-rose-600"
+                      : "border-line hover:border-line hover:bg-card",
+                  ].join(" ")}
+                />
+                {errors.fuel_type?.message && (
+                  <p className="text-[11px] font-semibold text-rose-500 animate-in fade-in duration-200">
+                    {errors.fuel_type?.message}
+                  </p>
+                )}
+              </div>
+            )}
           />
 
-          <FormSelect
-            label="Transmission"
-            placeholder="Select gear mechanism"
-            options={TRANSMISSION_OPTIONS}
-            error={errors.transmission?.message}
-            defaultValue=""
-            {...register("transmission")}
+          <Controller
+            name="transmission"
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <div className="space-y-1.5 font-sans">
+                <label className="block text-xs font-semibold text-ink-muted">
+                  Transmission
+                </label>
+                <CustomSelect
+                  options={transmissionOptions}
+                  value={value ?? ""}
+                  onChange={onChange}
+                  placeholder="Select gear mechanism"
+                  icon={<Sliders className="h-4 w-4 text-accent" />}
+                  className="w-full"
+                  buttonClassName={[
+                    "w-full h-10 px-3.5 py-2.5 rounded-lg border bg-inset text-xs transition-all duration-200 cursor-pointer font-bold",
+                    errors.transmission?.message
+                      ? "border-rose-500 text-rose-600"
+                      : "border-line hover:border-line hover:bg-card",
+                  ].join(" ")}
+                />
+                {errors.transmission?.message && (
+                  <p className="text-[11px] font-semibold text-rose-500 animate-in fade-in duration-200">
+                    {errors.transmission?.message}
+                  </p>
+                )}
+              </div>
+            )}
           />
         </div>
 
