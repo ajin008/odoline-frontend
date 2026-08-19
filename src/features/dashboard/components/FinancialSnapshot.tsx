@@ -191,13 +191,22 @@ export function FinancialSnapshot() {
           )}
         </div>
 
-        <div className="h-44 w-full">
+        <div className="h-48 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
-              margin={{ top: 22, right: 10, left: 0, bottom: 5 }}
+              layout="vertical"
+              margin={{ top: 10, right: 45, left: 10, bottom: 5 }}
             >
               <XAxis
+                type="number"
+                tickFormatter={(val) => formatCompactCurrency(Number(val))}
+                tick={{ fontSize: 10, fill: "#9ca3af" }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <YAxis
+                type="category"
                 dataKey="name"
                 tick={{
                   fontSize: 11,
@@ -206,13 +215,7 @@ export function FinancialSnapshot() {
                 }}
                 axisLine={false}
                 tickLine={false}
-              />
-              <YAxis
-                tickFormatter={(val) => formatCompactCurrency(Number(val))}
-                tick={{ fontSize: 10, fill: "#9ca3af" }}
-                axisLine={false}
-                tickLine={false}
-                width={52}
+                width={85}
               />
               <Tooltip
                 content={<FinancialTooltip />}
@@ -220,13 +223,13 @@ export function FinancialSnapshot() {
               />
               <Bar
                 dataKey="value"
-                radius={[6, 6, 0, 0]}
-                barSize={38}
+                radius={[0, 6, 6, 0]}
+                barSize={24}
                 isAnimationActive={true}
               >
                 <LabelList
                   dataKey="value"
-                  position="top"
+                  position="right"
                   formatter={(val: unknown) =>
                     formatCompactCurrency(Number(val))
                   }
