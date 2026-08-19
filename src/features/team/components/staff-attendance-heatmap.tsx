@@ -66,15 +66,15 @@ const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 function getStatusStyle(status: StaffHeatmapDayStatus): string {
   switch (status) {
     case "full":
-      return "bg-emerald-600 text-white font-bold hover:bg-emerald-700";
+      return "bg-emerald-600/90 text-white font-bold border border-emerald-700/30 hover:bg-emerald-600";
     case "half":
-      return "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-500/40 hover:bg-emerald-500/30";
+      return "bg-emerald-500/20 text-emerald-900 dark:text-emerald-300 font-bold border border-emerald-500/30 hover:bg-emerald-500/30";
     case "late":
-      return "bg-amber-500 text-white font-bold hover:bg-amber-600";
+      return "bg-amber-500/80 text-amber-950 dark:text-amber-100 font-bold border border-amber-500/40 hover:bg-amber-500/90";
     case "incomplete":
-      return "bg-purple-600 text-white font-bold hover:bg-purple-700";
+      return "bg-purple-500/25 text-purple-950 dark:text-purple-200 font-bold border border-purple-500/35 hover:bg-purple-500/35";
     case "absent":
-      return "bg-rose-600 text-white font-bold hover:bg-rose-700";
+      return "bg-rose-600 text-white font-bold border border-rose-700/30 hover:bg-rose-700";
     case "holiday":
       return "bg-neutral-state text-neutral-state-text font-bold border border-line/40 hover:opacity-90";
     case "future":
@@ -204,23 +204,23 @@ export function StaffAttendanceHeatmap({
       {/* ------------------------------------------------------------- */}
       <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-ink-muted pt-1">
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-emerald-600 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-emerald-600/90 border border-emerald-700/30 shrink-0" />
           <span>Full Day</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-emerald-500/20 border border-emerald-500/40 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-emerald-500/20 border border-emerald-500/30 shrink-0" />
           <span>Half Day</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-amber-500 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-amber-500/80 border border-amber-500/40 shrink-0" />
           <span>Late</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-purple-600 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-purple-500/30 border border-purple-500/40 shrink-0" />
           <span>Incomplete</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-rose-600 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-rose-600 border border-rose-700/30 shrink-0" />
           <span>Absent</span>
         </div>
         <div className="flex items-center gap-1.5">
