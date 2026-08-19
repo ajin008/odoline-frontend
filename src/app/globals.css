@@ -30,6 +30,10 @@
   --state-success-light: rgba(16, 185, 129, 0.09);
   --state-warning: #d97706;
   --state-warning-light: rgba(217, 119, 6, 0.09);
+  --state-neutral: #171819;
+  --state-neutral-text: #ffffff;
+  --state-neutral-light: rgba(23, 24, 25, 0.08);
+  --state-future: #e5e7eb;
 
   /* Unified Font Stack Mapping — Satoshi for body/UI, Cabinet Grotesk for headings */
   --font-sans: var(--font-satoshi), -apple-system, BlinkMacSystemFont,
@@ -71,6 +75,10 @@
   --state-success-light: rgba(52, 211, 153, 0.18);
   --state-warning: #fbbf24;
   --state-warning-light: rgba(251, 191, 36, 0.18);
+  --state-neutral: #e0e0e0;
+  --state-neutral-text: #111827;
+  --state-neutral-light: rgba(224, 224, 224, 0.15);
+  --state-future: #242936;
 
   /* Soft-Shadow Layering (Dark Mode) */
   --shadow-bento: 0 1px 3px rgba(0, 0, 0, 0.4),
@@ -100,6 +108,10 @@
   --color-success-light: var(--state-success-light);
   --color-warning: var(--state-warning);
   --color-warning-light: var(--state-warning-light);
+  --color-neutral-state: var(--state-neutral);
+  --color-neutral-state-text: var(--state-neutral-text);
+  --color-neutral-state-light: var(--state-neutral-light);
+  --color-future-state: var(--state-future);
 
   /* Refined Professional Emerald Palette */
   --color-emerald-50: #ecfdf5;

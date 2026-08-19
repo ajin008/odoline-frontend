@@ -76,10 +76,10 @@ function getStatusStyle(status: StaffHeatmapDayStatus): string {
     case "absent":
       return "bg-rose-600 text-white font-bold hover:bg-rose-700";
     case "holiday":
-      return "bg-inset text-ink-subtle font-semibold border border-line/60";
+      return "bg-neutral-state text-neutral-state-text font-bold border border-line/40 hover:opacity-90";
     case "future":
     default:
-      return "bg-inset border border-line/40 text-ink-subtle/40 opacity-50 cursor-not-allowed";
+      return "bg-future-state border border-line/50 text-ink-subtle/50 opacity-60 cursor-not-allowed";
   }
 }
 
@@ -224,11 +224,11 @@ export function StaffAttendanceHeatmap({
           <span>Absent</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-[#171819] border border-line/40 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-neutral-state border border-line/40 shrink-0" />
           <span>Weekly Off</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-inset border border-line/40 opacity-50 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-future-state border border-line/50 opacity-80 shrink-0" />
           <span>Future</span>
         </div>
       </div>
