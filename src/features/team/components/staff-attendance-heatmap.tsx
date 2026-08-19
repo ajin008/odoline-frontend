@@ -72,7 +72,7 @@ function getStatusStyle(status: StaffHeatmapDayStatus): string {
     case "late":
       return "bg-amber-500/80 text-amber-950 dark:text-amber-100 font-bold border border-amber-500/40 hover:bg-amber-500/90";
     case "incomplete":
-      return "bg-purple-500/25 text-purple-950 dark:text-purple-200 font-bold border border-purple-500/35 hover:bg-purple-500/35";
+      return "bg-purple-600 text-white font-bold border border-purple-700/30 hover:bg-purple-700";
     case "absent":
       return "bg-rose-600 text-white font-bold border border-rose-700/30 hover:bg-rose-700";
     case "holiday":
@@ -216,7 +216,7 @@ export function StaffAttendanceHeatmap({
           <span>Late</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="h-3 w-3 rounded-md bg-purple-500/30 border border-purple-500/40 shrink-0" />
+          <span className="h-3 w-3 rounded-md bg-purple-600 border border-purple-700/30 shrink-0" />
           <span>Incomplete</span>
         </div>
         <div className="flex items-center gap-1.5">
