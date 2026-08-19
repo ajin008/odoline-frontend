@@ -10,10 +10,7 @@ import { LeadActivityTimeline } from "./lead-activity-timeline";
 import { LeadFollowUps } from "./lead-follow-ups";
 import { LeadInterestedCars } from "./lead-interested-cars";
 import type { LeadPriority } from "../types/lead-types";
-import {
-  CustomSelect,
-  type CustomSelectOption,
-} from "@/src/components/ui/custom-select";
+import { CustomSelect } from "@/src/components/ui/custom-select";
 import {
   ArrowLeft,
   User,
