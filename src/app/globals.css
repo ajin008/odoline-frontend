@@ -48,15 +48,15 @@
 }
 
 .dark {
-  /* Canvas Matrix (Layered dark scale for elevated surfaces) */
-  --canvas-bg: #0d0f14;
-  --canvas-card: #151821;
-  --canvas-inset: #1c202b;
+  /* Canvas Matrix (True neutral layered dark scale - Linear/Vercel SaaS style) */
+  --canvas-bg: #09090b;
+  --canvas-card: #161618;
+  --canvas-inset: #1e1e21;
 
   /* Text & Contrast Typography */
-  --ink-primary: #f3f4f6;
-  --ink-secondary: #9ca3af;
-  --ink-muted: #6b7280;
+  --ink-primary: #f4f4f5;
+  --ink-secondary: #a1a1aa;
+  --ink-muted: #71717a;
   --inverse: #ffffff;
 
   /* Signature Accent Color Block */
@@ -65,7 +65,7 @@
   --brand-accent-light: rgba(139, 92, 246, 0.18);
 
   /* Hairlines */
-  --border-clean: rgba(255, 255, 255, 0.09);
+  --border-clean: rgba(255, 255, 255, 0.08);
   --border-focus: rgba(139, 92, 246, 0.35);
 
   /* System State Colors (Tuned for dark backgrounds) */
@@ -78,11 +78,11 @@
   --state-neutral: #e0e0e0;
   --state-neutral-text: #111827;
   --state-neutral-light: rgba(224, 224, 224, 0.15);
-  --state-future: #242936;
+  --state-future: #262629;
 
   /* Soft-Shadow Layering (Dark Mode) */
-  --shadow-bento: 0 1px 3px rgba(0, 0, 0, 0.4),
-    0 4px 20px rgba(0, 0, 0, 0.6);
+  --shadow-bento: 0 1px 3px rgba(0, 0, 0, 0.5),
+    0 4px 20px rgba(0, 0, 0, 0.7);
 }
 
 @theme inline {
