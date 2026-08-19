@@ -24,6 +24,8 @@ import {
   AlertCircle,
   Copy,
   Check,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 
 interface StaffDetailModalProps {
@@ -37,7 +39,7 @@ export function StaffDetailModal({
   onClose,
   staff,
 }: StaffDetailModalProps) {
-  const { deactivateStaff, activateStaff } = useStaffActions();
+  const { deactivateStaff, activateStaff, removePhoto } = useStaffActions();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isResetPinOpen, setIsResetPinOpen] = useState(false);
@@ -121,6 +123,24 @@ export function StaffDetailModal({
                     </span>
                   )}
                 </div>
+
+                {staff.photo_url && (
+                  <div className="pt-1">
+                    <button
+                      type="button"
+                      onClick={() => removePhoto.mutate(staff.id)}
+                      disabled={removePhoto.isPending}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-500 hover:text-rose-600 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      {removePhoto.isPending ? (
+                        <Loader2 className="h-3 w-3 animate-spin text-rose-500" />
+                      ) : (
+                        <Trash2 className="h-3 w-3 stroke-[2.5px]" />
+                      )}
+                      <span>Remove photo</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -25,6 +25,7 @@ import {
   AlertCircle,
   Camera,
   Loader2,
+  Trash2,
   Copy,
   Check,
 } from "lucide-react";
@@ -36,7 +37,8 @@ interface StaffDetailViewProps {
 
 export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { deactivateStaff, activateStaff, updatePhoto } = useStaffActions();
+  const { deactivateStaff, activateStaff, updatePhoto, removePhoto } =
+    useStaffActions();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isResetPinOpen, setIsResetPinOpen] = useState(false);
@@ -121,7 +123,9 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
               />
               <div
                 onClick={() =>
-                  !updatePhoto.isPending && fileInputRef.current?.click()
+                  !updatePhoto.isPending &&
+                  !removePhoto.isPending &&
+                  fileInputRef.current?.click()
                 }
                 className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-xl overflow-hidden shrink-0 cursor-pointer transition-all hover:opacity-90"
                 title="Click photo to upload or update profile picture"
@@ -140,13 +144,29 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
 
                 {/* Hover Camera Overlay / Upload Spinner */}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                  {updatePhoto.isPending ? (
+                  {updatePhoto.isPending || removePhoto.isPending ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
                     <Camera className="h-5 w-5 stroke-[2.5px]" />
                   )}
                 </div>
               </div>
+
+              {/* Quick Remove Trash Icon Badge */}
+              {staff.photo_url && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removePhoto.mutate(staff.id);
+                  }}
+                  disabled={removePhoto.isPending || updatePhoto.isPending}
+                  className="absolute -top-1 -right-1 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-rose-600 text-white shadow-md hover:bg-rose-700 transition-all cursor-pointer disabled:opacity-50"
+                  title="Remove staff profile photo"
+                >
+                  <Trash2 className="h-3 w-3 stroke-[2.5px]" />
+                </button>
+              )}
             </div>
 
             <div className="space-y-1">
@@ -163,6 +183,24 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
                   <span>{staff.department_name || "Unassigned"}</span>
                 </span>
               </div>
+
+              {staff.photo_url && (
+                <div className="pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => removePhoto.mutate(staff.id)}
+                    disabled={removePhoto.isPending || updatePhoto.isPending}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-500 hover:text-rose-600 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {removePhoto.isPending ? (
+                      <Loader2 className="h-3 w-3 animate-spin text-rose-500" />
+                    ) : (
+                      <Trash2 className="h-3 w-3 stroke-[2.5px]" />
+                    )}
+                    <span>Remove profile photo</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

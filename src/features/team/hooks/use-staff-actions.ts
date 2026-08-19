@@ -113,10 +113,24 @@ export function useStaffActions() {
     },
   });
 
+  const removePhoto = useMutation({
+    mutationFn: (id: string) => staffApi.removePhoto(id),
+    onSuccess: (data) => {
+      toast.success(`Profile photo removed for "${data.name}"`);
+      invalidateStaff();
+    },
+    onError: (err: AxiosError<ApiErrorPayload>) => {
+      toast.error(
+        err.response?.data?.error?.message || "Failed to remove staff photo"
+      );
+    },
+  });
+
   return {
     createStaff,
     updateStaff,
     updatePhoto,
+    removePhoto,
     resetPin,
     deactivateStaff,
     activateStaff,

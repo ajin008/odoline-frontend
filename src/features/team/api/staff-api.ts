@@ -48,6 +48,11 @@ export const staffApi = {
     return res.data.data;
   },
 
+  async removePhoto(id: string): Promise<StaffMember> {
+    const res = await apiClient.delete(endpoints.staff.updatePhoto(id));
+    return res.data.data;
+  },
+
   async resetPin(id: string, payload: ResetStaffPinPayload): Promise<StaffMember> {
     const res = await apiClient.patch(endpoints.staff.resetPin(id), payload);
     return res.data.data;
