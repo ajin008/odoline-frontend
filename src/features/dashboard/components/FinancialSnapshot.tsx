@@ -196,7 +196,7 @@ export function FinancialSnapshot() {
             <BarChart
               data={chartData}
               layout="vertical"
-              margin={{ top: 10, right: 45, left: 10, bottom: 5 }}
+              margin={{ top: 10, right: 55, left: 10, bottom: 5 }}
             >
               <XAxis
                 type="number"

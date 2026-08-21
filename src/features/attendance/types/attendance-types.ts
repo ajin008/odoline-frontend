@@ -43,6 +43,7 @@ export interface AttendanceOverviewStaffEntry {
   id: string;
   name: string;
   phone: string;
+  photo_url?: string | null;
   department_name: string | null;
   clock_in_at?: string;
   clock_out_at?: string | null;

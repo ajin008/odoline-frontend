@@ -6,15 +6,15 @@ const CRORE = 1_00_00_000;
  * the dashboard (e.g. 4450200 -> "₹44.5 lac", 21000000 -> "₹2.1 cr").
  * Values under ₹1,00,000 fall back to a plain "en-IN" grouped number.
  */
-export function formatCompactCurrency(value: number): string {
+export function formatCompactCurrency(value: number, decimals: number = 2): string {
   const abs = Math.abs(value);
   const sign = value < 0 ? "-" : "";
 
   if (abs >= CRORE) {
-    return `${sign}₹${trimDecimal(abs / CRORE)} cr`;
+    return `${sign}₹${trimDecimal(abs / CRORE, decimals)} cr`;
   }
   if (abs >= LAKH) {
-    return `${sign}₹${trimDecimal(abs / LAKH)} lac`;
+    return `${sign}₹${trimDecimal(abs / LAKH, decimals)} lac`;
   }
   return `${sign}₹${abs.toLocaleString("en-IN")}`;
 }
@@ -25,6 +25,7 @@ export function formatFullCurrency(value: number): string {
   return `${sign}₹${Math.abs(value).toLocaleString("en-IN")}`;
 }
 
-function trimDecimal(value: number): string {
-  return value.toFixed(1).replace(/\.0$/, "");
+function trimDecimal(value: number, maxDecimals: number = 2): string {
+  const str = value.toFixed(maxDecimals);
+  return str.replace(/\.00$/, "");
 }

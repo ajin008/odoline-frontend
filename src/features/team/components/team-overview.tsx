@@ -64,7 +64,11 @@ function formatISTTime(isoString?: string | null): string {
   });
 }
 
-export function TeamOverview() {
+interface TeamOverviewProps {
+  onSelectStaff?: (staffId: string) => void;
+}
+
+export function TeamOverview({ onSelectStaff }: TeamOverviewProps = {}) {
   const todayIst = getTodayISTDateString();
   const [selectedDate, setSelectedDate] = useState<string>(todayIst);
   const [activeListTab, setActiveListTab] = useState<
@@ -94,6 +98,14 @@ export function TeamOverview() {
       return;
     }
     setEditTargetStaff(staff);
+  };
+
+  const handleItemClick = (staff: AttendanceOverviewStaffEntry) => {
+    if (onSelectStaff) {
+      onSelectStaff(staff.id);
+    } else {
+      handleRowClick(staff);
+    }
   };
 
   const counts = overview?.counts ?? { present: 0, absent: 0, late: 0 };
@@ -341,21 +353,41 @@ export function TeamOverview() {
               <div key={staff.id} className="py-2.5 sm:py-0">
                 {/* MOBILE VIEW CARD (sm:hidden) */}
                 <div
-                  onClick={() => handleRowClick(staff)}
-                  className={`sm:hidden rounded-xl border border-line/60 bg-card p-3 space-y-3 transition-all ${
-                    isFutureDate
-                      ? "opacity-75 cursor-not-allowed"
-                      : "cursor-pointer hover:border-line"
-                  }`}
+                  onClick={() => handleItemClick(staff)}
+                  className="sm:hidden rounded-xl border border-line/60 bg-card p-3 space-y-3 transition-all cursor-pointer hover:border-line"
                 >
                   {/* Card Top: Staff Name, Dept & Status Badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-inset border border-line text-ink font-bold font-sans text-xs shrink-0">
-                        {staff.name.charAt(0).toUpperCase()}
+                      <div
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectStaff?.(staff.id);
+                        }}
+                        className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-inset border border-line text-ink font-bold font-sans text-xs shrink-0 overflow-hidden cursor-pointer hover:border-accent hover:opacity-90 transition-all"
+                        title={`View ${staff.name}'s profile`}
+                      >
+                        {staff.photo_url ? (
+                          <Image
+                            src={staff.photo_url}
+                            alt={staff.name}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+                        ) : (
+                          staff.name.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <div className="space-y-0.5">
-                        <h4 className="text-xs font-bold text-ink font-sans">
+                        <h4
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectStaff?.(staff.id);
+                          }}
+                          className="text-xs font-bold text-ink font-sans hover:text-accent cursor-pointer transition-colors"
+                          title={`View ${staff.name}'s profile`}
+                        >
                           {staff.name}
                         </h4>
                         {staff.department_name && (
@@ -470,22 +502,42 @@ export function TeamOverview() {
 
                 {/* DESKTOP VIEW ROW (hidden sm:flex) */}
                 <div
-                  onClick={() => handleRowClick(staff)}
-                  className={`hidden sm:flex p-4 px-5 items-center justify-between gap-3 transition-colors ${
-                    isFutureDate
-                      ? "opacity-75 cursor-not-allowed"
-                      : "cursor-pointer hover:bg-inset/40"
-                  }`}
+                  onClick={() => handleItemClick(staff)}
+                  className="hidden sm:flex p-4 px-5 items-center justify-between gap-3 transition-colors cursor-pointer hover:bg-inset/40"
                 >
                   {/* Left: Staff Identity & Phone Actions */}
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-inset border border-line/80 text-ink font-bold font-sans text-xs shrink-0">
-                      {staff.name.charAt(0).toUpperCase()}
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectStaff?.(staff.id);
+                      }}
+                      className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-inset border border-line/80 text-ink font-bold font-sans text-xs shrink-0 overflow-hidden cursor-pointer hover:border-accent hover:opacity-90 transition-all"
+                      title={`View ${staff.name}'s profile`}
+                    >
+                      {staff.photo_url ? (
+                        <Image
+                          src={staff.photo_url}
+                          alt={staff.name}
+                          fill
+                          unoptimized
+                          className="object-cover"
+                        />
+                      ) : (
+                        staff.name.charAt(0).toUpperCase()
+                      )}
                     </div>
 
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-xs font-bold text-ink font-sans">
+                        <h4
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectStaff?.(staff.id);
+                          }}
+                          className="text-xs font-bold text-ink font-sans hover:text-accent cursor-pointer transition-colors"
+                          title={`View ${staff.name}'s profile`}
+                        >
                           {staff.name}
                         </h4>
                         {staff.department_name && (

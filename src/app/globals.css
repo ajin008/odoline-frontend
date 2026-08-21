@@ -223,7 +223,7 @@ h6 {
 }
 
 [data-sonner-toast] [data-title] {
-  font-family: var(--font-heading);
+  font-family: var(--font-sans);
   font-weight: 600;
 }
 

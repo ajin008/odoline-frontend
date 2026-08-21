@@ -86,6 +86,32 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   return null;
 }
 
+interface CustomXAxisTickProps {
+  x?: number;
+  y?: number;
+  payload?: {
+    value: string;
+  };
+}
+
+function CustomXAxisTick({ x = 0, y = 0, payload }: CustomXAxisTickProps) {
+  if (!payload) return null;
+  const val = payload.value;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text
+        x={0}
+        y={0}
+        dy={10}
+        textAnchor="middle"
+        className="text-[9px] min-[390px]:text-[10px] sm:text-[11px] font-semibold font-sans fill-current text-ink-muted"
+      >
+        {val}
+      </text>
+    </g>
+  );
+}
+
 function CustomBarLabel({
   x = 0,
   y = 0,
@@ -433,55 +459,57 @@ export function OwnerFunnelDashboard() {
           </div>
         ) : (
           /* Recharts Minimalist Column Chart */
-          <div className="h-64 sm:h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartData}
-                margin={{ top: 24, right: 16, left: -16, bottom: 8 }}
-                barCategoryGap="25%"
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="var(--line, rgba(0,0,0,0.06))"
-                  opacity={0.5}
-                />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 11, fill: "#64748b", fontWeight: 500 }}
-                  dy={6}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{
-                    fontSize: 10,
-                    fill: "#64748b",
-                    fontFamily: "monospace",
-                  }}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  content={<CustomTooltip />}
-                  cursor={{ fill: "rgba(124, 58, 237, 0.04)" }}
-                />
-                <Bar
-                  dataKey="count"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={44}
-                  label={<CustomBarLabel />}
+          <div className="h-64 sm:h-72 w-full pt-4 overflow-x-auto no-scrollbar">
+            <div className="h-full min-w-[340px] sm:min-w-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 24, right: 8, left: -22, bottom: 8 }}
+                  barCategoryGap="15%"
                 >
-                  {chartData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={ACCENT_SHADES[index % ACCENT_SHADES.length]}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="var(--line, rgba(0,0,0,0.06))"
+                    opacity={0.5}
+                  />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    interval={0}
+                    tick={<CustomXAxisTick />}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 10,
+                      fill: "#64748b",
+                      fontFamily: "monospace",
+                    }}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    content={<CustomTooltip />}
+                    cursor={{ fill: "rgba(124, 58, 237, 0.04)" }}
+                  />
+                  <Bar
+                    dataKey="count"
+                    radius={[6, 6, 0, 0]}
+                    maxBarSize={44}
+                    label={<CustomBarLabel />}
+                  >
+                    {chartData.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={ACCENT_SHADES[index % ACCENT_SHADES.length]}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
       </div>

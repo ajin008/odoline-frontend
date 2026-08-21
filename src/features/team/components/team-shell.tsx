@@ -101,54 +101,51 @@ export function TeamShell() {
       {/* ACTIVE SUBTAB CONTENT VIEW                                    */}
       {/* ------------------------------------------------------------- */}
       <div className="pt-0.5">
-        {/* OVERVIEW SUBTAB */}
-        {activeTab === "overview" && <TeamOverview />}
+        {selectedStaffId && currentStaff ? (
+          /* In-Page Subtab Detail View */
+          <StaffDetailView
+            staff={currentStaff}
+            onBack={() => setSelectedStaffId(null)}
+          />
+        ) : activeTab === "overview" ? (
+          /* OVERVIEW SUBTAB */
+          <TeamOverview onSelectStaff={(id) => setSelectedStaffId(id)} />
+        ) : (
+          /* ACTIVE / INACTIVE STAFF SUBTABS */
+          <div className="space-y-4">
+            {/* Add Staff Top Action Bar */}
+            {activeTab === "active" && (
+              <div className="flex justify-end pb-1">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-inverse hover:bg-accent-hover active:scale-[0.98] transition-all cursor-pointer"
+                >
+                  <UserPlus className="h-4 w-4 stroke-[2.5px]" />
+                  <span>Add Staff</span>
+                </button>
+              </div>
+            )}
 
-        {/* ACTIVE / INACTIVE STAFF SUBTABS */}
-        {activeTab !== "overview" && (
-          currentStaff ? (
-            /* In-Page Subtab Detail View */
-            <StaffDetailView
-              staff={currentStaff}
-              onBack={() => setSelectedStaffId(null)}
+            <StaffList
+              staffList={staffList}
+              isLoading={isLoading}
+              emptyTitle={
+                activeTab === "active"
+                  ? "No active staff members found"
+                  : "No inactive staff members"
+              }
+              emptyDescription={
+                activeTab === "active"
+                  ? "Add your sales executive team members to set up their PIN logins and department assignments."
+                  : "Staff members marked as resigned will appear in this inactive list."
+              }
+              onSelectStaff={(staff) => setSelectedStaffId(staff.id)}
+              onAddClick={
+                activeTab === "active" ? () => setIsAddModalOpen(true) : undefined
+              }
             />
-          ) : (
-            /* Staff List View */
-            <div className="space-y-4">
-              {/* Add Staff Top Action Bar */}
-              {activeTab === "active" && (
-                <div className="flex justify-end pb-1">
-                  <button
-                    type="button"
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-inverse hover:bg-accent-hover active:scale-[0.98] transition-all cursor-pointer"
-                  >
-                    <UserPlus className="h-4 w-4 stroke-[2.5px]" />
-                    <span>Add Staff</span>
-                  </button>
-                </div>
-              )}
-
-              <StaffList
-                staffList={staffList}
-                isLoading={isLoading}
-                emptyTitle={
-                  activeTab === "active"
-                    ? "No active staff members found"
-                    : "No inactive staff members"
-                }
-                emptyDescription={
-                  activeTab === "active"
-                    ? "Add your sales executive team members to set up their PIN logins and department assignments."
-                    : "Staff members marked as resigned will appear in this inactive list."
-                }
-                onSelectStaff={(staff) => setSelectedStaffId(staff.id)}
-                onAddClick={
-                  activeTab === "active" ? () => setIsAddModalOpen(true) : undefined
-                }
-              />
-            </div>
-          )
+          </div>
         )}
       </div>
 
