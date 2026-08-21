@@ -28,6 +28,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { parseISTDateTimeToUTC } from "@/src/lib/formatters";
+
 export interface FollowUpTarget {
   id: string;
   lead_id: string;
@@ -81,20 +83,26 @@ function getTodayISTDateString(): string {
 
 function getQuickPickISODate(
   pick: QuickPickChoice,
-  customDateStr: string
+  customDateStr: string,
+  customTimeStr: string = "10:00"
 ): string {
-  const d = new Date();
+  const istOffsetMs = 5.5 * 60 * 60 * 1000;
+  const nowIST = new Date(Date.now() + istOffsetMs);
+  let dateStr = nowIST.toISOString().split("T")[0];
+
   if (pick === "tomorrow") {
-    d.setDate(d.getDate() + 1);
+    const tom = new Date(Date.now() + 24 * 60 * 60 * 1000 + istOffsetMs);
+    dateStr = tom.toISOString().split("T")[0];
   } else if (pick === "2days") {
-    d.setDate(d.getDate() + 2);
+    const d2 = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000 + istOffsetMs);
+    dateStr = d2.toISOString().split("T")[0];
   } else if (pick === "1week") {
-    d.setDate(d.getDate() + 7);
+    const d7 = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000 + istOffsetMs);
+    dateStr = d7.toISOString().split("T")[0];
   } else if (pick === "custom" && customDateStr) {
-    return new Date(`${customDateStr}T10:00:00.000Z`).toISOString();
+    dateStr = customDateStr;
   }
-  d.setHours(10, 0, 0, 0);
-  return d.toISOString();
+  return parseISTDateTimeToUTC(dateStr, customTimeStr || "10:00");
 }
 
 interface ApiError {
@@ -121,6 +129,7 @@ export function FollowUpOutcomeModal({
   // Reschedule / Next Date State
   const [quickPick, setQuickPick] = useState<QuickPickChoice>("tomorrow");
   const [customDate, setCustomDate] = useState(getTodayISTDateString());
+  const [customTime, setCustomTime] = useState("10:00");
 
   // Mark Lost State
   const [selectedLostReason, setSelectedLostReason] = useState(LOST_REASONS[0]);
@@ -159,7 +168,7 @@ export function FollowUpOutcomeModal({
     try {
       if (outcomeChoice === "reached") {
         // Choice A: Reached customer — set next follow-up
-        const chosenNextISO = getQuickPickISODate(quickPick, customDate);
+        const chosenNextISO = getQuickPickISODate(quickPick, customDate, customTime);
 
         // 1. Mark current follow-up as DONE
         await leadApi.updateFollowUp(leadId, fuId, {
@@ -202,7 +211,7 @@ export function FollowUpOutcomeModal({
         }
       } else if (outcomeChoice === "no_answer") {
         // Choice B: No Answer — reschedule follow-up (NO stage change)
-        const chosenISO = getQuickPickISODate(quickPick, customDate);
+        const chosenISO = getQuickPickISODate(quickPick, customDate, customTime);
 
         // 1. Update current follow-up due_at (keep status open)
         await leadApi.updateFollowUp(leadId, fuId, {
@@ -477,12 +486,30 @@ export function FollowUpOutcomeModal({
                     ))}
                   </div>
 
-                  {quickPick === "custom" && (
-                    <div className="pt-1">
+                  {quickPick === "custom" ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                       <DatePicker
                         value={customDate}
                         onChange={(d) => setCustomDate(d)}
                         align="left"
+                      />
+                      <input
+                        type="time"
+                        value={customTime}
+                        onChange={(e) => setCustomTime(e.target.value || "10:00")}
+                        className="w-full h-10 rounded-xl border border-line bg-surface px-3 py-2 text-xs font-semibold text-ink focus:border-accent focus:outline-none cursor-pointer font-mono"
+                      />
+                    </div>
+                  ) : (
+                    <div className="pt-1 flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-medium text-ink-subtle">
+                        Follow-up Time (IST):
+                      </span>
+                      <input
+                        type="time"
+                        value={customTime}
+                        onChange={(e) => setCustomTime(e.target.value || "10:00")}
+                        className="w-36 h-9 rounded-lg border border-line bg-surface px-3 py-1 text-xs font-semibold text-ink focus:border-accent focus:outline-none cursor-pointer font-mono"
                       />
                     </div>
                   )}
@@ -524,12 +551,30 @@ export function FollowUpOutcomeModal({
                     ))}
                   </div>
 
-                  {quickPick === "custom" && (
-                    <div className="pt-1">
+                  {quickPick === "custom" ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
                       <DatePicker
                         value={customDate}
                         onChange={(d) => setCustomDate(d)}
                         align="left"
+                      />
+                      <input
+                        type="time"
+                        value={customTime}
+                        onChange={(e) => setCustomTime(e.target.value || "10:00")}
+                        className="w-full h-10 rounded-xl border border-line bg-surface px-3 py-2 text-xs font-semibold text-ink focus:border-accent focus:outline-none cursor-pointer font-mono"
+                      />
+                    </div>
+                  ) : (
+                    <div className="pt-1 flex items-center justify-between gap-2">
+                      <span className="text-[11px] font-medium text-ink-subtle">
+                        Follow-up Time (IST):
+                      </span>
+                      <input
+                        type="time"
+                        value={customTime}
+                        onChange={(e) => setCustomTime(e.target.value || "10:00")}
+                        className="w-36 h-9 rounded-lg border border-line bg-surface px-3 py-1 text-xs font-semibold text-ink focus:border-accent focus:outline-none cursor-pointer font-mono"
                       />
                     </div>
                   )}

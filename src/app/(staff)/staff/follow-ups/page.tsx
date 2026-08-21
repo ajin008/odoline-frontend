@@ -1,5 +1,7 @@
-/* eslint-disable security/detect-object-injection */
 "use client";
+
+/* eslint-disable security/detect-object-injection */
+import { formatISTDateTime } from "@/src/lib/formatters";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -198,11 +200,7 @@ export default function StaffFollowUpsPage() {
               PRIORITY_CONFIG[leadPriority] || PRIORITY_CONFIG.warm;
             const stageLabel = getStageLabel(fu.lead?.stage);
 
-            const dueStr = new Date(fu.due_at).toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            });
+            const dueStr = formatISTDateTime(fu.due_at);
 
             return (
               <div

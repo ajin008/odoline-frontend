@@ -131,6 +131,7 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
   const customerPhone = lead.customer?.phone || "N/A";
   const stageLabel = STAGE_LABELS[lead.stage] || lead.stage;
   const sourceLabel = SOURCE_LABELS[lead.source] || lead.source;
+  const isTerminal = lead.stage === "won" || lead.stage === "lost";
 
   const minBudget = formatCurrency(lead.budget_min);
   const maxBudget = formatCurrency(lead.budget_max);
@@ -274,18 +275,24 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
           <LeadInterestedCars
             leadId={lead.id}
             interestedCars={lead.interested_cars}
+            readOnly={isTerminal}
           />
         </div>
 
         {/* Right Column: Follow-ups Schedule & Activity Timeline (40% Width) */}
         <div className="space-y-5 lg:col-span-5">
           {/* Follow-up Schedule Section */}
-          <LeadFollowUps leadId={lead.id} nextFollowUp={lead.next_follow_up} />
+          <LeadFollowUps
+            leadId={lead.id}
+            nextFollowUp={lead.next_follow_up}
+            readOnly={isTerminal}
+          />
 
           {/* Activity Audit Log & Timeline Component */}
           <LeadActivityTimeline
             leadId={lead.id}
             customerPhone={lead.customer?.phone}
+            readOnly={isTerminal}
           />
         </div>
       </div>

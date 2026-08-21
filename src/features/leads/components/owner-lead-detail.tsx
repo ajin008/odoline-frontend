@@ -163,6 +163,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
 
   const isWon = lead.stage === "won";
   const isLost = lead.stage === "lost";
+  const isTerminal = isWon || isLost;
 
   const minBudget = formatCurrency(lead.budget_min);
   const maxBudget = formatCurrency(lead.budget_max);
@@ -268,7 +269,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
               </div>
               <div className="min-w-0 text-left">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-ink-subtle block">
-                  Assigned Staff
+                  {isTerminal ? "Worked by" : "Assigned Staff"}
                 </span>
                 <span className="text-xs font-bold text-ink truncate block">
                   {lead.assigned_rep?.name || "Unassigned"}
@@ -276,16 +277,18 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setSelectedStaffId(lead.assigned_to || "");
-                setIsAssignOpen(true);
-              }}
-              className="flex items-center gap-1.5 rounded-lg bg-accent text-inverse hover:opacity-90 px-3 py-1.5 text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
-            >
-              <span>Reassign</span>
-            </button>
+            {!isTerminal && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedStaffId(lead.assigned_to || "");
+                  setIsAssignOpen(true);
+                }}
+                className="flex items-center gap-1.5 rounded-lg bg-accent text-inverse hover:opacity-90 px-3 py-1.5 text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
+              >
+                <span>Reassign</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

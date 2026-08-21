@@ -21,6 +21,7 @@ import {
 } from "../hooks/use-unassigned-leads";
 import { useStaff } from "@/src/features/team/hooks/use-staff";
 import { CustomSelect } from "@/src/components/ui/custom-select";
+import { formatISTDateTime } from "@/src/lib/formatters";
 import type { LeadPriority } from "../types/lead-types";
 
 const PRIORITY_CONFIG: Record<
@@ -418,10 +419,7 @@ export function UnassignedLeadsQueue() {
                               ? "Overdue"
                               : isDueToday
                               ? "Due Today"
-                              : `Due ${new Date(nextFu.due_at).toLocaleDateString("en-IN", {
-                                  day: "numeric",
-                                  month: "short",
-                                })}`}
+                              : `Due ${formatISTDateTime(nextFu.due_at)}`}
                           </span>
                         </span>
                       </>

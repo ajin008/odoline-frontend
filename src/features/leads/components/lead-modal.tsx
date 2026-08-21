@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useEffect, useState, useRef } from "react";
@@ -5,6 +6,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLeadActions } from "../hooks/use-lead-actions";
 import { DatePicker } from "@/src/components/ui/date-picker";
+import { parseISTDateTimeToUTC } from "@/src/lib/formatters";
 import {
   createLeadFormSchema,
   LEAD_PRIORITY_OPTIONS,
@@ -125,7 +127,9 @@ function getPriorityConfig(priority: string | null | undefined) {
     priority &&
     Object.prototype.hasOwnProperty.call(PRIORITY_CONFIG_MODAL, priority)
   ) {
-    return PRIORITY_CONFIG_MODAL[priority as keyof typeof PRIORITY_CONFIG_MODAL];
+    return PRIORITY_CONFIG_MODAL[
+      priority as keyof typeof PRIORITY_CONFIG_MODAL
+    ];
   }
   return PRIORITY_CONFIG_MODAL.warm;
 }
@@ -171,6 +175,7 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
   // Custom Dropdown Open States
   const [isSourceOpen, setIsSourceOpen] = useState(false);
   const [isPriorityOpen, setIsPriorityOpen] = useState(false);
+  const [followUpTime, setFollowUpTime] = useState("10:00");
 
   const sourceRef = useRef<HTMLDivElement>(null);
   const priorityRef = useRef<HTMLDivElement>(null);
@@ -206,6 +211,7 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
 
   useEffect(() => {
     if (isOpen) {
+      setFollowUpTime("10:00");
       reset({
         name: "",
         phone: "",
@@ -246,9 +252,11 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
     let isoFollowUp: string | null = null;
 
     if (data.first_follow_up_at) {
-      const dateStr = data.first_follow_up_at.split("T")[0];
+      const parts = data.first_follow_up_at.split("T");
+      const dateStr = parts[0];
+      const timeStr = parts[1] || followUpTime || "10:00";
       if (dateStr) {
-        isoFollowUp = new Date(`${dateStr}T10:00:00.000Z`).toISOString();
+        isoFollowUp = parseISTDateTimeToUTC(dateStr, timeStr);
       }
     }
 
@@ -283,7 +291,7 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 pointer-events-auto"
+      className="fixed inset-0 z-100 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 pointer-events-auto"
       onClick={onClose}
     >
       <div
@@ -624,21 +632,52 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
                 </div>
               </div>
 
-              {/* First Follow Up Date using existing DatePicker component */}
+              {/* First Follow Up Date & Time */}
               <div className="space-y-1">
-                <label className="text-xs font-medium text-ink flex items-center gap-1">
-                  <CalendarDays className="h-3.5 w-3.5 text-ink-subtle" />
-                  First Follow-up Date
+                <label className="text-xs font-medium text-ink flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <CalendarDays className="h-3.5 w-3.5 text-ink-subtle" />
+                    First Follow-up Date &amp; Time
+                  </span>
+                  <span className="text-[10px] text-ink-subtle font-mono">
+                    (IST)
+                  </span>
                 </label>
-                <DatePicker
-                  value={selectedFollowUpDate.split("T")[0] || ""}
-                  onChange={(dateStr) => {
-                    setValue("first_follow_up_at", dateStr, {
-                      shouldValidate: true,
-                    });
-                  }}
-                  align="left"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <DatePicker
+                    value={selectedFollowUpDate.split("T")[0] || ""}
+                    onChange={(dateStr) => {
+                      const curTime = followUpTime || "10:00";
+                      setValue(
+                        "first_follow_up_at",
+                        dateStr ? `${dateStr}T${curTime}` : "",
+                        {
+                          shouldValidate: true,
+                        }
+                      );
+                    }}
+                    align="left"
+                  />
+                  <input
+                    type="time"
+                    value={followUpTime}
+                    onChange={(e) => {
+                      const timeVal = e.target.value || "10:00";
+                      setFollowUpTime(timeVal);
+                      const dateStr = selectedFollowUpDate.split("T")[0];
+                      if (dateStr) {
+                        setValue(
+                          "first_follow_up_at",
+                          `${dateStr}T${timeVal}`,
+                          {
+                            shouldValidate: true,
+                          }
+                        );
+                      }
+                    }}
+                    className="w-full h-10 rounded-xl border border-line bg-inset px-3 py-2 text-xs font-semibold text-ink focus:border-accent focus:outline-none cursor-pointer font-mono"
+                  />
+                </div>
               </div>
 
               {/* Remark / Notes */}

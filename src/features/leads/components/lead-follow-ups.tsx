@@ -12,6 +12,7 @@ import type {
 } from "../types/lead-types";
 import { DatePicker } from "@/src/components/ui/date-picker";
 import { FollowUpOutcomeModal } from "./follow-up-outcome-modal";
+import { formatISTDateTime, parseISTDateTimeToUTC } from "@/src/lib/formatters";
 import {
   CalendarCheck,
   Clock,
@@ -81,19 +82,21 @@ export function LeadFollowUps({
   // Modals state
   const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [scheduleDate, setScheduleDate] = useState(getTodayISTDateString());
+  const [scheduleTime, setScheduleTime] = useState("10:00");
 
   // Outcome Modal State
   const [selectedOutcomeFu, setSelectedOutcomeFu] = useState<FollowUp | null>(null);
 
   const handleScheduleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const isoDateTime = new Date(`${scheduleDate}T10:00:00.000Z`).toISOString();
+    const isoDateTime = parseISTDateTimeToUTC(scheduleDate, scheduleTime || "10:00");
 
     scheduleMutation.mutate(
       { due_at: isoDateTime },
       {
         onSuccess: () => {
           setIsScheduleOpen(false);
+          setScheduleTime("10:00");
         },
       }
     );
@@ -170,13 +173,7 @@ export function LeadFollowUps({
           <div className="flex items-center gap-2 text-xs font-semibold text-ink">
             <Calendar className="h-4 w-4 text-accent shrink-0" />
             <span>
-              Due:{" "}
-              {new Date(nextFollowUp.due_at).toLocaleDateString("en-IN", {
-                weekday: "short",
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
+              Due: {formatISTDateTime(nextFollowUp.due_at)}
             </span>
           </div>
         </div>
@@ -207,11 +204,7 @@ export function LeadFollowUps({
 
           <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
             {followUps.map((fu) => {
-              const dueStr = new Date(fu.due_at).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              });
+              const dueStr = formatISTDateTime(fu.due_at);
 
               if (fu.status === "open") {
                 return (
@@ -296,14 +289,20 @@ export function LeadFollowUps({
 
             <form onSubmit={handleScheduleSubmit} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-ink-muted">
-                  Follow-up Date (IST)
+                <label className="text-xs font-medium text-ink-muted flex items-center justify-between">
+                  <span>Follow-up Date &amp; Time (IST)</span>
                 </label>
-                <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <DatePicker
                     value={scheduleDate}
                     onChange={(d) => setScheduleDate(d)}
                     align="left"
+                  />
+                  <input
+                    type="time"
+                    value={scheduleTime}
+                    onChange={(e) => setScheduleTime(e.target.value || "10:00")}
+                    className="w-full h-10 rounded-xl border border-line bg-inset px-3 py-2 text-xs font-semibold text-ink focus:border-accent focus:outline-none cursor-pointer font-mono"
                   />
                 </div>
               </div>
