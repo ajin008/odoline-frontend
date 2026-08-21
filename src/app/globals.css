@@ -48,10 +48,10 @@
 }
 
 .dark {
-  /* Canvas Matrix (True neutral layered dark scale - Linear/Vercel SaaS style) */
-  --canvas-bg: #09090b;
-  --canvas-card: #161618;
-  --canvas-inset: #1e1e21;
+  /* Canvas Matrix (Deep black root bg + rich dark scale) */
+  --canvas-bg: #000000;
+  --canvas-card: #121315;
+  --canvas-inset: #1a1b1e;
 
   /* Text & Contrast Typography */
   --ink-primary: #f4f4f5;

@@ -11,9 +11,9 @@ export function OwnerSidebar() {
   const inStockCount = stats?.total_stock ?? 0;
 
   return (
-    <aside className="flex h-full flex-col bg-[#171819] text-white border border-[#262729] rounded-xl shadow-bento overflow-hidden select-none">
+    <aside className="flex h-full flex-col bg-[#0f1012] text-white border border-[#1f2023] rounded-xl shadow-bento overflow-hidden select-none">
       {/* Brand Identity Branding Header (Updated with Image & Fixed Typography) */}
-      <div className="flex h-18 items-center px-6 border-b border-[#262729]">
+      <div className="flex h-18 items-center px-6 border-b border-[#1f2023]">
         <div className="flex items-center gap-2.5">
           <Image
             src="/icons/icon-192.png"
@@ -79,7 +79,7 @@ export function OwnerSidebar() {
       </nav>
 
       {/* Internal Showroom Context Block */}
-      <div className="p-4 border-t border-[#262729] bg-[#121314]/60 space-y-2.5">
+      <div className="p-4 border-t border-[#1f2023] bg-[#090a0b]/60 space-y-2.5">
         <div className="flex items-center gap-2 text-slate-300">
           <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
           <span className="text-xs font-semibold tracking-tight text-white">
@@ -87,7 +87,7 @@ export function OwnerSidebar() {
           </span>
         </div>
 
-        <div className="flex items-center justify-between rounded-lg bg-[#1e1f21] border border-[#2e2f33] p-2 shadow-sm">
+        <div className="flex items-center justify-between rounded-lg bg-[#161719] border border-[#232428] p-2 shadow-sm">
           <div className="flex items-center gap-1.5">
             <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-[10px] font-bold tracking-wide uppercase text-slate-300">
