@@ -114,120 +114,152 @@ export default function StaffDashboardPage() {
         {/* Left Column: My Day Action Tasks & Inventory Stats */}
         <div className="lg:col-span-2 space-y-6">
           {/* Section Title: My Tasks Today */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse" />
-              <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-ink-subtle">
+          <div className="flex items-center justify-between gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse shrink-0" />
+              <h2 className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-wider text-ink-subtle truncate">
                 My Action Items Today
               </h2>
             </div>
             {totalTasks > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-accent/10 border border-accent/20 text-accent">
-                {totalTasks} Task{totalTasks === 1 ? "" : "s"} Needing Action
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-accent/10 border border-accent/20 text-accent whitespace-nowrap shrink-0">
+                <span className="sm:hidden">{totalTasks} Pending</span>
+                <span className="hidden sm:inline">
+                  {totalTasks} Task{totalTasks === 1 ? "" : "s"} Needing Action
+                </span>
               </span>
             )}
           </div>
 
-          {/* Action Task Metric Cards */}
+          {/* Action Task & Key Metrics Cards (2x2 Matrix on Mobile, 3-col on Desktop) */}
           {isLoadingAtRisk ? (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-pulse">
-              {[1, 2, 3].map((i) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4.5 animate-pulse">
+              {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-36 rounded-2xl border border-line bg-card/60 p-4 space-y-3"
+                  className="h-32 sm:h-36 rounded-xl sm:rounded-2xl border border-line bg-card/60 p-3.5 sm:p-4 space-y-3"
                 >
-                  <div className="h-4 w-20 bg-inset rounded" />
-                  <div className="h-8 w-12 bg-inset rounded" />
-                  <div className="h-3 w-28 bg-inset rounded" />
+                  <div className="h-3.5 w-16 sm:w-20 bg-inset rounded" />
+                  <div className="h-6 sm:h-8 w-10 sm:w-12 bg-inset rounded" />
+                  <div className="h-3 w-20 sm:w-28 bg-inset rounded" />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4.5">
               {/* Task Card 1: Follow-ups Due Today */}
               <Link
                 href="/staff/follow-ups?bucket=today"
-                className="group relative flex flex-col justify-between rounded-2xl border border-accent/30 bg-accent/5 p-4.5 shadow-xs hover:border-accent/60 active:scale-[0.98] transition-all cursor-pointer min-h-[145px]"
+                className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-accent/30 bg-accent/5 p-3.5 sm:p-5 shadow-xs hover:border-accent/60 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px]"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold tracking-wider uppercase text-accent">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-accent truncate">
                     Due Today
                   </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-accent/15 text-accent border border-accent/25 shrink-0">
-                    <Calendar className="h-4 w-4 stroke-[2.25px]" />
+                  <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-accent/15 text-accent border border-accent/25 shrink-0">
+                    <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.25px]" />
                   </div>
                 </div>
 
-                <div className="my-2">
-                  <span className="font-heading text-3xl sm:text-4xl font-extrabold tracking-tight text-ink block leading-none">
+                <div className="my-1 sm:my-2">
+                  <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-ink block leading-none">
                     {dueToday}
                   </span>
-                  <p className="text-xs text-ink-subtle mt-1.5 leading-relaxed">
+                  <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
                     Follow-ups scheduled for today.
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-accent/15 flex items-center justify-between text-xs font-bold text-accent group-hover:translate-x-0.5 transition-transform">
-                  <span>View Due Today</span>
-                  <ArrowRight className="h-3.5 w-3.5 shrink-0" />
+                <div className="pt-1.5 sm:pt-2.5 border-t border-accent/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-accent group-hover:translate-x-0.5 transition-transform">
+                  <span className="truncate">View Due Today</span>
+                  <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                 </div>
               </Link>
 
               {/* Task Card 2: Overdue Follow-ups */}
               <Link
                 href="/staff/follow-ups?bucket=overdue"
-                className="group relative flex flex-col justify-between rounded-2xl border border-rose-500/30 bg-rose-500/5 dark:bg-rose-500/10 p-4.5 shadow-xs hover:shadow-bento hover:border-rose-500/60 active:scale-[0.98] transition-all cursor-pointer min-h-[145px]"
+                className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-rose-500/30 bg-rose-500/5 dark:bg-rose-500/10 p-3.5 sm:p-5 shadow-xs hover:shadow-bento hover:border-rose-500/60 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px]"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold tracking-wider uppercase text-rose-600 dark:text-rose-400">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-rose-600 dark:text-rose-400 truncate">
                     Overdue
                   </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25 shrink-0">
-                    <AlertTriangle className="h-4 w-4 stroke-[2.25px]" />
+                  <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25 shrink-0">
+                    <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.25px]" />
                   </div>
                 </div>
 
-                <div className="my-2">
-                  <span className="font-heading text-3xl sm:text-4xl font-extrabold tracking-tight text-rose-600 dark:text-rose-400 block leading-none">
+                <div className="my-1 sm:my-2">
+                  <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-rose-600 dark:text-rose-400 block leading-none">
                     {overdueCount}
                   </span>
-                  <p className="text-xs text-ink-subtle mt-1.5 leading-relaxed">
+                  <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
                     Missed follow-ups past due.
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-rose-500/15 flex items-center justify-between text-xs font-bold text-rose-600 dark:text-rose-400 group-hover:translate-x-0.5 transition-transform">
-                  <span>View Overdue</span>
-                  <ArrowRight className="h-3.5 w-3.5 shrink-0" />
+                <div className="pt-1.5 sm:pt-2.5 border-t border-rose-500/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 group-hover:translate-x-0.5 transition-transform">
+                  <span className="truncate">View Overdue</span>
+                  <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                 </div>
               </Link>
 
               {/* Task Card 3: My Hot Leads */}
               <Link
                 href="/staff/leads?priority=hot"
-                className="group relative flex flex-col justify-between rounded-2xl border border-orange-500/30 bg-orange-500/5 dark:bg-orange-500/10 p-4.5 shadow-xs hover:shadow-bento hover:border-orange-500/60 active:scale-[0.98] transition-all cursor-pointer min-h-[145px]"
+                className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-orange-500/30 bg-orange-500/5 dark:bg-orange-500/10 p-3.5 sm:p-5 shadow-xs hover:shadow-bento hover:border-orange-500/60 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px]"
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-mono font-bold tracking-wider uppercase text-orange-600 dark:text-orange-400">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-orange-600 dark:text-orange-400 truncate">
                     My Hot Leads
                   </span>
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/25 shrink-0">
-                    <Flame className="h-4 w-4 stroke-[2.25px]" />
+                  <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/25 shrink-0">
+                    <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.25px]" />
                   </div>
                 </div>
 
-                <div className="my-2">
-                  <span className="font-heading text-3xl sm:text-4xl font-extrabold tracking-tight text-orange-600 dark:text-orange-400 block leading-none">
+                <div className="my-1 sm:my-2">
+                  <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-orange-600 dark:text-orange-400 block leading-none">
                     {hotLeadsCount}
                   </span>
-                  <p className="text-xs text-ink-subtle mt-1.5 leading-relaxed">
+                  <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
                     Active Hot & Very Hot leads.
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-orange-500/15 flex items-center justify-between text-xs font-bold text-orange-600 dark:text-orange-400 group-hover:translate-x-0.5 transition-transform">
-                  <span>View Hot Leads</span>
-                  <ArrowRight className="h-3.5 w-3.5 shrink-0" />
+                <div className="pt-1.5 sm:pt-2.5 border-t border-orange-500/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-orange-600 dark:text-orange-400 group-hover:translate-x-0.5 transition-transform">
+                  <span className="truncate">View Hot Leads</span>
+                  <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                </div>
+              </Link>
+
+              {/* Task Card 4: In-Stock Cars Count (Completes 2x2 Matrix on Mobile) */}
+              <Link
+                href="/staff/stock"
+                className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-line bg-card p-3.5 sm:p-5 shadow-xs hover:border-accent/40 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px] sm:hidden"
+              >
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-ink-subtle truncate">
+                    In-Stock Cars
+                  </span>
+                  <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-inset text-ink-subtle border border-line group-hover:text-accent group-hover:border-accent/30 transition-colors shrink-0">
+                    <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2px]" />
+                  </div>
+                </div>
+
+                <div className="my-1 sm:my-2">
+                  <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-ink block leading-none">
+                    {isLoadingCars ? "…" : availableCarsCount}
+                  </span>
+                  <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
+                    Browse ready inventory.
+                  </p>
+                </div>
+
+                <div className="pt-1.5 sm:pt-2.5 border-t border-line/60 flex items-center justify-between text-[10px] sm:text-xs font-bold text-accent group-hover:translate-x-0.5 transition-transform">
+                  <span className="truncate">Browse Cars</span>
+                  <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                 </div>
               </Link>
             </div>
@@ -249,12 +281,12 @@ export default function StaffDashboardPage() {
             </div>
           )}
 
-          {/* Secondary Context Row: In-Stock Inventory & Coming Soon Bookings */}
+          {/* Secondary Context Row: In-Stock Inventory (Tablet/Desktop) & Coming Soon Bookings */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Card 1: In-Stock Cars Count */}
+            {/* Card 1: In-Stock Cars Count (Desktop & Tablet view) */}
             <Link
               href="/staff/stock"
-              className="group flex flex-col justify-between rounded-2xl border border-line bg-card p-5 shadow-xs hover:border-accent/40 active:scale-[0.98] transition-all cursor-pointer"
+              className="hidden sm:flex group flex-col justify-between rounded-2xl border border-line bg-card p-5 shadow-xs hover:border-accent/40 active:scale-[0.98] transition-all cursor-pointer min-h-[145px]"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold tracking-wider uppercase text-ink-subtle">
@@ -286,36 +318,36 @@ export default function StaffDashboardPage() {
             </Link>
 
             {/* Card 2: Bookings — Customer Tokens (COMING SOON PLACEHOLDER) */}
-            <div className="flex flex-col justify-between rounded-2xl border border-dashed border-line/80 bg-card/40 p-5 opacity-85 select-none relative overflow-hidden">
-              <div className="flex items-center justify-between">
+            <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl border border-dashed border-line/80 bg-card/40 p-3.5 sm:p-5 opacity-85 select-none relative overflow-hidden min-h-[130px] sm:min-h-[145px]">
+              <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-mono font-bold tracking-wider uppercase text-ink-subtle">
+                  <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-ink-subtle truncate">
                     Bookings
                   </span>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                     <Sparkles className="h-2.5 w-2.5 shrink-0" />
                     Coming Soon
                   </span>
                 </div>
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-inset/50 text-ink-subtle/60 border border-line/50 shrink-0">
-                  <CalendarCheck className="h-4 w-4 stroke-[2px]" />
+                <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-inset/50 text-ink-subtle/60 border border-line/50 shrink-0">
+                  <CalendarCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2px]" />
                 </div>
               </div>
 
-              <div className="my-3 space-y-1">
-                <h4 className="text-sm font-bold text-ink font-sans flex items-center gap-1.5">
+              <div className="my-1.5 sm:my-3 space-y-0.5 sm:space-y-1">
+                <h4 className="text-xs sm:text-sm font-bold text-ink font-sans flex items-center gap-1.5">
                   <span>Customer Tokens</span>
                   <Lock className="h-3 w-3 text-ink-subtle/70 shrink-0" />
                 </h4>
-                <p className="text-xs text-ink-subtle leading-relaxed">
+                <p className="text-[10px] sm:text-xs text-ink-subtle leading-tight sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
                   Advance booking tokens and deal closing workflows will launch
                   in the next release phase.
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-line/40 flex items-center justify-between text-xs font-medium text-ink-subtle/60">
+              <div className="pt-1.5 sm:pt-2.5 border-t border-line/40 flex items-center justify-between text-[10px] sm:text-xs font-medium text-ink-subtle/60">
                 <span>Feature Preview</span>
-                <span className="text-[10px] font-mono">v4.1</span>
+                <span className="text-[9px] sm:text-[10px] font-mono">v4.1</span>
               </div>
             </div>
           </div>
