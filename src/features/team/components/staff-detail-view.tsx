@@ -48,7 +48,8 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
 
   const handleCopyPhone = () => {
     if (!staff?.phone) return;
-    const textToCopy = `+91${staff.phone}`;
+    const digitsOnly = staff.phone.replace(/\D/g, "");
+    const textToCopy = digitsOnly.length > 10 ? digitsOnly.slice(-10) : digitsOnly;
     navigator.clipboard.writeText(textToCopy);
     toast.success(`Copied ${textToCopy} to clipboard!`);
     setCopied(true);
@@ -268,7 +269,7 @@ export function StaffDetailView({ staff, onBack }: StaffDetailViewProps) {
                     type="button"
                     onClick={handleCopyPhone}
                     className="h-7 px-2 text-[11px] rounded-lg border border-line/60 bg-surface hover:border-line text-ink-muted hover:text-ink font-semibold flex items-center gap-1 cursor-pointer transition-colors"
-                    title={`Copy +91 ${staff.phone}`}
+                    title={`Copy ${staff.phone}`}
                   >
                     {copied ? (
                       <Check className="h-3 w-3 text-emerald-500" />

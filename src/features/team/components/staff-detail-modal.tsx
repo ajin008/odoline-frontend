@@ -49,7 +49,8 @@ export function StaffDetailModal({
 
   const handleCopyPhone = () => {
     if (!staff?.phone) return;
-    const textToCopy = `+91${staff.phone}`;
+    const digitsOnly = staff.phone.replace(/\D/g, "");
+    const textToCopy = digitsOnly.length > 10 ? digitsOnly.slice(-10) : digitsOnly;
     navigator.clipboard.writeText(textToCopy);
     toast.success(`Copied ${textToCopy} to clipboard!`);
     setCopied(true);
@@ -177,7 +178,7 @@ export function StaffDetailModal({
                       type="button"
                       onClick={handleCopyPhone}
                       className="flex h-6 w-6 items-center justify-center rounded-md border border-line/70 bg-card hover:border-accent/40 hover:bg-inset transition-all cursor-pointer p-0.5"
-                      title={`Copy +91 ${staff.phone}`}
+                      title={`Copy ${staff.phone}`}
                     >
                       {copied ? (
                         <Check className="h-3 w-3 text-emerald-500 stroke-[2.5px]" />

@@ -27,7 +27,8 @@ export function StaffList({
 
   const handleCopyPhone = (e: React.MouseEvent, phone: string, id: string) => {
     e.stopPropagation();
-    const textToCopy = `+91${phone}`;
+    const digitsOnly = phone.replace(/\D/g, "");
+    const textToCopy = digitsOnly.length > 10 ? digitsOnly.slice(-10) : digitsOnly;
     navigator.clipboard.writeText(textToCopy);
     toast.success(`Copied ${textToCopy} to clipboard!`);
     setCopiedId(id);
@@ -165,7 +166,7 @@ export function StaffList({
                 type="button"
                 onClick={(e) => handleCopyPhone(e, staff.phone, staff.id)}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-line/70 bg-inset hover:bg-card hover:border-accent/40 transition-all cursor-pointer p-1.5"
-                title={`Copy +91 ${staff.phone}`}
+                title={`Copy ${staff.phone}`}
               >
                 {copiedId === staff.id ? (
                   <Check className="h-4 w-4 text-emerald-500 stroke-[2.5px]" />
