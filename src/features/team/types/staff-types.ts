@@ -34,6 +34,7 @@ export interface CreateStaffPayload {
 export interface UpdateStaffPayload {
   name?: string;
   phone?: string;
+  role?: "sales" | "cro";
   position?: string | null;
   gender?: string | null;
   address?: string | null;
