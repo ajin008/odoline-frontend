@@ -147,7 +147,7 @@ export function LeadActivityTimeline({
     ["call", "whatsapp", "visit"].includes(a.type)
   );
 
-  let lastContactLabel = "No contact logged yet";
+  let lastContactLabel = "No activity recorded yet";
   if (lastContactActivity) {
     const diffMs =
       new Date().getTime() - new Date(lastContactActivity.created_at).getTime();
@@ -180,7 +180,7 @@ export function LeadActivityTimeline({
       {!readOnly && (
         <div className="space-y-1.5">
           <span className="text-[11px] font-medium text-ink-subtle uppercase tracking-wider">
-            Quick Actions (1-Tap Log)
+            Quick Actions
           </span>
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -262,8 +262,7 @@ export function LeadActivityTimeline({
         </p>
       ) : !activities || activities.length === 0 ? (
         <div className="rounded-lg border border-dashed border-line bg-inset/50 p-6 text-center text-xs text-ink-subtle">
-          No activities logged yet. Use the quick buttons above to record a call
-          or note.
+          No activity history yet. Use the buttons above to record a call, message, or note.
         </div>
       ) : (
         <div className="relative border-l border-line/70 pl-4 space-y-4 my-2 ml-2">
@@ -314,7 +313,7 @@ export function LeadActivityTimeline({
                   )}
 
                   <p className="text-[11px] text-ink-subtle">
-                    Logged by{" "}
+                    By{" "}
                     <span className="font-medium text-ink">
                       {item.performed_by?.name || "System"}
                     </span>

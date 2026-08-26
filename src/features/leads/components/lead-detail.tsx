@@ -1,11 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useLead } from "../hooks/use-lead";
+import { useMe } from "@/src/features/auth/hooks/use-me";
 import { LeadActivityTimeline } from "./lead-activity-timeline";
 import { LeadFollowUps } from "./lead-follow-ups";
 import { LeadStageControl } from "./lead-stage-control";
 import { LeadInterestedCars } from "./lead-interested-cars";
+import { EditLeadModal } from "./edit-lead-modal";
 import type { LeadPriority } from "../types/lead-types";
 import {
   ArrowLeft,
@@ -16,6 +19,7 @@ import {
   Calendar,
   MessageSquare,
   AlertTriangle,
+  Edit3,
 } from "lucide-react";
 
 interface LeadDetailProps {
@@ -82,7 +86,9 @@ function formatCurrency(amountStr: string | null): string {
 }
 
 export function LeadDetail({ leadId }: LeadDetailProps) {
+  const { data: user } = useMe();
   const { data: lead, isLoading, isError } = useLead(leadId);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -133,6 +139,12 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
   const sourceLabel = SOURCE_LABELS[lead.source] || lead.source;
   const isTerminal = lead.stage === "won" || lead.stage === "lost";
 
+  // Permission check for editing: CRO or assigned Sales rep, provided lead is not closed (won/lost)
+  const canEdit =
+    !isTerminal &&
+    user?.role !== "owner" &&
+    (user?.role === "cro" || (user?.role === "sales" && lead.assigned_to === user.id));
+
   const minBudget = formatCurrency(lead.budget_min);
   const maxBudget = formatCurrency(lead.budget_max);
   let budgetDisplay = "Not specified";
@@ -156,7 +168,7 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
     <div className="w-full space-y-5 font-sans select-none">
       {/* Top Bar Navigation (Native Mobile App Header feel) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line/60 pb-3 sm:pb-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/staff/leads"
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle hover:bg-hover hover:text-ink transition-colors shrink-0 shadow-xs"
@@ -182,6 +194,18 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
             </p>
           </div>
         </div>
+
+        {/* Action Controls Header */}
+        {canEdit && (
+          <button
+            type="button"
+            onClick={() => setIsEditOpen(true)}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-line hover:border-accent/40 text-ink-subtle hover:text-accent text-xs font-semibold shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
+          >
+            <Edit3 className="h-3.5 w-3.5" />
+            <span>Edit Details</span>
+          </button>
+        )}
       </div>
 
       {/* Buyer Stage Stepper Pipeline Component */}
@@ -296,6 +320,15 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
           />
         </div>
       </div>
+
+      {/* Edit Lead Modal */}
+      {canEdit && (
+        <EditLeadModal
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+          lead={lead}
+        />
+      )}
     </div>
   );
 }

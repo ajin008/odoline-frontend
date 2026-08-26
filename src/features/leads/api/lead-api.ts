@@ -13,6 +13,7 @@ import type {
   DashboardFunnelData,
   CroAtRiskData,
   MyAtRiskData,
+  UpdateLeadPayload,
 } from "../types/lead-types";
 import type { Car } from "@/src/features/cars/api/cars-api";
 
@@ -89,6 +90,12 @@ export const leadApi = {
   /** GET /api/v1/leads/:id — Get single lead detail */
   async getById(id: string): Promise<Lead> {
     const res = await apiClient.get(endpoints.leads.detail(id));
+    return res.data.data;
+  },
+
+  /** PATCH /api/v1/leads/:id — Update lead descriptive fields & customer details */
+  async update(id: string, payload: UpdateLeadPayload): Promise<Lead> {
+    const res = await apiClient.patch(endpoints.leads.detail(id), payload);
     return res.data.data;
   },
 

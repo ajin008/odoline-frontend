@@ -43,6 +43,17 @@ export interface LogActivityPayload {
   note?: string;
 }
 
+export interface UpdateLeadPayload {
+  name?: string;
+  phone?: string;
+  priority?: LeadPriority;
+  budget_min?: string | null;
+  budget_max?: string | null;
+  source?: LeadSource;
+  source_note?: string | null;
+  remark?: string | null;
+}
+
 export interface ChangeStagePayload {
   to_stage: LeadStage;
   won_car_id?: string | null;
