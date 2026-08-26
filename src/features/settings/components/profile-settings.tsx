@@ -71,7 +71,7 @@ export function ProfileSettings() {
                   !removePhotoMutation.isPending &&
                   fileInputRef.current?.click()
                 }
-                className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-xl overflow-hidden shrink-0 cursor-pointer transition-all hover:opacity-90"
+                className="relative flex h-14 w-14 items-center justify-center rounded-full bg-accent/10 border border-accent/20 text-accent font-bold text-xl overflow-hidden shrink-0 cursor-pointer transition-all hover:opacity-90"
                 title="Click to upload or change profile photo"
               >
                 {user?.photo_url ? (
@@ -79,7 +79,7 @@ export function ProfileSettings() {
                   <img
                     src={user.photo_url}
                     alt={user.name}
-                    className="h-full w-full object-cover"
+                    className="h-full w-full object-cover rounded-full"
                   />
                 ) : (
                   <User className="h-7 w-7 stroke-[2.5px]" />

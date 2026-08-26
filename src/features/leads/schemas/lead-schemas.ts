@@ -54,6 +54,7 @@ export const createLeadFormSchema = z
       .nullable(),
     remark: z.string().trim().optional().nullable(),
     first_follow_up_at: z.string().optional().nullable(),
+    assigned_to: z.string().optional().nullable(),
   })
   .superRefine((data, ctx) => {
     if (

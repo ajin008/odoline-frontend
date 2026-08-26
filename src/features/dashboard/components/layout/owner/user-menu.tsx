@@ -104,14 +104,14 @@ export function UserMenu() {
         ].join(" ")}
       >
         {/* Avatar Image / Initials Badge */}
-        <div className="relative flex h-7.5 w-7.5 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-accent/10 border border-accent/20 text-accent font-bold font-mono text-xs shadow-2xs">
+        <div className="relative flex h-7.5 w-7.5 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent/10 border border-accent/20 text-accent font-bold font-mono text-xs shadow-2xs">
           {user?.photo_url ? (
             <Image
               src={user.photo_url}
               alt={user.name || "User Avatar"}
               fill
               sizes="30px"
-              className="object-cover rounded-lg"
+              className="object-cover rounded-full"
             />
           ) : (
             <span>{initials}</span>
@@ -145,14 +145,14 @@ export function UserMenu() {
         >
           {/* User Profile Card Header */}
           <div className="flex items-center gap-3 p-2.5 rounded-xl bg-inset/60 border border-line/40">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-accent/15 border border-accent/25 text-accent font-bold font-mono text-sm shadow-xs">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent/15 border border-accent/25 text-accent font-bold font-mono text-sm shadow-xs">
               {user?.photo_url ? (
                 <Image
                   src={user.photo_url}
                   alt={user.name || "User Avatar"}
                   fill
                   sizes="40px"
-                  className="object-cover rounded-xl"
+                  className="object-cover rounded-full"
                 />
               ) : (
                 <span>{initials}</span>

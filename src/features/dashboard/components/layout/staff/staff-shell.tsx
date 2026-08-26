@@ -13,14 +13,12 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading, error } = useMe();
   const isUnauthorized = isAxiosError(error) && error.response?.status === 401;
 
-  // Role guard: only sales role with is_active === true can access staff routes
+  // Role guard: non-owner staff (sales and cro) with is_active === true can access staff routes
   useEffect(() => {
     if (isUnauthorized || (user && !user.is_active)) {
       router.replace("/login");
     } else if (user && user.role === "owner") {
       router.replace("/owner/dashboard");
-    } else if (user && user.role !== "sales") {
-      router.replace("/login");
     }
   }, [user, isUnauthorized, router]);
 
@@ -32,7 +30,7 @@ export function StaffShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user || user.role !== "sales" || !user.is_active) {
+  if (!user || user.role === "owner" || !user.is_active) {
     return null;
   }
 

@@ -149,6 +149,7 @@ export interface CreateLeadPayload {
   budget_max?: string | null;
   remark?: string | null;
   first_follow_up_at?: string | null;
+  assigned_to?: string | null;
 }
 
 export interface FunnelCounts {
@@ -178,4 +179,19 @@ export interface DashboardFunnelData {
   period: DashboardFunnelPeriod;
   metrics: DashboardFunnelMetrics;
   funnel: FunnelCounts;
+}
+
+export interface CroAtRiskData {
+  overdue_followups: number;
+  going_cold: number;
+  hot_no_followup: number;
+  total_active: number;
+}
+
+export interface MyAtRiskData {
+  due_today: number;
+  overdue_followups: number;
+  hot_leads: number;
+  going_cold: number;
+  total_active: number;
 }

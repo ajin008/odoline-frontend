@@ -4,6 +4,7 @@
 import { formatISTDateTime } from "@/src/lib/formatters";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useActionFollowUps } from "@/src/features/leads/hooks/use-lead-follow-ups";
@@ -68,7 +69,22 @@ function getStageLabel(stage?: string | null): string {
 }
 
 export default function StaffFollowUpsPage() {
-  const [activeBucket, setActiveBucket] = useState<BucketType>("today");
+  const searchParams = useSearchParams();
+  const bucketParam = searchParams.get("bucket") as BucketType | null;
+  const [activeBucket, setActiveBucket] = useState<BucketType>(() => {
+    return bucketParam && ["today", "overdue", "upcoming"].includes(bucketParam)
+      ? bucketParam
+      : "today";
+  });
+  const [prevBucketParam, setPrevBucketParam] = useState(bucketParam);
+
+  if (bucketParam !== prevBucketParam) {
+    setPrevBucketParam(bucketParam);
+    if (bucketParam && ["today", "overdue", "upcoming"].includes(bucketParam)) {
+      setActiveBucket(bucketParam);
+    }
+  }
+
   const [selectedOutcomeFu, setSelectedOutcomeFu] = useState<FollowUp | null>(null);
 
   const { data: todayList } = useActionFollowUps("today");
@@ -141,14 +157,20 @@ export default function StaffFollowUpsPage() {
           onClick={() => setActiveBucket("overdue")}
           className={`flex items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full text-center ${
             activeBucket === "overdue"
-              ? "bg-red-500 text-white shadow-xs font-bold"
-              : "text-ink-subtle hover:text-ink hover:bg-card/50"
+              ? "bg-rose-600 text-white shadow-xs font-bold"
+              : "text-rose-500 dark:text-rose-400 hover:text-rose-600 hover:bg-rose-500/10"
           }`}
         >
           <Clock className="h-3.5 w-3.5 shrink-0" />
           <span>Overdue</span>
           {overdueCount > 0 && (
-            <span className="ml-0.5 rounded-md bg-red-500/20 text-white font-bold px-1.5 py-0.2 text-[10px] font-mono">
+            <span
+              className={`ml-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold ${
+                activeBucket === "overdue"
+                  ? "bg-white/20 text-white"
+                  : "bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30"
+              }`}
+            >
               {overdueCount}
             </span>
           )}
@@ -235,8 +257,20 @@ export default function StaffFollowUpsPage() {
                       <div className="flex items-center gap-2 text-[11px] sm:text-xs text-ink-subtle flex-wrap">
                         <span className="font-mono font-medium">{customerPhone}</span>
                         <span className="text-line">•</span>
-                        <span className="flex items-center gap-1 font-mono text-[10px] sm:text-[11px] text-ink-subtle">
-                          <Clock className="h-3 w-3 text-accent shrink-0" />
+                        <span
+                          className={`flex items-center gap-1 font-mono text-[10px] sm:text-[11px] ${
+                            activeBucket === "overdue"
+                              ? "text-rose-500 dark:text-rose-400 font-semibold"
+                              : "text-ink-subtle"
+                          }`}
+                        >
+                          <Clock
+                            className={`h-3 w-3 shrink-0 ${
+                              activeBucket === "overdue"
+                                ? "text-rose-500 dark:text-rose-400"
+                                : "text-accent"
+                            }`}
+                          />
                           Due: {dueStr}
                         </span>
                       </div>

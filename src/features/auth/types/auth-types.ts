@@ -1,7 +1,7 @@
 // features/auth/types/auth-types.ts
 
-/** The two roles that exist in the users table. */
-export type UserRole = "owner" | "sales";
+/** The roles that exist in the users table. */
+export type UserRole = "owner" | "sales" | "cro";
 
 /**
  * The authenticated user the backend returns.

@@ -137,7 +137,7 @@ export function TeamShell() {
               }
               emptyDescription={
                 activeTab === "active"
-                  ? "Add your sales executive team members to set up their PIN logins and department assignments."
+                  ? "Add your team members to set up their PIN logins, roles, and department assignments."
                   : "Staff members marked as resigned will appear in this inactive list."
               }
               onSelectStaff={(staff) => setSelectedStaffId(staff.id)}

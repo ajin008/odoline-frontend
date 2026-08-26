@@ -139,6 +139,17 @@ export function StaffList({
               )}
             </div>
 
+            {/* Role Badge */}
+            <span
+              className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${
+                staff.role === "cro"
+                  ? "text-purple-700 dark:text-purple-300 bg-purple-500/10 border-purple-500/25"
+                  : "text-blue-700 dark:text-blue-300 bg-blue-500/10 border-blue-500/25"
+              }`}
+            >
+              {staff.role === "cro" ? "CRO" : "Sales"}
+            </span>
+
             {/* Department Badge */}
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-inset border border-line/70 text-[11px] font-bold text-ink-muted shrink-0">
               <Building2 className="h-3 w-3 text-accent shrink-0" />

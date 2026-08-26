@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Lead, LeadPriority } from "../types/lead-types";
 import {
   User,
+  UserX,
   Phone,
   Globe,
   IndianRupee,
@@ -257,10 +258,17 @@ export function LeadCard({ lead, onClick, showAssignedRep, href }: LeadCardProps
         </div>
 
         {showAssignedRep && (
-          <span className="inline-flex items-center gap-1 font-medium text-ink-muted bg-inset px-2 py-0.5 rounded-md border border-line/60 shrink-0 max-w-[140px]">
-            <User className="h-3 w-3 text-ink-subtle shrink-0" />
-            <span className="truncate">{lead.assigned_rep?.name || "Unassigned"}</span>
-          </span>
+          lead.assigned_rep?.name ? (
+            <span className="inline-flex items-center gap-1 font-semibold text-accent bg-accent/10 border border-accent/25 px-2 py-0.5 rounded-md text-[11px] shrink-0 max-w-[160px] shadow-2xs">
+              <User className="h-3 w-3 text-accent shrink-0 stroke-[2.25px]" />
+              <span className="truncate">Rep: {lead.assigned_rep.name}</span>
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 font-medium text-ink-subtle bg-inset border border-line/60 px-2 py-0.5 rounded-md text-[11px] shrink-0 shadow-2xs">
+              <UserX className="h-3 w-3 text-ink-subtle/70 shrink-0 stroke-[2px]" />
+              <span>Unassigned</span>
+            </span>
+          )
         )}
       </div>
     </div>

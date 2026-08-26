@@ -2,7 +2,7 @@ export interface StaffMember {
   id: string;
   name: string;
   phone: string;
-  role: "sales" | "owner";
+  role: "sales" | "owner" | "cro";
   position: string | null;
   gender: "male" | "female" | "other" | null;
   address: string | null;
@@ -23,6 +23,7 @@ export interface CreateStaffPayload {
   name: string;
   phone: string;
   pin: string;
+  role?: "sales" | "cro";
   position?: string | null;
   gender?: string | null;
   address?: string | null;

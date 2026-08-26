@@ -19,10 +19,8 @@ export function OwnerShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (isUnauthorized || (user && !user.is_active)) {
       router.replace("/login");
-    } else if (user && user.role === "sales") {
-      router.replace("/staff/dashboard");
     } else if (user && user.role !== "owner") {
-      router.replace("/login");
+      router.replace("/staff/dashboard");
     }
   }, [user, isUnauthorized, router]);
 

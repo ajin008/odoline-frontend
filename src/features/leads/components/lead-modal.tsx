@@ -7,6 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLeadActions } from "../hooks/use-lead-actions";
 import { DatePicker } from "@/src/components/ui/date-picker";
 import { parseISTDateTimeToUTC } from "@/src/lib/formatters";
+import { useMe } from "@/src/features/auth/hooks/use-me";
+import { useStaffLoad } from "../hooks/use-unassigned-leads";
+import { CustomSelect, type CustomSelectOption } from "@/src/components/ui/custom-select";
 import {
   createLeadFormSchema,
   LEAD_PRIORITY_OPTIONS,
@@ -202,12 +205,24 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
     },
   });
 
+  const { data: user } = useMe();
+  const isCro = user?.role === "cro";
+
+  const { data: staffLoadList = [], isLoading: isLoadingStaffLoad } = useStaffLoad();
+
+  const salespersonOptions: CustomSelectOption[] = staffLoadList.map((item) => ({
+    value: item.staff_id,
+    label: `${item.name} (${item.active_lead_count} active lead${item.active_lead_count === 1 ? "" : "s"})`,
+    description: `${item.active_lead_count} active lead${item.active_lead_count === 1 ? "" : "s"} assigned`,
+  }));
+
   const selectedSource = useWatch({ control, name: "source" });
   const selectedPriority = useWatch({ control, name: "priority" });
   const selectedFollowUpDate =
     useWatch({ control, name: "first_follow_up_at" }) || "";
   const budgetMinRaw = useWatch({ control, name: "budget_min" }) || "";
   const budgetMaxRaw = useWatch({ control, name: "budget_max" }) || "";
+  const selectedAssignedTo = useWatch({ control, name: "assigned_to" }) || "";
 
   useEffect(() => {
     if (isOpen) {
@@ -222,6 +237,7 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
         budget_max: "",
         remark: "",
         first_follow_up_at: "",
+        assigned_to: "",
       });
     }
   }, [isOpen, reset]);
@@ -270,6 +286,7 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
       budget_max: parseRawNumber(data.budget_max) || null,
       remark: data.remark || null,
       first_follow_up_at: isoFollowUp,
+      assigned_to: isCro ? (data.assigned_to?.trim() || null) : undefined,
     };
 
     createLead.mutate(payload, {
@@ -326,6 +343,46 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
           className="flex flex-col flex-1 overflow-hidden"
         >
           <div className="p-6 space-y-4 overflow-y-auto max-h-[calc(90vh-130px)] touch-pan-y overscroll-contain">
+            {/* CRO-only Required Salesperson Assignment Dropdown */}
+            {isCro && (
+              <div className="space-y-1.5 bg-accent/5 border border-accent/25 rounded-xl p-3.5 font-sans">
+                <label className="text-xs font-semibold text-ink flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-accent font-bold">
+                    <UserCheck className="h-4 w-4 stroke-[2.25px]" />
+                    Assign to Salesperson <span className="text-rose-500">*</span>
+                  </span>
+                  <span className="text-[10px] font-mono font-medium text-ink-muted uppercase tracking-wider">
+                    Required for CRO
+                  </span>
+                </label>
+
+                <CustomSelect
+                  options={salespersonOptions}
+                  value={selectedAssignedTo}
+                  onChange={(val) => {
+                    setValue("assigned_to", val, { shouldValidate: true });
+                  }}
+                  placeholder={
+                    isLoadingStaffLoad
+                      ? "Loading salespeople..."
+                      : salespersonOptions.length === 0
+                      ? "No salespeople available"
+                      : "-- Select Salesperson --"
+                  }
+                  icon={<UserCheck className="h-3.5 w-3.5" />}
+                  className="w-full"
+                  buttonClassName="h-10 border-line bg-surface hover:border-accent text-xs font-semibold"
+                  disabled={isLoadingStaffLoad || salespersonOptions.length === 0}
+                />
+
+                {errors.assigned_to && (
+                  <p className="text-[11px] font-medium text-rose-500 mt-1">
+                    {errors.assigned_to.message}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Customer Details Section */}
             <div className="space-y-3">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted flex items-center gap-1.5">
@@ -707,8 +764,8 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
             </button>
             <button
               type="submit"
-              disabled={createLead.isPending}
-              className="flex items-center gap-2 rounded-xl bg-accent px-5 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 cursor-pointer"
+              disabled={createLead.isPending || (isCro && !selectedAssignedTo.trim())}
+              className="flex items-center gap-2 rounded-xl bg-accent px-5 py-2 text-xs font-semibold text-inverse shadow-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {createLead.isPending ? (
                 <>

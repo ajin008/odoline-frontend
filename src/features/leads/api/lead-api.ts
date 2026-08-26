@@ -11,6 +11,8 @@ import type {
   ChangeStagePayload,
   LeadStageHistory,
   DashboardFunnelData,
+  CroAtRiskData,
+  MyAtRiskData,
 } from "../types/lead-types";
 import type { Car } from "@/src/features/cars/api/cars-api";
 
@@ -199,6 +201,18 @@ export const leadApi = {
     const res = await apiClient.patch(endpoints.leads.assign(id), {
       assigned_to: assignedTo,
     });
+    return res.data.data;
+  },
+
+  /** GET /api/v1/leads/cro/at-risk — CRO & Owner At-Risk Summary */
+  async getCroAtRisk(): Promise<CroAtRiskData> {
+    const res = await apiClient.get(endpoints.leads.croAtRisk);
+    return res.data.data;
+  },
+
+  /** GET /api/v1/leads/my/at-risk — Self-scoped At-Risk Summary for logged-in sales staff */
+  async getMyAtRisk(): Promise<MyAtRiskData> {
+    const res = await apiClient.get(endpoints.leads.myAtRisk);
     return res.data.data;
   },
 };

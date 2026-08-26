@@ -26,7 +26,7 @@ export function useLogin() {
   useEffect(() => {
     if (user) {
       const targetUrl =
-        user.role === "sales" ? "/staff/dashboard" : "/owner/dashboard";
+        user.role === "owner" ? "/owner/dashboard" : "/staff/dashboard";
       router.replace(targetUrl);
     }
   }, [user, router]);
@@ -54,9 +54,9 @@ export function useLogin() {
       // router cache and guarantee fresh httpOnly cookies on the new dashboard document
       // without violating React Compiler immutability rules.
       const targetUrl =
-        loggedInUser.role === "sales"
-          ? "/staff/dashboard"
-          : "/owner/dashboard";
+        loggedInUser.role === "owner"
+          ? "/owner/dashboard"
+          : "/staff/dashboard";
 
       window.location.assign(targetUrl);
     } catch (error) {

@@ -22,6 +22,7 @@ import {
   Lock,
   Eye,
   EyeOff,
+  UserCog,
 } from "lucide-react";
 
 const staffFormSchema = z.object({
@@ -30,6 +31,7 @@ const staffFormSchema = z.object({
     .string()
     .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
   pin: z.string().optional(),
+  role: z.enum(["sales", "cro"]),
   gender: z.string().optional().nullable(),
   position: z.string().trim().max(100).optional().nullable(),
   department_id: z.string().optional().nullable(),
@@ -66,6 +68,7 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
       name: "",
       phone: "",
       pin: "",
+      role: "sales",
       gender: "",
       position: "",
       department_id: "",
@@ -83,6 +86,7 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
         name: staff.name,
         phone: staff.phone,
         pin: "",
+        role: staff.role === "cro" ? "cro" : "sales",
         gender: staff.gender ?? "",
         position: staff.position ?? "",
         department_id: staff.department_id ?? "",
@@ -94,6 +98,7 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
         name: "",
         phone: "",
         pin: "",
+        role: "sales",
         gender: "",
         position: "",
         department_id: "",
@@ -121,6 +126,7 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
     const payload = {
       name: data.name,
       phone: data.phone,
+      role: data.role || "sales",
       gender: data.gender || null,
       position: data.position || null,
       department_id: data.department_id || null,
@@ -162,12 +168,12 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
             </div>
             <div>
               <h3 className="text-base font-bold text-ink tracking-tight font-sans">
-                {isEditing ? "Edit Staff Profile" : "Add Sales Staff Member"}
+                {isEditing ? "Edit Staff Profile" : "Add Staff Member"}
               </h3>
               <p className="text-xs text-ink-subtle mt-0.5">
                 {isEditing
-                  ? "Update staff credentials, position, and department"
-                  : "Create new staff login credentials and profile details"}
+                  ? "Update staff credentials, role, position, and department"
+                  : "Create new staff login credentials, role, and profile details"}
               </p>
             </div>
           </div>
@@ -298,51 +304,71 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
             />
           </div>
 
-          {/* Department Custom Dropdown (or Warning Alert if 0 Departments) */}
-          <div className="space-y-1.5">
-            {isDeptLoading ? (
-              <div className="h-10 rounded-lg bg-inset border border-line animate-pulse" />
-            ) : departments.length === 0 ? (
-              <>
-                <label className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
-                  <Building2 className="h-3.5 w-3.5 text-accent" />
-                  <span>Assigned Department</span>
-                </label>
-                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
-                  <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="font-bold">No active departments found.</p>
-                    <p className="text-[11px] text-amber-700 dark:text-amber-400">
-                      Create showroom departments first in{" "}
-                      <Link
-                        href="/owner/settings?tab=department"
-                        onClick={onClose}
-                        className="underline font-bold hover:text-amber-900"
-                      >
-                        Settings → Department
-                      </Link>
-                      .
-                    </p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <FormSelect
-                label={
-                  <span className="flex items-center gap-1.5">
+          {/* Role & Department Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Staff Role Selector */}
+            <FormSelect
+              label={
+                <span className="flex items-center gap-1.5">
+                  <UserCog className="h-3.5 w-3.5 text-accent" />
+                  <span>Staff Role</span> <span className="text-rose-500">*</span>
+                </span>
+              }
+              options={[
+                { value: "sales", label: "Sales" },
+                { value: "cro", label: "CRO — Customer Relations Officer" },
+              ]}
+              placeholder="Select Role"
+              {...register("role")}
+              error={errors.role?.message}
+            />
+
+            {/* Department Custom Dropdown (or Warning Alert if 0 Departments) */}
+            <div className="space-y-1.5">
+              {isDeptLoading ? (
+                <div className="h-10 rounded-lg bg-inset border border-line animate-pulse" />
+              ) : departments.length === 0 ? (
+                <>
+                  <label className="text-xs font-semibold text-ink-muted flex items-center gap-1.5">
                     <Building2 className="h-3.5 w-3.5 text-accent" />
                     <span>Assigned Department</span>
-                  </span>
-                }
-                options={departments.map((dept) => ({
-                  value: dept.id,
-                  label: dept.name,
-                }))}
-                placeholder="No Department Assigned"
-                {...register("department_id")}
-                error={errors.department_id?.message}
-              />
-            )}
+                  </label>
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-300">
+                    <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="space-y-1">
+                      <p className="font-bold">No active departments found.</p>
+                      <p className="text-[11px] text-amber-700 dark:text-amber-400">
+                        Create showroom departments first in{" "}
+                        <Link
+                          href="/owner/settings?tab=department"
+                          onClick={onClose}
+                          className="underline font-bold hover:text-amber-900"
+                        >
+                          Settings → Department
+                        </Link>
+                        .
+                      </p>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <FormSelect
+                  label={
+                    <span className="flex items-center gap-1.5">
+                      <Building2 className="h-3.5 w-3.5 text-accent" />
+                      <span>Assigned Department</span>
+                    </span>
+                  }
+                  options={departments.map((dept) => ({
+                    value: dept.id,
+                    label: dept.name,
+                  }))}
+                  placeholder="No Department Assigned"
+                  {...register("department_id")}
+                  error={errors.department_id?.message}
+                />
+              )}
+            </div>
           </div>
 
           {/* Date Joined Calendar Component */}

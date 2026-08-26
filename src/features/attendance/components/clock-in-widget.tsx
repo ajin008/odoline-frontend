@@ -145,9 +145,9 @@ export function ClockInWidget() {
   }
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 select-none font-sans">
+    <div className="w-full select-none font-sans">
       {/* Attendance Clock Bento Card */}
-      <div className="rounded-2xl border border-line/90 bg-card p-6 md:p-8 shadow-bento space-y-6">
+      <div className="rounded-2xl border border-line bg-card p-5 sm:p-6 shadow-xs space-y-5">
         {/* Card Header: Greeting & Formatted Date / Time */}
         <div className="border-b border-line/40 pb-5 space-y-1">
           <h2 className="text-xl font-bold tracking-tight text-ink font-sans">

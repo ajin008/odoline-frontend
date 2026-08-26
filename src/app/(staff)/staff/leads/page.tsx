@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import { UserPlus } from "lucide-react";
+import { useMe } from "@/src/features/auth/hooks/use-me";
 import { LeadModal } from "@/src/features/leads/components/lead-modal";
 import { LeadList } from "@/src/features/leads/components/lead-list";
 
 export default function StaffLeadsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { data: user } = useMe();
+  const isCro = user?.role === "cro";
 
   return (
     <div className="w-full space-y-5 font-sans select-none">
@@ -31,7 +34,7 @@ export default function StaffLeadsPage() {
       </div>
 
       {/* Infinite Leads List */}
-      <LeadList />
+      <LeadList showStaffFilter={isCro} showAssignedRep={isCro} />
 
       {/* Add Lead Modal */}
       <LeadModal

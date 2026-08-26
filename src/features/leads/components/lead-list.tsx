@@ -192,15 +192,17 @@ export function LeadList({
 
           {/* Filters Group: Staff Filter & Priority Select Dropdown */}
           <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap shrink-0">
-            {/* Owner Staff Filter Dropdown */}
+            {/* Staff Filter Dropdown */}
             {showStaffFilter && (
               <CustomSelect
                 options={[
                   { value: "", label: "All staff" },
-                  ...staffList.map((staff) => ({
-                    value: staff.id,
-                    label: staff.name,
-                  })),
+                  ...staffList
+                    .filter((staff) => staff.role === "sales")
+                    .map((staff) => ({
+                      value: staff.id,
+                      label: staff.name,
+                    })),
                 ]}
                 value={selectedStaffId || ""}
                 onChange={(val) => setSelectedStaffId(val ? String(val) : undefined)}

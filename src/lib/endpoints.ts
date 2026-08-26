@@ -80,6 +80,8 @@ export const endpoints = {
     unassigned: "/leads/unassigned",
     staffLoad: "/leads/staff-load",
     bulkAssign: "/leads/bulk-assign",
+    croAtRisk: "/leads/cro/at-risk",
+    myAtRisk: "/leads/my/at-risk",
     assign: (id: string) => `/leads/${id}/assign`,
   },
 

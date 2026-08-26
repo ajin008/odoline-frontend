@@ -69,6 +69,8 @@ export const queryKeys = {
       ["leads", "dashboard", "funnel", { period }] as const,
     unassigned: ["leads", "unassigned"] as const,
     staffLoad: ["leads", "staff-load"] as const,
+    croAtRisk: ["leads", "cro-at-risk"] as const,
+    myAtRisk: ["leads", "my-at-risk"] as const,
   },
 
   followUps: {
