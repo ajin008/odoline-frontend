@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useChangeStage } from "../hooks/use-lead-stage";
 import type { Lead, LeadStage } from "../types/lead-types";
 import { carsApi } from "@/src/features/cars/api/cars-api";
+import { CustomSelect } from "@/src/components/ui/custom-select";
 import {
   ChevronRight,
   ChevronLeft,
@@ -15,6 +16,7 @@ import {
   X,
   Check,
   ShoppingBag,
+  Car,
   Tag,
   CreditCard,
   RefreshCw,
@@ -312,7 +314,9 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 {changeStageMutation.isPending && (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 )}
-                <span>Move to {getStageConfig(nextActiveStage).shortLabel}</span>
+                <span>
+                  Move to {getStageConfig(nextActiveStage).shortLabel}
+                </span>
                 <ChevronRight className="h-4 w-4" />
               </button>
             )}
@@ -326,7 +330,9 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                   className="flex items-center justify-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover py-2 px-1 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50 truncate"
                 >
                   <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{getStageConfig(prevActiveStage).shortLabel}</span>
+                  <span className="truncate">
+                    {getStageConfig(prevActiveStage).shortLabel}
+                  </span>
                 </button>
               ) : (
                 <div />
@@ -457,70 +463,70 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
         {/* Desktop Stepper Pipeline Bar */}
         <div className="hidden sm:grid grid-cols-5 gap-1.5 sm:gap-2">
-        {ACTIVE_STAGES.map((stg, idx) => {
-          const isCurrent = currentStage === stg;
-          const isPassed = activeIndex > idx && !isTerminal;
+          {ACTIVE_STAGES.map((stg, idx) => {
+            const isCurrent = currentStage === stg;
+            const isPassed = activeIndex > idx && !isTerminal;
 
-          return (
-            <div
-              key={stg}
-              className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-center transition-all ${
-                isCurrent
-                  ? "bg-accent text-white shadow-xs font-bold scale-[1.02]"
-                  : isPassed
-                  ? "bg-accent/10 text-accent font-semibold"
-                  : "bg-inset/40 border border-line/60 text-ink-subtle/70 font-normal"
-              }`}
-            >
-              <div className="flex items-center gap-1">
-                {isPassed && (
-                  <Check className="h-3 w-3 text-accent shrink-0 stroke-[2.5px]" />
-                )}
-                <span className="text-xs font-bold truncate">
-                  {getStageConfig(stg).shortLabel}
-                </span>
-              </div>
-              <span
-                className={`text-[9px] hidden sm:block truncate w-full ${
-                  isCurrent ? "text-white/80" : "text-ink-subtle"
+            return (
+              <div
+                key={stg}
+                className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-center transition-all ${
+                  isCurrent
+                    ? "bg-accent text-white shadow-xs font-bold scale-[1.02]"
+                    : isPassed
+                    ? "bg-accent/10 text-accent font-semibold"
+                    : "bg-inset/40 border border-line/60 text-ink-subtle/70 font-normal"
                 }`}
               >
-                {getStageConfig(stg).description}
-              </span>
-            </div>
-          );
-        })}
+                <div className="flex items-center gap-1">
+                  {isPassed && (
+                    <Check className="h-3 w-3 text-accent shrink-0 stroke-[2.5px]" />
+                  )}
+                  <span className="text-xs font-bold truncate">
+                    {getStageConfig(stg).shortLabel}
+                  </span>
+                </div>
+                <span
+                  className={`text-[9px] hidden sm:block truncate w-full ${
+                    isCurrent ? "text-white/80" : "text-ink-subtle"
+                  }`}
+                >
+                  {getStageConfig(stg).description}
+                </span>
+              </div>
+            );
+          })}
 
-        {/* Terminal Stage Column (Won / Lost) */}
-        <div
-          className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-center transition-all ${
-            currentStage === "won"
-              ? "bg-emerald-600 text-white font-bold shadow-xs scale-[1.02]"
-              : currentStage === "lost"
-              ? "bg-rose-600 text-white font-bold shadow-xs scale-[1.02]"
-              : "bg-inset/40 border border-line/60 text-ink-subtle/70 font-normal"
-          }`}
-        >
-          <span className="text-xs font-bold truncate w-full">
-            {currentStage === "won"
-              ? "Won"
-              : currentStage === "lost"
-              ? "Lost"
-              : "Closed"}
-          </span>
-          <span
-            className={`text-[9px] hidden sm:block truncate w-full ${
-              isTerminal ? "text-white/80" : "text-ink-subtle"
+          {/* Terminal Stage Column (Won / Lost) */}
+          <div
+            className={`flex flex-col items-center justify-center p-2.5 rounded-xl text-center transition-all ${
+              currentStage === "won"
+                ? "bg-emerald-600 text-white font-bold shadow-xs scale-[1.02]"
+                : currentStage === "lost"
+                ? "bg-rose-600 text-white font-bold shadow-xs scale-[1.02]"
+                : "bg-inset/40 border border-line/60 text-ink-subtle/70 font-normal"
             }`}
           >
-            {currentStage === "won"
-              ? "Deal won"
-              : currentStage === "lost"
-              ? "Deal lost"
-              : "Terminal"}
-          </span>
+            <span className="text-xs font-bold truncate w-full">
+              {currentStage === "won"
+                ? "Won"
+                : currentStage === "lost"
+                ? "Lost"
+                : "Closed"}
+            </span>
+            <span
+              className={`text-[9px] hidden sm:block truncate w-full ${
+                isTerminal ? "text-white/80" : "text-ink-subtle"
+              }`}
+            >
+              {currentStage === "won"
+                ? "Deal won"
+                : currentStage === "lost"
+                ? "Deal lost"
+                : "Terminal"}
+            </span>
+          </div>
         </div>
-      </div>
       </div>
 
       {/* Won Details Banner (if already WON) */}
@@ -620,20 +626,21 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                     No in-stock vehicles available to link.
                   </p>
                 ) : (
-                  <select
+                  <CustomSelect
+                    options={inStockCars.data.map((car) => ({
+                      value: car.id,
+                      label: `${car.year} ${car.make} ${car.model}`,
+                      description: `Reg: ${car.reg_number}`,
+                      icon: <Car className="h-3.5 w-3.5" />,
+                    }))}
                     value={selectedCarId}
-                    onChange={(e) => setSelectedCarId(e.target.value)}
-                    required
-                    className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none"
-                  >
-                    <option value="">-- Pick an in-stock car --</option>
-                    {inStockCars.data.map((car) => (
-                      <option key={car.id} value={car.id}>
-                        {car.year} {car.make} {car.model} — (Reg:{" "}
-                        {car.reg_number})
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => setSelectedCarId(val)}
+                    placeholder="-- Pick an in-stock car --"
+                    searchPlaceholder="Search by car name or reg no..."
+                    icon={<Car className="h-4 w-4" />}
+                    className="w-full"
+                    buttonClassName="w-full min-h-[44px] bg-inset border border-line text-xs font-semibold text-ink rounded-xl hover:border-accent transition-all px-3"
+                  />
                 )}
               </div>
 

@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, Search } from "lucide-react";
 
 export interface CustomSelectOption<T extends string | number = string> {
   value: T;
@@ -20,6 +21,8 @@ export interface CustomSelectProps<T extends string | number = string> {
   className?: string;
   buttonClassName?: string;
   disabled?: boolean;
+  searchable?: boolean;
+  searchPlaceholder?: string;
 }
 
 export function CustomSelect<T extends string | number = string>({
@@ -32,11 +35,30 @@ export function CustomSelect<T extends string | number = string>({
   className = "",
   buttonClassName = "",
   disabled = false,
+  searchable,
+  searchPlaceholder = "Search...",
 }: CustomSelectProps<T>) {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
+  const showSearch = searchable !== undefined ? searchable : options.length > 5;
+
+  const filteredOptions = options.filter((opt) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const labelMatch = opt.label.toLowerCase().includes(query);
+    const descMatch = opt.description?.toLowerCase().includes(query);
+    return labelMatch || descMatch;
+  });
+
+  // Reset search on close
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+    }
+  }, [isOpen]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -105,7 +127,9 @@ export function CustomSelect<T extends string | number = string>({
           )}
           <span
             className={`truncate ${
-              selectedOption ? "text-ink font-bold" : "text-ink-subtle font-normal"
+              selectedOption
+                ? "text-ink font-bold"
+                : "text-ink-subtle font-normal"
             }`}
           >
             {selectedOption ? selectedOption.label : placeholder}
@@ -124,54 +148,76 @@ export function CustomSelect<T extends string | number = string>({
       {isOpen && (
         <div
           role="listbox"
-          className="absolute left-0 top-full mt-1.5 z-50 w-full min-w-[180px] max-h-60 overflow-y-auto rounded-xl border border-line bg-card p-1 shadow-xl animate-in fade-in-50 zoom-in-95 duration-150 space-y-0.5"
+          className="absolute left-0 top-full mt-1.5 z-50 w-full min-w-[200px] max-h-60 overflow-y-auto rounded-xl border border-line bg-card p-1 shadow-xl animate-in fade-in-50 zoom-in-95 duration-150 space-y-0.5"
         >
-          {options.map((opt) => {
-            const isSelected = opt.value === value;
+          {showSearch && (
+            <div className="p-1 border-b border-line/60 sticky top-0 bg-card z-10">
+              <div className="relative flex items-center">
+                <Search className="absolute left-2.5 h-3.5 w-3.5 text-ink-subtle" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-inset border border-line/60 rounded-lg text-ink focus:border-accent focus:outline-none"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            </div>
+          )}
 
-            return (
-              <button
-                key={String(opt.value)}
-                type="button"
-                role="option"
-                aria-selected={isSelected}
-                onClick={() => {
-                  onChange(opt.value);
-                  setIsOpen(false);
-                }}
-                className={[
-                  "w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-colors duration-150 text-left cursor-pointer",
-                  isSelected
-                    ? "bg-accent/10 text-accent font-bold"
-                    : "text-ink hover:bg-inset hover:text-ink",
-                ].join(" ")}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  {opt.icon && (
-                    <span
-                      className={
-                        isSelected ? "text-accent" : "text-ink-subtle"
-                      }
-                    >
-                      {opt.icon}
-                    </span>
-                  )}
-                  <div>
-                    <span className="block truncate">{opt.label}</span>
-                    {opt.description && (
-                      <span className="block text-[10px] font-normal text-ink-subtle truncate">
-                        {opt.description}
+          {filteredOptions.length === 0 ? (
+            <div className="px-3 py-3 text-center text-xs text-ink-subtle font-medium">
+              No matching options
+            </div>
+          ) : (
+            filteredOptions.map((opt) => {
+              const isSelected = opt.value === value;
+
+              return (
+                <button
+                  key={String(opt.value)}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    onChange(opt.value);
+                    setIsOpen(false);
+                  }}
+                  className={[
+                    "w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-xs font-semibold transition-colors duration-150 text-left cursor-pointer",
+                    isSelected
+                      ? "bg-accent/10 text-accent font-bold"
+                      : "text-ink hover:bg-inset hover:text-ink",
+                  ].join(" ")}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    {opt.icon && (
+                      <span
+                        className={
+                          isSelected ? "text-accent" : "text-ink-subtle"
+                        }
+                      >
+                        {opt.icon}
                       </span>
                     )}
+                    <div className="min-w-0">
+                      <span className="block truncate">{opt.label}</span>
+                      {opt.description && (
+                        <span className="block text-[10px] font-normal text-ink-subtle truncate">
+                          {opt.description}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {isSelected && (
-                  <Check className="h-3.5 w-3.5 text-accent shrink-0 stroke-[2.5px]" />
-                )}
-              </button>
-            );
-          })}
+                  {isSelected && (
+                    <Check className="h-3.5 w-3.5 text-accent shrink-0 stroke-[2.5px]" />
+                  )}
+                </button>
+              );
+            })
+          )}
         </div>
       )}
     </div>
