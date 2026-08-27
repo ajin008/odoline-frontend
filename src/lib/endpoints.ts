@@ -109,4 +109,10 @@ export const endpoints = {
         : "/attendance/me/heatmap",
     manual: "/attendance/manual",
   },
+
+  bookings: {
+    create: "/bookings",
+    list: "/bookings",
+    detail: (id: string) => `/bookings/${id}`,
+  },
 } as const;

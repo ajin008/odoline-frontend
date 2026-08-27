@@ -1,12 +1,20 @@
-/* eslint-disable security/detect-object-injection */
-"use client";
-
+/* eslint-disable react-hooks/incompatible-library */
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useChangeStage } from "../hooks/use-lead-stage";
 import type { Lead, LeadStage } from "../types/lead-types";
 import { carsApi } from "@/src/features/cars/api/cars-api";
 import { CustomSelect } from "@/src/components/ui/custom-select";
+import { useConfig } from "@/src/features/settings/hooks/use-config";
+import { useCreateBooking } from "@/src/features/booking/hooks/use-booking-actions";
+import {
+  advanceAgreementSchema,
+  type AdvanceAgreementFormValues,
+} from "@/src/features/booking/schemas/booking-schemas";
+import { numberToWordsRupees } from "@/src/features/booking/utils/number-to-words";
+import type { PaymentMethod } from "@/src/features/booking/types/booking-types";
 import {
   ChevronRight,
   ChevronLeft,
@@ -22,6 +30,12 @@ import {
   RefreshCw,
   SearchX,
   MoreHorizontal,
+  FileText,
+  Banknote,
+  Building2,
+  QrCode,
+  Coins,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -72,8 +86,17 @@ const STAGE_CONFIG: Record<
   },
 };
 
+const stageConfigMap = new Map<LeadStage, (typeof STAGE_CONFIG)[LeadStage]>([
+  ["new", STAGE_CONFIG.new],
+  ["contacted", STAGE_CONFIG.contacted],
+  ["test_drive", STAGE_CONFIG.test_drive],
+  ["discussion", STAGE_CONFIG.discussion],
+  ["won", STAGE_CONFIG.won],
+  ["lost", STAGE_CONFIG.lost],
+]);
+
 function getStageConfig(stage: LeadStage) {
-  return STAGE_CONFIG[stage] || STAGE_CONFIG.new;
+  return stageConfigMap.get(stage) || STAGE_CONFIG.new;
 }
 
 const COMMON_LOST_REASONS = [
@@ -127,14 +150,23 @@ const LOST_REASON_CONFIG: Record<
   },
 };
 
+const lostReasonConfigMap = new Map<
+  string,
+  { label: string; icon: LucideIcon; colorBg: string; colorText: string }
+>([
+  ["Bought elsewhere", LOST_REASON_CONFIG["Bought elsewhere"]],
+  ["Price too high", LOST_REASON_CONFIG["Price too high"]],
+  ["Loan rejected", LOST_REASON_CONFIG["Loan rejected"]],
+  [
+    "Changed mind / no longer buying",
+    LOST_REASON_CONFIG["Changed mind / no longer buying"],
+  ],
+  ["Car model not available", LOST_REASON_CONFIG["Car model not available"]],
+  ["Other", LOST_REASON_CONFIG["Other"]],
+]);
+
 function getLostReasonConfig(reason: string) {
-  if (
-    reason &&
-    Object.prototype.hasOwnProperty.call(LOST_REASON_CONFIG, reason)
-  ) {
-    return LOST_REASON_CONFIG[reason];
-  }
-  return LOST_REASON_CONFIG["Other"];
+  return lostReasonConfigMap.get(reason) || LOST_REASON_CONFIG["Other"];
 }
 
 function formatCurrency(amountStr: string | null): string {
@@ -144,11 +176,53 @@ function formatCurrency(amountStr: string | null): string {
   return `₹${num.toLocaleString("en-IN")}`;
 }
 
+const PAYMENT_METHOD_OPTIONS = [
+  { value: "cash", label: "Cash", icon: <Banknote className="h-3.5 w-3.5" /> },
+  {
+    value: "bank_transfer",
+    label: "Bank Transfer / NEFT / RTGS",
+    icon: <Building2 className="h-3.5 w-3.5" />,
+  },
+  {
+    value: "upi",
+    label: "UPI / GPay / PhonePe",
+    icon: <QrCode className="h-3.5 w-3.5" />,
+  },
+  {
+    value: "card",
+    label: "Credit / Debit Card",
+    icon: <CreditCard className="h-3.5 w-3.5" />,
+  },
+  {
+    value: "cheque",
+    label: "Cheque",
+    icon: <FileText className="h-3.5 w-3.5" />,
+  },
+  {
+    value: "loan",
+    label: "Bank Loan / Finance",
+    icon: <Coins className="h-3.5 w-3.5" />,
+  },
+  {
+    value: "exchange",
+    label: "Exchange Car",
+    icon: <Car className="h-3.5 w-3.5" />,
+  },
+  {
+    value: "other",
+    label: "Other Method",
+    icon: <Wallet className="h-3.5 w-3.5" />,
+  },
+];
+
 export function LeadStageControl({ lead }: LeadStageControlProps) {
   const changeStageMutation = useChangeStage(lead.id);
+  const createBookingMutation = useCreateBooking();
+  const { data: configData } = useConfig();
 
   // Modals state
   const [isWonOpen, setIsWonOpen] = useState(false);
+  const [wonStep, setWonStep] = useState<"won" | "advance">("won");
   const [selectedCarId, setSelectedCarId] = useState("");
   const [wonPrice, setWonPrice] = useState("");
   const [wonNotes, setWonNotes] = useState("");
@@ -166,6 +240,40 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
     queryFn: () => carsApi.getList({ statuses: ["in_stock"] }),
     enabled: isWonOpen,
   });
+
+  // Step 2 Form Hook
+  const {
+    register: registerAdvance,
+    handleSubmit: handleSubmitAdvance,
+    setValue: setAdvanceValue,
+    watch: watchAdvance,
+    reset: resetAdvance,
+    formState: { errors: advanceErrors },
+  } = useForm<AdvanceAgreementFormValues>({
+    resolver: zodResolver(advanceAgreementSchema),
+    defaultValues: {
+      advance_amount: "",
+      advance_method: "cash",
+      advance_reference: "",
+      advance_receipt_date: new Date().toISOString().split("T")[0],
+      balance_due_days: "",
+    },
+  });
+
+  const watchAdvanceAmount = watchAdvance("advance_amount");
+  const watchMethod = watchAdvance("advance_method") || "cash";
+
+  const amountInWords = watchAdvanceAmount
+    ? numberToWordsRupees(watchAdvanceAmount)
+    : "";
+
+  const calculatedBalance =
+    wonPrice &&
+    watchAdvanceAmount &&
+    !isNaN(Number(wonPrice)) &&
+    !isNaN(Number(watchAdvanceAmount))
+      ? Math.max(0, Number(wonPrice) - Number(watchAdvanceAmount))
+      : null;
 
   const currentStage = lead.stage;
   const isTerminal = currentStage === "won" || currentStage === "lost";
@@ -192,20 +300,55 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
     });
   };
 
-  const handleWonSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedCarId || !wonPrice) return;
+  const handleOpenWonModal = () => {
+    setIsWonOpen(true);
+    setWonStep("won");
+    setSelectedCarId("");
+    setWonPrice("");
+    setWonNotes("");
+    resetAdvance({
+      advance_amount: "",
+      advance_method: "cash",
+      advance_reference: "",
+      advance_receipt_date: new Date().toISOString().split("T")[0],
+      balance_due_days: "",
+    });
+  };
 
-    changeStageMutation.mutate(
+  const handleProceedToAdvance = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedCarId || !wonPrice || Number(wonPrice) <= 0) return;
+    setWonStep("advance");
+  };
+
+  const onSubmitAdvance = (data: AdvanceAgreementFormValues) => {
+    createBookingMutation.mutate(
       {
-        to_stage: "won",
+        lead_id: lead.id,
         won_car_id: selectedCarId,
         won_price: wonPrice,
-        notes: wonNotes.trim() || undefined,
+        closing_notes: wonNotes.trim() || undefined,
+        advance_amount: data.advance_amount,
+        advance_method: data.advance_method as PaymentMethod,
+        advance_reference: data.advance_reference?.trim() || undefined,
+        advance_receipt_date: data.advance_receipt_date || undefined,
+        balance_due_days: data.balance_due_days
+          ? Number(data.balance_due_days)
+          : undefined,
       },
       {
         onSuccess: () => {
           setIsWonOpen(false);
+          setWonStep("won");
+        },
+        onError: (err: unknown) => {
+          const axiosErr = err as {
+            response?: { data?: { error?: { code?: string } } };
+          };
+          const code = axiosErr?.response?.data?.error?.code;
+          if (code === "CAR_ALREADY_BOOKED") {
+            setWonStep("won");
+          }
         },
       }
     );
@@ -234,6 +377,13 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
       }
     );
   };
+
+  const selectedCarObj = inStockCars?.data?.find((c) => c.id === selectedCarId);
+  const selectedCarLabel = selectedCarObj
+    ? `${selectedCarObj.year} ${selectedCarObj.make} ${selectedCarObj.model} (${selectedCarObj.reg_number})`
+    : "Vehicle Selected";
+
+  const showroomName = configData?.showroom_name || "Cars4";
 
   return (
     <div className="font-sans select-none space-y-4">
@@ -340,12 +490,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
               <button
                 type="button"
-                onClick={() => {
-                  setIsWonOpen(true);
-                  setSelectedCarId("");
-                  setWonPrice("");
-                  setWonNotes("");
-                }}
+                onClick={handleOpenWonModal}
                 className="flex items-center justify-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-1 text-xs font-bold shadow-xs cursor-pointer"
               >
                 <Trophy className="h-3.5 w-3.5 stroke-[2.5px] shrink-0" />
@@ -432,12 +577,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
               <button
                 type="button"
-                onClick={() => {
-                  setIsWonOpen(true);
-                  setSelectedCarId("");
-                  setWonPrice("");
-                  setWonNotes("");
-                }}
+                onClick={handleOpenWonModal}
                 className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
               >
                 <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
@@ -592,109 +732,356 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
         </div>
       )}
 
-      {/* Modal 1: Mark as Won */}
+      {/* Extended Won Modal: Step 1 (Deal Info) -> Step 2 (Advance Sale Agreement) */}
       {isWonOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 pointer-events-auto">
-          <div className="w-full max-w-md rounded-2xl border border-line bg-card p-5 shadow-xl space-y-4 pointer-events-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4 pointer-events-auto overflow-y-auto">
+          <div className="w-full max-w-lg my-8 rounded-2xl border border-line bg-card p-5 shadow-xl space-y-4 pointer-events-auto">
+            {/* Modal Header with Stepper */}
             <div className="flex items-center justify-between border-b border-line pb-3">
-              <h4 className="text-sm font-bold text-ink flex items-center gap-2">
-                <Trophy className="h-4 w-4 text-emerald-500" />
-                Close Deal as Won
-              </h4>
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
+                  <Trophy className="h-4 w-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-ink">
+                    {wonStep === "won"
+                      ? "Close Deal as Won"
+                      : "Advance Sale Agreement"}
+                  </h4>
+                  <span className="text-[11px] font-medium text-ink-subtle">
+                    Step {wonStep === "won" ? "1" : "2"} of 2 —{" "}
+                    {wonStep === "won"
+                      ? "Vehicle & Deal Price"
+                      : "Token Advance & Payment"}
+                  </span>
+                </div>
+              </div>
+
               <button
                 type="button"
-                onClick={() => setIsWonOpen(false)}
-                className="text-ink-subtle hover:text-ink transition-colors p-1 cursor-pointer"
+                onClick={() => {
+                  setIsWonOpen(false);
+                  setWonStep("won");
+                }}
+                className="text-ink-subtle hover:text-ink transition-colors p-1 cursor-pointer rounded-lg hover:bg-hover"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <form onSubmit={handleWonSubmit} className="space-y-4">
-              {/* Select Car from In-Stock vehicles */}
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-ink-muted">
-                  Select Purchased Car *
-                </label>
-                {isCarsLoading ? (
-                  <div className="py-2 text-xs text-ink-subtle flex items-center gap-2">
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    Loading available vehicles…
+            {/* Step Indicator Bar */}
+            <div className="grid grid-cols-2 gap-2">
+              <div
+                className={`h-1.5 rounded-full transition-all ${
+                  wonStep === "won" ? "bg-emerald-500" : "bg-emerald-500/40"
+                }`}
+              />
+              <div
+                className={`h-1.5 rounded-full transition-all ${
+                  wonStep === "advance"
+                    ? "bg-emerald-500"
+                    : "bg-inset border border-line"
+                }`}
+              />
+            </div>
+
+            {/* STEP 1: WON FIELDS */}
+            {wonStep === "won" && (
+              <form onSubmit={handleProceedToAdvance} className="space-y-4">
+                {/* Select Car from In-Stock vehicles */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-ink-muted">
+                    Select Purchased Car <span className="text-danger">*</span>
+                  </label>
+                  {isCarsLoading ? (
+                    <div className="py-2 text-xs text-ink-subtle flex items-center gap-2">
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Loading available vehicles…
+                    </div>
+                  ) : !inStockCars?.data || inStockCars.data.length === 0 ? (
+                    <p className="text-xs text-amber-500 font-medium py-1">
+                      No in-stock vehicles available to link.
+                    </p>
+                  ) : (
+                    <CustomSelect
+                      options={inStockCars.data.map((car) => ({
+                        value: car.id,
+                        label: `${car.year} ${car.make} ${car.model}`,
+                        description: `Reg: ${car.reg_number}`,
+                        icon: <Car className="h-3.5 w-3.5" />,
+                      }))}
+                      value={selectedCarId}
+                      onChange={(val) => setSelectedCarId(val)}
+                      placeholder="-- Pick an in-stock car --"
+                      searchPlaceholder="Search by car name or reg no..."
+                      icon={<Car className="h-4 w-4" />}
+                      className="w-full"
+                      buttonClassName="w-full min-h-[44px] bg-inset border border-line text-xs font-semibold text-ink rounded-xl hover:border-accent transition-all px-3"
+                    />
+                  )}
+                </div>
+
+                {/* Agreed Final Deal Price */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-ink-muted">
+                    Agreed Deal Price (₹) <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    value={wonPrice}
+                    onChange={(e) => setWonPrice(e.target.value)}
+                    placeholder="e.g. 750000"
+                    className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
+                  />
+                  {wonPrice && numberToWordsRupees(wonPrice) && (
+                    <p className="text-[11px] text-ink-subtle italic font-sans pt-0.5">
+                      &ldquo;{numberToWordsRupees(wonPrice)}&rdquo;
+                    </p>
+                  )}
+                </div>
+
+                {/* Optional Notes */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-ink-muted">
+                    Closing Notes (Optional)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={wonNotes}
+                    onChange={(e) => setWonNotes(e.target.value)}
+                    placeholder="e.g. Customer agreed on cash payment, token today..."
+                    className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-line">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsWonOpen(false);
+                      setWonStep("won");
+                    }}
+                    className="rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-ink hover:bg-hover transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={
+                      !selectedCarId || !wonPrice || Number(wonPrice) <= 0
+                    }
+                    className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 px-4 py-2 text-xs font-bold text-white shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    <span>Proceed to Prebooking</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* STEP 2: ADVANCE AGREEMENT FORM */}
+            {wonStep === "advance" && (
+              <form
+                onSubmit={handleSubmitAdvance(onSubmitAdvance)}
+                className="space-y-4"
+              >
+                {/* Read-only Summary Box */}
+                <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 space-y-2 text-xs">
+                  <div className="flex items-center justify-between font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="flex items-center gap-1">
+                      <FileText className="h-3.5 w-3.5" />
+                      Agreement Summary
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setWonStep("won")}
+                      className="text-[11px] underline text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 cursor-pointer font-semibold"
+                    >
+                      Edit Step 1
+                    </button>
                   </div>
-                ) : !inStockCars?.data || inStockCars.data.length === 0 ? (
-                  <p className="text-xs text-amber-500 font-medium py-1">
-                    No in-stock vehicles available to link.
-                  </p>
-                ) : (
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-ink text-[11px] pt-1 border-t border-emerald-500/10">
+                    <div>
+                      <span className="text-ink-subtle block text-[10px] uppercase font-semibold">
+                        Buyer Name
+                      </span>
+                      <span className="font-bold">
+                        {lead.customer?.name || "Customer"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-ink-subtle block text-[10px] uppercase font-semibold">
+                        Showroom / Seller
+                      </span>
+                      <span className="font-bold">{showroomName}</span>
+                    </div>
+                    <div>
+                      <span className="text-ink-subtle block text-[10px] uppercase font-semibold">
+                        Selected Vehicle
+                      </span>
+                      <span className="font-bold truncate block">
+                        {selectedCarLabel}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-ink-subtle block text-[10px] uppercase font-semibold">
+                        Agreed Price
+                      </span>
+                      <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                        {formatCurrency(wonPrice)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Advance Amount Received */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-ink-muted flex items-center justify-between">
+                    <span>
+                      Advance Amount Received (₹){" "}
+                      <span className="text-danger">*</span>
+                    </span>
+                    {calculatedBalance !== null && (
+                      <span className="text-[11px] font-mono font-bold text-accent">
+                        Balance Due: {formatCurrency(String(calculatedBalance))}
+                      </span>
+                    )}
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="e.g. 25000"
+                    {...registerAdvance("advance_amount")}
+                    className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
+                  />
+                  {advanceErrors.advance_amount && (
+                    <p className="text-[11px] text-danger font-medium">
+                      {advanceErrors.advance_amount.message}
+                    </p>
+                  )}
+                  {amountInWords && (
+                    <p className="text-[11px] text-ink-subtle italic font-sans pt-0.5">
+                      &ldquo;{amountInWords}&rdquo;
+                    </p>
+                  )}
+                </div>
+
+                {/* Payment Method */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-ink-muted">
+                    Payment Method <span className="text-danger">*</span>
+                  </label>
                   <CustomSelect
-                    options={inStockCars.data.map((car) => ({
-                      value: car.id,
-                      label: `${car.year} ${car.make} ${car.model}`,
-                      description: `Reg: ${car.reg_number}`,
-                      icon: <Car className="h-3.5 w-3.5" />,
-                    }))}
-                    value={selectedCarId}
-                    onChange={(val) => setSelectedCarId(val)}
-                    placeholder="-- Pick an in-stock car --"
-                    searchPlaceholder="Search by car name or reg no..."
-                    icon={<Car className="h-4 w-4" />}
+                    options={PAYMENT_METHOD_OPTIONS}
+                    value={watchMethod}
+                    onChange={(val) =>
+                      setAdvanceValue("advance_method", val as PaymentMethod, {
+                        shouldValidate: true,
+                      })
+                    }
+                    placeholder="Select method..."
                     className="w-full"
                     buttonClassName="w-full min-h-[44px] bg-inset border border-line text-xs font-semibold text-ink rounded-xl hover:border-accent transition-all px-3"
                   />
-                )}
-              </div>
-
-              {/* Agreed Final Deal Price */}
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-ink-muted">
-                  Agreed Deal Price (₹) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  value={wonPrice}
-                  onChange={(e) => setWonPrice(e.target.value)}
-                  placeholder="e.g. 750000"
-                  className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
-                />
-              </div>
-
-              {/* Optional Notes */}
-              <div className="space-y-1">
-                <label className="text-xs font-medium text-ink-muted">
-                  Closing Notes (Optional)
-                </label>
-                <textarea
-                  rows={2}
-                  value={wonNotes}
-                  onChange={(e) => setWonNotes(e.target.value)}
-                  placeholder="e.g. Customer paid via bank transfer, delivery scheduled..."
-                  className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsWonOpen(false)}
-                  className="rounded-lg border border-line bg-surface px-3.5 py-2 text-xs font-semibold text-ink hover:bg-hover transition-colors cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={
-                    changeStageMutation.isPending || !selectedCarId || !wonPrice
-                  }
-                  className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 px-4 py-2 text-xs font-bold text-white shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
-                >
-                  {changeStageMutation.isPending && (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  {advanceErrors.advance_method && (
+                    <p className="text-[11px] text-danger font-medium">
+                      {advanceErrors.advance_method.message}
+                    </p>
                   )}
-                  <span>Confirm Won</span>
-                </button>
-              </div>
-            </form>
+                </div>
+
+                {/* Receipt / Reference Number (Rt No.) */}
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-ink-muted flex items-center justify-between">
+                    <span>Receipt / Reference No. (Rt No.)</span>
+                    {watchMethod !== "cash" && (
+                      <span className="text-[10px] text-amber-500 font-medium">
+                        (Cheque / UTR / Txn ID recommended)
+                      </span>
+                    )}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={
+                      watchMethod === "cash"
+                        ? "Optional receipt no."
+                        : "e.g. UTR123456789 / CHQ-00123"
+                    }
+                    {...registerAdvance("advance_reference")}
+                    className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
+                  />
+                  {advanceErrors.advance_reference && (
+                    <p className="text-[11px] text-danger font-medium">
+                      {advanceErrors.advance_reference.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Date & Balance Due Days Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-ink-muted">
+                      Receipt Date (dtd)
+                    </label>
+                    <input
+                      type="date"
+                      {...registerAdvance("advance_receipt_date")}
+                      className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
+                    />
+                    {advanceErrors.advance_receipt_date && (
+                      <p className="text-[11px] text-danger font-medium">
+                        {advanceErrors.advance_receipt_date.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-ink-muted">
+                      Balance Deadline (Days)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="e.g. 10"
+                      {...registerAdvance("balance_due_days")}
+                      className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
+                    />
+                    {advanceErrors.balance_due_days && (
+                      <p className="text-[11px] text-danger font-medium">
+                        {advanceErrors.balance_due_days.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Step 2 Action Buttons */}
+                <div className="flex items-center justify-between gap-2 pt-2 border-t border-line">
+                  <button
+                    type="button"
+                    onClick={() => setWonStep("won")}
+                    disabled={createBookingMutation.isPending}
+                    className="flex items-center gap-1 rounded-xl border border-line bg-surface px-4 py-2 text-xs font-semibold text-ink hover:bg-hover transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span>Back</span>
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={createBookingMutation.isPending}
+                    className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    {createBookingMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        <span>Creating Prebooking…</span>
+                      </>
+                    ) : (
+                      <span>Create Agreement</span>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

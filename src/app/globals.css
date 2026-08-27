@@ -231,3 +231,25 @@ h6 {
   background: var(--brand-accent) !important;
   color: var(--inverse) !important;
 }
+
+/* Print-specific stylesheet isolation */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #advance-agreement-print,
+  #advance-agreement-print * {
+    visibility: visible !important;
+  }
+  #advance-agreement-print {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 24px !important;
+    background: white !important;
+    color: black !important;
+  }
+}
+

@@ -87,4 +87,11 @@ export const queryKeys = {
     meHeatmap: (month?: string) =>
       ["attendance", "me", "heatmap", month] as const,
   },
+
+  booking: {
+    all: ["bookings"] as const,
+    list: (status: "active" | "closed") =>
+      ["bookings", "list", { status }] as const,
+    detail: (id: string) => ["bookings", "detail", id] as const,
+  },
 } as const;
