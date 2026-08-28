@@ -20,6 +20,7 @@ import {
   Lock,
   ArrowRight,
   Printer,
+  Download,
   Share2,
   ChevronRight,
   Receipt,
@@ -237,7 +238,7 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
           </div>
 
           {/* Header Action Buttons */}
-          <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
             <button
               type="button"
               onClick={handleShare}
@@ -246,6 +247,16 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
             >
               <Share2 className="h-4 w-4 text-ink-subtle" />
               <span>Share Summary</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-line text-xs font-semibold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs"
+              title="Download Agreement PDF"
+            >
+              <Download className="h-4 w-4 text-ink-subtle" />
+              <span>Download PDF</span>
             </button>
 
             <button

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { BookingDetail } from "../types/booking-types";
 import { numberToWordsRupees } from "../utils/number-to-words";
 
@@ -7,193 +8,364 @@ interface AdvanceAgreementPrintProps {
   booking: BookingDetail;
 }
 
-function formatCurrency(amountStr: string | null | undefined): string {
+function formatCurrency(amountStr: string | number | null | undefined): string {
   if (!amountStr) return "₹0";
   const num = Number(amountStr);
-  if (isNaN(num)) return amountStr;
+  if (isNaN(num)) return String(amountStr);
   return `₹${num.toLocaleString("en-IN")}`;
 }
 
 function formatDateIST(dateStr: string | null | undefined): string {
   if (!dateStr) return "—";
-  return new Date(dateStr).toLocaleDateString("en-IN", {
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return String(dateStr);
+  return d.toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
     year: "numeric",
+    timeZone: "Asia/Kolkata",
   });
+}
+
+function formatDateTimeIST(dateStr: string | null | undefined): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return String(dateStr);
+  const dateFormatted = d.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  });
+  const timeFormatted = d.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Asia/Kolkata",
+  });
+  return `${dateFormatted}, ${timeFormatted} IST`;
+}
+
+function formatDateOrdinalIST(dateStr: string | null | undefined): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return String(dateStr);
+  const day = d.getDate();
+  const month = d.toLocaleDateString("en-IN", {
+    month: "long",
+    timeZone: "Asia/Kolkata",
+  });
+  const year = d.getFullYear();
+
+  const suffix = (n: number) => {
+    if (n > 3 && n < 21) return "th";
+    switch (n % 10) {
+      case 1:
+        return "st";
+      case 2:
+        return "nd";
+      case 3:
+        return "rd";
+      default:
+        return "th";
+    }
+  };
+  return `${day}${suffix(day)} ${month} ${year}`;
 }
 
 export function AdvanceAgreementPrint({ booking }: AdvanceAgreementPrintProps) {
   const advanceInWords =
     numberToWordsRupees(booking.amount_paid) || "Zero Rupees Only";
   const agreedInWords = numberToWordsRupees(booking.agreed_price) || "";
-  const balanceInWords = numberToWordsRupees(booking.balance_due);
+  const balanceInWords = numberToWordsRupees(booking.balance_due) || "";
 
-  const customerName = booking.customer?.name || "____________________";
-  const customerPhone = booking.customer?.phone || "____________________";
-  const carName = booking.car
+  const customerName = booking.customer?.name || "Customer";
+  const customerPhone = booking.customer?.phone || "";
+
+  const carYearMakeModel = booking.car
     ? `${booking.car.year} ${booking.car.make} ${booking.car.model}`
     : "Vehicle";
-  const regNumber = booking.car?.reg_number || "____________________";
+  const carReg = booking.car?.reg_number || "Unregistered";
 
-  const sellerName = booking.seller?.name || "Cars4 Showroom";
-  const sellerAddress = booking.seller?.address || "";
+  const sellerName = booking.seller?.name || "CARS 4 PRE OWNED CARS";
+  const sellerAddress =
+    booking.seller?.address || "NH Bypass, Edappally, Kochi, Kerala";
   const sellerPhone = booking.seller?.phone || "";
+
+  const hasReceiptNo = Boolean(
+    booking.advance_receipt_no && booking.advance_receipt_no.trim().length > 0
+  );
 
   return (
     <div
       id="advance-agreement-print"
-      className="hidden print:block font-sans text-black bg-white p-8 max-w-4xl mx-auto leading-relaxed text-sm"
+      className="hidden print:block text-slate-900 bg-white p-6 max-w-[210mm] mx-auto text-xs leading-normal font-sans select-text"
+      style={{ color: "#0f172a", backgroundColor: "#ffffff" }}
     >
-      {/* 1. Header Row */}
-      <div className="flex justify-between items-start border-b-2 border-black pb-4 mb-6">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight uppercase font-sans">
-            {sellerName}
-          </h1>
-          {sellerAddress && (
-            <p className="text-xs text-gray-700 max-w-md font-sans">
-              {sellerAddress}
-            </p>
-          )}
-          {sellerPhone && (
-            <p className="text-xs font-mono font-semibold text-gray-800">
-              Tel: {sellerPhone}
-            </p>
-          )}
+      {/* 1. Header Band */}
+      <div className="flex justify-between items-start border-b-2 border-slate-900 pb-3 mb-4">
+        <div className="flex items-center gap-3.5">
+          {/* Logo */}
+          <Image
+            src="/icons/icon-512.png"
+            alt="Cars4 Logo"
+            width={56}
+            height={56}
+            className="w-14 h-14 object-contain shrink-0 no-strip"
+            priority
+          />
+          <div className="space-y-0.5">
+            <h1 className="text-xl font-extrabold uppercase tracking-tight text-slate-900 font-sans">
+              {sellerName}
+            </h1>
+            {sellerAddress && (
+              <p className="text-[11px] text-slate-700 leading-tight max-w-md">
+                {sellerAddress}
+              </p>
+            )}
+            {sellerPhone && (
+              <p className="text-[11px] font-semibold text-slate-800 font-mono pt-0.5">
+                Ph: {sellerPhone}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="text-right space-y-1 font-sans">
-          <div className="text-xs text-gray-500 uppercase tracking-widest font-semibold">
-            Booking Ref No.
+        <div className="text-right space-y-1">
+          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            Agreement Ref.
           </div>
-          <div className="text-xl font-bold font-mono text-black border-2 border-black px-3 py-1 inline-block rounded">
+          <div className="text-sm font-bold font-mono text-slate-900 border-2 border-slate-900 px-3 py-1 inline-block rounded bg-slate-50">
             {booking.booking_number}
           </div>
-          <div className="text-xs font-medium text-gray-700">
-            Date: {formatDateIST(booking.prebooked_at)}
+        </div>
+      </div>
+
+      {/* 2. Document Title & IST Date Header */}
+      <div className="text-center my-4 space-y-1">
+        <h2 className="text-base font-extrabold uppercase tracking-wider text-slate-900 underline decoration-slate-900 decoration-2 underline-offset-4">
+          Advance Sale Agreement Cum Receipt
+        </h2>
+        <div className="text-[11px] font-medium text-slate-600">
+          Date &amp; Time:{" "}
+          <span className="font-semibold text-slate-800 font-mono">
+            {formatDateTimeIST(booking.prebooked_at)}
+          </span>
+        </div>
+      </div>
+
+      {/* 3. Financial Summary Bar */}
+      <div className="my-4 border border-slate-900 rounded overflow-hidden text-xs">
+        <div className="grid grid-cols-3 divide-x divide-slate-900 bg-slate-50/80 text-center py-2.5 font-mono">
+          <div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-wider font-sans font-semibold">
+              Mutually Agreed Price
+            </div>
+            <div className="font-bold text-slate-900 text-sm">
+              {formatCurrency(booking.agreed_price)}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-wider font-sans font-semibold">
+              Advance Token Received
+            </div>
+            <div className="font-bold text-slate-900 text-sm">
+              {formatCurrency(booking.amount_paid)}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-500 uppercase tracking-wider font-sans font-semibold">
+              Net Balance Due
+            </div>
+            <div className="font-bold text-slate-900 text-sm">
+              {formatCurrency(booking.balance_due)}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 2. Document Title */}
-      <div className="text-center my-6">
-        <h2 className="text-lg font-bold uppercase underline tracking-wider font-sans">
-          Advance Sale Agreement Cum Receipt
-        </h2>
-      </div>
-
-      {/* 3. Formal Agreement Statement */}
-      <div className="space-y-4 text-justify my-6 font-sans text-sm leading-7">
-        <p>
-          Received with thanks from Mr./Ms.{" "}
-          <strong className="underline decoration-black decoration-1 uppercase">
+      {/* 4. Formal Contract Body / Clauses */}
+      <div className="space-y-3.5 text-slate-800 text-[11pt] leading-relaxed text-justify my-5 font-sans">
+        {/* Receipt Paragraph */}
+        <p className="p-3 bg-slate-50/50 rounded border border-slate-200">
+          Received with thanks from{" "}
+          <strong className="font-bold text-slate-900 uppercase">
             {customerName}
           </strong>{" "}
-          (Contact: <strong className="font-mono">{customerPhone}</strong>) an advance sum of{" "}
-          <strong className="font-mono">{formatCurrency(booking.amount_paid)}</strong> (in words:{" "}
-          <em className="font-semibold">{advanceInWords}</em>)
-          {booking.advance_receipt_no ? (
+          {customerPhone ? (
             <>
-              {" "}vide Receipt/Ref No.{" "}
-              <strong className="font-mono">{booking.advance_receipt_no}</strong>
-              {booking.advance_receipt_date
-                ? ` dated ${formatDateIST(booking.advance_receipt_date)}`
-                : ""}
+              (Contact:{" "}
+              <strong className="font-semibold font-mono text-slate-900">
+                {customerPhone}
+              </strong>
+              ){" "}
             </>
-          ) : null}{" "}
-          towards booking token for the purchase of pre-owned vehicle{" "}
-          <strong className="uppercase">
-            {carName}
+          ) : null}
+          an amount of{" "}
+          <strong className="font-bold font-mono text-slate-900">
+            {formatCurrency(booking.amount_paid)}
           </strong>{" "}
-          bearing Registration No.{" "}
-          <strong className="font-mono uppercase">{regNumber}</strong> for a mutually agreed total deal price of{" "}
-          <strong className="font-mono">{formatCurrency(booking.agreed_price)}</strong> (in words:{" "}
-          <em className="font-semibold">{agreedInWords}</em>).
-        </p>
-
-        <p>
-          The buyer agrees to pay the remaining balance amount of{" "}
-          <strong className="font-mono">{formatCurrency(booking.balance_due)}</strong>
-          {balanceInWords ? ` (${balanceInWords})` : ""}{" "}
-          {booking.balance_due_days ? (
+          (<strong>{advanceInWords}</strong>)
+          {hasReceiptNo ? (
             <>
-              within <strong>{booking.balance_due_days} working days</strong> from the date of this agreement
+              , Receipt No.{" "}
+              <strong className="font-bold font-mono text-slate-900">
+                {booking.advance_receipt_no}
+              </strong>
+              {booking.advance_receipt_date ? (
+                <>
+                  {" "}
+                  dated{" "}
+                  <strong className="font-bold text-slate-900">
+                    {formatDateIST(booking.advance_receipt_date)}
+                  </strong>
+                </>
+              ) : null}
             </>
-          ) : (
-            <>prior to vehicle delivery</>
-          )}
-          .
+          ) : null}
+          , being advance towards purchase/sale of{" "}
+          <strong className="font-bold uppercase text-slate-900">
+            {carYearMakeModel}
+          </strong>{" "}
+          bearing Reg. No.{" "}
+          <strong className="font-bold font-mono uppercase text-slate-900">
+            {carReg}
+          </strong>{" "}
+          for a mutually agreed price of{" "}
+          <strong className="font-bold font-mono text-slate-900">
+            {formatCurrency(booking.agreed_price)}
+          </strong>{" "}
+          (<strong>{agreedInWords}</strong>).
+        </p>
+
+        {/* Balance Clause */}
+        <p className="p-3 bg-slate-50/50 rounded border border-slate-200">
+          The purchaser has agreed to take delivery of the car after making
+          balance payment in full, i.e.{" "}
+          <strong className="font-bold font-mono text-slate-900">
+            {formatCurrency(booking.balance_due)}
+          </strong>{" "}
+          {balanceInWords ? (
+            <>
+              (<strong>{balanceInWords}</strong>){" "}
+            </>
+          ) : null}
+          within{" "}
+          <strong className="font-bold text-slate-900">
+            {booking.balance_due_days
+              ? `${booking.balance_due_days} working days`
+              : "the agreed working days"}
+          </strong>
+          , failing which this agreement stands void, the seller is at full
+          liberty to sell the car to anyone else, and the advance amount paid
+          shall be forfeited.
+        </p>
+
+        {/* Vehicle Verification & Finalization Statement */}
+        <p className="px-1 text-[10.5pt] leading-snug">
+          The vehicle and its documents have been duly verified, tested, and
+          approved by the buyer, and the sale is hereby finalized.
+        </p>
+
+        {/* Other Requirements / Commitments */}
+        <div className="px-1 text-[10.5pt] space-y-1 pt-1">
+          <div className="font-bold text-slate-900 uppercase text-[10pt] tracking-wide">
+            Other Requirements &amp; Commitments:
+          </div>
+          <ol className="list-decimal list-inside space-y-0.5 text-slate-800 pl-1">
+            <li>Documentation charges of ₹1,000 will be extra.</li>
+            <li>
+              No-claim-bonus (NCB) repayment to the insurance company, if any,
+              to be borne by the buyer.
+            </li>
+          </ol>
+        </div>
+
+        {/* Acceptance Statement */}
+        <p className="px-1 pt-2 text-[10.5pt] font-semibold text-slate-900">
+          Agreed and accepted on this day of{" "}
+          {formatDateOrdinalIST(booking.prebooked_at)}.
         </p>
       </div>
 
-      {/* 4. Financial Breakdown Summary Table */}
-      <div className="my-6 border border-black rounded overflow-hidden font-sans">
-        <table className="w-full text-xs text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-100 border-b border-black text-black uppercase font-bold">
-              <th className="p-2 border-r border-black">Particulars</th>
-              <th className="p-2 text-right">Amount (₹)</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-300">
-            <tr>
-              <td className="p-2 border-r border-black font-semibold">Mutually Agreed Deal Price</td>
-              <td className="p-2 text-right font-mono font-bold">{formatCurrency(booking.agreed_price)}</td>
-            </tr>
-            <tr>
-              <td className="p-2 border-r border-black font-semibold">Advance Amount Received</td>
-              <td className="p-2 text-right font-mono font-bold text-emerald-700">{formatCurrency(booking.amount_paid)}</td>
-            </tr>
-            <tr className="bg-gray-50 font-bold">
-              <td className="p-2 border-r border-black uppercase">Net Balance Due</td>
-              <td className="p-2 text-right font-mono text-amber-700">{formatCurrency(booking.balance_due)}</td>
-            </tr>
-          </tbody>
-        </table>
+      {/* 5. Signature Grid */}
+      <div className="mt-8 pt-4 border-t border-slate-300">
+        <div className="grid grid-cols-3 gap-6 text-center font-sans text-xs">
+          {/* Buyer Signature */}
+          <div className="space-y-5">
+            <div className="h-10 flex items-end justify-center">
+              <div className="w-4/5 border-b border-dashed border-slate-400" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="font-bold uppercase text-slate-900">
+                Buyer Signature
+              </div>
+              <div className="text-slate-700 text-[11px]">
+                Name:{" "}
+                <span className="font-semibold text-slate-900">
+                  {customerName}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Seller Signature */}
+          <div className="space-y-5">
+            <div className="h-10 flex items-end justify-center">
+              <div className="w-4/5 border-b border-dashed border-slate-400" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="font-bold uppercase text-slate-900">
+                Authorized Signatory
+              </div>
+              <div className="text-slate-700 text-[11px]">
+                For{" "}
+                <span className="font-semibold text-slate-900">
+                  {sellerName}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Witness Signature */}
+          <div className="space-y-5">
+            <div className="h-10 flex items-end justify-center">
+              <div className="w-4/5 border-b border-dashed border-slate-400" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="font-bold uppercase text-slate-900">
+                Witness Signature
+              </div>
+              <div className="text-slate-700 text-[11px]">
+                Name: __________________
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* 5. Terms & Conditions Block */}
-      <div className="my-6 space-y-2 border-t border-b border-gray-300 py-4 font-sans text-xs">
-        <h3 className="font-bold uppercase tracking-wider text-black">
-          Terms &amp; Conditions:
-        </h3>
-        <ol className="list-decimal list-inside space-y-1 text-gray-800 leading-relaxed">
+      {/* 6. PS / Terms Block */}
+      <div className="mt-6 border border-slate-900 rounded p-3 bg-slate-50/70 text-[9.5pt] leading-tight space-y-1">
+        <div className="font-bold uppercase tracking-wider text-slate-900 text-[10pt] border-b border-slate-300 pb-1 mb-1.5 flex items-center justify-between">
+          <span>Important Terms &amp; Conditions (P.S.)</span>
+          <span className="text-[8.5pt] text-slate-500 font-mono normal-case">
+            Form No. 1718
+          </span>
+        </div>
+        <ol className="list-decimal list-inside space-y-1 text-slate-800">
           <li>
-            Ownership transfer charges, insurance transfer, and documentation fees will be borne as per mutual agreement.
+            All cheques / drafts to be drawn in the name of{" "}
+            <strong>&rdquo;CARS 4&#34;</strong> only; payment by cheque is
+            subject to bank realization.
           </li>
           <li>
-            The advance token secures the vehicle for the balance payment period of{" "}
-            {booking.balance_due_days ? `${booking.balance_due_days} working days` : "agreed timeline"}.
+            Buyer must pay a minimum of <strong>₹10,000</strong> as advance to
+            keep the booking alive.
           </li>
           <li>
-            In the event of buyer cancellation, standard processing charges / cancellation fees will be applicable as per dealership policy.
-          </li>
-          <li>
-            All cheque / electronic fund transfers are accepted subject to bank realization.
-          </li>
-          <li>
-            Vehicle physical possession &amp; keys will be handed over only after full settlement of the net balance due.
+            Booking cancellation charge is <strong>₹3,000</strong>.
           </li>
         </ol>
-      </div>
-
-      {/* 6. Signature Columns */}
-      <div className="mt-12 pt-8 grid grid-cols-3 gap-6 text-center font-sans text-xs">
-        <div className="border-t border-black pt-2 space-y-1">
-          <div className="font-bold uppercase">{customerName}</div>
-          <div className="text-gray-600 text-[11px]">(Buyer Signature)</div>
-        </div>
-
-        <div className="border-t border-black pt-2 space-y-1">
-          <div className="font-bold uppercase">Witness</div>
-          <div className="text-gray-600 text-[11px]">(Name &amp; Signature)</div>
-        </div>
-
-        <div className="border-t border-black pt-2 space-y-1">
-          <div className="font-bold uppercase">{sellerName}</div>
-          <div className="text-gray-600 text-[11px]">(Authorized Signatory)</div>
-        </div>
       </div>
     </div>
   );
