@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useInfiniteBookings } from "../hooks/use-bookings";
-import { BookingCard } from "./booking-card";
+import { BookingCard, MobileBookingCard } from "./booking-card";
 import {
   CalendarCheck,
   CalendarX,
@@ -112,47 +112,47 @@ export function BookingList() {
   return (
     <div className="space-y-5 font-sans select-none">
       {/* 1. KPI Executive Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
         {/* Card 1: Count */}
-        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-4 space-y-1 shadow-xs">
-          <div className="flex items-center justify-between text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
+        <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1 shadow-xs">
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
             <span>{activeTab === "active" ? "Active Bookings" : "Closed Records"}</span>
-            <Receipt className="h-4 w-4 text-accent" />
+            <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold font-mono text-ink">
+          <div className="text-lg sm:text-2xl font-bold font-mono text-ink">
             {kpiStats.count}
           </div>
         </div>
 
         {/* Card 2: Total Agreed Value */}
-        <div className="rounded-2xl border border-line bg-card p-3.5 sm:p-4 space-y-1 shadow-xs">
-          <div className="flex items-center justify-between text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
-            <span>Total Agreed Deals</span>
-            <IndianRupee className="h-4 w-4 text-accent" />
+        <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1 shadow-xs">
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
+            <span>Total Agreed</span>
+            <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold font-mono text-ink">
+          <div className="text-lg sm:text-2xl font-bold font-mono text-ink truncate">
             {formatCurrency(kpiStats.agreedSum)}
           </div>
         </div>
 
         {/* Card 3: Total Advances Collected */}
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3.5 sm:p-4 space-y-1 shadow-xs">
-          <div className="flex items-center justify-between text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-            <span>Advance Collected</span>
-            <PiggyBank className="h-4 w-4 text-emerald-500" />
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3 sm:p-4 space-y-1 shadow-xs">
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+            <span>Advance Paid</span>
+            <PiggyBank className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+          <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 truncate">
             {formatCurrency(kpiStats.paidSum)}
           </div>
         </div>
 
         {/* Card 4: Outstanding Balance */}
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3.5 sm:p-4 space-y-1 shadow-xs">
-          <div className="flex items-center justify-between text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3 sm:p-4 space-y-1 shadow-xs">
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
             <span>Pending Balance</span>
-            <Clock className="h-4 w-4 text-amber-500" />
+            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500" />
           </div>
-          <div className="text-xl sm:text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">
+          <div className="text-lg sm:text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 truncate">
             {formatCurrency(kpiStats.balanceSum)}
           </div>
         </div>
@@ -217,8 +217,8 @@ export function BookingList() {
         </div>
       </div>
 
-      {/* 3. Data Table Container */}
-      <div className="rounded-2xl border border-line bg-card overflow-hidden shadow-xs">
+      {/* 3. DESKTOP DATA TABLE VIEW (hidden md:block) */}
+      <div className="hidden md:block rounded-2xl border border-line bg-card overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse min-w-[700px]">
             <thead>
@@ -324,7 +324,61 @@ export function BookingList() {
         )}
       </div>
 
-      {/* 4. Infinite Scroll Trigger / Footer */}
+      {/* 4. MOBILE NATIVE CARD STACK VIEW (block md:hidden) */}
+      <div className="block md:hidden space-y-3">
+        {/* Mobile Skeletons Loading State */}
+        {isLoading &&
+          Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-line bg-card p-4 space-y-3 animate-pulse"
+            >
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-20 bg-inset rounded" />
+                <div className="h-4 w-16 bg-inset rounded" />
+              </div>
+              <div className="h-12 w-full bg-inset rounded-xl" />
+              <div className="h-8 w-full bg-inset rounded" />
+            </div>
+          ))}
+
+        {/* Mobile Data Cards */}
+        {!isLoading &&
+          !isError &&
+          filteredBookings.length > 0 &&
+          filteredBookings.map((booking) => (
+            <MobileBookingCard
+              key={booking.id}
+              booking={booking}
+              activeTab={activeTab}
+            />
+          ))}
+
+        {/* Mobile Empty State */}
+        {!isLoading && !isError && filteredBookings.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-line bg-inset/40 p-6 text-center space-y-3">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle">
+              {activeTab === "active" ? (
+                <CalendarCheck className="h-5 w-5" />
+              ) : (
+                <CalendarX className="h-5 w-5" />
+              )}
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-xs font-bold text-ink">
+                {searchQuery ? "No matching bookings" : "No bookings found"}
+              </h3>
+              <p className="text-[11px] text-ink-subtle">
+                {searchQuery
+                  ? `No records match "${searchQuery}"`
+                  : "No booking records available."}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 5. Infinite Scroll Trigger / Footer */}
       <div ref={sentinelRef} className="py-4 text-center">
         {isFetchingNextPage && (
           <div className="inline-flex items-center gap-2 text-xs font-medium text-ink-muted">
