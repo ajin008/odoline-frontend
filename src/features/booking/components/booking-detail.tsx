@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { getBookingStatusConfig } from "../utils/booking-status-map";
@@ -9,7 +10,6 @@ import { AdvanceAgreementPrint } from "./advance-agreement-print";
 import {
   ArrowLeft,
   User,
-  Phone,
   Car as CarIcon,
   Calendar,
   CheckCircle2,
@@ -24,7 +24,7 @@ import {
   ChevronRight,
   Receipt,
   Clock,
-  MessageSquare,
+  ExternalLink,
 } from "lucide-react";
 
 interface BookingDetailProps {
@@ -437,30 +437,63 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
         <div className="lg:col-span-4 space-y-4">
           {/* Sidebar 1: Buyer Profile Bento Card */}
           <div className="rounded-2xl border border-line bg-card p-4 space-y-4 shadow-xs">
-            <div className="flex items-center gap-2 border-b border-line/40 pb-3">
-              <User className="h-4 w-4 text-accent" />
-              <h3 className="text-xs font-bold text-ink uppercase tracking-wider">
-                Buyer Profile
-              </h3>
+            <div className="flex items-center justify-between border-b border-line/40 pb-3">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-accent" />
+                <h3 className="text-xs font-bold text-ink uppercase tracking-wider">
+                  Buyer Profile
+                </h3>
+              </div>
+              {booking.lead?.id && (
+                <Link
+                  href={`/staff/leads/${booking.lead.id}`}
+                  className="text-[11px] font-semibold text-accent hover:underline flex items-center gap-1"
+                >
+                  <span>View Lead</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
             </div>
 
-            <div className="flex items-start gap-3">
-              {/* Initials Avatar */}
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-sm shrink-0">
-                {getInitials(booking.customer?.name)}
-              </div>
-
-              <div className="space-y-1 min-w-0 flex-1">
-                <div className="font-bold text-ink text-sm truncate">
-                  {booking.customer?.name || "Customer Unlinked"}
+            {booking.lead?.id ? (
+              <Link
+                href={`/staff/leads/${booking.lead.id}`}
+                className="flex items-start gap-3 p-2 -mx-2 rounded-xl hover:bg-inset transition-colors group cursor-pointer"
+              >
+                {/* Initials Avatar */}
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-sm shrink-0 group-hover:bg-accent group-hover:text-inverse transition-colors">
+                  {getInitials(booking.customer?.name)}
                 </div>
-                {booking.customer?.phone && (
-                  <div className="font-mono text-xs font-semibold text-ink-muted">
-                    {booking.customer.phone}
+
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="font-bold text-ink text-sm truncate group-hover:text-accent transition-colors flex items-center gap-1.5">
+                    <span>{booking.customer?.name || "Customer Unlinked"}</span>
+                    <ChevronRight className="h-3.5 w-3.5 text-ink-subtle opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                   </div>
-                )}
+                  {booking.customer?.phone && (
+                    <div className="font-mono text-xs font-semibold text-ink-muted">
+                      {booking.customer.phone}
+                    </div>
+                  )}
+                </div>
+              </Link>
+            ) : (
+              <div className="flex items-start gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-sm shrink-0">
+                  {getInitials(booking.customer?.name)}
+                </div>
+                <div className="space-y-1 min-w-0 flex-1">
+                  <div className="font-bold text-ink text-sm truncate">
+                    {booking.customer?.name || "Customer Unlinked"}
+                  </div>
+                  {booking.customer?.phone && (
+                    <div className="font-mono text-xs font-semibold text-ink-muted">
+                      {booking.customer.phone}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Quick Action Links */}
             {booking.customer?.phone && (
@@ -469,7 +502,13 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
                   href={`tel:${booking.customer.phone}`}
                   className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-inset border border-line/60 text-xs font-semibold text-ink hover:bg-card hover:border-accent transition-all"
                 >
-                  <Phone className="h-3.5 w-3.5 text-accent" />
+                  <Image
+                    src="/icons/phonecall-icon.png"
+                    alt="Call"
+                    width={16}
+                    height={16}
+                    className="h-4 w-4 shrink-0 object-contain"
+                  />
                   <span>Call Buyer</span>
                 </a>
                 <a
@@ -478,7 +517,13 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
                   rel="noreferrer"
                   className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-all"
                 >
-                  <MessageSquare className="h-3.5 w-3.5" />
+                  <Image
+                    src="/icons/whatsappIcon.png"
+                    alt="WhatsApp"
+                    width={16}
+                    height={16}
+                    className="h-4 w-4 shrink-0 object-contain"
+                  />
                   <span>WhatsApp</span>
                 </a>
               </div>
@@ -487,37 +532,79 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
 
           {/* Sidebar 2: Booked Vehicle Bento Card */}
           <div className="rounded-2xl border border-line bg-card p-4 space-y-3.5 shadow-xs">
-            <div className="flex items-center gap-2 border-b border-line/40 pb-3">
-              <CarIcon className="h-4 w-4 text-accent" />
-              <h3 className="text-xs font-bold text-ink uppercase tracking-wider">
-                Booked Vehicle
-              </h3>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              <div className="font-bold text-ink text-sm leading-snug">
-                {booking.car
-                  ? `${booking.car.year} ${booking.car.make} ${booking.car.model}`
-                  : "Vehicle Unlinked"}
+            <div className="flex items-center justify-between border-b border-line/40 pb-3">
+              <div className="flex items-center gap-2">
+                <CarIcon className="h-4 w-4 text-accent" />
+                <h3 className="text-xs font-bold text-ink uppercase tracking-wider">
+                  Booked Vehicle
+                </h3>
               </div>
-
-              {booking.car?.reg_number && (
-                <div>
-                  <span className="inline-block px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase bg-inset text-ink-muted border border-line/60">
-                    {booking.car.reg_number}
-                  </span>
-                </div>
-              )}
-
-              {booking.car?.selling_price && (
-                <div className="bg-inset/50 p-2.5 rounded-xl border border-line/40 flex items-center justify-between text-xs">
-                  <span className="text-ink-subtle">Asking Stock Price:</span>
-                  <span className="font-mono font-bold text-ink">
-                    {formatCurrency(booking.car.selling_price)}
-                  </span>
-                </div>
+              {booking.car?.id && (
+                <Link
+                  href={`/staff/stock/${booking.car.id}`}
+                  className="text-[11px] font-semibold text-accent hover:underline flex items-center gap-1"
+                >
+                  <span>View Car</span>
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
               )}
             </div>
+
+            {booking.car?.id ? (
+              <Link
+                href={`/staff/stock/${booking.car.id}`}
+                className="block space-y-2 text-xs p-2 -mx-2 rounded-xl hover:bg-inset transition-colors group cursor-pointer"
+              >
+                <div className="font-bold text-ink text-sm leading-snug group-hover:text-accent transition-colors flex items-center justify-between gap-1">
+                  <span>
+                    {`${booking.car.year} ${booking.car.make} ${booking.car.model}`}
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-ink-subtle opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
+                </div>
+
+                {booking.car?.reg_number && (
+                  <div>
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase bg-inset text-ink-muted border border-line/60">
+                      {booking.car.reg_number}
+                    </span>
+                  </div>
+                )}
+
+                {booking.car?.selling_price && (
+                  <div className="bg-inset/50 p-2.5 rounded-xl border border-line/40 flex items-center justify-between text-xs">
+                    <span className="text-ink-subtle">Asking Stock Price:</span>
+                    <span className="font-mono font-bold text-ink">
+                      {formatCurrency(booking.car.selling_price)}
+                    </span>
+                  </div>
+                )}
+              </Link>
+            ) : (
+              <div className="space-y-2 text-xs">
+                <div className="font-bold text-ink text-sm leading-snug">
+                  {booking.car
+                    ? `${booking.car.year} ${booking.car.make} ${booking.car.model}`
+                    : "Vehicle Unlinked"}
+                </div>
+
+                {booking.car?.reg_number && (
+                  <div>
+                    <span className="inline-block px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase bg-inset text-ink-muted border border-line/60">
+                      {booking.car.reg_number}
+                    </span>
+                  </div>
+                )}
+
+                {booking.car?.selling_price && (
+                  <div className="bg-inset/50 p-2.5 rounded-xl border border-line/40 flex items-center justify-between text-xs">
+                    <span className="text-ink-subtle">Asking Stock Price:</span>
+                    <span className="font-mono font-bold text-ink">
+                      {formatCurrency(booking.car.selling_price)}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Sidebar 3: Showroom Seller Bento Card */}
