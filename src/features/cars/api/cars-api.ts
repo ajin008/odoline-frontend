@@ -65,6 +65,10 @@ export interface Car {
 
   days_in_stock?: number | null;
 
+  // Booked info badge data
+  is_booked?: boolean;
+  booking_number?: string | null;
+
   // Batch-generated 7-day presigned thumbnail URL
   thumbnail_url?: string | null;
   primary_photo_url?: string | null;
@@ -128,6 +132,41 @@ export const carsApi = {
     if (limit) params.limit = limit;
 
     const res = await apiClient.get(endpoints.cars.list, {
+      params: Object.keys(params).length ? params : undefined,
+    });
+    return { data: res.data.data, pagination: res.data.pagination };
+  },
+
+  /**
+   * GET /cars/staff/stock — dedicated staff stock list (in_stock + booked cars, available first).
+   */
+  async getStaffStock({
+    sort,
+    search,
+    fuel_type,
+    min_price,
+    max_price,
+    cursor,
+    limit,
+  }: {
+    sort?: string;
+    search?: string;
+    fuel_type?: string;
+    min_price?: number;
+    max_price?: number;
+    cursor?: string;
+    limit?: number;
+  } = {}): Promise<CarsPage> {
+    const params: Record<string, string | number> = {};
+    if (sort) params.sort = sort;
+    if (search?.trim()) params.search = search.trim();
+    if (fuel_type?.trim()) params.fuel_type = fuel_type.trim();
+    if (min_price !== undefined) params.min_price = min_price;
+    if (max_price !== undefined) params.max_price = max_price;
+    if (cursor) params.cursor = cursor;
+    if (limit) params.limit = limit;
+
+    const res = await apiClient.get(endpoints.cars.staffStock, {
       params: Object.keys(params).length ? params : undefined,
     });
     return { data: res.data.data, pagination: res.data.pagination };

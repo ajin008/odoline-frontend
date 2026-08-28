@@ -52,3 +52,36 @@ export function useInfiniteCars({
     getNextPageParam: (lastPage) => lastPage.pagination.next_cursor ?? undefined,
   });
 }
+
+/**
+ * Cursor-paginated staff stock list (in_stock + booked cars).
+ */
+export function useInfiniteStaffStock({
+  sort,
+  search,
+  fuel_type,
+  min_price,
+  max_price,
+}: {
+  sort?: string;
+  search?: string;
+  fuel_type?: string;
+  min_price?: number;
+  max_price?: number;
+} = {}) {
+  return useInfiniteQuery({
+    queryKey: ["cars", "staff-stock", { sort, search, fuel_type, min_price, max_price }],
+    queryFn: ({ pageParam }) =>
+      carsApi.getStaffStock({
+        sort,
+        search,
+        fuel_type,
+        min_price,
+        max_price,
+        cursor: pageParam,
+        limit: PAGE_SIZE,
+      }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.pagination.next_cursor ?? undefined,
+  });
+}

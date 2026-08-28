@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useInfiniteCars } from "@/src/features/cars/hooks/use-infinite-cars";
+import { useInfiniteStaffStock } from "@/src/features/cars/hooks/use-infinite-cars";
 import { StaffCarCard } from "@/src/features/cars/components/staff-car-card";
 import { StaffStockFilters } from "@/src/features/cars/components/staff-stock-filters";
 import { Car, Loader2, RefreshCw } from "lucide-react";
@@ -29,8 +29,7 @@ export default function StaffStockPage() {
     hasNextPage,
     isFetchingNextPage,
     refetch,
-  } = useInfiniteCars({
-    statuses: ["in_stock"],
+  } = useInfiniteStaffStock({
     sort: "newest",
     search,
     fuel_type: fuelType,

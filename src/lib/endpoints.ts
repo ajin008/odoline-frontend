@@ -12,6 +12,7 @@ export const endpoints = {
 
   cars: {
     list: "/cars",
+    staffStock: "/cars/staff/stock",
     create: "/cars",
     detail: (id: string) => `/cars/${id}`,
     update: (id: string) => `/cars/${id}`,
