@@ -309,21 +309,27 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
               </div>
 
               {/* Total Paid */}
-              <div className="bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/20 space-y-1">
-                <div className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+              <div
+                className="p-4 rounded-xl border-0 space-y-1"
+                style={{ backgroundColor: "#d8f1b7" }}
+              >
+                <div className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider">
                   Advance Amount Paid
                 </div>
-                <div className="text-xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                <div className="text-xl font-bold font-mono text-emerald-950">
                   {formatCurrency(booking.amount_paid)}
                 </div>
               </div>
 
               {/* Balance Due */}
-              <div className="bg-amber-500/5 p-4 rounded-xl border border-amber-500/20 space-y-1">
-                <div className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+              <div
+                className="p-4 rounded-xl border-0 space-y-1"
+                style={{ backgroundColor: "#fae9cf" }}
+              >
+                <div className="text-[10px] font-bold text-amber-900 uppercase tracking-wider">
                   Net Balance Due
                 </div>
-                <div className="text-xl font-bold font-mono text-amber-600 dark:text-amber-400">
+                <div className="text-xl font-bold font-mono text-amber-950">
                   {formatCurrency(booking.balance_due)}
                 </div>
               </div>
