@@ -112,69 +112,78 @@ export function FinancialSnapshot() {
       {/* 2. Full-Width 3-Column Core Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
         {/* Metric 1: Total Invested (Purchase + Refurbish) */}
-        <div className="rounded-xl border border-line/60 bg-inset p-3 space-y-1 w-full">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
-            <Vault className="h-3.5 w-3.5 text-indigo-500 shrink-0" />
+        <div
+          className="rounded-xl p-3 space-y-1 w-full border-0"
+          style={{ backgroundColor: "#fae9cf" }}
+        >
+          <div className="flex items-center gap-1.5 text-xs font-medium text-amber-950/80">
+            <Vault className="h-3.5 w-3.5 text-amber-800 shrink-0" />
             <span className="truncate">Invested Capital</span>
           </div>
           {isLoading ? (
-            <div className="h-6 w-20 animate-pulse rounded bg-line/20" />
+            <div className="h-6 w-20 animate-pulse rounded bg-amber-900/10" />
           ) : (
             <p
-              className="font-mono text-base sm:text-lg font-bold text-ink tracking-tight truncate"
+              className="font-mono text-base sm:text-lg font-bold text-amber-950 tracking-tight truncate"
               title={formatFullCurrency(capitalTiedUpNum)}
             >
               {formatCompactCurrency(capitalTiedUpNum)}
             </p>
           )}
-          <span className="text-[10px] text-ink-subtle block truncate">
+          <span className="text-[10px] text-amber-900/70 block truncate">
             Purchase + Refurb
           </span>
         </div>
 
         {/* Metric 2: Total Stock Value */}
-        <div className="rounded-xl border border-line/60 bg-inset p-3 space-y-1 w-full">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
-            <Coins className="h-3.5 w-3.5 text-purple-500 shrink-0" />
+        <div
+          className="rounded-xl p-3 space-y-1 w-full border-0"
+          style={{ backgroundColor: "#cfdefb" }}
+        >
+          <div className="flex items-center gap-1.5 text-xs font-medium text-blue-950/80">
+            <Coins className="h-3.5 w-3.5 text-blue-800 shrink-0" />
             <span className="truncate">Total Stock Value</span>
           </div>
           {isLoading ? (
-            <div className="h-6 w-20 animate-pulse rounded bg-line/20" />
+            <div className="h-6 w-20 animate-pulse rounded bg-blue-900/10" />
           ) : (
             <p
-              className="font-mono text-base sm:text-lg font-bold text-ink tracking-tight truncate"
+              className="font-mono text-base sm:text-lg font-bold text-blue-950 tracking-tight truncate"
               title={formatFullCurrency(stockValueNum)}
             >
               {formatCompactCurrency(stockValueNum)}
             </p>
           )}
-          <span className="text-[10px] text-ink-subtle block truncate">
+          <span className="text-[10px] text-blue-900/70 block truncate">
             Asking Price Total
           </span>
         </div>
 
         {/* Metric 3: Expected Gross Profit */}
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 space-y-1 w-full">
-          <div className="flex items-center justify-between text-xs font-medium text-emerald-700">
+        <div
+          className="rounded-xl p-3 space-y-1 w-full border-0"
+          style={{ backgroundColor: "#d8f1b7" }}
+        >
+          <div className="flex items-center justify-between text-xs font-medium text-emerald-950/80">
             <span className="truncate">Gross Profit</span>
             {roiPct > 0 && (
-              <span className="inline-flex items-center text-[10px] font-bold text-emerald-600 font-mono">
+              <span className="inline-flex items-center text-[10px] font-bold text-emerald-900 font-mono">
                 <TrendingUp className="h-3 w-3 mr-0.5" />
                 +{roiPct.toFixed(0)}%
               </span>
             )}
           </div>
           {isLoading ? (
-            <div className="h-6 w-20 animate-pulse rounded bg-emerald-500/20" />
+            <div className="h-6 w-20 animate-pulse rounded bg-emerald-900/10" />
           ) : (
             <p
-              className="font-mono text-base sm:text-lg font-bold text-emerald-600 tracking-tight truncate"
+              className="font-mono text-base sm:text-lg font-bold text-emerald-950 tracking-tight truncate"
               title={formatFullCurrency(profit)}
             >
               +{formatCompactCurrency(profit)}
             </p>
           )}
-          <span className="text-[10px] text-emerald-600/80 block truncate font-mono font-medium">
+          <span className="text-[10px] text-emerald-900/70 block truncate font-mono font-medium">
             Expected Margin
           </span>
         </div>

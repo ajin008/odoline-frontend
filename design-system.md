@@ -22,7 +22,7 @@ All colors are mapped to CSS variables in the root theme.
 
 - **Canvas:** `--color-canvas` (#f3f4f6)
 - **Card/Surface:** `--color-card` (#ffffff)
-- **Accent (Violet):** `--color-accent` (#7c3aed)
+- **Accent (Blue):** `--color-accent` (#2c7aff)
 - **Text Ink:**
   - Primary: `--color-ink` (#111827)
   - Muted: `--color-ink-muted` (#4b5563)
@@ -38,7 +38,7 @@ Toasts follow the same card language as the rest of the app: `--color-card`
 background, `shadow-bento`, and a `rounded-xl` radius. Default/neutral toasts use ink text on card
 background; `success`/`warning`/`error` use the matching state color's tint
 as background with the solid color as border; `info`/action toasts use the
-violet accent. Action buttons inside a toast use `--color-accent` filled,
+blue accent. Action buttons inside a toast use `--color-accent` filled,
 matching the primary button style.
 
 ---

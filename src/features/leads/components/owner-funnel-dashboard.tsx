@@ -27,12 +27,12 @@ import { CustomSelect } from "@/src/components/ui/custom-select";
 import { useDashboardFunnel } from "../hooks/use-dashboard-funnel";
 
 const ACCENT_SHADES = [
-  "#a78bfa", // violet-400
-  "#8b5cf6", // violet-500
-  "#7c3aed", // violet-600 (base accent)
-  "#6d28d9", // violet-700
-  "#5b21b6", // violet-800
-  "#4c1d95", // violet-900
+  "#60a5fa", // blue-400
+  "#3b82f6", // blue-500
+  "#2c7aff", // blue base accent (#2c7aff)
+  "#1d4ed8", // blue-700
+  "#1e40af", // blue-800
+  "#1e3a8a", // blue-900
 ];
 
 const PERIOD_OPTIONS = [
@@ -492,7 +492,7 @@ export function OwnerFunnelDashboard() {
                   />
                   <Tooltip
                     content={<CustomTooltip />}
-                    cursor={{ fill: "rgba(124, 58, 237, 0.04)" }}
+                    cursor={{ fill: "rgba(44, 122, 255, 0.04)" }}
                   />
                   <Bar
                     dataKey="count"
