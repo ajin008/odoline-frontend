@@ -381,39 +381,69 @@ export function OwnerFunnelDashboard() {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3">
         {conversionCards.map((card) => {
           const Icon = card.icon;
+          const isTotalOpen = card.label === "Total Open Leads";
           return (
             <div
               key={card.label}
-              className={`flex flex-col justify-between rounded-xl border bg-card p-3 sm:p-3.5 transition-colors ${
-                card.isLive
-                  ? "border-emerald-500/40 bg-emerald-500/5"
-                  : "border-line/60 hover:border-line"
+              className={`flex flex-col justify-between rounded-xl p-3 sm:p-3.5 transition-colors ${
+                isTotalOpen
+                  ? "border-0"
+                  : card.isLive
+                  ? "border border-emerald-500/40 bg-emerald-500/5"
+                  : "border border-line/60 bg-card hover:border-line"
               }`}
+              style={isTotalOpen ? { backgroundColor: "#97d8d0" } : undefined}
             >
               <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1 min-w-0">
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-ink-muted truncate">
+                  <span
+                    className={`text-[10px] sm:text-[11px] font-semibold truncate ${
+                      isTotalOpen ? "text-teal-950/80" : "text-ink-muted"
+                    }`}
+                  >
                     {card.label}
                   </span>
                   {card.isLive && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 shrink-0">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span
+                      className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold shrink-0 ${
+                        isTotalOpen
+                          ? "bg-teal-900/15 border border-teal-900/25 text-teal-950"
+                          : "bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                      }`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full animate-pulse ${
+                          isTotalOpen ? "bg-teal-900" : "bg-emerald-500"
+                        }`}
+                      />
                       Live
                     </span>
                   )}
                 </div>
                 <div
-                  className={`flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg border ${card.color} shrink-0`}
+                  className={`flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-lg border ${
+                    isTotalOpen
+                      ? "text-teal-950 bg-teal-950/10 border-teal-950/20"
+                      : card.color
+                  } shrink-0`}
                 >
                   <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 stroke-[2px]" />
                 </div>
               </div>
 
               <div className="mt-2.5 space-y-0.5">
-                <span className="font-heading text-xl sm:text-2xl font-bold tracking-tight text-ink block leading-none">
+                <span
+                  className={`font-heading text-xl sm:text-2xl font-bold tracking-tight block leading-none ${
+                    isTotalOpen ? "text-teal-950" : "text-ink"
+                  }`}
+                >
                   {card.value}
                 </span>
-                <span className="text-[10px] text-ink-subtle block truncate">
+                <span
+                  className={`text-[10px] block truncate ${
+                    isTotalOpen ? "text-teal-900/80" : "text-ink-subtle"
+                  }`}
+                >
                   {card.subtitle}
                 </span>
               </div>

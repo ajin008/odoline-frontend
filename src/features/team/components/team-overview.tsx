@@ -187,23 +187,24 @@ export function TeamOverview({ onSelectStaff }: TeamOverviewProps = {}) {
         {/* Count Card 1: Present */}
         <div
           onClick={() => setActiveListTab("present")}
-          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border transition-all cursor-pointer text-center sm:text-left ${
+          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border-0 transition-all cursor-pointer text-center sm:text-left ${
             activeListTab === "present"
-              ? "border-emerald-500/40 bg-emerald-500/5 text-ink"
-              : "bg-card border-line/60 hover:border-line text-ink"
+              ? "shadow-sm scale-[1.01]"
+              : "opacity-85 hover:opacity-100"
           }`}
+          style={{ backgroundColor: "#d8f1b7" }}
         >
-          <div className="flex items-center justify-center sm:justify-between text-emerald-600">
-            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-ink-muted">
+          <div className="flex items-center justify-center sm:justify-between text-emerald-900">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-emerald-950/80">
               Present
             </span>
-            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-emerald-500" />
+            <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-emerald-800" />
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
-            <span className="text-xl sm:text-2xl font-bold font-mono text-ink">
+            <span className="text-xl sm:text-2xl font-bold font-mono text-emerald-950">
               {isLoading ? "…" : counts.present}
             </span>
-            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-ink-subtle">
+            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-emerald-900/70">
               Clocked-in
             </span>
           </div>
@@ -212,23 +213,24 @@ export function TeamOverview({ onSelectStaff }: TeamOverviewProps = {}) {
         {/* Count Card 2: Absent */}
         <div
           onClick={() => setActiveListTab("absent")}
-          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border transition-all cursor-pointer text-center sm:text-left ${
+          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border-0 transition-all cursor-pointer text-center sm:text-left ${
             activeListTab === "absent"
-              ? "border-rose-500/40 bg-rose-500/5 text-ink"
-              : "bg-card border-line/60 hover:border-line text-ink"
+              ? "shadow-sm scale-[1.01]"
+              : "opacity-85 hover:opacity-100"
           }`}
+          style={{ backgroundColor: "#f2b5ba" }}
         >
-          <div className="flex items-center justify-center sm:justify-between text-rose-600">
-            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-ink-muted">
+          <div className="flex items-center justify-center sm:justify-between text-rose-900">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-rose-950/80">
               Absent
             </span>
-            <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-rose-500" />
+            <UserX className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-rose-800" />
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
-            <span className="text-xl sm:text-2xl font-bold font-mono text-ink">
+            <span className="text-xl sm:text-2xl font-bold font-mono text-rose-950">
               {isLoading ? "…" : counts.absent}
             </span>
-            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-ink-subtle">
+            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-rose-900/70">
               Excl. off
             </span>
           </div>
@@ -237,23 +239,24 @@ export function TeamOverview({ onSelectStaff }: TeamOverviewProps = {}) {
         {/* Count Card 3: Late Coming */}
         <div
           onClick={() => setActiveListTab("late")}
-          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border transition-all cursor-pointer text-center sm:text-left ${
+          className={`rounded-xl p-3 sm:p-4 space-y-1 sm:space-y-2 border-0 transition-all cursor-pointer text-center sm:text-left ${
             activeListTab === "late"
-              ? "border-amber-500/40 bg-amber-500/5 text-ink"
-              : "bg-card border-line/60 hover:border-line text-ink"
+              ? "shadow-sm scale-[1.01]"
+              : "opacity-85 hover:opacity-100"
           }`}
+          style={{ backgroundColor: "#fae9cf" }}
         >
-          <div className="flex items-center justify-center sm:justify-between text-amber-600">
-            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-ink-muted">
+          <div className="flex items-center justify-center sm:justify-between text-amber-900">
+            <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider truncate text-amber-950/80">
               Late
             </span>
-            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-amber-500" />
+            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.5px] hidden sm:block text-amber-800" />
           </div>
           <div className="flex flex-col sm:flex-row items-center sm:items-baseline justify-between">
-            <span className="text-xl sm:text-2xl font-bold font-mono text-ink">
+            <span className="text-xl sm:text-2xl font-bold font-mono text-amber-950">
               {isLoading ? "…" : counts.late}
             </span>
-            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-ink-subtle">
+            <span className="text-[9px] sm:text-[11px] hidden sm:inline text-amber-900/70">
               Subset present
             </span>
           </div>
