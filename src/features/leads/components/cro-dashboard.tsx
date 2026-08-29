@@ -107,27 +107,28 @@ export function CroDashboard() {
                 {/* Row 1, Card 1: Overdue Follow-ups */}
                 <Link
                   href="/staff/follow-ups?bucket=overdue"
-                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-rose-500/30 bg-rose-500/5 dark:bg-rose-500/10 p-3.5 sm:p-5 shadow-xs hover:shadow-bento hover:border-rose-500/60 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px]"
+                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border-0 p-3.5 sm:p-5 transition-all cursor-pointer min-h-[130px] sm:min-h-[155px] hover:opacity-95 active:scale-[0.98]"
+                  style={{ backgroundColor: "#f2b5ba" }}
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-rose-600 dark:text-rose-400 truncate">
+                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-rose-950/80 truncate">
                       Overdue
                     </span>
-                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25 shrink-0">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-rose-950/10 text-rose-900 shrink-0">
                       <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.25px]" />
                     </div>
                   </div>
 
                   <div className="my-1 sm:my-2">
-                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-rose-600 dark:text-rose-400 block leading-none">
+                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-rose-950 block leading-none">
                       {overdueCount}
                     </span>
-                    <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
+                    <p className="text-[10px] sm:text-xs text-rose-900/70 mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none font-medium">
                       Follow-ups missed today or earlier.
                     </p>
                   </div>
 
-                  <div className="pt-1.5 sm:pt-2.5 border-t border-rose-500/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-rose-600 dark:text-rose-400 group-hover:translate-x-0.5 transition-transform">
+                  <div className="pt-1.5 sm:pt-2.5 border-t border-rose-950/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-rose-950 group-hover:translate-x-0.5 transition-transform">
                     <span className="truncate">View Overdue</span>
                     <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                   </div>
@@ -136,27 +137,28 @@ export function CroDashboard() {
                 {/* Row 1, Card 2: Going Cold (14+ Days) */}
                 <Link
                   href="/staff/leads?status=active"
-                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10 p-3.5 sm:p-5 shadow-xs hover:shadow-bento hover:border-amber-500/60 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px]"
+                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border-0 p-3.5 sm:p-5 transition-all cursor-pointer min-h-[130px] sm:min-h-[155px] hover:opacity-95 active:scale-[0.98]"
+                  style={{ backgroundColor: "#fae9cf" }}
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-amber-600 dark:text-amber-400 truncate">
+                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-amber-950/80 truncate">
                       Going Cold (14d+)
                     </span>
-                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25 shrink-0">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-amber-950/10 text-amber-900 shrink-0">
                       <Snowflake className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.25px]" />
                     </div>
                   </div>
 
                   <div className="my-1 sm:my-2">
-                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-amber-600 dark:text-amber-400 block leading-none">
+                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-amber-950 block leading-none">
                       {coldCount}
                     </span>
-                    <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
+                    <p className="text-[10px] sm:text-xs text-amber-900/70 mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none font-medium">
                       No calls logged in 14+ days.
                     </p>
                   </div>
 
-                  <div className="pt-1.5 sm:pt-2.5 border-t border-amber-500/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-0.5 transition-transform">
+                  <div className="pt-1.5 sm:pt-2.5 border-t border-amber-950/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-amber-950 group-hover:translate-x-0.5 transition-transform">
                     <span className="truncate">View Active</span>
                     <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                   </div>
@@ -165,27 +167,28 @@ export function CroDashboard() {
                 {/* Row 2, Card 3: Hot Leads w/ No Follow-up */}
                 <Link
                   href="/staff/leads?status=active&priority=hot"
-                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-orange-500/30 bg-orange-500/5 dark:bg-orange-500/10 p-3.5 sm:p-5 shadow-xs hover:shadow-bento hover:border-orange-500/60 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px]"
+                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border-0 p-3.5 sm:p-5 transition-all cursor-pointer min-h-[130px] sm:min-h-[155px] hover:opacity-95 active:scale-[0.98]"
+                  style={{ backgroundColor: "#fae9cf" }}
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-orange-600 dark:text-orange-400 truncate">
+                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-amber-950/80 truncate">
                       Hot w/ No FU
                     </span>
-                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400 border border-orange-500/25 shrink-0">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-amber-950/10 text-amber-900 shrink-0">
                       <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.25px]" />
                     </div>
                   </div>
 
                   <div className="my-1 sm:my-2">
-                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-orange-600 dark:text-orange-400 block leading-none">
+                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-amber-950 block leading-none">
                       {hotNoFuCount}
                     </span>
-                    <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
+                    <p className="text-[10px] sm:text-xs text-amber-900/70 mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none font-medium">
                       Hot leads with no next date set.
                     </p>
                   </div>
 
-                  <div className="pt-1.5 sm:pt-2.5 border-t border-orange-500/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-orange-600 dark:text-orange-400 group-hover:translate-x-0.5 transition-transform">
+                  <div className="pt-1.5 sm:pt-2.5 border-t border-amber-950/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-amber-950 group-hover:translate-x-0.5 transition-transform">
                     <span className="truncate">View Hot</span>
                     <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                   </div>
@@ -194,27 +197,28 @@ export function CroDashboard() {
                 {/* Row 2, Card 4: Active Leads */}
                 <Link
                   href="/staff/leads?status=active"
-                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border border-accent/30 bg-accent/5 p-3.5 sm:p-5 shadow-xs hover:border-accent/60 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[155px]"
+                  className="group relative flex flex-col justify-between rounded-xl sm:rounded-2xl border-0 p-3.5 sm:p-5 transition-all cursor-pointer min-h-[130px] sm:min-h-[155px] hover:opacity-95 active:scale-[0.98]"
+                  style={{ backgroundColor: "#97d8d0" }}
                 >
                   <div className="flex items-center justify-between gap-1">
-                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-accent truncate">
+                    <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-teal-950/80 truncate">
                       Active Leads
                     </span>
-                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-accent/15 text-accent border border-accent/25 shrink-0">
+                    <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-teal-950/10 text-teal-950 shrink-0">
                       <FolderOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2.25px]" />
                     </div>
                   </div>
 
                   <div className="my-1 sm:my-2">
-                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-ink block leading-none">
+                    <span className="font-heading text-2xl sm:text-4xl font-extrabold tracking-tight text-teal-950 block leading-none">
                       {totalActiveCount}
                     </span>
-                    <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none">
+                    <p className="text-[10px] sm:text-xs text-teal-900/70 mt-1 sm:mt-2 leading-tight sm:leading-relaxed line-clamp-1 sm:line-clamp-none font-medium">
                       All active showroom leads.
                     </p>
                   </div>
 
-                  <div className="pt-1.5 sm:pt-2.5 border-t border-accent/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-accent group-hover:translate-x-0.5 transition-transform">
+                  <div className="pt-1.5 sm:pt-2.5 border-t border-teal-950/15 flex items-center justify-between text-[10px] sm:text-xs font-bold text-teal-950 group-hover:translate-x-0.5 transition-transform">
                     <span className="truncate">View All</span>
                     <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
                   </div>

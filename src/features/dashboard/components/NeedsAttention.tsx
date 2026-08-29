@@ -42,17 +42,18 @@ export function NeedsAttention() {
           {/* Row 1: Docs Pending */}
           <Link
             href="/owner/inventory?tab=in_stock"
-            className="group flex items-center justify-between rounded-lg border border-line/60 bg-inset p-2.5 transition-all duration-200 hover:border-amber-500/40 hover:bg-card active:scale-[0.98]"
+            className="group flex items-center justify-between rounded-lg border-0 p-2.5 transition-all duration-200 hover:opacity-95 active:scale-[0.98]"
+            style={{ backgroundColor: "#fae9cf" }}
           >
             <div className="flex items-center gap-2 min-w-0">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-950/10 text-amber-900 shrink-0">
                 <FileText className="h-3.5 w-3.5 stroke-[2.25px]" />
               </div>
               <div className="space-y-0.5 min-w-0">
-                <span className="text-xs font-bold text-ink group-hover:text-amber-600 transition-colors block truncate">
+                <span className="text-xs font-bold text-amber-950 block truncate">
                   Docs Pending
                 </span>
-                <span className="text-[10px] text-ink-muted block truncate font-sans">
+                <span className="text-[10px] text-amber-900/70 block truncate font-sans">
                   Missing doc scans
                 </span>
               </div>
@@ -60,37 +61,38 @@ export function NeedsAttention() {
 
             <div className="flex items-center gap-1 shrink-0 ml-1.5">
               {isLoading ? (
-                <div className="h-5 w-6 animate-pulse rounded bg-line/20" />
+                <div className="h-5 w-6 animate-pulse rounded bg-amber-900/10" />
               ) : (
                 <span
                   className={[
-                    "font-mono text-xs font-bold px-2 py-0.5 rounded-md border leading-none",
+                    "font-mono text-xs font-bold px-2 py-0.5 rounded-md border-0 leading-none",
                     docsPending > 0
-                      ? "bg-amber-500 text-white border-amber-600/30"
-                      : "bg-inset text-ink-muted border-line/50",
+                      ? "bg-amber-950 text-amber-50"
+                      : "bg-amber-900/10 text-amber-900",
                   ].join(" ")}
                 >
                   {docsPending}
                 </span>
               )}
-              <ArrowUpRight className="h-3.5 w-3.5 text-ink-subtle opacity-40 group-hover:opacity-100 group-hover:text-amber-600 transition-all" />
+              <ArrowUpRight className="h-3.5 w-3.5 text-amber-900/60 group-hover:text-amber-950 transition-all" />
             </div>
           </Link>
 
           {/* Row 2: Aging > 60 Days */}
           <Link
             href="/owner/inventory?tab=in_stock"
-            className="group flex items-center justify-between rounded-lg border border-line/60 bg-inset p-2.5 transition-all duration-200 hover:border-rose-500/40 hover:bg-card active:scale-[0.98]"
+            className="group flex items-center justify-between rounded-lg border-0 p-2.5 transition-all duration-200 hover:opacity-95 active:scale-[0.98]"
+            style={{ backgroundColor: "#f2b5ba" }}
           >
             <div className="flex items-center gap-2 min-w-0">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-500/10 text-rose-600 border border-rose-500/20 shrink-0">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-rose-950/10 text-rose-900 shrink-0">
                 <Clock className="h-3.5 w-3.5 stroke-[2.25px]" />
               </div>
               <div className="space-y-0.5 min-w-0">
-                <span className="text-xs font-bold text-ink group-hover:text-rose-600 transition-colors block truncate">
+                <span className="text-xs font-bold text-rose-950 block truncate">
                   Aging &gt; 60 Days
                 </span>
-                <span className="text-[10px] text-ink-muted block truncate font-sans">
+                <span className="text-[10px] text-rose-900/70 block truncate font-sans">
                   Sitting &gt; 60 days
                 </span>
               </div>
@@ -98,20 +100,20 @@ export function NeedsAttention() {
 
             <div className="flex items-center gap-1 shrink-0 ml-1.5">
               {isLoading ? (
-                <div className="h-5 w-6 animate-pulse rounded bg-line/20" />
+                <div className="h-5 w-6 animate-pulse rounded bg-rose-900/10" />
               ) : (
                 <span
                   className={[
-                    "font-mono text-xs font-bold px-2 py-0.5 rounded-md border leading-none",
+                    "font-mono text-xs font-bold px-2 py-0.5 rounded-md border-0 leading-none",
                     agingOver60 > 0
-                      ? "bg-rose-600 text-white border-rose-700/30"
-                      : "bg-inset text-ink-muted border-line/50",
+                      ? "bg-rose-950 text-rose-50"
+                      : "bg-rose-900/10 text-rose-900",
                   ].join(" ")}
                 >
                   {agingOver60}
                 </span>
               )}
-              <ArrowUpRight className="h-3.5 w-3.5 text-ink-subtle opacity-40 group-hover:opacity-100 group-hover:text-rose-600 transition-all" />
+              <ArrowUpRight className="h-3.5 w-3.5 text-rose-900/60 group-hover:text-rose-950 transition-all" />
             </div>
           </Link>
         </div>

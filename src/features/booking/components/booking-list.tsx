@@ -114,7 +114,7 @@ export function BookingList() {
       {/* 1. KPI Executive Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
         {/* Card 1: Count */}
-        <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1 shadow-xs">
+        <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1">
           <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
             <span>{activeTab === "active" ? "Active Bookings" : "Closed Records"}</span>
             <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
@@ -125,7 +125,7 @@ export function BookingList() {
         </div>
 
         {/* Card 2: Total Agreed Value */}
-        <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1 shadow-xs">
+        <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1">
           <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
             <span>Total Agreed</span>
             <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
@@ -136,23 +136,29 @@ export function BookingList() {
         </div>
 
         {/* Card 3: Total Advances Collected */}
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-3 sm:p-4 space-y-1 shadow-xs">
-          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+        <div
+          className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+          style={{ backgroundColor: "#d8f1b7" }}
+        >
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
             <span>Advance Paid</span>
-            <PiggyBank className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
+            <PiggyBank className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-800" />
           </div>
-          <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400 truncate">
+          <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-950 truncate">
             {formatCurrency(kpiStats.paidSum)}
           </div>
         </div>
 
         {/* Card 4: Outstanding Balance */}
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-3 sm:p-4 space-y-1 shadow-xs">
-          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+        <div
+          className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+          style={{ backgroundColor: "#fae9cf" }}
+        >
+          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-amber-900 uppercase tracking-wider">
             <span>Pending Balance</span>
-            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500" />
+            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-800" />
           </div>
-          <div className="text-lg sm:text-2xl font-bold font-mono text-amber-600 dark:text-amber-400 truncate">
+          <div className="text-lg sm:text-2xl font-bold font-mono text-amber-950 truncate">
             {formatCurrency(kpiStats.balanceSum)}
           </div>
         </div>
