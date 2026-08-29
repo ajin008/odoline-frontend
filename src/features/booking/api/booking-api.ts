@@ -5,6 +5,7 @@ import type {
   BookingDetail,
   BookingsPage,
   CreateBookingPayload,
+  CancelBookingPayload,
 } from "../types/booking-types";
 
 export const bookingApi = {
@@ -39,4 +40,11 @@ export const bookingApi = {
     const res = await apiClient.get(endpoints.bookings.detail(id));
     return res.data.data;
   },
+
+  /** POST /api/v1/bookings/:id/cancel — Cancel Prebooking */
+  async cancel(id: string, payload: CancelBookingPayload): Promise<BookingDetail> {
+    const res = await apiClient.post(endpoints.bookings.cancel(id), payload);
+    return res.data.data;
+  },
 };
+

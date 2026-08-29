@@ -15,6 +15,7 @@ import {
   Receipt,
   PiggyBank,
   Clock,
+  RotateCcw,
   X,
 } from "lucide-react";
 
@@ -27,7 +28,15 @@ function formatCurrency(num: number): string {
   return `₹${num.toLocaleString("en-IN")}`;
 }
 
-export function BookingList() {
+interface BookingListProps {
+  basePath?: string;
+  role?: string;
+}
+
+export function BookingList({
+  basePath = "/staff/booking",
+  role,
+}: BookingListProps = {}) {
   const [activeTab, setActiveTab] = useState<BookingSubtab>("active");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -41,6 +50,7 @@ export function BookingList() {
     refetch,
   } = useInfiniteBookings({
     status: activeTab,
+    role,
   });
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -94,11 +104,15 @@ export function BookingList() {
     let agreedSum = 0;
     let paidSum = 0;
     let balanceSum = 0;
+    let retainedSum = 0;
+    let refundedSum = 0;
 
     allBookings.forEach((b) => {
       agreedSum += Number(b.agreed_price || 0);
       paidSum += Number(b.amount_paid || 0);
       balanceSum += Number(b.balance_due || 0);
+      retainedSum += Number(b.amount_retained || 0);
+      refundedSum += Number(b.refunded_total || 0);
     });
 
     return {
@@ -106,6 +120,8 @@ export function BookingList() {
       agreedSum,
       paidSum,
       balanceSum,
+      retainedSum,
+      refundedSum,
     };
   }, [allBookings]);
 
@@ -135,33 +151,67 @@ export function BookingList() {
           </div>
         </div>
 
-        {/* Card 3: Total Advances Collected */}
-        <div
-          className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
-          style={{ backgroundColor: "#d8f1b7" }}
-        >
-          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
-            <span>Advance Paid</span>
-            <PiggyBank className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-800" />
-          </div>
-          <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-950 truncate">
-            {formatCurrency(kpiStats.paidSum)}
-          </div>
-        </div>
+        {activeTab === "active" ? (
+          <>
+            {/* Card 3: Total Advances Collected */}
+            <div
+              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+              style={{ backgroundColor: "#d8f1b7" }}
+            >
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
+                <span>Advance Paid</span>
+                <PiggyBank className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-800" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-950 truncate">
+                {formatCurrency(kpiStats.paidSum)}
+              </div>
+            </div>
 
-        {/* Card 4: Outstanding Balance */}
-        <div
-          className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
-          style={{ backgroundColor: "#fae9cf" }}
-        >
-          <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-amber-900 uppercase tracking-wider">
-            <span>Pending Balance</span>
-            <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-800" />
-          </div>
-          <div className="text-lg sm:text-2xl font-bold font-mono text-amber-950 truncate">
-            {formatCurrency(kpiStats.balanceSum)}
-          </div>
-        </div>
+            {/* Card 4: Outstanding Balance */}
+            <div
+              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+              style={{ backgroundColor: "#fae9cf" }}
+            >
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-amber-900 uppercase tracking-wider">
+                <span>Pending Balance</span>
+                <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-800" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold font-mono text-amber-950 truncate">
+                {formatCurrency(kpiStats.balanceSum)}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Card 3: Total Retained (Closed Tab) */}
+            <div
+              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+              style={{ backgroundColor: "#fddede" }}
+            >
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-rose-900 uppercase tracking-wider">
+                <span>Total Retained</span>
+                <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-rose-800" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold font-mono text-rose-950 truncate">
+                {formatCurrency(kpiStats.retainedSum)}
+              </div>
+            </div>
+
+            {/* Card 4: Total Refunded (Closed Tab) */}
+            <div
+              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+              style={{ backgroundColor: "#e0f2fe" }}
+            >
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-sky-900 uppercase tracking-wider">
+                <span>Total Refunded</span>
+                <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-sky-800" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold font-mono text-sky-950 truncate">
+                {formatCurrency(kpiStats.refundedSum)}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* 2. Controls & Search Toolbar */}
@@ -272,6 +322,7 @@ export function BookingList() {
                     key={booking.id}
                     booking={booking}
                     activeTab={activeTab}
+                    basePath={basePath}
                   />
                 ))}
             </tbody>
@@ -357,6 +408,7 @@ export function BookingList() {
               key={booking.id}
               booking={booking}
               activeTab={activeTab}
+              basePath={basePath}
             />
           ))}
 

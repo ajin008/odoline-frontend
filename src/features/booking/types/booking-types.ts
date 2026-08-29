@@ -46,6 +46,11 @@ export interface BookingLead {
   stage: string;
 }
 
+export interface BookingRep {
+  id: string;
+  name: string;
+}
+
 export interface Booking {
   id: string;
   booking_number: string;
@@ -60,6 +65,7 @@ export interface Booking {
   cancelled_at: string | null;
   created_at: string;
   updated_at: string;
+  rep?: BookingRep | null;
   car: Car | null;
   customer: BookingCustomer | null;
   lead: BookingLead | null;
@@ -84,11 +90,16 @@ export interface BookingListItem {
   status: BookingStatus;
   agreed_price: string;
   amount_paid: string;
-  balance_due: string;
+  balance_due: string | null;
   prebooked_at: string;
-  cancelled_at: string | null;
+  cancelled_at?: string | null;
+  cancel_reason?: string | null;
+  advance_total?: string | null;
+  refunded_total?: string | null;
+  amount_retained?: string | null;
   created_at: string;
   updated_at: string;
+  rep?: BookingRep | null;
   car: Car | null;
   customer: BookingCustomer | null;
   lead: BookingLead | null;
@@ -102,6 +113,20 @@ export interface BookingsPagination {
 export interface BookingsPage {
   items: BookingListItem[];
   pagination: BookingsPagination;
+}
+
+export type CancelReasonCode =
+  | "buyer_backed_out"
+  | "loan_rejected"
+  | "found_another_car"
+  | "price_issue"
+  | "other";
+
+export interface CancelBookingPayload {
+  cancel_reason_code: CancelReasonCode;
+  cancel_reason_note?: string;
+  refund_amount?: string;
+  refund_method?: PaymentMethod;
 }
 
 export interface BookingDetailSeller {
@@ -125,6 +150,8 @@ export interface BookingDetail {
   updated_at: string;
   amount_paid: string;
   balance_due: string;
+  amount_retained?: string | null;
+  rep?: BookingRep | null;
   car: Car | null;
   customer: BookingCustomer | null;
   lead: { id: string } | null;

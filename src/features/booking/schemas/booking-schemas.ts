@@ -40,3 +40,49 @@ export const advanceAgreementSchema = z.object({
 export type AdvanceAgreementFormValues = z.infer<
   typeof advanceAgreementSchema
 >;
+
+export const CANCEL_REASON_CODES = [
+  "buyer_backed_out",
+  "loan_rejected",
+  "found_another_car",
+  "price_issue",
+  "other",
+] as const;
+
+export const createCancelBookingSchema = (maxRefund: number) =>
+  z
+    .object({
+      cancel_reason_code: z.enum(CANCEL_REASON_CODES, {
+        message: "Please select a cancellation reason",
+      }),
+      cancel_reason_note: z.string().optional().or(z.literal("")),
+      refund_amount: z
+        .string()
+        .min(1, "Refund amount is required")
+        .refine((val) => !isNaN(Number(val)), {
+          message: "Refund amount must be a valid number",
+        })
+        .refine((val) => Number(val) >= 0, {
+          message: "Refund amount cannot be negative",
+        })
+        .refine((val) => Number(val) <= maxRefund, {
+          message: `Refund amount cannot exceed total advance paid (₹${maxRefund.toLocaleString("en-IN")})`,
+        }),
+    })
+    .superRefine((data, ctx) => {
+      if (
+        data.cancel_reason_code === "other" &&
+        (!data.cancel_reason_note || data.cancel_reason_note.trim().length === 0)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Reason note is required when reason is 'Other'",
+          path: ["cancel_reason_note"],
+        });
+      }
+    });
+
+export type CancelBookingFormValues = z.infer<
+  ReturnType<typeof createCancelBookingSchema>
+>;
+

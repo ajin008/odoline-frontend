@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -7,6 +8,7 @@ import { useBooking } from "../hooks/use-booking";
 import { getBookingStatusConfig } from "../utils/booking-status-map";
 import { BookingProgressBar } from "./booking-progress-bar";
 import { AdvanceAgreementPrint } from "./advance-agreement-print";
+import { CancelBookingModal } from "./cancel-booking-modal";
 import {
   ArrowLeft,
   User,
@@ -26,10 +28,13 @@ import {
   Receipt,
   Clock,
   ExternalLink,
+  XCircle,
 } from "lucide-react";
 
 interface BookingDetailProps {
   bookingId: string;
+  readOnly?: boolean;
+  basePath?: string;
 }
 
 function formatCurrency(amountStr: string | null | undefined): string {
@@ -76,11 +81,24 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-export function BookingDetail({ bookingId }: BookingDetailProps) {
+export function BookingDetail({
+  bookingId,
+  readOnly = false,
+  basePath = "/staff/booking",
+}: BookingDetailProps) {
   const { data: booking, isLoading, isError } = useBooking(bookingId);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const handlePrint = () => {
+    if (!booking) return;
+    const originalTitle = document.title;
+    const customerName = booking.customer?.name || "Customer";
+    const sanitizedCustomer = customerName.replace(/[/\\?%*:|"<>]/g, "").trim();
+    document.title = `Cars4 Prebooking Agreement - ${sanitizedCustomer}`;
     window.print();
+    setTimeout(() => {
+      document.title = originalTitle;
+    }, 1000);
   };
 
   const handleShare = async () => {
@@ -147,7 +165,7 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
       <div className="w-full space-y-5 font-sans select-none">
         <div className="flex items-center gap-3">
           <Link
-            href="/staff/booking"
+            href={basePath}
             className="flex h-9 w-9 items-center justify-center rounded-xl bg-card border border-line text-ink hover:bg-inset transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -164,11 +182,11 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
               Booking Not Found or Access Denied
             </h3>
             <p className="text-xs text-ink-subtle max-w-sm mx-auto">
-              This booking record does not exist or is not assigned to your account.
+              This booking record does not exist or is not accessible.
             </p>
           </div>
           <Link
-            href="/staff/booking"
+            href={basePath}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95"
           >
             Return to Booking List
@@ -189,6 +207,20 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
       ? Math.min(100, Math.max(0, Math.round((paidNum / agreedNum) * 100)))
       : 0;
 
+  const leadHref = readOnly
+    ? `/owner/sales`
+    : booking.lead?.id
+    ? `/staff/leads/${booking.lead.id}`
+    : null;
+
+  const carHref = readOnly
+    ? booking.car?.id
+      ? `/owner/cars/${booking.car.id}/intake`
+      : `/owner/inventory`
+    : booking.car?.id
+    ? `/staff/stock/${booking.car.id}`
+    : null;
+
   return (
     <div className="w-full space-y-5 font-sans select-none pb-12">
       {/* 1. Header Toolbar & Breadcrumb */}
@@ -196,7 +228,7 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-medium text-ink-subtle">
           <Link
-            href="/staff/booking"
+            href={basePath}
             className="hover:text-ink transition-colors flex items-center gap-1"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
@@ -231,14 +263,37 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
               )}
             </div>
 
-            <div className="text-xs text-ink-subtle flex items-center gap-1 font-medium">
-              <Calendar className="h-3.5 w-3.5 text-ink-subtle" />
-              <span>Prebooking Agreement executed on {formatDateIST(booking.prebooked_at)}</span>
+            <div className="text-xs text-ink-subtle flex items-center gap-2 flex-wrap font-medium">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5 text-ink-subtle" />
+                <span>Prebooking Agreement executed on {formatDateIST(booking.prebooked_at)}</span>
+              </div>
+              {booking.rep?.name && (
+                <>
+                  <span>•</span>
+                  <div className="flex items-center gap-1 font-semibold text-ink">
+                    <User className="h-3.5 w-3.5 text-accent" />
+                    <span>Booked by {booking.rep.name}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
           {/* Header Action Buttons */}
           <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            {booking.status === "prebooked" && !readOnly && (
+              <button
+                type="button"
+                onClick={() => setIsCancelModalOpen(true)}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+                title="Cancel Booking"
+              >
+                <XCircle className="h-4 w-4" />
+                <span>Cancel Booking</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={handleShare}
@@ -461,9 +516,9 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
                   Buyer Profile
                 </h3>
               </div>
-              {booking.lead?.id && (
+              {leadHref && (
                 <Link
-                  href={`/staff/leads/${booking.lead.id}`}
+                  href={leadHref}
                   className="text-[11px] font-semibold text-accent hover:underline flex items-center gap-1"
                 >
                   <span>View Lead</span>
@@ -472,9 +527,9 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
               )}
             </div>
 
-            {booking.lead?.id ? (
+            {leadHref ? (
               <Link
-                href={`/staff/leads/${booking.lead.id}`}
+                href={leadHref}
                 className="flex items-start gap-3 p-2 -mx-2 rounded-xl hover:bg-inset transition-colors group cursor-pointer"
               >
                 {/* Initials Avatar */}
@@ -556,9 +611,9 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
                   Booked Vehicle
                 </h3>
               </div>
-              {booking.car?.id && (
+              {carHref && (
                 <Link
-                  href={`/staff/stock/${booking.car.id}`}
+                  href={carHref}
                   className="text-[11px] font-semibold text-accent hover:underline flex items-center gap-1"
                 >
                   <span>View Car</span>
@@ -567,14 +622,14 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
               )}
             </div>
 
-            {booking.car?.id ? (
+            {carHref ? (
               <Link
-                href={`/staff/stock/${booking.car.id}`}
+                href={carHref}
                 className="block space-y-2 text-xs p-2 -mx-2 rounded-xl hover:bg-inset transition-colors group cursor-pointer"
               >
                 <div className="font-bold text-ink text-sm leading-snug group-hover:text-accent transition-colors flex items-center justify-between gap-1">
                   <span>
-                    {`${booking.car.year} ${booking.car.make} ${booking.car.model}`}
+                    {`${booking.car?.year || ""} ${booking.car?.make || ""} ${booking.car?.model || "Vehicle"}`}
                   </span>
                   <ChevronRight className="h-4 w-4 text-ink-subtle opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" />
                 </div>
@@ -652,32 +707,45 @@ export function BookingDetail({ bookingId }: BookingDetailProps) {
         </div>
       </div>
 
-      {/* Stage 2 Order Form Action Card (Sits at the very bottom on both desktop and mobile) */}
-      <div className="rounded-2xl border border-line bg-card p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
-        <div className="space-y-1 text-center sm:text-left">
-          <div className="flex items-center gap-2 justify-center sm:justify-start">
-            <Lock className="h-4 w-4 text-accent shrink-0" />
-            <h4 className="text-sm font-bold text-ink font-sans">
-              Stage 2: Vehicle Order Form
-            </h4>
+      {/* Stage 2 Order Form Action Card (Only shown for mutation actors, hidden for readOnly owner) */}
+      {!readOnly && (
+        <div className="rounded-2xl border border-line bg-card p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+          <div className="space-y-1 text-center sm:text-left">
+            <div className="flex items-center gap-2 justify-center sm:justify-start">
+              <Lock className="h-4 w-4 text-accent shrink-0" />
+              <h4 className="text-sm font-bold text-ink font-sans">
+                Stage 2: Vehicle Order Form
+              </h4>
+            </div>
+            <p className="text-xs text-ink-subtle max-w-md">
+              Accessories selection &amp; formal vehicle order specification module coming next in slice BK-2.
+            </p>
           </div>
-          <p className="text-xs text-ink-subtle max-w-md">
-            Accessories selection &amp; formal vehicle order specification module coming next in slice BK-2.
-          </p>
-        </div>
 
-        <button
-          type="button"
-          disabled
-          className="w-full sm:w-auto h-10 px-5 rounded-xl bg-accent/40 text-inverse font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed opacity-60 shrink-0"
-        >
-          <span>Proceed to Order Form</span>
-          <ArrowRight className="h-4 w-4" />
-        </button>
-      </div>
+          <button
+            type="button"
+            disabled
+            className="w-full sm:w-auto h-10 px-5 rounded-xl bg-accent/40 text-inverse font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed opacity-60 shrink-0"
+          >
+            <span>Proceed to Order Form</span>
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Hidden Print Document */}
       <AdvanceAgreementPrint booking={booking} />
+
+      {/* Cancel Booking Modal */}
+      {booking.status === "prebooked" && !readOnly && (
+        <CancelBookingModal
+          isOpen={isCancelModalOpen}
+          onClose={() => setIsCancelModalOpen(false)}
+          bookingId={booking.id}
+          bookingNumber={booking.booking_number}
+          amountPaid={booking.amount_paid}
+        />
+      )}
     </div>
   );
 }

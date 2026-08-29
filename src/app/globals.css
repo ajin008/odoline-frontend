@@ -266,18 +266,21 @@ h6 {
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
-    color: #0f172a !important;
+    color: #000000 !important;
     box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .no-print {
     display: none !important;
   }
 
-  img, .no-strip {
+  img, .no-strip, .keep-ink {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 }
+
 
 

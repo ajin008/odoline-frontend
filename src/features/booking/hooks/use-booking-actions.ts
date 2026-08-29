@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { bookingApi } from "../api/booking-api";
-import type { CreateBookingPayload } from "../types/booking-types";
+import type { CreateBookingPayload, CancelBookingPayload } from "../types/booking-types";
 import { queryKeys } from "@/src/lib/query-keys";
 
 export function useCreateBooking() {
@@ -36,3 +36,55 @@ export function useCreateBooking() {
     },
   });
 }
+
+export function useCancelBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: CancelBookingPayload;
+    }) => bookingApi.cancel(id, payload),
+    onSuccess: (_, variables) => {
+      toast.success("Booking cancelled");
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.detail(variables.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.list("active"),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.list("closed"),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.booking.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.leads.all });
+    },
+    onError: (err: unknown) => {
+      const axiosErr = err as {
+        response?: { data?: { error?: { code?: string; message?: string } } };
+      };
+      const errObj = axiosErr?.response?.data?.error;
+      const code = errObj?.code;
+      const message = errObj?.message || "Failed to cancel booking";
+
+      if (code === "INVALID_REFUND_AMOUNT") {
+        toast.error(
+          "Invalid refund amount. Refund cannot be negative or exceed total advance paid."
+        );
+      } else if (code === "INVALID_BOOKING_TRANSITION") {
+        toast.error(
+          "This booking cannot be cancelled because it is no longer in prebooked status."
+        );
+      } else if (code === "BOOKING_NOT_FOUND") {
+        toast.error("Booking not found or not assigned to your account.");
+      } else {
+        toast.error(message);
+      }
+    },
+  });
+}
+

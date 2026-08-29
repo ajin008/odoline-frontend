@@ -27,6 +27,7 @@ export function OwnerNavbar() {
   const isDashboard = pathname === "/owner/dashboard";
   const isSales = pathname.startsWith("/owner/sales");
   const isInventory = pathname.startsWith("/owner/inventory") || pathname.startsWith("/owner/cars");
+  const isBooking = pathname.startsWith("/owner/booking");
   const isSettings = pathname.startsWith("/owner/settings");
   const isTeam = pathname.startsWith("/owner/team");
 
@@ -79,6 +80,12 @@ export function OwnerNavbar() {
                 <div className="flex items-center gap-1.5 font-bold text-ink">
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Inventory</span>
+                </div>
+              )}
+
+              {isBooking && (
+                <div className="flex items-center gap-1.5 font-bold text-ink">
+                  <span>Booking</span>
                 </div>
               )}
 

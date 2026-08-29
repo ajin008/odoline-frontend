@@ -6,17 +6,18 @@ const PAGE_SIZE = 16;
 
 export interface UseInfiniteBookingsParams {
   status?: "active" | "closed";
+  role?: string;
 }
 
 /**
  * Cursor-paginated bookings list as infinite-scroll server state.
- * Accepts status ('active' | 'closed').
+ * Accepts status ('active' | 'closed') and role ('owner' | 'sales' | etc).
  */
 export function useInfiniteBookings(params: UseInfiniteBookingsParams = {}) {
-  const { status = "active" } = params;
+  const { status = "active", role } = params;
 
   return useInfiniteQuery({
-    queryKey: queryKeys.booking.list(status),
+    queryKey: queryKeys.booking.list(status, role),
     queryFn: ({ pageParam }) =>
       bookingApi.list({
         status,

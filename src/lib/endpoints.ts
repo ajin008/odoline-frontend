@@ -115,5 +115,6 @@ export const endpoints = {
     create: "/bookings",
     list: "/bookings",
     detail: (id: string) => `/bookings/${id}`,
+    cancel: (id: string) => `/bookings/${id}/cancel`,
   },
 } as const;
