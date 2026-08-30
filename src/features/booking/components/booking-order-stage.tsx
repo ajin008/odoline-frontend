@@ -7,11 +7,13 @@ import { AlertTriangle } from "lucide-react";
 interface BookingOrderStageProps {
   bookingId: string;
   readOnly?: boolean;
+  basePath?: string;
 }
 
 export function BookingOrderStage({
   bookingId,
   readOnly = false,
+  basePath = "/staff/booking",
 }: BookingOrderStageProps) {
   const { data: booking, isLoading, isError } = useBooking(bookingId);
 
@@ -39,6 +41,7 @@ export function BookingOrderStage({
         bookingId={booking.id}
         bookingStatus={booking.status}
         readOnly={readOnly}
+        basePath={basePath}
       />
     </div>
   );

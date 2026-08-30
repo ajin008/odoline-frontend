@@ -7,5 +7,11 @@ export default async function OwnerBookingOrderPage({
 }) {
   const { id } = await params;
 
-  return <BookingOrderStage bookingId={id} readOnly={true} />;
+  return (
+    <BookingOrderStage
+      bookingId={id}
+      readOnly={true}
+      basePath="/owner/booking"
+    />
+  );
 }

@@ -86,3 +86,51 @@ export function formatISTTimeOnly(isoString?: string | Date | null): string {
     hour12: true,
   });
 }
+
+/**
+ * Formats a currency number in Lakhs (Lac) or Crores (Cr) with Indian notation.
+ * Examples:
+ *   2350000  -> "₹23.50 Lac"
+ *   20430200 -> "₹2.04 Cr"
+ *   57000    -> "₹57,000"
+ */
+export function formatLakhsCrores(value: number | string | null | undefined): string {
+  if (value === null || value === undefined || value === "") return "₹0";
+  const num = typeof value === "number" ? value : Number(String(value).replace(/,/g, ""));
+  if (isNaN(num) || num === 0) return "₹0";
+
+  const absNum = Math.abs(num);
+  const sign = num < 0 ? "-" : "";
+
+  if (absNum >= 10000000) {
+    const cr = absNum / 10000000;
+    return `${sign}₹${cr.toFixed(2)} Cr`;
+  } else if (absNum >= 100000) {
+    const lac = absNum / 100000;
+    return `${sign}₹${lac.toFixed(2)} Lac`;
+  } else {
+    return `${sign}₹${absNum.toLocaleString("en-IN")}`;
+  }
+}
+
+/**
+ * Returns helper label text in Lac / Cr / K for integer input fields.
+ * Examples:
+ *   "2350000"  -> "23.50 Lac"
+ *   "20430200" -> "2.04 Cr"
+ *   "57000"    -> "57 K"
+ */
+export function getLakhsCroresText(value: number | string | null | undefined): string {
+  if (value === null || value === undefined || value === "") return "";
+  const num = typeof value === "number" ? value : Number(String(value).replace(/,/g, ""));
+  if (isNaN(num) || num <= 0) return "";
+
+  if (num >= 10000000) {
+    return `${(num / 10000000).toFixed(2)} Cr`;
+  } else if (num >= 100000) {
+    return `${(num / 100000).toFixed(2)} Lac`;
+  } else if (num >= 1000) {
+    return `${(num / 1000).toFixed(2)} K`;
+  }
+  return "";
+}

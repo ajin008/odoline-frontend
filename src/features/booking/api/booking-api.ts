@@ -9,6 +9,7 @@ import type {
   BookingOrder,
   SaveOrderPayload,
   EditAgreementPayload,
+  SettleDeliverPayload,
 } from "../types/booking-types";
 
 export const bookingApi = {
@@ -90,6 +91,28 @@ export const bookingApi = {
       responseType: "blob",
     });
     return res.data;
+  },
+
+  /** GET /api/v1/bookings/:id/settlement/pdf — Fetch Settlement Form PDF blob */
+  async getSettlementPdf(id: string): Promise<Blob> {
+    const res = await apiClient.get(endpoints.bookings.settlementPdf(id), {
+      responseType: "blob",
+    });
+    return res.data;
+  },
+
+  /** GET /api/v1/bookings/:id/delivery/pdf — Fetch Delivery Note PDF blob */
+  async getDeliveryPdf(id: string): Promise<Blob> {
+    const res = await apiClient.get(endpoints.bookings.deliveryPdf(id), {
+      responseType: "blob",
+    });
+    return res.data;
+  },
+
+  /** POST /api/v1/bookings/:id/settle-deliver — Complete Settlement + Delivery */
+  async settleDeliver(id: string, payload: SettleDeliverPayload): Promise<BookingDetail> {
+    const res = await apiClient.post(endpoints.bookings.settleDeliver(id), payload);
+    return res.data.data;
   },
 };
 

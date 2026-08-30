@@ -5,6 +5,7 @@ import type {
   CreateBookingPayload,
   CancelBookingPayload,
   EditAgreementPayload,
+  SettleDeliverPayload,
 } from "../types/booking-types";
 import { queryKeys } from "@/src/lib/query-keys";
 
@@ -130,4 +131,53 @@ export function useCancelBooking() {
     },
   });
 }
+
+export function useSettleDeliver() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: SettleDeliverPayload;
+    }) => bookingApi.settleDeliver(id, payload),
+    onSuccess: (_, variables) => {
+      toast.success("Settlement complete — vehicle delivered");
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.detail(variables.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.list("active"),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.list("closed"),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.booking.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
+    },
+    onError: (err: unknown) => {
+      const axiosErr = err as {
+        response?: { data?: { error?: { code?: string; message?: string } } };
+      };
+      const errObj = axiosErr?.response?.data?.error;
+      const code = errObj?.code;
+      const message = errObj?.message || "Failed to complete settlement";
+
+      if (code === "BALANCE_NOT_CLEARED") {
+        toast.error(message || "Full balance not collected — payment required before delivery.");
+      } else if (code === "INVALID_BOOKING_TRANSITION") {
+        toast.error(
+          "This booking cannot be settled because it is not in prebooked or offer stage."
+        );
+      } else if (code === "BOOKING_NOT_FOUND") {
+        toast.error("Booking not found or not assigned to your account.");
+      } else {
+        toast.error(message);
+      }
+    },
+  });
+}
+
 

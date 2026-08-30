@@ -129,6 +129,33 @@ export interface CancelBookingPayload {
   refund_method?: PaymentMethod;
 }
 
+export interface BookingSettlement {
+  id: string;
+  rto_charges: string | null;
+  insurance_charges: string | null;
+  finance_company: string | null;
+  remark: string | null;
+  settled_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BookingDelivery {
+  id: string;
+  chassis_number: string | null;
+  engine_number: string | null;
+  km_reading: number | null;
+  witness_name: string | null;
+  delivery_place: string | null;
+  delivered_by: string;
+  rc_transfer_date: string | null;
+  rc_document_url: string | null;
+  rc_note: string | null;
+  closed_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface BookingDetailSeller {
   name: string;
   address: string;
@@ -151,11 +178,15 @@ export interface BookingDetail {
   amount_paid: string;
   balance_due: string;
   amount_retained?: string | null;
+  accessories_total?: string;
+  grand_total?: string;
   rep?: BookingRep | null;
   car: Car | null;
   customer: BookingCustomer | null;
   lead: { id: string } | null;
   payments: BookingPayment[];
+  settlement?: BookingSettlement | null;
+  delivery?: BookingDelivery | null;
   seller: BookingDetailSeller;
 }
 
@@ -192,6 +223,34 @@ export interface EditAgreementPayload {
   advance_receipt_date?: string | null;
   balance_due_days?: number | null;
 }
+
+export interface SettlementPayload {
+  rto_charges?: string | null;
+  insurance_charges?: string | null;
+  finance_company?: string | null;
+  remark?: string | null;
+}
+
+export interface DeliveryPayload {
+  chassis_number?: string | null;
+  engine_number?: string | null;
+  km_reading?: number | null;
+  witness_name?: string | null;
+  delivery_place?: string | null;
+}
+
+export interface SettleDeliverPaymentPayload {
+  amount: string;
+  method: PaymentMethod;
+  reference?: string | null;
+}
+
+export interface SettleDeliverPayload {
+  settlement?: SettlementPayload | null;
+  delivery?: DeliveryPayload | null;
+  payments: SettleDeliverPaymentPayload[];
+}
+
 
 
 

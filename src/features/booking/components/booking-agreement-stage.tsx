@@ -7,18 +7,23 @@ import { useMe } from "@/src/features/auth/hooks/use-me";
 import { bookingApi } from "../api/booking-api";
 import { toast } from "sonner";
 import { EditAgreementModal } from "./edit-agreement-modal";
+import Link from "next/link";
 import {
   Receipt,
   CreditCard,
   Printer,
+  Download,
   Share2,
   Clock,
   AlertTriangle,
   Edit3,
+  ArrowRight,
 } from "lucide-react";
 
 interface BookingAgreementStageProps {
   bookingId: string;
+  readOnly?: boolean;
+  basePath?: string;
 }
 
 function formatCurrency(amountStr: string | null | undefined): string {
@@ -56,14 +61,25 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps) {
+export function BookingAgreementStage({
+  bookingId,
+  readOnly = false,
+  basePath = "/staff/booking",
+}: BookingAgreementStageProps) {
   const { data: user } = useMe();
   const { data: booking, isLoading, isError } = useBooking(bookingId);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  const isTerminal = booking?.status === "cancelled" || booking?.status === "closed";
-  const canEdit = Boolean(booking && !isTerminal && user && user.role !== "owner");
+  const isTerminal =
+    booking?.status === "cancelled" || booking?.status === "closed";
+  const isActive =
+    booking?.status === "prebooked" || booking?.status === "offer";
+  const canEdit = Boolean(
+    booking && !isTerminal && !readOnly && user && user.role !== "owner"
+  );
+  const showProceedBar = Boolean(booking && isActive && !readOnly);
 
   const handleViewAgreement = async () => {
     if (!booking) return;
@@ -90,6 +106,41 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
       toast.error(message);
     } finally {
       setIsPdfLoading(false);
+    }
+  };
+
+  const handleDownloadAgreement = async () => {
+    if (!booking) return;
+    setIsDownloading(true);
+    try {
+      const blob = await bookingApi.getAgreementPdf(booking.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Agreement-${booking.booking_number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("Agreement PDF downloaded");
+    } catch (err: unknown) {
+      let message = "Failed to download agreement PDF";
+      if (isAxiosError(err)) {
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text();
+            const json = JSON.parse(text);
+            if (json.message) message = json.message;
+          } catch {
+            // ignore parse error
+          }
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -143,7 +194,9 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
     return (
       <div className="rounded-2xl border border-dashed border-rose-500/30 bg-rose-500/5 p-6 text-center space-y-2">
         <AlertTriangle className="h-5 w-5 text-rose-500 mx-auto" />
-        <p className="text-xs font-semibold text-ink">Failed to load agreement details.</p>
+        <p className="text-xs font-semibold text-ink">
+          Failed to load agreement details.
+        </p>
       </div>
     );
   }
@@ -156,7 +209,30 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
       : 0;
 
   return (
-    <div className="space-y-5 select-none font-sans">
+    <div className="space-y-5 select-none font-sans pb-36 sm:pb-12">
+      {/* Guided Next-Stage Proceed Banner */}
+      {showProceedBar && (
+        <div className="rounded-2xl border border-accent/30 bg-accent/5 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="space-y-1">
+            <div className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-accent" />
+              <span>Next Guided Pipeline Step</span>
+            </div>
+            <div className="text-xs text-ink-subtle leading-relaxed">
+              Advance agreement is recorded. Proceed to add order form (vehicle
+              accessories &amp; offers).
+            </div>
+          </div>
+          <Link
+            href={`${basePath}/${booking.id}/order`}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 shadow-xs cursor-pointer shrink-0"
+          >
+            <span>Proceed to Order Form</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      )}
+
       {/* Agreement Actions Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3 rounded-2xl border border-line shadow-xs">
         <div className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2 px-1">
@@ -164,26 +240,37 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
           <span>Stage 1: Advance Sale Agreement</span>
         </div>
 
-        <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
-          <button
-            type="button"
-            onClick={handleShare}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
-            title="Share Agreement Summary"
-          >
-            <Share2 className="h-3.5 w-3.5 text-ink-subtle" />
-            <span>Share</span>
-          </button>
-
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleViewAgreement}
             disabled={isPdfLoading}
-            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50 min-h-[44px] sm:min-h-0"
             title="View or Print Advance Agreement PDF"
           >
             <Printer className="h-3.5 w-3.5" />
-            <span>{isPdfLoading ? "Opening PDF..." : "View / Print Agreement"}</span>
+            <span>{isPdfLoading ? "Opening..." : "View / Print"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleDownloadAgreement}
+            disabled={isDownloading}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer disabled:opacity-50 min-h-[44px] sm:min-h-0"
+            title="Direct Download Agreement PDF"
+          >
+            <Download className="h-3.5 w-3.5 text-ink-subtle" />
+            <span>{isDownloading ? "Downloading..." : "Download"}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShare}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer min-h-[44px] sm:min-h-0"
+            title="Share Agreement Summary"
+          >
+            <Share2 className="h-3.5 w-3.5 text-ink-subtle" />
+            <span>Share</span>
           </button>
         </div>
       </div>
@@ -257,8 +344,13 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
         {/* Payment Collection Progress Bar */}
         <div className="space-y-1.5 bg-inset/40 p-3.5 rounded-xl border border-line/40">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-ink">Payment Collection Progress</span>
-            <span className="font-mono text-ink-subtle">{formatCurrency(booking.amount_paid)} of {formatCurrency(booking.agreed_price)}</span>
+            <span className="font-semibold text-ink">
+              Payment Collection Progress
+            </span>
+            <span className="font-mono text-ink-subtle">
+              {formatCurrency(booking.amount_paid)} of{" "}
+              {formatCurrency(booking.agreed_price)}
+            </span>
           </div>
           <div className="h-2 w-full bg-inset rounded-full overflow-hidden border border-line/60">
             <div

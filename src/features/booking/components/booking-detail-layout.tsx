@@ -149,14 +149,16 @@ export function BookingDetailLayout({
     currentStageName = "Order Form";
   } else if (
     pathname?.endsWith("/settlement") ||
-    pathname?.includes("/settlement/")
-  ) {
-    currentStageName = "Settlement";
-  } else if (
+    pathname?.includes("/settlement/") ||
     pathname?.endsWith("/delivery") ||
     pathname?.includes("/delivery/")
   ) {
-    currentStageName = "Delivery";
+    currentStageName = "Settlement & Delivery";
+  } else if (
+    pathname?.endsWith("/close") ||
+    pathname?.includes("/close/")
+  ) {
+    currentStageName = "Close (RC Transfer)";
   }
 
   return (
@@ -181,64 +183,65 @@ export function BookingDetailLayout({
         </div>
 
         {/* Title & Actions Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold tracking-tight text-ink font-mono">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-ink font-mono">
                 {booking.booking_number}
               </h1>
               <span
-                className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold border ${statusConfig.badgeColor}`}
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusConfig.badgeColor}`}
               >
                 {statusConfig.label}
               </span>
-              {isFullyPaid ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  <span>Fully Paid</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                  <span>Balance Pending</span>
-                </span>
-              )}
             </div>
 
-            <div className="text-xs text-ink-subtle flex items-center gap-2 flex-wrap font-medium">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5 text-ink-subtle" />
-                <span>
-                  Prebooking Agreement executed on{" "}
-                  {formatDateIST(booking.prebooked_at)}
-                </span>
-              </div>
-              {booking.rep?.name && (
-                <>
-                  <span>•</span>
-                  <div className="flex items-center gap-1 font-semibold text-ink">
-                    <User className="h-3.5 w-3.5 text-accent" />
-                    <span>Booked by {booking.rep.name}</span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Header Action Buttons (Cancel booking-wide action) */}
-          {booking.status === "prebooked" && !readOnly && (
-            <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+            {/* Header Action Button (Cancel booking - right aligned) */}
+            {booking.status === "prebooked" && !readOnly && (
               <button
                 type="button"
                 onClick={() => setIsCancelModalOpen(true)}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 text-xs font-semibold transition-colors cursor-pointer shadow-xs shrink-0 ml-auto"
                 title="Cancel Booking"
               >
                 <XCircle className="h-4 w-4" />
                 <span>Cancel Booking</span>
               </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {isFullyPaid ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                <span>Fully Paid</span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <span>Balance Pending</span>
+              </span>
+            )}
+          </div>
+
+          <div className="text-xs text-ink-subtle flex items-center gap-2 flex-wrap font-medium">
+            <div className="flex items-center gap-1">
+              <Calendar className="h-3.5 w-3.5 text-ink-subtle" />
+              <span>
+                Prebooking Agreement executed on{" "}
+                {formatDateIST(booking.prebooked_at)}
+              </span>
             </div>
-          )}
+            {booking.rep?.name && (
+              <>
+                <span>•</span>
+                <div className="flex items-center gap-1 font-semibold text-ink">
+                  <User className="h-3.5 w-3.5 text-accent" />
+                  <span>Booked by {booking.rep.name}</span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

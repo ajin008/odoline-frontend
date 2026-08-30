@@ -8,6 +8,7 @@ import { useBookingOrder, useDeleteOrder } from "../hooks/use-booking-order";
 import { bookingApi } from "../api/booking-api";
 import { OrderFormEditor } from "./order-form-editor";
 import type { BookingStatus } from "../types/booking-types";
+import Link from "next/link";
 import {
   Tag,
   Plus,
@@ -17,13 +18,17 @@ import {
   FileText,
   Loader2,
   Printer,
+  Download,
   Share2,
+  ArrowLeft,
+  ArrowRight,
 } from "lucide-react";
 
 interface BookingOrderSectionProps {
   bookingId: string;
   bookingStatus: BookingStatus;
   readOnly?: boolean;
+  basePath?: string;
 }
 
 function formatCurrency(amountStr: string | null | undefined): string {
@@ -37,6 +42,7 @@ export function BookingOrderSection({
   bookingId,
   bookingStatus,
   readOnly = false,
+  basePath = "/staff/booking",
 }: BookingOrderSectionProps) {
   const { data: booking } = useBooking(bookingId);
   const { data: order, isLoading } = useBookingOrder(bookingId);
@@ -44,6 +50,7 @@ export function BookingOrderSection({
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const isTerminal =
     bookingStatus === "cancelled" || bookingStatus === "closed";
@@ -82,6 +89,41 @@ export function BookingOrderSection({
       toast.error(message);
     } finally {
       setIsPdfLoading(false);
+    }
+  };
+
+  const handleDownloadOrderPdf = async () => {
+    if (!order || !booking) return;
+    setIsDownloading(true);
+    try {
+      const blob = await bookingApi.getOrderPdf(booking.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Order-${booking.booking_number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("Order form PDF downloaded");
+    } catch (err: unknown) {
+      let message = "Failed to download order PDF";
+      if (isAxiosError(err)) {
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text();
+            const json = JSON.parse(text);
+            if (json.message) message = json.message;
+          } catch {
+            // ignore parse error
+          }
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -124,9 +166,43 @@ export function BookingOrderSection({
     );
   }
 
+  const isActive = bookingStatus === "prebooked" || bookingStatus === "offer";
+  const showProceedBar = Boolean(isActive && !readOnly);
+
   return (
-    <>
-      <div className="rounded-2xl border border-line bg-card p-5 space-y-4 shadow-xs select-none font-sans">
+    <div className="space-y-5 select-none font-sans pb-36 sm:pb-12">
+      {/* Guided Next-Stage Proceed Banner */}
+      {showProceedBar && (
+        <div className="rounded-2xl border border-accent/30 bg-accent/5 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div className="space-y-1">
+            <div className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-accent" />
+              <span>Next Guided Pipeline Step</span>
+            </div>
+            <div className="text-xs text-ink-subtle leading-relaxed">
+              Order form &amp; accessories updated. Proceed to final settlement and vehicle delivery handover.
+            </div>
+          </div>
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2.5 w-full sm:w-auto shrink-0">
+            <Link
+              href={`${basePath}/${bookingId}/agreement`}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-3 sm:py-2.5 rounded-xl bg-card border border-line text-xs font-bold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs min-h-[44px] sm:min-h-0"
+            >
+              <ArrowLeft className="h-3.5 w-3.5 text-ink-subtle" />
+              <span>Back to Agreement</span>
+            </Link>
+            <Link
+              href={`${basePath}/${bookingId}/settlement`}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 shadow-md cursor-pointer min-h-[44px] sm:min-h-0"
+            >
+              <span>Proceed to Settlement &amp; Delivery</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-2xl border border-line bg-card p-4 sm:p-5 space-y-4 shadow-xs">
         {/* Section Header */}
         <div className="flex items-center justify-between border-b border-line/40 pb-3 flex-wrap gap-2">
           <div className="flex items-center gap-2">
@@ -141,30 +217,41 @@ export function BookingOrderSection({
             )}
           </div>
 
-          {/* Header Actions when Order Exists */}
+          {/* Header Actions when Order Exists - Row by row on mobile */}
           {order && (
-            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={handleShareOrder}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
-                title="Share Order Summary"
-              >
-                <Share2 className="h-3.5 w-3.5 text-ink-subtle" />
-                <span>Share</span>
-              </button>
-
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleViewOrderPdf}
                 disabled={isPdfLoading}
-                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50 min-h-[44px] sm:min-h-0"
                 title="View or Print Order Form PDF"
               >
                 <Printer className="h-3.5 w-3.5" />
                 <span>
-                  {isPdfLoading ? "Opening PDF..." : "View / Print Order"}
+                  {isPdfLoading ? "Opening..." : "View / Print"}
                 </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDownloadOrderPdf}
+                disabled={isDownloading}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer disabled:opacity-50 min-h-[44px] sm:min-h-0"
+                title="Direct Download Order Form PDF"
+              >
+                <Download className="h-3.5 w-3.5 text-ink-subtle" />
+                <span>{isDownloading ? "Downloading..." : "Download"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleShareOrder}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3 py-2.5 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer min-h-[44px] sm:min-h-0"
+                title="Share Order Summary"
+              >
+                <Share2 className="h-3.5 w-3.5 text-ink-subtle" />
+                <span>Share</span>
               </button>
 
               {/* Edit / Remove controls for non-terminal, non-readOnly staff */}
@@ -339,6 +426,6 @@ export function BookingOrderSection({
         bookingId={bookingId}
         existingOrder={order || null}
       />
-    </>
+    </div>
   );
 }

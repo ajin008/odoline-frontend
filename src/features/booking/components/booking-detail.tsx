@@ -23,6 +23,7 @@ import {
   CreditCard,
   AlertTriangle,
   Printer,
+  Download,
   Share2,
   ChevronRight,
   Receipt,
@@ -90,6 +91,7 @@ export function BookingDetail({
   const { data: order } = useBookingOrder(bookingId);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleViewAgreement = async () => {
     if (!booking) return;
@@ -116,6 +118,41 @@ export function BookingDetail({
       toast.error(message);
     } finally {
       setIsPdfLoading(false);
+    }
+  };
+
+  const handleDownloadAgreement = async () => {
+    if (!booking) return;
+    setIsDownloading(true);
+    try {
+      const blob = await bookingApi.getAgreementPdf(booking.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Agreement-${booking.booking_number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success("Agreement PDF downloaded");
+    } catch (err: unknown) {
+      let message = "Failed to download agreement PDF";
+      if (isAxiosError(err)) {
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text();
+            const json = JSON.parse(text);
+            if (json.message) message = json.message;
+          } catch {
+            // ignore parse error
+          }
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -304,12 +341,12 @@ export function BookingDetail({
           </div>
 
           {/* Header Action Buttons */}
-          <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+          <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto">
             {booking.status === "prebooked" && !readOnly && (
               <button
                 type="button"
                 onClick={() => setIsCancelModalOpen(true)}
-                className="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+                className="col-span-3 sm:col-span-1 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 text-xs font-semibold transition-colors cursor-pointer shadow-xs"
                 title="Cancel Booking"
               >
                 <XCircle className="h-4 w-4" />
@@ -324,7 +361,18 @@ export function BookingDetail({
               title="Share Agreement Summary"
             >
               <Share2 className="h-4 w-4 text-ink-subtle" />
-              <span>Share Summary</span>
+              <span>Share</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDownloadAgreement}
+              disabled={isDownloading}
+              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-line text-xs font-semibold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+              title="Direct Download Advance Agreement PDF"
+            >
+              <Download className="h-4 w-4 text-ink-subtle" />
+              <span>{isDownloading ? "Downloading..." : "Download"}</span>
             </button>
 
             <button
@@ -335,7 +383,7 @@ export function BookingDetail({
               title="View or Print Advance Agreement PDF"
             >
               <Printer className="h-4 w-4" />
-              <span>{isPdfLoading ? "Opening PDF..." : "View / Print Agreement"}</span>
+              <span>{isPdfLoading ? "Opening..." : "View / Print"}</span>
             </button>
           </div>
         </div>

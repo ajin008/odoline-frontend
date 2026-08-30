@@ -1,6 +1,6 @@
-import { BookingDeliveryStage } from "@/src/features/booking/components/booking-delivery-stage";
+import { BookingCloseStage } from "@/src/features/booking/components/booking-close-stage";
 
-export default async function StaffBookingDeliveryPage({
+export default async function StaffBookingClosePage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -8,7 +8,7 @@ export default async function StaffBookingDeliveryPage({
   const { id } = await params;
 
   return (
-    <BookingDeliveryStage
+    <BookingCloseStage
       bookingId={id}
       readOnly={false}
       basePath="/staff/booking"

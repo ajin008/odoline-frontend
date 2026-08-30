@@ -7,5 +7,11 @@ export default async function StaffBookingAgreementPage({
 }) {
   const { id } = await params;
 
-  return <BookingAgreementStage bookingId={id} />;
+  return (
+    <BookingAgreementStage
+      bookingId={id}
+      readOnly={false}
+      basePath="/staff/booking"
+    />
+  );
 }

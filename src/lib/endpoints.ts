@@ -121,6 +121,9 @@ export const endpoints = {
     editAgreement: (id: string) => `/bookings/${id}/agreement`,
     agreementPdf: (id: string) => `/bookings/${id}/agreement/pdf`,
     orderPdf: (id: string) => `/bookings/${id}/order/pdf`,
+    settlementPdf: (id: string) => `/bookings/${id}/settlement/pdf`,
+    deliveryPdf: (id: string) => `/bookings/${id}/delivery/pdf`,
+    settleDeliver: (id: string) => `/bookings/${id}/settle-deliver`,
   },
 } as const;
 

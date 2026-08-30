@@ -126,5 +126,88 @@ export const editAgreementSchema = z.object({
 
 export type EditAgreementFormValues = z.infer<typeof editAgreementSchema>;
 
+export const settleDeliverPaymentItemSchema = z.object({
+  amount: z
+    .string()
+    .trim()
+    .min(1, "Amount is required")
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Amount must be a positive number",
+    }),
+  method: z.enum(PAYMENT_METHODS, {
+    message: "Select a payment method",
+  }),
+  reference: z.string().trim().optional().or(z.literal("")),
+});
+
+export const settleDeliverSchema = z.object({
+  rto_charges: z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), {
+      message: "RTO charges must be a non-negative number",
+    }),
+  insurance_charges: z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .refine((val) => !val || (!isNaN(Number(val)) && Number(val) >= 0), {
+      message: "Insurance charges must be a non-negative number",
+    }),
+  finance_company: z
+    .string()
+    .trim()
+    .max(150, "Finance company name must not exceed 150 characters")
+    .optional()
+    .or(z.literal("")),
+  remark: z.string().trim().optional().or(z.literal("")),
+
+  chassis_number: z
+    .string()
+    .trim()
+    .max(50, "Chassis number must not exceed 50 characters")
+    .optional()
+    .or(z.literal("")),
+  engine_number: z
+    .string()
+    .trim()
+    .max(50, "Engine number must not exceed 50 characters")
+    .optional()
+    .or(z.literal("")),
+  km_reading: z
+    .string()
+    .trim()
+    .optional()
+    .or(z.literal(""))
+    .refine(
+      (val) =>
+        !val ||
+        (!isNaN(Number(val)) &&
+          Number.isInteger(Number(val)) &&
+          Number(val) >= 0),
+      { message: "KM reading must be a non-negative whole number" }
+    ),
+  witness_name: z
+    .string()
+    .trim()
+    .max(100, "Witness name must not exceed 100 characters")
+    .optional()
+    .or(z.literal("")),
+  delivery_place: z
+    .string()
+    .trim()
+    .max(150, "Delivery place must not exceed 150 characters")
+    .optional()
+    .or(z.literal("")),
+
+  payments: z.array(settleDeliverPaymentItemSchema),
+});
+
+export type SettleDeliverFormValues = z.infer<typeof settleDeliverSchema>;
+
+
 
 

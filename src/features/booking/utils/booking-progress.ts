@@ -3,17 +3,18 @@ import type { BookingStatus } from "../types/booking-types";
 export type MilestoneState = "done" | "current" | "upcoming";
 
 export interface BookingMilestoneStage {
-  id: "agreement" | "order" | "settlement" | "delivery";
+  id: "agreement" | "order" | "settlement" | "close";
   label: string;
   shortLabel: string;
   state: MilestoneState;
+  isClickable: boolean;
 }
 
 export const BOOKING_STAGES = [
   { id: "agreement", label: "Advance Agreement", shortLabel: "Agreement" },
-  { id: "order", label: "Order Form", shortLabel: "Order" },
-  { id: "settlement", label: "Settlement", shortLabel: "Settlement" },
-  { id: "delivery", label: "Vehicle Delivery", shortLabel: "Delivery" },
+  { id: "order", label: "Order Form", shortLabel: "Order Form" },
+  { id: "settlement", label: "Settlement & Delivery", shortLabel: "Settlement & Delivery" },
+  { id: "close", label: "Close (RC Transfer)", shortLabel: "Close" },
 ] as const;
 
 export function getBookingMilestones(
@@ -25,27 +26,14 @@ export function getBookingMilestones(
 } {
   const isCancelled = status === "cancelled";
 
-  let currentIndex = 0;
-  switch (status) {
-    case "prebooked":
-      currentIndex = 0;
-      break;
-    case "offer":
-      currentIndex = 1;
-      break;
-    case "settlement":
-      currentIndex = 2;
-      break;
-    case "delivered":
-      currentIndex = 3;
-      break;
-    case "closed":
-      currentIndex = 4;
-      break;
-    case "cancelled":
-    default:
-      currentIndex = 0;
-      break;
+  // Reachable index rule:
+  // prebooked / offer / settlement -> reachable up to index 2 (Settlement & Delivery)
+  // delivered / closed -> reachable up to index 3 (Close)
+  let maxReachableIndex = 0;
+  if (status === "closed" || status === "delivered") {
+    maxReachableIndex = 3;
+  } else if (status === "prebooked" || status === "offer" || status === "settlement") {
+    maxReachableIndex = 2;
   }
 
   const stages: BookingMilestoneStage[] = BOOKING_STAGES.map(
@@ -55,26 +43,37 @@ export function getBookingMilestones(
       if (stage.id === "agreement") {
         state = !isCancelled ? "done" : "upcoming";
       } else if (stage.id === "order") {
-        if (hasOrderForm || status === "offer" || status === "closed" || (index < currentIndex && currentIndex > 1)) {
+        if (hasOrderForm || status === "offer" || status === "delivered" || status === "closed") {
           state = "done";
         } else {
           state = "upcoming";
         }
-      } else {
-        if (status === "closed" || index < currentIndex) {
+      } else if (stage.id === "settlement") {
+        if (status === "delivered" || status === "closed") {
           state = "done";
-        } else if (index === currentIndex && !isCancelled) {
+        } else if (!isCancelled) {
           state = "current";
         }
+      } else if (stage.id === "close") {
+        if (status === "closed") {
+          state = "done";
+        } else if (status === "delivered" && !isCancelled) {
+          state = "current";
+        } else {
+          state = "upcoming";
+        }
       }
+
+      // A milestone is clickable if index <= maxReachableIndex and not cancelled
+      const isClickable = !isCancelled && index <= maxReachableIndex;
 
       return {
         ...stage,
         state,
+        isClickable,
       };
     }
   );
 
   return { stages, isCancelled };
 }
-
