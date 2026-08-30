@@ -93,5 +93,7 @@ export const queryKeys = {
     list: (status: "active" | "closed", role?: string) =>
       ["bookings", "list", { status, role }] as const,
     detail: (id: string) => ["bookings", "detail", id] as const,
+    order: (id: string) => ["bookings", id, "order"] as const,
   },
 } as const;
+

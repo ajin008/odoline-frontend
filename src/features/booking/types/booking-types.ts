@@ -159,4 +159,33 @@ export interface BookingDetail {
   seller: BookingDetailSeller;
 }
 
+export interface OrderItem {
+  id: string;
+  name: string;
+  amount: string;
+  is_free: boolean;
+  sort_order: number;
+}
+
+export interface BookingOrder {
+  id: string;
+  remark: string | null;
+  created_at: string;
+  updated_at: string;
+  items: OrderItem[];
+  total: string;
+}
+
+export interface SaveOrderItemPayload {
+  name: string;
+  amount: string;
+  is_free: boolean;
+}
+
+export interface SaveOrderPayload {
+  remark?: string | null;
+  items: SaveOrderItemPayload[];
+}
+
+
 

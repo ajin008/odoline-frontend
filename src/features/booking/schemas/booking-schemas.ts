@@ -86,3 +86,26 @@ export type CancelBookingFormValues = z.infer<
   ReturnType<typeof createCancelBookingSchema>
 >;
 
+export const orderItemSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Item name is required")
+    .max(150, "Item name must not exceed 150 characters"),
+  amount: z
+    .string()
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+      message: "Amount must be a non-negative number",
+    }),
+  is_free: z.boolean(),
+});
+
+export const orderFormSchema = z.object({
+  remark: z.string().optional().or(z.literal("")),
+  items: z.array(orderItemSchema),
+});
+
+export type OrderFormValues = z.infer<typeof orderFormSchema>;
+
+
+

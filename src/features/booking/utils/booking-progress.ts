@@ -16,7 +16,10 @@ export const BOOKING_STAGES = [
   { id: "delivery", label: "Vehicle Delivery", shortLabel: "Delivery" },
 ] as const;
 
-export function getBookingMilestones(status: BookingStatus): {
+export function getBookingMilestones(
+  status: BookingStatus,
+  hasOrderForm: boolean = false
+): {
   stages: BookingMilestoneStage[];
   isCancelled: boolean;
 } {
@@ -48,11 +51,23 @@ export function getBookingMilestones(status: BookingStatus): {
   const stages: BookingMilestoneStage[] = BOOKING_STAGES.map(
     (stage, index) => {
       let state: MilestoneState = "upcoming";
-      if (status === "closed" || index < currentIndex) {
-        state = "done";
-      } else if (index === currentIndex && !isCancelled) {
-        state = "current";
+
+      if (stage.id === "agreement") {
+        state = !isCancelled ? "done" : "upcoming";
+      } else if (stage.id === "order") {
+        if (hasOrderForm || status === "offer" || status === "closed" || (index < currentIndex && currentIndex > 1)) {
+          state = "done";
+        } else {
+          state = "upcoming";
+        }
+      } else {
+        if (status === "closed" || index < currentIndex) {
+          state = "done";
+        } else if (index === currentIndex && !isCancelled) {
+          state = "current";
+        }
       }
+
       return {
         ...stage,
         state,
@@ -62,3 +77,4 @@ export function getBookingMilestones(status: BookingStatus): {
 
   return { stages, isCancelled };
 }
+

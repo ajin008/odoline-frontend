@@ -252,12 +252,65 @@ h6 {
     visibility: hidden !important;
   }
 
-  #advance-agreement-print,
-  #advance-agreement-print * {
+  /* When printing Agreement specifically */
+  body[data-print-document="agreement"] #advance-agreement-print,
+  body[data-print-document="agreement"] #advance-agreement-print * {
     visibility: visible !important;
   }
 
-  #advance-agreement-print {
+  body[data-print-document="agreement"] #advance-agreement-print {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  body[data-print-document="agreement"] #order-form-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* When printing Order Form specifically */
+  body[data-print-document="order"] #order-form-print,
+  body[data-print-document="order"] #order-form-print * {
+    visibility: visible !important;
+  }
+
+  body[data-print-document="order"] #order-form-print {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  body[data-print-document="order"] #advance-agreement-print {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Default fallback when no attribute is set */
+  body:not([data-print-document]) #advance-agreement-print,
+  body:not([data-print-document]) #advance-agreement-print * {
+    visibility: visible !important;
+  }
+
+  body:not([data-print-document]) #advance-agreement-print {
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;

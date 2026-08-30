@@ -3,14 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { toast } from "sonner";
+import { usePathname } from "next/navigation";
+
 import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder } from "../hooks/use-booking-order";
 import { getBookingStatusConfig } from "../utils/booking-status-map";
 import { BookingProgressBar } from "./booking-progress-bar";
-import { AdvanceAgreementPrint } from "./advance-agreement-print";
 import { CancelBookingModal } from "./cancel-booking-modal";
-import { BookingOrderSection } from "./booking-order-section";
 import {
   ArrowLeft,
   User,
@@ -19,22 +18,17 @@ import {
   CheckCircle2,
   AlertCircle,
   Building2,
-  CreditCard,
   AlertTriangle,
-  Printer,
-  Download,
-  Share2,
   ChevronRight,
-  Receipt,
-  Clock,
   ExternalLink,
   XCircle,
 } from "lucide-react";
 
-interface BookingDetailProps {
+interface BookingDetailLayoutProps {
   bookingId: string;
   readOnly?: boolean;
   basePath?: string;
+  children: React.ReactNode;
 }
 
 function formatCurrency(amountStr: string | null | undefined): string {
@@ -62,82 +56,16 @@ function getInitials(name: string | null | undefined): string {
   return name.slice(0, 2).toUpperCase();
 }
 
-const PAYMENT_TYPE_LABELS: Record<string, string> = {
-  advance: "Advance Payment",
-  part_payment: "Part Payment",
-  settlement: "Final Settlement",
-  refund: "Refund",
-  cancellation_charge: "Cancellation Charge",
-};
-
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  cash: "Cash",
-  bank_transfer: "Bank Transfer",
-  upi: "UPI",
-  card: "Card",
-  cheque: "Cheque",
-  loan: "Loan Disbursement",
-  exchange: "Vehicle Exchange",
-  other: "Other",
-};
-
-export function BookingDetail({
+export function BookingDetailLayout({
   bookingId,
   readOnly = false,
   basePath = "/staff/booking",
-}: BookingDetailProps) {
+  children,
+}: BookingDetailLayoutProps) {
+  const pathname = usePathname();
   const { data: booking, isLoading, isError } = useBooking(bookingId);
   const { data: order } = useBookingOrder(bookingId);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-
-  const handlePrint = () => {
-    if (!booking) return;
-    const originalTitle = document.title;
-    const customerName = booking.customer?.name || "Customer";
-    const sanitizedCustomer = customerName.replace(/[/\\?%*:|"<>]/g, "").trim();
-    document.title = `Cars4 Prebooking Agreement - ${sanitizedCustomer}`;
-    window.print();
-    setTimeout(() => {
-      document.title = originalTitle;
-    }, 1000);
-  };
-
-  const handleShare = async () => {
-    if (!booking) return;
-
-    const carStr = booking.car
-      ? `${booking.car.year} ${booking.car.make} ${booking.car.model}${
-          booking.car.reg_number ? ` (${booking.car.reg_number})` : ""
-        }`
-      : "Vehicle";
-
-    const shareText = `Cars4 Booking ${booking.booking_number}\nBuyer: ${
-      booking.customer?.name || "Customer"
-    }\nCar: ${carStr}\nAgreed: ${formatCurrency(
-      booking.agreed_price
-    )} · Advance: ${formatCurrency(
-      booking.amount_paid
-    )} · Balance: ${formatCurrency(booking.balance_due)}`;
-
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Cars4 Booking ${booking.booking_number}`,
-          text: shareText,
-        });
-        return;
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") return;
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(shareText);
-      toast.success("Agreement summary copied to clipboard");
-    } catch {
-      toast.error("Failed to copy summary to clipboard");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -198,15 +126,8 @@ export function BookingDetail({
   }
 
   const statusConfig = getBookingStatusConfig(booking.status);
-  const agreedNum = Number(booking.agreed_price || 0);
-  const paidNum = Number(booking.amount_paid || 0);
   const balanceDueNum = Number(booking.balance_due || 0);
   const isFullyPaid = balanceDueNum <= 0;
-
-  const pctPaid =
-    agreedNum > 0
-      ? Math.min(100, Math.max(0, Math.round((paidNum / agreedNum) * 100)))
-      : 0;
 
   const leadHref = readOnly
     ? `/owner/sales`
@@ -222,8 +143,24 @@ export function BookingDetail({
     ? `/staff/stock/${booking.car.id}`
     : null;
 
+  // Determine current stage name for breadcrumbs
+  let currentStageName = "Agreement";
+  if (pathname?.endsWith("/order") || pathname?.includes("/order/")) {
+    currentStageName = "Order Form";
+  } else if (
+    pathname?.endsWith("/settlement") ||
+    pathname?.includes("/settlement/")
+  ) {
+    currentStageName = "Settlement";
+  } else if (
+    pathname?.endsWith("/delivery") ||
+    pathname?.includes("/delivery/")
+  ) {
+    currentStageName = "Delivery";
+  }
+
   return (
-    <div className="w-full space-y-5 font-sans select-none pb-12">
+    <div className="w-full space-y-5 font-sans select-none">
       {/* 1. Header Toolbar & Breadcrumb */}
       <div className="space-y-3 border-b border-line/60 pb-4">
         {/* Breadcrumb */}
@@ -239,6 +176,8 @@ export function BookingDetail({
           <span className="font-mono text-ink font-bold">
             {booking.booking_number}
           </span>
+          <ChevronRight className="h-3.5 w-3.5 text-line" />
+          <span className="text-accent font-semibold">{currentStageName}</span>
         </div>
 
         {/* Title & Actions Bar */}
@@ -286,9 +225,9 @@ export function BookingDetail({
             </div>
           </div>
 
-          {/* Header Action Buttons */}
-          <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-            {booking.status === "prebooked" && !readOnly && (
+          {/* Header Action Buttons (Cancel booking-wide action) */}
+          {booking.status === "prebooked" && !readOnly && (
+            <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
               <button
                 type="button"
                 onClick={() => setIsCancelModalOpen(true)}
@@ -298,224 +237,24 @@ export function BookingDetail({
                 <XCircle className="h-4 w-4" />
                 <span>Cancel Booking</span>
               </button>
-            )}
-
-            <button
-              type="button"
-              onClick={handleShare}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-line text-xs font-semibold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs"
-              title="Share Agreement Summary"
-            >
-              <Share2 className="h-4 w-4 text-ink-subtle" />
-              <span>Share Summary</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-line text-xs font-semibold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs"
-              title="Download Agreement PDF"
-            >
-              <Download className="h-4 w-4 text-ink-subtle" />
-              <span>Download PDF</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs"
-              title="Print Advance Agreement"
-            >
-              <Printer className="h-4 w-4" />
-              <span>Print Agreement</span>
-            </button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 2. Lifecycle Progress Pipeline */}
+      {/* 2. Lifecycle Progress Pipeline Navigation Bar */}
       <BookingProgressBar
         status={booking.status}
         cancelReason={booking.cancel_reason}
         hasOrderForm={Boolean(order)}
+        bookingId={booking.id}
+        basePath={basePath}
       />
 
-      {/* 3. Master 2-Column Bento Layout */}
+      {/* 3. Master 2-Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* ================= LEFT / MAIN COLUMN (8 cols) ================= */}
-        <div className="lg:col-span-8 space-y-5">
-          {/* Bento Card A: Financial Agreement Breakdown */}
-          <div className="rounded-2xl border border-line bg-card p-5 space-y-5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-line/40 pb-3">
-              <div className="flex items-center gap-2">
-                <Receipt className="h-4.5 w-4.5 text-accent" />
-                <h3 className="text-sm font-bold text-ink font-sans">
-                  Financial Terms &amp; Collection Progress
-                </h3>
-              </div>
-              <span className="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-                {pctPaid}% Paid
-              </span>
-            </div>
-
-            {/* 3 Metrics Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {/* Agreed Price */}
-              <div className="bg-inset/70 p-4 rounded-xl border border-line/50 space-y-1">
-                <div className="text-[10px] font-bold text-ink-subtle uppercase tracking-wider">
-                  Agreed Deal Price
-                </div>
-                <div className="text-xl font-bold font-mono text-ink">
-                  {formatCurrency(booking.agreed_price)}
-                </div>
-              </div>
-
-              {/* Total Paid */}
-              <div
-                className="p-4 rounded-xl border-0 space-y-1"
-                style={{ backgroundColor: "#d8f1b7" }}
-              >
-                <div className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider">
-                  Advance Amount Paid
-                </div>
-                <div className="text-xl font-bold font-mono text-emerald-950">
-                  {formatCurrency(booking.amount_paid)}
-                </div>
-              </div>
-
-              {/* Balance Due */}
-              <div
-                className="p-4 rounded-xl border-0 space-y-1"
-                style={{ backgroundColor: "#fae9cf" }}
-              >
-                <div className="text-[10px] font-bold text-amber-900 uppercase tracking-wider">
-                  Net Balance Due
-                </div>
-                <div className="text-xl font-bold font-mono text-amber-950">
-                  {formatCurrency(booking.balance_due)}
-                </div>
-              </div>
-            </div>
-
-            {/* Payment Collection Progress Bar */}
-            <div className="space-y-1.5 bg-inset/40 p-3.5 rounded-xl border border-line/40">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-ink">
-                  Payment Collection Progress
-                </span>
-                <span className="font-mono text-ink-subtle">
-                  {formatCurrency(booking.amount_paid)} of{" "}
-                  {formatCurrency(booking.agreed_price)}
-                </span>
-              </div>
-              <div className="h-2 w-full bg-inset rounded-full overflow-hidden border border-line/60">
-                <div
-                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                  style={{ width: `${pctPaid}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Agreement Terms Meta */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-inset/30 p-3.5 rounded-xl border border-line/40">
-              {booking.balance_due_days ? (
-                <div className="space-y-0.5">
-                  <span className="text-ink-subtle font-medium">
-                    Balance Settlement Window:
-                  </span>
-                  <div className="font-bold text-ink flex items-center gap-1.5">
-                    <Clock className="h-3.5 w-3.5 text-amber-500" />
-                    <span>Within {booking.balance_due_days} working days</span>
-                  </div>
-                </div>
-              ) : null}
-
-              {booking.advance_receipt_no ? (
-                <div className="space-y-0.5">
-                  <span className="text-ink-subtle font-medium">
-                    Advance Receipt Reference:
-                  </span>
-                  <div className="font-bold text-ink font-mono">
-                    Ref #{booking.advance_receipt_no}{" "}
-                    {booking.advance_receipt_date
-                      ? `(dtd ${formatDateIST(booking.advance_receipt_date)})`
-                      : ""}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          {/* Bento Card B: Payments Ledger Audit Trail */}
-          <div className="rounded-2xl border border-line bg-card p-5 space-y-4 shadow-xs">
-            <div className="flex items-center justify-between border-b border-line/40 pb-3">
-              <div className="flex items-center gap-2">
-                <CreditCard className="h-4.5 w-4.5 text-accent" />
-                <h3 className="text-sm font-bold text-ink font-sans">
-                  Payments Ledger Audit Trail
-                </h3>
-              </div>
-              <span className="text-[11px] text-ink-subtle font-medium">
-                {booking.payments?.length || 0} ledger entries
-              </span>
-            </div>
-
-            {booking.payments && booking.payments.length > 0 ? (
-              <div className="overflow-x-auto rounded-xl border border-line/50">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="border-b border-line/50 text-[10px] font-bold text-ink-subtle uppercase tracking-wider bg-inset">
-                      <th className="py-2.5 px-3">Date</th>
-                      <th className="py-2.5 px-3">Type</th>
-                      <th className="py-2.5 px-3">Method</th>
-                      <th className="py-2.5 px-3">Reference</th>
-                      <th className="py-2.5 px-3 text-right">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-line/40 bg-card">
-                    {booking.payments.map((p) => {
-                      const isNegative =
-                        p.type === "refund" || p.type === "cancellation_charge";
-                      return (
-                        <tr
-                          key={p.id}
-                          className="hover:bg-inset/50 transition-colors"
-                        >
-                          <td className="py-2.5 px-3 font-medium text-ink">
-                            {formatDateIST(p.paid_at)}
-                          </td>
-                          <td className="py-2.5 px-3 font-semibold text-ink">
-                            {PAYMENT_TYPE_LABELS[p.type] || p.type}
-                          </td>
-                          <td className="py-2.5 px-3 text-ink-muted">
-                            {PAYMENT_METHOD_LABELS[p.method] || p.method}
-                          </td>
-                          <td className="py-2.5 px-3 font-mono text-ink-subtle">
-                            {p.reference || "—"}
-                          </td>
-                          <td
-                            className={`py-2.5 px-3 font-bold font-mono text-right ${
-                              isNegative
-                                ? "text-rose-500"
-                                : "text-emerald-600 dark:text-emerald-400"
-                            }`}
-                          >
-                            {isNegative ? "-" : "+"}
-                            {formatCurrency(p.amount)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="text-xs text-ink-subtle italic py-4 text-center bg-inset/30 rounded-xl border border-line/40">
-                No payments logged in the ledger yet.
-              </div>
-            )}
-          </div>
-        </div>
+        {/* ================= LEFT / STAGE CONTENT COLUMN (8 cols) ================= */}
+        <div className="lg:col-span-8 space-y-5">{children}</div>
 
         {/* ================= RIGHT / SIDEBAR COLUMN (4 cols) ================= */}
         <div className="lg:col-span-4 space-y-4">
@@ -544,7 +283,6 @@ export function BookingDetail({
                 href={leadHref}
                 className="flex items-start gap-3 p-2 -mx-2 rounded-xl hover:bg-inset transition-colors group cursor-pointer"
               >
-                {/* Initials Avatar */}
                 <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent font-bold text-sm shrink-0 group-hover:bg-accent group-hover:text-inverse transition-colors">
                   {getInitials(booking.customer?.name)}
                 </div>
@@ -726,16 +464,6 @@ export function BookingDetail({
           </div>
         </div>
       </div>
-
-      {/* Stage 2 Vehicle Order Form Section */}
-      <BookingOrderSection
-        bookingId={booking.id}
-        bookingStatus={booking.status}
-        readOnly={readOnly}
-      />
-
-      {/* Hidden Print Document */}
-      <AdvanceAgreementPrint booking={booking} />
 
       {/* Cancel Booking Modal */}
       {booking.status === "prebooked" && !readOnly && (

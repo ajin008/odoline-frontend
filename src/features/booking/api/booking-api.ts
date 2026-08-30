@@ -6,6 +6,8 @@ import type {
   BookingsPage,
   CreateBookingPayload,
   CancelBookingPayload,
+  BookingOrder,
+  SaveOrderPayload,
 } from "../types/booking-types";
 
 export const bookingApi = {
@@ -46,5 +48,23 @@ export const bookingApi = {
     const res = await apiClient.post(endpoints.bookings.cancel(id), payload);
     return res.data.data;
   },
+
+  /** GET /api/v1/bookings/:id/order — Fetch Order Form */
+  async getOrder(id: string): Promise<BookingOrder | null> {
+    const res = await apiClient.get(endpoints.bookings.order(id));
+    return res.data.data.order;
+  },
+
+  /** PUT /api/v1/bookings/:id/order — Save/Replace Order Form */
+  async saveOrder(id: string, payload: SaveOrderPayload): Promise<BookingOrder> {
+    const res = await apiClient.put(endpoints.bookings.order(id), payload);
+    return res.data.data.order;
+  },
+
+  /** DELETE /api/v1/bookings/:id/order — Delete Order Form */
+  async deleteOrder(id: string): Promise<void> {
+    await apiClient.delete(endpoints.bookings.order(id));
+  },
 };
+
 

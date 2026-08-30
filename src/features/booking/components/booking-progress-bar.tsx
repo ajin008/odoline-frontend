@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import type { BookingStatus } from "../types/booking-types";
 import { getBookingMilestones } from "../utils/booking-progress";
 import { Check, XCircle, Clock, ChevronRight } from "lucide-react";
@@ -7,13 +9,20 @@ import { Check, XCircle, Clock, ChevronRight } from "lucide-react";
 interface BookingProgressBarProps {
   status: BookingStatus;
   cancelReason?: string | null;
+  hasOrderForm?: boolean;
+  bookingId?: string;
+  basePath?: string;
 }
 
 export function BookingProgressBar({
   status,
   cancelReason,
+  hasOrderForm = false,
+  bookingId,
+  basePath = "/staff/booking",
 }: BookingProgressBarProps) {
-  const { stages, isCancelled } = getBookingMilestones(status);
+  const pathname = usePathname();
+  const { stages, isCancelled } = getBookingMilestones(status, hasOrderForm);
 
   if (isCancelled) {
     return (
@@ -40,10 +49,10 @@ export function BookingProgressBar({
       <div className="flex items-center justify-between">
         <div className="text-[11px] font-bold text-ink-subtle uppercase tracking-wider flex items-center gap-2">
           <Clock className="h-3.5 w-3.5 text-accent" />
-          <span>Booking Lifecycle Stages</span>
+          <span>Booking Lifecycle Stage Documents</span>
         </div>
         <span className="text-[11px] font-medium text-ink-muted hidden sm:inline">
-          Stage 1 of 4: Prebooking Agreement Active
+          Click any milestone tab to view stage document
         </span>
       </div>
 
@@ -52,15 +61,27 @@ export function BookingProgressBar({
           const isDone = stage.state === "done";
           const isCurrent = stage.state === "current";
 
-          return (
+          // Determine if this stage is the active route in current pathname
+          const stageHref = bookingId
+            ? `${basePath}/${bookingId}/${stage.id}`
+            : null;
+
+          const isActiveRoute = Boolean(
+            pathname &&
+              (pathname.endsWith(`/${stage.id}`) ||
+                pathname.includes(`/${stage.id}/`))
+          );
+
+          const cardContent = (
             <div
-              key={stage.id}
-              className={`relative flex items-center gap-3 p-3 rounded-xl border transition-all ${
-                isDone
-                  ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+              className={`relative flex items-center gap-3 p-3 rounded-xl border transition-all h-full ${
+                isActiveRoute
+                  ? "bg-[#0f1012] border-[#1f2023] text-white shadow-xs"
+                  : isDone
+                  ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500/50"
                   : isCurrent
-                  ? "bg-accent/10 border-line/60 text-ink"
-                  : "bg-inset/50 border-line/60 text-ink-muted"
+                  ? "bg-accent/10 border-line/60 text-ink hover:border-accent"
+                  : "bg-inset/50 border-line/60 text-ink-muted hover:border-line"
               }`}
             >
               {/* Icon / Number Indicator */}
@@ -68,7 +89,7 @@ export function BookingProgressBar({
                 className={`flex h-7 w-7 items-center justify-center rounded-lg font-mono text-xs font-bold shrink-0 transition-colors ${
                   isDone
                     ? "bg-emerald-500 text-white"
-                    : isCurrent
+                    : isCurrent || isActiveRoute
                     ? "bg-accent text-inverse shadow-xs"
                     : "bg-card border border-line text-ink-subtle"
                 }`}
@@ -82,11 +103,26 @@ export function BookingProgressBar({
 
               {/* Stage Info */}
               <div className="space-y-0.5 min-w-0 flex-1">
-                <div className="text-xs font-bold tracking-tight truncate">
-                  {stage.label}
+                <div className="text-xs font-bold tracking-tight truncate flex items-center justify-between gap-1">
+                  <span className={isActiveRoute ? "text-white font-extrabold" : ""}>
+                    {stage.label}
+                  </span>
+                  {isActiveRoute && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse shrink-0" />
+                  )}
                 </div>
-                <div className="text-[10px] font-semibold uppercase tracking-wider text-ink-subtle">
-                  {isDone ? "Completed" : isCurrent ? "Active Stage" : "Upcoming"}
+                <div
+                  className={`text-[10px] font-semibold uppercase tracking-wider truncate ${
+                    isActiveRoute ? "text-gray-400" : "text-ink-subtle"
+                  }`}
+                >
+                  {isActiveRoute
+                    ? "Active View"
+                    : isDone
+                    ? "Completed"
+                    : isCurrent
+                    ? "Active Stage"
+                    : "Upcoming"}
                 </div>
               </div>
 
@@ -96,6 +132,16 @@ export function BookingProgressBar({
               )}
             </div>
           );
+
+          if (stageHref) {
+            return (
+              <Link key={stage.id} href={stageHref} className="block group">
+                {cardContent}
+              </Link>
+            );
+          }
+
+          return <div key={stage.id}>{cardContent}</div>;
         })}
       </div>
     </div>

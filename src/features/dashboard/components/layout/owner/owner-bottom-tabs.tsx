@@ -1,9 +1,11 @@
+"use client";
+
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ownerNavItems } from "./nav-items";
 import { useDashboardStats } from "@/src/features/dashboard/hooks/use-dashboard-stats";
-import { Menu, X, BarChart3, Sparkles, Layers, Receipt } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export function OwnerBottomTabs() {
   const pathname = usePathname();
@@ -11,19 +13,15 @@ export function OwnerBottomTabs() {
   const { data: stats } = useDashboardStats();
   const inStockCount = stats?.total_stock ?? 0;
 
-  // Core mobile navigation items (Dashboard, Inventory, Team, Settings)
-  const realMobileItems = ownerNavItems.filter((i) => i.mobile);
+  // Primary mobile bottom bar items: Dashboard, Sales, Inventory, Team
+  const primaryItems = ownerNavItems.filter(
+    (i) => i.href !== "/owner/booking" && i.href !== "/owner/settings"
+  );
 
-  // Simulated future scale items
-  const dummyOverflowItems = [
-    { href: "/owner/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/owner/expenses", label: "Expenses", icon: Receipt },
-    { href: "/owner/campaigns", label: "Marketing", icon: Sparkles },
-    { href: "/owner/categories", label: "Categories", icon: Layers },
-  ];
-
-  const primaryItems = realMobileItems;
-  const overflowItems = dummyOverflowItems;
+  // Overflow items in "More" sheet: Booking, Settings
+  const overflowItems = ownerNavItems.filter(
+    (i) => i.href === "/owner/booking" || i.href === "/owner/settings"
+  );
 
   const isOverflowActive = overflowItems.some((item) =>
     pathname.startsWith(item.href)
@@ -34,7 +32,6 @@ export function OwnerBottomTabs() {
       {/* ------------------------------------------------------------- */}
       {/* FLOATING DETACHED DOCK NAVIGATION BAR                         */}
       {/* ------------------------------------------------------------- */}
-      {/* Lifted using bottom-5, bounded left/right with mx-4, and full pill rounding */}
       <div className="fixed bottom-5 left-4 right-4 z-50 bg-card/85 backdrop-blur-xl border border-line rounded-full shadow-bento md:hidden select-none max-w-md mx-auto pointer-events-auto">
         <nav className="flex h-14 items-center justify-around px-2">
           {primaryItems.map((item) => {
@@ -78,6 +75,7 @@ export function OwnerBottomTabs() {
 
           {/* DOCK EXPANSION TRIGGER */}
           <button
+            type="button"
             onClick={() => setIsMoreOpen(!isMoreOpen)}
             className={[
               "flex flex-1 flex-col items-center justify-center h-full gap-0.5 text-[10px] font-semibold tracking-tight transition-all duration-200 active:scale-90 cursor-pointer",
@@ -121,7 +119,6 @@ export function OwnerBottomTabs() {
           />
 
           {/* Floating Action Menu Drawer Sheet */}
-          {/* Positioned cleanly above the floating dock bar with bottom-24 */}
           <div className="fixed bottom-24 left-4 right-4 z-40 max-h-[55vh] overflow-y-auto bg-card border border-line rounded-[2rem] shadow-bento p-4 space-y-1.5 md:hidden max-w-md mx-auto animate-in slide-in-from-bottom-6 cubic-bezier(0.16, 1, 0.3, 1) duration-300 pointer-events-auto">
             <div className="text-[10px] font-mono font-bold tracking-widest text-ink-subtle uppercase px-3 py-1.5 border-b border-line/40 mb-2">
               System Applications

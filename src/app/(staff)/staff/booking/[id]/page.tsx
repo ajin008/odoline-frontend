@@ -1,11 +1,10 @@
-import { BookingDetail } from "@/src/features/booking/components/booking-detail";
+import { redirect } from "next/navigation";
 
-export default async function StaffBookingDetailPage({
+export default async function StaffBookingIndexPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
-  return <BookingDetail bookingId={id} />;
+  redirect(`/staff/booking/${id}/agreement`);
 }
