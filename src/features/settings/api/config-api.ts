@@ -33,4 +33,17 @@ export const configApi = {
     const res = await apiClient.patch(endpoints.config.updateGeofence, payload);
     return res.data.data;
   },
+
+  /** PATCH /config/logo — upload/replace showroom logo. */
+  async uploadLogo(file: File | Blob): Promise<{ showroom_logo_url: string }> {
+    const formData = new FormData();
+    const fileName = (file as File).name || "showroom-logo.png";
+    formData.append("logo", file, fileName);
+    formData.append("file", file, fileName);
+    const res = await apiClient.patch(endpoints.config.logo, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data.data;
+  },
 };
+

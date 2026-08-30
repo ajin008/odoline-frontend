@@ -246,6 +246,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
     register: registerAdvance,
     handleSubmit: handleSubmitAdvance,
     setValue: setAdvanceValue,
+    setError: setErrorAdvance,
     watch: watchAdvance,
     reset: resetAdvance,
     formState: { errors: advanceErrors },
@@ -317,11 +318,30 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
   const handleProceedToAdvance = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedCarId || !wonPrice || Number(wonPrice) <= 0) return;
+    if (!selectedCarId || !wonPrice || Number(wonPrice) < 3000) return;
     setWonStep("advance");
   };
 
   const onSubmitAdvance = (data: AdvanceAgreementFormValues) => {
+    const advNum = Number(data.advance_amount);
+    const wonNum = Number(wonPrice);
+
+    if (advNum < 3000) {
+      setErrorAdvance("advance_amount", {
+        type: "manual",
+        message: "Advance amount must be at least ₹3,000",
+      });
+      return;
+    }
+
+    if (wonNum && advNum > wonNum) {
+      setErrorAdvance("advance_amount", {
+        type: "manual",
+        message: `Advance amount cannot exceed agreed deal price (${formatCurrency(wonPrice)})`,
+      });
+      return;
+    }
+
     createBookingMutation.mutate(
       {
         lead_id: lead.id,
@@ -834,7 +854,12 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                     placeholder="e.g. 750000"
                     className="w-full rounded-xl border border-line bg-inset p-3 text-xs text-ink focus:border-accent focus:outline-none font-mono"
                   />
-                  {wonPrice && numberToWordsRupees(wonPrice) && (
+                  {wonPrice && Number(wonPrice) < 3000 && (
+                    <p className="text-[11px] text-danger font-medium pt-0.5">
+                      Agreed deal price must be at least ₹3,000
+                    </p>
+                  )}
+                  {wonPrice && Number(wonPrice) >= 3000 && numberToWordsRupees(wonPrice) && (
                     <p className="text-[11px] text-ink-subtle italic font-sans pt-0.5">
                       &ldquo;{numberToWordsRupees(wonPrice)}&rdquo;
                     </p>
@@ -869,7 +894,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                   <button
                     type="submit"
                     disabled={
-                      !selectedCarId || !wonPrice || Number(wonPrice) <= 0
+                      !selectedCarId || !wonPrice || Number(wonPrice) < 3000
                     }
                     className="flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 px-4 py-2 text-xs font-bold text-white shadow-xs hover:shadow transition-all disabled:opacity-50 cursor-pointer"
                   >
@@ -957,6 +982,11 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                   {advanceErrors.advance_amount && (
                     <p className="text-[11px] text-danger font-medium">
                       {advanceErrors.advance_amount.message}
+                    </p>
+                  )}
+                  {!advanceErrors.advance_amount && watchAdvanceAmount && wonPrice && Number(watchAdvanceAmount) > Number(wonPrice) && (
+                    <p className="text-[11px] text-danger font-medium">
+                      Advance amount cannot exceed agreed deal price ({formatCurrency(wonPrice)})
                     </p>
                   )}
                   {amountInWords && (

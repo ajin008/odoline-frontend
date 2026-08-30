@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder, useDeleteOrder } from "../hooks/use-booking-order";
+import { bookingApi } from "../api/booking-api";
 import { OrderFormEditor } from "./order-form-editor";
-import { OrderFormPrint } from "./order-form-print";
 import type { BookingStatus } from "../types/booking-types";
 import {
   Tag,
@@ -17,7 +18,6 @@ import {
   Loader2,
   Printer,
   Share2,
-  Download,
 } from "lucide-react";
 
 interface BookingOrderSectionProps {
@@ -43,8 +43,10 @@ export function BookingOrderSection({
   const deleteOrderMutation = useDeleteOrder();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
 
-  const isTerminal = bookingStatus === "cancelled" || bookingStatus === "closed";
+  const isTerminal =
+    bookingStatus === "cancelled" || bookingStatus === "closed";
   const canEdit = !readOnly && !isTerminal;
 
   const handleDelete = () => {
@@ -55,18 +57,32 @@ export function BookingOrderSection({
     });
   };
 
-  const handlePrintOrder = () => {
+  const handleViewOrderPdf = async () => {
     if (!order || !booking) return;
-    const originalTitle = document.title;
-    const customerName = booking.customer?.name || "Customer";
-    const sanitizedCustomer = customerName.replace(/[/\\?%*:|"<>]/g, "").trim();
-    document.title = `Cars4 Order Form - ${sanitizedCustomer}`;
-    document.body.setAttribute("data-print-document", "order");
-    window.print();
-    setTimeout(() => {
-      document.title = originalTitle;
-      document.body.removeAttribute("data-print-document");
-    }, 1000);
+    setIsPdfLoading(true);
+    try {
+      const blob = await bookingApi.getOrderPdf(booking.id);
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (err: unknown) {
+      let message = "Failed to load order PDF";
+      if (isAxiosError(err)) {
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text();
+            const json = JSON.parse(text);
+            if (json.message) message = json.message;
+          } catch {
+            // ignore parse error
+          }
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsPdfLoading(false);
+    }
   };
 
   const handleShareOrder = async () => {
@@ -104,10 +120,7 @@ export function BookingOrderSection({
 
   if (isLoading) {
     return (
-      <div className="rounded-2xl border border-line bg-card p-5 space-y-4 shadow-xs select-none">
-        <div className="h-5 w-40 animate-pulse rounded-lg bg-inset border border-line" />
-        <div className="h-20 animate-pulse rounded-xl bg-inset border border-line" />
-      </div>
+      <div className="h-32 animate-pulse rounded-2xl bg-card border border-line" />
     );
   }
 
@@ -130,12 +143,11 @@ export function BookingOrderSection({
 
           {/* Header Actions when Order Exists */}
           {order && (
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Share, PDF Download & Print Buttons */}
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleShareOrder}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
                 title="Share Order Summary"
               >
                 <Share2 className="h-3.5 w-3.5 text-ink-subtle" />
@@ -144,72 +156,67 @@ export function BookingOrderSection({
 
               <button
                 type="button"
-                onClick={handlePrintOrder}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
-                title="Download Order Form PDF"
-              >
-                <Download className="h-3.5 w-3.5 text-ink-subtle" />
-                <span>PDF</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handlePrintOrder}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs"
-                title="Print Order Form Document"
+                onClick={handleViewOrderPdf}
+                disabled={isPdfLoading}
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50"
+                title="View or Print Order Form PDF"
               >
                 <Printer className="h-3.5 w-3.5" />
-                <span>Print Order Form</span>
+                <span>
+                  {isPdfLoading ? "Opening PDF..." : "View / Print Order"}
+                </span>
               </button>
 
               {/* Edit / Remove controls for non-terminal, non-readOnly staff */}
               {canEdit && (
                 <>
                   {isConfirmingDelete ? (
-                    <div className="flex items-center gap-1.5 bg-rose-500/10 p-1 rounded-xl border border-rose-500/20">
-                      <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 px-2">
+                    <div className="col-span-2 sm:col-span-1 flex items-center justify-between gap-1.5 bg-rose-500/10 p-1 rounded-xl border border-rose-500/20">
+                      <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 px-1 truncate">
                         Remove form?
                       </span>
-                      <button
-                        type="button"
-                        onClick={handleDelete}
-                        disabled={deleteOrderMutation.isPending}
-                        className="px-2.5 py-1 rounded-lg bg-rose-500 text-white text-xs font-bold transition-opacity hover:opacity-90 cursor-pointer flex items-center gap-1"
-                      >
-                        {deleteOrderMutation.isPending ? (
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                        ) : (
-                          "Yes, Delete"
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setIsConfirmingDelete(false)}
-                        disabled={deleteOrderMutation.isPending}
-                        className="px-2 py-1 rounded-lg bg-card text-ink-subtle text-xs font-bold hover:text-ink cursor-pointer"
-                      >
-                        Cancel
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={handleDelete}
+                          disabled={deleteOrderMutation.isPending}
+                          className="px-2.5 py-1 rounded-lg bg-rose-500 text-white text-xs font-bold transition-opacity hover:opacity-90 cursor-pointer flex items-center gap-1 shrink-0"
+                        >
+                          {deleteOrderMutation.isPending ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            "Delete"
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsConfirmingDelete(false)}
+                          disabled={deleteOrderMutation.isPending}
+                          className="px-2 py-1 rounded-lg bg-card text-ink-subtle text-xs font-bold hover:text-ink cursor-pointer shrink-0"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <>
                       <button
                         type="button"
-                        onClick={() => setIsConfirmingDelete(true)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-line bg-card text-xs font-semibold text-ink-subtle hover:text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/20 transition-colors cursor-pointer"
-                        title="Remove Order Form"
+                        onClick={() => setIsEditorOpen(true)}
+                        className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-accent/10 border border-accent/20 text-accent hover:bg-accent hover:text-inverse text-xs font-bold transition-all cursor-pointer shadow-xs"
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Remove</span>
+                        <Pencil className="h-3.5 w-3.5" />
+                        <span>Edit Order</span>
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => setIsEditorOpen(true)}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-accent/10 border border-accent/20 text-accent hover:bg-accent hover:text-inverse text-xs font-bold transition-all cursor-pointer shadow-xs"
+                        onClick={() => setIsConfirmingDelete(true)}
+                        className="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl border border-line bg-card text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/20 transition-colors cursor-pointer col-span-2 sm:col-span-1"
+                        title="Remove Order Form"
                       >
-                        <Pencil className="h-3.5 w-3.5" />
-                        <span>Edit Order</span>
+                        <Trash2 className="h-3.5 w-3.5" />
+                        <span>Remove</span>
                       </button>
                     </>
                   )}
@@ -230,7 +237,8 @@ export function BookingOrderSection({
                 No Order Form Added
               </h4>
               <p className="text-[11px] text-ink-subtle max-w-sm mx-auto">
-                Accessories and work charges are optional. Create an order form if the buyer requested accessories.
+                Accessories and work charges are optional. Create an order form
+                if the buyer requested accessories.
               </p>
             </div>
 
@@ -261,7 +269,10 @@ export function BookingOrderSection({
                   </thead>
                   <tbody className="divide-y divide-line/40 bg-card">
                     {order.items.map((item, idx) => (
-                      <tr key={item.id} className="hover:bg-inset/50 transition-colors">
+                      <tr
+                        key={item.id}
+                        className="hover:bg-inset/50 transition-colors"
+                      >
                         <td className="py-2.5 px-3 text-center font-mono text-ink-subtle text-[11px]">
                           {idx + 1}
                         </td>
@@ -328,11 +339,6 @@ export function BookingOrderSection({
         bookingId={bookingId}
         existingOrder={order || null}
       />
-
-      {/* Hidden Printable PDF Document */}
-      {order && booking && (
-        <OrderFormPrint booking={booking} order={order} />
-      )}
     </>
   );
 }

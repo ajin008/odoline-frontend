@@ -1,16 +1,20 @@
 "use client";
 
+import { useState } from "react";
+import { isAxiosError } from "axios";
 import { useBooking } from "../hooks/use-booking";
+import { useMe } from "@/src/features/auth/hooks/use-me";
+import { bookingApi } from "../api/booking-api";
 import { toast } from "sonner";
-import { AdvanceAgreementPrint } from "./advance-agreement-print";
+import { EditAgreementModal } from "./edit-agreement-modal";
 import {
   Receipt,
   CreditCard,
   Printer,
-  Download,
   Share2,
   Clock,
   AlertTriangle,
+  Edit3,
 } from "lucide-react";
 
 interface BookingAgreementStageProps {
@@ -53,20 +57,40 @@ const PAYMENT_METHOD_LABELS: Record<string, string> = {
 };
 
 export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps) {
+  const { data: user } = useMe();
   const { data: booking, isLoading, isError } = useBooking(bookingId);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
 
-  const handlePrint = () => {
+  const isTerminal = booking?.status === "cancelled" || booking?.status === "closed";
+  const canEdit = Boolean(booking && !isTerminal && user && user.role !== "owner");
+
+  const handleViewAgreement = async () => {
     if (!booking) return;
-    const originalTitle = document.title;
-    const customerName = booking.customer?.name || "Customer";
-    const sanitizedCustomer = customerName.replace(/[/\\?%*:|"<>]/g, "").trim();
-    document.title = `Cars4 Prebooking Agreement - ${sanitizedCustomer}`;
-    document.body.setAttribute("data-print-document", "agreement");
-    window.print();
-    setTimeout(() => {
-      document.title = originalTitle;
-      document.body.removeAttribute("data-print-document");
-    }, 1000);
+    setIsPdfLoading(true);
+    try {
+      const blob = await bookingApi.getAgreementPdf(booking.id);
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (err: unknown) {
+      let message = "Failed to load agreement PDF";
+      if (isAxiosError(err)) {
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text();
+            const json = JSON.parse(text);
+            if (json.message) message = json.message;
+          } catch {
+            // ignore JSON parse failure on Blob
+          }
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsPdfLoading(false);
+    }
   };
 
   const handleShare = async () => {
@@ -134,17 +158,17 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
   return (
     <div className="space-y-5 select-none font-sans">
       {/* Agreement Actions Bar */}
-      <div className="flex items-center justify-between gap-3 bg-card p-3 rounded-2xl border border-line shadow-xs flex-wrap">
-        <div className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2 px-2">
-          <Receipt className="h-4 w-4 text-accent" />
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3 rounded-2xl border border-line shadow-xs">
+        <div className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2 px-1">
+          <Receipt className="h-4 w-4 text-accent shrink-0" />
           <span>Stage 1: Advance Sale Agreement</span>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleShare}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
             title="Share Agreement Summary"
           >
             <Share2 className="h-3.5 w-3.5 text-ink-subtle" />
@@ -153,38 +177,42 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
 
           <button
             type="button"
-            onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
-            title="Download Agreement PDF"
-          >
-            <Download className="h-3.5 w-3.5 text-ink-subtle" />
-            <span>PDF</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs"
-            title="Print Advance Agreement"
+            onClick={handleViewAgreement}
+            disabled={isPdfLoading}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50"
+            title="View or Print Advance Agreement PDF"
           >
             <Printer className="h-3.5 w-3.5" />
-            <span>Print Agreement</span>
+            <span>{isPdfLoading ? "Opening PDF..." : "View / Print Agreement"}</span>
           </button>
         </div>
       </div>
 
       {/* Bento Card A: Financial Agreement Breakdown */}
       <div className="rounded-2xl border border-line bg-card p-5 space-y-5 shadow-xs">
-        <div className="flex items-center justify-between border-b border-line/40 pb-3">
+        <div className="flex items-center justify-between border-b border-line/40 pb-3 flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <Receipt className="h-4.5 w-4.5 text-accent" />
             <h3 className="text-sm font-bold text-ink font-sans">
               Financial Terms &amp; Collection Progress
             </h3>
           </div>
-          <span className="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-            {pctPaid}% Paid
-          </span>
+          <div className="flex items-center gap-2">
+            {canEdit && (
+              <button
+                type="button"
+                onClick={() => setIsEditOpen(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
+                title="Edit Agreement Details"
+              >
+                <Edit3 className="h-3.5 w-3.5 text-accent" />
+                <span>Edit</span>
+              </button>
+            )}
+            <span className="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+              {pctPaid}% Paid
+            </span>
+          </div>
         </div>
 
         {/* 3 Metrics Cards Grid */}
@@ -340,8 +368,14 @@ export function BookingAgreementStage({ bookingId }: BookingAgreementStageProps)
         )}
       </div>
 
-      {/* Hidden Printable Agreement Document */}
-      {booking && <AdvanceAgreementPrint booking={booking} />}
+      {/* Edit Agreement Metadata Modal */}
+      {booking && (
+        <EditAgreementModal
+          booking={booking}
+          isOpen={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
     </div>
   );
 }

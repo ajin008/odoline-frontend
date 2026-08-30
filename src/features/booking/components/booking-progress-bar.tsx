@@ -76,7 +76,7 @@ export function BookingProgressBar({
             <div
               className={`relative flex items-center gap-3 p-3 rounded-xl border transition-all h-full ${
                 isActiveRoute
-                  ? "bg-[#0f1012] border-[#1f2023] text-white shadow-xs"
+                  ? "bg-[#97d8d0] border-[#7ecbc2] text-slate-900 shadow-xs"
                   : isDone
                   ? "bg-emerald-500/5 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:border-emerald-500/50"
                   : isCurrent
@@ -87,9 +87,11 @@ export function BookingProgressBar({
               {/* Icon / Number Indicator */}
               <div
                 className={`flex h-7 w-7 items-center justify-center rounded-lg font-mono text-xs font-bold shrink-0 transition-colors ${
-                  isDone
+                  isActiveRoute
+                    ? "bg-[#0a3832] text-white shadow-xs"
+                    : isDone
                     ? "bg-emerald-500 text-white"
-                    : isCurrent || isActiveRoute
+                    : isCurrent
                     ? "bg-accent text-inverse shadow-xs"
                     : "bg-card border border-line text-ink-subtle"
                 }`}
@@ -104,16 +106,16 @@ export function BookingProgressBar({
               {/* Stage Info */}
               <div className="space-y-0.5 min-w-0 flex-1">
                 <div className="text-xs font-bold tracking-tight truncate flex items-center justify-between gap-1">
-                  <span className={isActiveRoute ? "text-white font-extrabold" : ""}>
+                  <span className={isActiveRoute ? "text-[#0a2723] font-extrabold" : ""}>
                     {stage.label}
                   </span>
                   {isActiveRoute && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse shrink-0" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#0a3832] animate-pulse shrink-0" />
                   )}
                 </div>
                 <div
                   className={`text-[10px] font-semibold uppercase tracking-wider truncate ${
-                    isActiveRoute ? "text-gray-400" : "text-ink-subtle"
+                    isActiveRoute ? "text-[#0a3832]/80 font-bold" : "text-ink-subtle"
                   }`}
                 >
                   {isActiveRoute

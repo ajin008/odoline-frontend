@@ -21,6 +21,8 @@ import {
   Trash2,
 } from "lucide-react";
 
+import { ShowroomLogoControl } from "./showroom-logo-control";
+
 export function ProfileSettings() {
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -227,7 +229,7 @@ export function ProfileSettings() {
       />
 
       {/* ------------------------------------------------------------- */}
-      {/* PART 2: SHOWROOM INFORMATION (READONLY)                       */}
+      {/* PART 2: SHOWROOM INFORMATION                                 */}
       {/* ------------------------------------------------------------- */}
       <div className="rounded-xl border border-line/60 bg-card p-5 sm:p-6 space-y-6">
         {/* Section Header */}
@@ -247,52 +249,57 @@ export function ProfileSettings() {
           </div>
 
           <span className="text-[10px] font-mono font-bold uppercase tracking-wider border border-line/60 px-2 py-0.5 rounded-md bg-inset text-ink-subtle self-start sm:self-auto">
-            Read-Only
+            Read-Only Identity
           </span>
         </div>
 
-        {/* Readonly Showroom Fields Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Showroom Name */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
-              Showroom Name
-            </label>
-            <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
-              <span>{config?.showroom_name || "Cars4 Showroom"}</span>
-              <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
-            </div>
-          </div>
+        {/* Showroom Logo Control (Uploadable) */}
+        <ShowroomLogoControl />
 
-          {/* Showroom Phone */}
-          <div className="space-y-1">
-            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
-              Contact Phone
-            </label>
-            <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Phone className="h-3.5 w-3.5 text-accent shrink-0" />
-                <span className="font-mono">
-                  {config?.showroom_phone1
-                    ? `+91 ${config.showroom_phone1}`
-                    : "—"}
-                </span>
+        <div className="border-t border-line/40 pt-4">
+          {/* Readonly Showroom Identity Fields Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Showroom Name */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
+                Showroom Name
+              </label>
+              <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
+                <span>{config?.showroom_name || "Cars4 Showroom"}</span>
+                <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
               </div>
-              <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
             </div>
-          </div>
 
-          {/* Showroom Address (Wide Spanning Field) */}
-          <div className="space-y-1 sm:col-span-2">
-            <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block flex items-center gap-1">
-              <MapPin className="h-3 w-3 text-accent shrink-0" />
-              <span>Primary Address</span>
-            </label>
-            <div className="rounded-xl border border-line/60 bg-surface px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
-              <span className="leading-relaxed break-words flex-1 pr-2">
-                {config?.showroom_address || "—"}
-              </span>
-              <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
+            {/* Showroom Phone */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
+                Contact Phone
+              </label>
+              <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 text-accent shrink-0" />
+                  <span className="font-mono">
+                    {config?.showroom_phone1
+                      ? `+91 ${config.showroom_phone1}`
+                      : "—"}
+                  </span>
+                </div>
+                <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
+              </div>
+            </div>
+
+            {/* Showroom Address (Wide Spanning Field) */}
+            <div className="space-y-1 sm:col-span-2">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block flex items-center gap-1">
+                <MapPin className="h-3 w-3 text-accent shrink-0" />
+                <span>Primary Address</span>
+              </label>
+              <div className="rounded-xl border border-line/60 bg-surface px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
+                <span className="leading-relaxed break-words flex-1 pr-2">
+                  {config?.showroom_address || "—"}
+                </span>
+                <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
+              </div>
             </div>
           </div>
         </div>
@@ -300,3 +307,4 @@ export function ProfileSettings() {
     </div>
   );
 }
+

@@ -43,6 +43,7 @@ export const endpoints = {
     get: "/config",
     update: "/config",
     updateGeofence: "/config/geofence",
+    logo: "/config/logo",
   },
 
   departments: {
@@ -117,6 +118,9 @@ export const endpoints = {
     detail: (id: string) => `/bookings/${id}`,
     cancel: (id: string) => `/bookings/${id}/cancel`,
     order: (id: string) => `/bookings/${id}/order`,
+    editAgreement: (id: string) => `/bookings/${id}/agreement`,
+    agreementPdf: (id: string) => `/bookings/${id}/agreement/pdf`,
+    orderPdf: (id: string) => `/bookings/${id}/order/pdf`,
   },
 } as const;
 

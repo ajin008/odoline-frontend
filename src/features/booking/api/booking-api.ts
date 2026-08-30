@@ -8,6 +8,7 @@ import type {
   CancelBookingPayload,
   BookingOrder,
   SaveOrderPayload,
+  EditAgreementPayload,
 } from "../types/booking-types";
 
 export const bookingApi = {
@@ -43,6 +44,15 @@ export const bookingApi = {
     return res.data.data;
   },
 
+  /** PATCH /api/v1/bookings/:id/agreement — Edit Agreement Metadata */
+  async editAgreement(
+    id: string,
+    payload: EditAgreementPayload
+  ): Promise<BookingDetail> {
+    const res = await apiClient.patch(endpoints.bookings.editAgreement(id), payload);
+    return res.data.data;
+  },
+
   /** POST /api/v1/bookings/:id/cancel — Cancel Prebooking */
   async cancel(id: string, payload: CancelBookingPayload): Promise<BookingDetail> {
     const res = await apiClient.post(endpoints.bookings.cancel(id), payload);
@@ -64,6 +74,22 @@ export const bookingApi = {
   /** DELETE /api/v1/bookings/:id/order — Delete Order Form */
   async deleteOrder(id: string): Promise<void> {
     await apiClient.delete(endpoints.bookings.order(id));
+  },
+
+  /** GET /api/v1/bookings/:id/agreement/pdf — Fetch Agreement PDF blob */
+  async getAgreementPdf(id: string): Promise<Blob> {
+    const res = await apiClient.get(endpoints.bookings.agreementPdf(id), {
+      responseType: "blob",
+    });
+    return res.data;
+  },
+
+  /** GET /api/v1/bookings/:id/order/pdf — Fetch Order Form PDF blob */
+  async getOrderPdf(id: string): Promise<Blob> {
+    const res = await apiClient.get(endpoints.bookings.orderPdf(id), {
+      responseType: "blob",
+    });
+    return res.data;
   },
 };
 

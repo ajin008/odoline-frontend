@@ -187,5 +187,11 @@ export interface SaveOrderPayload {
   items: SaveOrderItemPayload[];
 }
 
+export interface EditAgreementPayload {
+  advance_receipt_no?: string | null;
+  advance_receipt_date?: string | null;
+  balance_due_days?: number | null;
+}
+
 
 

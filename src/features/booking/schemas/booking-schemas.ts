@@ -15,8 +15,8 @@ export const advanceAgreementSchema = z.object({
   advance_amount: z
     .string()
     .min(1, "Advance amount is required")
-    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
-      message: "Advance amount must be greater than 0",
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 3000, {
+      message: "Advance amount must be at least ₹3,000",
     }),
   advance_method: z.enum(PAYMENT_METHODS, {
     message: "Please select a payment method",
@@ -106,6 +106,25 @@ export const orderFormSchema = z.object({
 });
 
 export type OrderFormValues = z.infer<typeof orderFormSchema>;
+
+export const editAgreementSchema = z.object({
+  advance_receipt_no: z.string().trim().optional().or(z.literal("")),
+  advance_receipt_date: z.string().optional().or(z.literal("")),
+  balance_due_days: z
+    .string()
+    .optional()
+    .or(z.literal(""))
+    .refine(
+      (val) =>
+        !val ||
+        (!isNaN(Number(val)) &&
+          Number.isInteger(Number(val)) &&
+          Number(val) > 0),
+      { message: "Balance deadline must be a positive whole number" }
+    ),
+});
+
+export type EditAgreementFormValues = z.infer<typeof editAgreementSchema>;
 
 
 

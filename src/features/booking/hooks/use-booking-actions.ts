@@ -1,7 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { bookingApi } from "../api/booking-api";
-import type { CreateBookingPayload, CancelBookingPayload } from "../types/booking-types";
+import type {
+  CreateBookingPayload,
+  CancelBookingPayload,
+  EditAgreementPayload,
+} from "../types/booking-types";
 import { queryKeys } from "@/src/lib/query-keys";
 
 export function useCreateBooking() {
@@ -30,6 +34,45 @@ export function useCreateBooking() {
         toast.error(
           "This car was just booked under another deal — pick a different car."
         );
+      } else {
+        toast.error(message);
+      }
+    },
+  });
+}
+
+export function useEditAgreement() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      id,
+      payload,
+    }: {
+      id: string;
+      payload: EditAgreementPayload;
+    }) => bookingApi.editAgreement(id, payload),
+    onSuccess: (_, variables) => {
+      toast.success("Agreement updated");
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.detail(variables.id),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.booking.all });
+    },
+    onError: (err: unknown) => {
+      const axiosErr = err as {
+        response?: { data?: { error?: { code?: string; message?: string } } };
+      };
+      const errObj = axiosErr?.response?.data?.error;
+      const code = errObj?.code;
+      const message = errObj?.message || "Failed to update agreement details";
+
+      if (code === "BOOKING_TERMINAL_FROZEN") {
+        toast.error(
+          "This booking is closed/cancelled — details can't be edited."
+        );
+      } else if (code === "BOOKING_NOT_FOUND") {
+        toast.error("Booking not found or not assigned to your account.");
       } else {
         toast.error(message);
       }

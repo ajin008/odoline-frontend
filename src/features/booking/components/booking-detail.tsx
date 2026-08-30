@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder } from "../hooks/use-booking-order";
+import { bookingApi } from "../api/booking-api";
 import { getBookingStatusConfig } from "../utils/booking-status-map";
 import { BookingProgressBar } from "./booking-progress-bar";
-import { AdvanceAgreementPrint } from "./advance-agreement-print";
 import { CancelBookingModal } from "./cancel-booking-modal";
 import { BookingOrderSection } from "./booking-order-section";
 import {
@@ -22,7 +23,6 @@ import {
   CreditCard,
   AlertTriangle,
   Printer,
-  Download,
   Share2,
   ChevronRight,
   Receipt,
@@ -89,17 +89,34 @@ export function BookingDetail({
   const { data: booking, isLoading, isError } = useBooking(bookingId);
   const { data: order } = useBookingOrder(bookingId);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
 
-  const handlePrint = () => {
+  const handleViewAgreement = async () => {
     if (!booking) return;
-    const originalTitle = document.title;
-    const customerName = booking.customer?.name || "Customer";
-    const sanitizedCustomer = customerName.replace(/[/\\?%*:|"<>]/g, "").trim();
-    document.title = `Cars4 Prebooking Agreement - ${sanitizedCustomer}`;
-    window.print();
-    setTimeout(() => {
-      document.title = originalTitle;
-    }, 1000);
+    setIsPdfLoading(true);
+    try {
+      const blob = await bookingApi.getAgreementPdf(booking.id);
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (err: unknown) {
+      let message = "Failed to load agreement PDF";
+      if (isAxiosError(err)) {
+        if (err.response?.data instanceof Blob) {
+          try {
+            const text = await err.response.data.text();
+            const json = JSON.parse(text);
+            if (json.message) message = json.message;
+          } catch {
+            // ignore parse error on Blob
+          }
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
+        }
+      }
+      toast.error(message);
+    } finally {
+      setIsPdfLoading(false);
+    }
   };
 
   const handleShare = async () => {
@@ -223,7 +240,7 @@ export function BookingDetail({
     : null;
 
   return (
-    <div className="w-full space-y-5 font-sans select-none pb-12">
+    <div className="w-full space-y-5 font-sans select-none pb-28 md:pb-12">
       {/* 1. Header Toolbar & Breadcrumb */}
       <div className="space-y-3 border-b border-line/60 pb-4">
         {/* Breadcrumb */}
@@ -287,12 +304,12 @@ export function BookingDetail({
           </div>
 
           {/* Header Action Buttons */}
-          <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
+          <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
             {booking.status === "prebooked" && !readOnly && (
               <button
                 type="button"
                 onClick={() => setIsCancelModalOpen(true)}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 text-xs font-semibold transition-colors cursor-pointer shadow-xs"
+                className="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 text-xs font-semibold transition-colors cursor-pointer shadow-xs"
                 title="Cancel Booking"
               >
                 <XCircle className="h-4 w-4" />
@@ -303,7 +320,7 @@ export function BookingDetail({
             <button
               type="button"
               onClick={handleShare}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-line text-xs font-semibold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs"
+              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-line text-xs font-semibold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs"
               title="Share Agreement Summary"
             >
               <Share2 className="h-4 w-4 text-ink-subtle" />
@@ -312,22 +329,13 @@ export function BookingDetail({
 
             <button
               type="button"
-              onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-card border border-line text-xs font-semibold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs"
-              title="Download Agreement PDF"
-            >
-              <Download className="h-4 w-4 text-ink-subtle" />
-              <span>Download PDF</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs"
-              title="Print Advance Agreement"
+              onClick={handleViewAgreement}
+              disabled={isPdfLoading}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50"
+              title="View or Print Advance Agreement PDF"
             >
               <Printer className="h-4 w-4" />
-              <span>Print Agreement</span>
+              <span>{isPdfLoading ? "Opening PDF..." : "View / Print Agreement"}</span>
             </button>
           </div>
         </div>
@@ -733,9 +741,6 @@ export function BookingDetail({
         bookingStatus={booking.status}
         readOnly={readOnly}
       />
-
-      {/* Hidden Print Document */}
-      <AdvanceAgreementPrint booking={booking} />
 
       {/* Cancel Booking Modal */}
       {booking.status === "prebooked" && !readOnly && (
