@@ -558,10 +558,10 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
         </div>
 
         {/* Live Grid with borderless pastel background boxes */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs">
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2.5 text-xs">
           {/* Agreed Price - Neutral Pastel */}
           <div className="p-3 rounded-xl border-0 space-y-0.5 bg-inset/70">
-            <span className="text-[10px] font-bold text-ink-subtle uppercase truncate block">
+            <span className="text-[10px] font-bold text-ink-subtle uppercase leading-tight block">
               Agreed Price
             </span>
             <div className="font-mono font-bold text-ink text-xs">
@@ -574,7 +574,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
 
           {/* Accessories - Neutral Pastel */}
           <div className="p-3 rounded-xl border-0 space-y-0.5 bg-inset/70">
-            <span className="text-[10px] font-bold text-ink-subtle uppercase truncate block">
+            <span className="text-[10px] font-bold text-ink-subtle uppercase leading-tight block">
               Accessories
             </span>
             <div className="font-mono font-bold text-ink text-xs">
@@ -587,7 +587,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
 
           {/* RTO + Insurance - Neutral Pastel */}
           <div className="p-3 rounded-xl border-0 space-y-0.5 bg-inset/70">
-            <span className="text-[10px] font-bold text-ink-subtle uppercase truncate block">
+            <span className="text-[10px] font-bold text-ink-subtle uppercase leading-tight block">
               RTO + Insurance
             </span>
             <div className="font-mono font-bold text-ink text-xs">
@@ -603,7 +603,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
             className="p-3 rounded-xl border-0 space-y-0.5"
             style={{ backgroundColor: "#97d8d0" }}
           >
-            <span className="text-[10px] font-extrabold text-[#0a3832] uppercase truncate block">
+            <span className="text-[10px] font-extrabold text-[#0a3832] uppercase leading-tight block">
               Grand Total
             </span>
             <div className="font-mono font-extrabold text-[#0a2723] text-xs">
@@ -619,7 +619,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
             className="p-3 rounded-xl border-0 space-y-0.5"
             style={{ backgroundColor: "#d8f1b7" }}
           >
-            <span className="text-[10px] font-extrabold text-emerald-900 uppercase truncate block">
+            <span className="text-[10px] font-extrabold text-emerald-900 uppercase leading-tight block">
               Already Paid
             </span>
             <div className="font-mono font-extrabold text-emerald-950 text-xs">
@@ -635,7 +635,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
             className="p-3 rounded-xl border-0 space-y-0.5"
             style={{ backgroundColor: "#dbeafe" }}
           >
-            <span className="text-[10px] font-extrabold text-blue-900 uppercase truncate block">
+            <span className="text-[10px] font-extrabold text-blue-900 uppercase leading-tight block">
               Collecting Now
             </span>
             <div className="font-mono font-extrabold text-blue-950 text-xs">
@@ -648,13 +648,13 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
 
           {/* Remaining - Pastel Amber (Shortfall) or Pastel Green (Cleared) */}
           <div
-            className="p-3 rounded-xl border-0 space-y-0.5 col-span-2 sm:col-span-1"
+            className="p-3 rounded-xl border-0 space-y-0.5 col-span-2 md:col-span-1"
             style={{
               backgroundColor: isFullyCovered ? "#d8f1b7" : "#fae9cf",
             }}
           >
             <span
-              className={`text-[10px] font-extrabold uppercase tracking-wider block truncate ${
+              className={`text-[10px] font-extrabold uppercase tracking-wider block leading-tight ${
                 isFullyCovered ? "text-emerald-900" : "text-amber-900"
               }`}
             >

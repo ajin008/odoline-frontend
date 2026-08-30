@@ -68,8 +68,8 @@ export function BookingProgressBar({
         </span>
       </div>
 
-      {/* Symmetrical 2x2 Grid on Mobile, 4-Col Grid on Desktop */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
+      {/* 2x2 Grid on Mobile, 4-Col Grid on Tablet & Desktop */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
         {stages.map((stage, idx) => {
           const isDone = stage.state === "done";
           const isClickable = stage.isClickable;

@@ -217,9 +217,9 @@ export function BookingOrderSection({
             )}
           </div>
 
-          {/* Header Actions when Order Exists - Row by row on mobile */}
+          {/* Header Actions when Order Exists - Responsive flex wrap on tablet */}
           {order && (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleViewOrderPdf}

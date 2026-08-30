@@ -383,7 +383,7 @@ export function BookingSettlementStage({
             <span>Document 1: Order / Final Settlement Form PDF</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleViewSettlementPdf}
@@ -522,7 +522,7 @@ export function BookingSettlementStage({
             <span>Document 2: Car Delivery Note PDF</span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={handleViewDeliveryPdf}

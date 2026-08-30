@@ -240,7 +240,7 @@ export function BookingAgreementStage({
           <span>Stage 1: Advance Sale Agreement</span>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <button
             type="button"
             onClick={handleViewAgreement}
