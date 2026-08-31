@@ -6,6 +6,7 @@ import { useBooking } from "../hooks/use-booking";
 import { useMe } from "@/src/features/auth/hooks/use-me";
 import { bookingApi } from "../api/booking-api";
 import { toast } from "sonner";
+import { isBookingEditable } from "../utils/booking-status-map";
 import { EditAgreementModal } from "./edit-agreement-modal";
 import Link from "next/link";
 import {
@@ -72,14 +73,11 @@ export function BookingAgreementStage({
   const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const isTerminal =
-    booking?.status === "cancelled" || booking?.status === "closed";
-  const isActive =
-    booking?.status === "prebooked" || booking?.status === "offer";
+  const editable = isBookingEditable(booking?.status);
   const canEdit = Boolean(
-    booking && !isTerminal && !readOnly && user && user.role !== "owner"
+    booking && editable && !readOnly && user && user.role !== "owner"
   );
-  const showProceedBar = Boolean(booking && isActive && !readOnly);
+  const showProceedBar = Boolean(booking && editable && !readOnly);
 
   const handleViewAgreement = async () => {
     if (!booking) return;

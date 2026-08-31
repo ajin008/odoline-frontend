@@ -3,23 +3,26 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useInfiniteBookings } from "../hooks/use-bookings";
 import { BookingCard, MobileBookingCard } from "./booking-card";
+import type { BookingTab } from "../types/booking-types";
 import {
-  CalendarCheck,
+  getRcTransferBadgeConfig,
+  getBalanceOverdueBadgeConfig,
+} from "../utils/booking-status-map";
+import {
   CalendarX,
   Loader2,
   AlertTriangle,
   Flame,
+  Truck,
   CheckCircle2,
   Search,
   IndianRupee,
-  Receipt,
   PiggyBank,
   Clock,
   RotateCcw,
+  FileText,
   X,
 } from "lucide-react";
-
-type BookingSubtab = "active" | "closed";
 
 function formatCurrency(num: number): string {
   if (num >= 100000) {
@@ -37,7 +40,7 @@ export function BookingList({
   basePath = "/staff/booking",
   role,
 }: BookingListProps = {}) {
-  const [activeTab, setActiveTab] = useState<BookingSubtab>("active");
+  const [activeTab, setActiveTab] = useState<BookingTab>("prebooked");
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
@@ -49,7 +52,7 @@ export function BookingList({
     isFetchingNextPage,
     refetch,
   } = useInfiniteBookings({
-    status: activeTab,
+    tab: activeTab,
     role,
   });
 
@@ -106,6 +109,8 @@ export function BookingList({
     let balanceSum = 0;
     let retainedSum = 0;
     let refundedSum = 0;
+    let rcOverdueCount = 0;
+    let balanceOverdueCount = 0;
 
     allBookings.forEach((b) => {
       agreedSum += Number(b.agreed_price || 0);
@@ -113,6 +118,26 @@ export function BookingList({
       balanceSum += Number(b.balance_due || 0);
       retainedSum += Number(b.amount_retained || 0);
       refundedSum += Number(b.refunded_total || 0);
+
+      if (b.status === "delivered") {
+        const rcInfo = getRcTransferBadgeConfig(
+          b.car?.delivered_at,
+          b.updated_at
+        );
+        if (rcInfo.isOverdue) {
+          rcOverdueCount++;
+        }
+      }
+
+      const balInfo = getBalanceOverdueBadgeConfig(
+        b.status,
+        b.prebooked_at,
+        b.balance_due_days,
+        b.balance_due
+      );
+      if (balInfo?.isOverdue) {
+        balanceOverdueCount++;
+      }
     });
 
     return {
@@ -122,6 +147,8 @@ export function BookingList({
       balanceSum,
       retainedSum,
       refundedSum,
+      rcOverdueCount,
+      balanceOverdueCount,
     };
   }, [allBookings]);
 
@@ -132,18 +159,36 @@ export function BookingList({
         {/* Card 1: Count */}
         <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1">
           <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
-            <span>{activeTab === "active" ? "Active Bookings" : "Closed Records"}</span>
-            <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
+            <span>
+              {activeTab === "prebooked"
+                ? "Prebooked"
+                : activeTab === "delivered"
+                ? "Delivered"
+                : activeTab === "completed"
+                ? "Completed"
+                : "Cancelled"}
+            </span>
+            {activeTab === "prebooked" ? (
+              <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
+            ) : activeTab === "delivered" ? (
+              <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
+            ) : activeTab === "completed" ? (
+              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
+            ) : (
+              <CalendarX className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-rose-500" />
+            )}
           </div>
           <div className="text-lg sm:text-2xl font-bold font-mono text-ink">
             {kpiStats.count}
           </div>
         </div>
 
-        {/* Card 2: Total Agreed Value */}
+        {/* Card 2: Total Value */}
         <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1">
           <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
-            <span>Total Agreed</span>
+            <span>
+              {activeTab === "completed" ? "Total Sales Value" : "Total Agreed"}
+            </span>
             <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
           </div>
           <div className="text-lg sm:text-2xl font-bold font-mono text-ink truncate">
@@ -151,9 +196,9 @@ export function BookingList({
           </div>
         </div>
 
-        {activeTab === "active" ? (
+        {activeTab === "prebooked" ? (
           <>
-            {/* Card 3: Total Advances Collected */}
+            {/* Card 3: Advances Collected */}
             <div
               className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
               style={{ backgroundColor: "#d8f1b7" }}
@@ -179,11 +224,94 @@ export function BookingList({
               <div className="text-lg sm:text-2xl font-bold font-mono text-amber-950 truncate">
                 {formatCurrency(kpiStats.balanceSum)}
               </div>
+              {kpiStats.balanceOverdueCount > 0 && (
+                <div className="text-[10px] font-bold text-amber-900 font-sans truncate">
+                  {kpiStats.balanceOverdueCount} balance overdue
+                </div>
+              )}
+            </div>
+          </>
+        ) : activeTab === "delivered" ? (
+          <>
+            {/* Card 3: Total Paid / Collected */}
+            <div
+              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+              style={{ backgroundColor: "#d8f1b7" }}
+            >
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
+                <span>Total Collected</span>
+                <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-800" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-950 truncate">
+                {formatCurrency(kpiStats.paidSum)}
+              </div>
+            </div>
+
+            {/* Card 4: RC Pending / Overdue Status */}
+            <div
+              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1 transition-colors"
+              style={{
+                backgroundColor:
+                  kpiStats.rcOverdueCount > 0 ? "#fae9cf" : "#e0f2fe",
+              }}
+            >
+              <div
+                className={`flex items-center justify-between text-[10px] sm:text-[11px] font-bold uppercase tracking-wider ${
+                  kpiStats.rcOverdueCount > 0
+                    ? "text-amber-900"
+                    : "text-sky-900"
+                }`}
+              >
+                <span>RC Transfer</span>
+                {kpiStats.rcOverdueCount > 0 ? (
+                  <AlertTriangle className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-800" />
+                ) : (
+                  <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-sky-800" />
+                )}
+              </div>
+              <div
+                className={`text-sm sm:text-base font-bold font-sans truncate mt-1 ${
+                  kpiStats.rcOverdueCount > 0
+                    ? "text-amber-950"
+                    : "text-sky-950"
+                }`}
+              >
+                {kpiStats.rcOverdueCount > 0
+                  ? `${kpiStats.count} awaiting · ${kpiStats.rcOverdueCount} overdue`
+                  : `${kpiStats.count} awaiting RC`}
+              </div>
+            </div>
+          </>
+        ) : activeTab === "completed" ? (
+          <>
+            {/* Card 3: Total Collected */}
+            <div
+              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
+              style={{ backgroundColor: "#d8f1b7" }}
+            >
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
+                <span>Total Collected</span>
+                <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-800" />
+              </div>
+              <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-950 truncate">
+                {formatCurrency(kpiStats.paidSum)}
+              </div>
+            </div>
+
+            {/* Card 4: Fully Closed Status */}
+            <div className="rounded-2xl border border-line bg-inset p-3 sm:p-4 space-y-1">
+              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
+                <span>Status</span>
+                <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="text-sm sm:text-base font-bold font-sans text-ink truncate mt-1">
+                Fully Closed
+              </div>
             </div>
           </>
         ) : (
           <>
-            {/* Card 3: Total Retained (Closed Tab) */}
+            {/* Card 3: Total Retained (Cancelled Tab) */}
             <div
               className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
               style={{ backgroundColor: "#fddede" }}
@@ -197,7 +325,7 @@ export function BookingList({
               </div>
             </div>
 
-            {/* Card 4: Total Refunded (Closed Tab) */}
+            {/* Card 4: Total Refunded (Cancelled Tab) */}
             <div
               className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
               style={{ backgroundColor: "#e0f2fe" }}
@@ -216,38 +344,70 @@ export function BookingList({
 
       {/* 2. Controls & Search Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-line/60 pb-3">
-        {/* Status Subtabs */}
-        <div className="flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0">
+        {/* Status Subtabs (Four Tabs: Prebooked / Delivered / Completed / Cancelled) */}
+        <div className="flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0 overflow-x-auto">
           <button
             type="button"
             onClick={() => {
-              setActiveTab("active");
+              setActiveTab("prebooked");
               setSearchQuery("");
             }}
-            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-4 flex items-center justify-center gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              activeTab === "active"
+            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              activeTab === "prebooked"
                 ? "bg-accent text-inverse shadow-xs font-bold"
                 : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
             }`}
           >
             <Flame className="h-3.5 w-3.5 shrink-0" />
-            <span>Active Bookings</span>
+            <span>Prebooked</span>
           </button>
 
           <button
             type="button"
             onClick={() => {
-              setActiveTab("closed");
+              setActiveTab("delivered");
               setSearchQuery("");
             }}
-            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-4 flex items-center justify-center gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              activeTab === "closed"
-                ? "bg-slate-700 text-white dark:bg-slate-800 shadow-xs font-bold"
+            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              activeTab === "delivered"
+                ? "bg-purple-600 text-white dark:bg-purple-500 shadow-xs font-bold"
+                : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
+            }`}
+          >
+            <Truck className="h-3.5 w-3.5 shrink-0" />
+            <span>Delivered</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("completed");
+              setSearchQuery("");
+            }}
+            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              activeTab === "completed"
+                ? "bg-emerald-700 text-white dark:bg-emerald-600 shadow-xs font-bold"
                 : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
             }`}
           >
             <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-            <span>Closed Bookings</span>
+            <span>Completed</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("cancelled");
+              setSearchQuery("");
+            }}
+            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+              activeTab === "cancelled"
+                ? "bg-slate-700 text-white dark:bg-slate-800 shadow-xs font-bold"
+                : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
+            }`}
+          >
+            <CalendarX className="h-3.5 w-3.5 shrink-0" />
+            <span>Cancelled</span>
           </button>
         </div>
 
@@ -336,7 +496,9 @@ export function BookingList({
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-sm font-bold text-ink">Failed to load bookings</h3>
+              <h3 className="text-sm font-bold text-ink">
+                Failed to load bookings
+              </h3>
               <p className="text-xs text-ink-subtle">
                 An error occurred while communicating with the server.
               </p>
@@ -355,26 +517,38 @@ export function BookingList({
         {!isLoading && !isError && filteredBookings.length === 0 && (
           <div className="p-8 text-center space-y-3 bg-inset/30">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle">
-              {activeTab === "active" ? (
-                <CalendarCheck className="h-6 w-6 stroke-[1.8]" />
+              {activeTab === "prebooked" ? (
+                <Flame className="h-6 w-6 text-accent" />
+              ) : activeTab === "delivered" ? (
+                <Truck className="h-6 w-6 text-purple-500" />
+              ) : activeTab === "completed" ? (
+                <CheckCircle2 className="h-6 w-6 text-emerald-500" />
               ) : (
-                <CalendarX className="h-6 w-6 stroke-[1.8]" />
+                <CalendarX className="h-6 w-6 text-rose-500" />
               )}
             </div>
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-ink">
                 {searchQuery
                   ? "No matching bookings found"
-                  : activeTab === "active"
-                  ? "No active bookings yet"
-                  : "No closed bookings yet"}
+                  : activeTab === "prebooked"
+                  ? "No prebooked bookings yet"
+                  : activeTab === "delivered"
+                  ? "No delivered bookings yet"
+                  : activeTab === "completed"
+                  ? "No completed sales yet"
+                  : "No cancelled bookings yet"}
               </h3>
               <p className="text-xs text-ink-subtle max-w-sm mx-auto">
                 {searchQuery
                   ? `No records match "${searchQuery}". Try clearing the search term.`
-                  : activeTab === "active"
+                  : activeTab === "prebooked"
                   ? "When leads are closed as won and prebooked, their booking records will appear in this table."
-                  : "Completed sales and cancelled vehicle bookings will be listed here."}
+                  : activeTab === "delivered"
+                  ? "Vehicles that have been delivered to customers awaiting RC transfer will be listed here."
+                  : activeTab === "completed"
+                  ? "Sales that have completed RC transfer and full closure will be listed here."
+                  : "Cancelled vehicle bookings and refund details will be listed here."}
               </p>
             </div>
           </div>
@@ -416,10 +590,14 @@ export function BookingList({
         {!isLoading && !isError && filteredBookings.length === 0 && (
           <div className="rounded-2xl border border-dashed border-line bg-inset/40 p-6 text-center space-y-3">
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle">
-              {activeTab === "active" ? (
-                <CalendarCheck className="h-5 w-5" />
+              {activeTab === "prebooked" ? (
+                <Flame className="h-5 w-5 text-accent" />
+              ) : activeTab === "delivered" ? (
+                <Truck className="h-5 w-5 text-purple-500" />
+              ) : activeTab === "completed" ? (
+                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               ) : (
-                <CalendarX className="h-5 w-5" />
+                <CalendarX className="h-5 w-5 text-rose-500" />
               )}
             </div>
             <div className="space-y-1">
@@ -429,7 +607,7 @@ export function BookingList({
               <p className="text-[11px] text-ink-subtle">
                 {searchQuery
                   ? `No records match "${searchQuery}"`
-                  : "No booking records available."}
+                  : "No booking records available for this tab."}
               </p>
             </div>
           </div>

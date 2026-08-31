@@ -208,6 +208,22 @@ export const settleDeliverSchema = z.object({
 
 export type SettleDeliverFormValues = z.infer<typeof settleDeliverSchema>;
 
+const getTodayString = () => new Date().toISOString().split("T")[0];
+
+export const closeBookingSchema = z.object({
+  rc_transfer_date: z
+    .string()
+    .min(1, "RC transfer date is required")
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format")
+    .refine((val) => val <= getTodayString(), {
+      message: "Transfer date cannot be in the future",
+    }),
+  rc_note: z.string().trim().optional().or(z.literal("")),
+});
+
+export type CloseBookingFormValues = z.infer<typeof closeBookingSchema>;
+
+
 
 
 

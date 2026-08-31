@@ -90,8 +90,8 @@ export const queryKeys = {
 
   booking: {
     all: ["bookings"] as const,
-    list: (status: "active" | "closed", role?: string) =>
-      ["bookings", "list", { status, role }] as const,
+    list: (tab: string = "prebooked", role?: string) =>
+      ["bookings", "list", { tab, role }] as const,
     detail: (id: string) => ["bookings", "detail", id] as const,
     order: (id: string) => ["bookings", id, "order"] as const,
   },

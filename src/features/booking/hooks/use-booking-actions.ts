@@ -180,4 +180,46 @@ export function useSettleDeliver() {
   });
 }
 
+export function useCloseBooking() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
+      bookingApi.close(id, formData),
+    onSuccess: (_, variables) => {
+      toast.success("RC transfer recorded — booking closed");
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.detail(variables.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.list("delivered"),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.booking.list("completed"),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.booking.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
+    },
+    onError: (err: unknown) => {
+      const axiosErr = err as {
+        response?: { data?: { error?: { code?: string; message?: string } } };
+      };
+      const errObj = axiosErr?.response?.data?.error;
+      const code = errObj?.code;
+      const message = errObj?.message || "Failed to close booking";
+
+      if (code === "INVALID_BOOKING_TRANSITION") {
+        toast.error("This booking isn't in a state to be closed.");
+      } else if (code === "BOOKING_NOT_FOUND") {
+        toast.error("Booking not found or not assigned to your account.");
+      } else if (code === "FILE_UPLOAD_FAILED") {
+        toast.error("Failed to upload RC transfer document. Please try again.");
+      } else {
+        toast.error(message);
+      }
+    },
+  });
+}
+
+
 

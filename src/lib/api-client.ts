@@ -9,6 +9,18 @@ export const apiClient = axios.create({
   timeout: 15000,
 });
 
+// Request interceptor: If data is FormData, remove default JSON content-type
+// so browser/axios sets the correct multipart/form-data boundary automatically.
+apiClient.interceptors.request.use((config) => {
+  if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+    if (config.headers) {
+      delete config.headers["Content-Type"];
+      delete config.headers["content-type"];
+    }
+  }
+  return config;
+});
+
 // ── 2. Refresh-queue state (shared across ALL requests) ───────
 let isRefreshing = false;
 let waitingQueue: Array<{

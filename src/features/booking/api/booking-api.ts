@@ -4,6 +4,7 @@ import type {
   Booking,
   BookingDetail,
   BookingsPage,
+  BookingTab,
   CreateBookingPayload,
   CancelBookingPayload,
   BookingOrder,
@@ -19,16 +20,18 @@ export const bookingApi = {
     return res.data.data;
   },
 
-  /** GET /api/v1/bookings — Cursor-paginated bookings list (active | closed) */
+  /** GET /api/v1/bookings — Cursor-paginated bookings list (tab: prebooked | delivered | completed | cancelled) */
   async list(
     params: {
+      tab?: BookingTab;
       status?: "active" | "closed";
       cursor?: string;
       limit?: number;
     } = {}
   ): Promise<BookingsPage> {
     const queryParams: Record<string, string | number> = {};
-    if (params.status) queryParams.status = params.status;
+    if (params.tab) queryParams.tab = params.tab;
+    else if (params.status) queryParams.status = params.status;
     if (params.cursor) queryParams.cursor = params.cursor;
     if (params.limit) queryParams.limit = params.limit;
 
@@ -114,6 +117,15 @@ export const bookingApi = {
     const res = await apiClient.post(endpoints.bookings.settleDeliver(id), payload);
     return res.data.data;
   },
+
+  /** POST /api/v1/bookings/:id/close — Close Booking (RC transfer document upload + flip status to closed) */
+  async close(id: string, formData: FormData): Promise<BookingDetail> {
+    const res = await apiClient.post(endpoints.bookings.close(id), formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data.data;
+  },
 };
+
 
 

@@ -1,13 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import type { BookingListItem } from "../types/booking-types";
-import { getBookingStatusConfig } from "../utils/booking-status-map";
+import type { BookingListItem, BookingTab } from "../types/booking-types";
+import {
+  getBookingStatusConfig,
+  getRcTransferBadgeConfig,
+  getBalanceOverdueBadgeConfig,
+} from "../utils/booking-status-map";
 import { Phone, Calendar, ChevronRight } from "lucide-react";
 
 interface BookingCardProps {
   booking: BookingListItem;
-  activeTab?: "active" | "closed";
+  activeTab?: BookingTab;
   basePath?: string;
 }
 
@@ -34,6 +38,8 @@ export function BookingCard({
 }: BookingCardProps) {
   const statusConfig = getBookingStatusConfig(booking.status);
   const isCancelled = booking.status === "cancelled";
+  const isDelivered = booking.status === "delivered";
+  const isCompleted = booking.status === "closed";
   const detailHref = `${basePath}/${booking.id}`;
 
   const agreedNum = Number(booking.agreed_price || 0);
@@ -46,7 +52,22 @@ export function BookingCard({
 
   const dateLabel = isCancelled
     ? `Cancelled: ${formatDateIST(booking.cancelled_at)}`
+    : isDelivered
+    ? `Delivered: ${formatDateIST(booking.car?.delivered_at || booking.updated_at)}`
+    : isCompleted
+    ? `Closed: ${formatDateIST(booking.car?.closed_at || booking.updated_at)}`
     : formatDateIST(booking.prebooked_at);
+
+  const rcBadge = isDelivered
+    ? getRcTransferBadgeConfig(booking.car?.delivered_at, booking.updated_at)
+    : null;
+
+  const balanceOverdueBadge = getBalanceOverdueBadgeConfig(
+    booking.status,
+    booking.prebooked_at,
+    booking.balance_due_days,
+    booking.balance_due
+  );
 
   return (
     <tr
@@ -180,12 +201,30 @@ export function BookingCard({
 
       {/* Col 5: Status */}
       <td className="py-3.5 px-4 font-sans">
-        <Link href={detailHref} className="block">
+        <Link href={detailHref} className="block space-y-1">
           <span
             className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold border whitespace-nowrap ${statusConfig.badgeColor}`}
           >
             {statusConfig.label}
           </span>
+          {rcBadge && (
+            <div>
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border whitespace-nowrap ${rcBadge.badgeColor}`}
+              >
+                {rcBadge.label}
+              </span>
+            </div>
+          )}
+          {balanceOverdueBadge && (
+            <div>
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border whitespace-nowrap ${balanceOverdueBadge.badgeColor}`}
+              >
+                {balanceOverdueBadge.label}
+              </span>
+            </div>
+          )}
         </Link>
       </td>
 
@@ -209,6 +248,8 @@ export function MobileBookingCard({
 }: BookingCardProps) {
   const statusConfig = getBookingStatusConfig(booking.status);
   const isCancelled = booking.status === "cancelled";
+  const isDelivered = booking.status === "delivered";
+  const isCompleted = booking.status === "closed";
   const detailHref = `${basePath}/${booking.id}`;
 
   const agreedNum = Number(booking.agreed_price || 0);
@@ -221,7 +262,22 @@ export function MobileBookingCard({
 
   const dateLabel = isCancelled
     ? `Cancelled: ${formatDateIST(booking.cancelled_at)}`
+    : isDelivered
+    ? `Delivered: ${formatDateIST(booking.car?.delivered_at || booking.updated_at)}`
+    : isCompleted
+    ? `Closed: ${formatDateIST(booking.car?.closed_at || booking.updated_at)}`
     : formatDateIST(booking.prebooked_at);
+
+  const rcBadge = isDelivered
+    ? getRcTransferBadgeConfig(booking.car?.delivered_at, booking.updated_at)
+    : null;
+
+  const balanceOverdueBadge = getBalanceOverdueBadgeConfig(
+    booking.status,
+    booking.prebooked_at,
+    booking.balance_due_days,
+    booking.balance_due
+  );
 
   return (
     <Link
@@ -243,6 +299,20 @@ export function MobileBookingCard({
           >
             {statusConfig.label}
           </span>
+          {rcBadge && (
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border ${rcBadge.badgeColor}`}
+            >
+              {rcBadge.label}
+            </span>
+          )}
+          {balanceOverdueBadge && (
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border ${balanceOverdueBadge.badgeColor}`}
+            >
+              {balanceOverdueBadge.label}
+            </span>
+          )}
           {booking.rep?.name && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-accent/10 text-accent border border-accent/20">
               By {booking.rep.name}

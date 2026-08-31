@@ -124,6 +124,7 @@ export const endpoints = {
     settlementPdf: (id: string) => `/bookings/${id}/settlement/pdf`,
     deliveryPdf: (id: string) => `/bookings/${id}/delivery/pdf`,
     settleDeliver: (id: string) => `/bookings/${id}/settle-deliver`,
+    close: (id: string) => `/bookings/${id}/close`,
   },
 } as const;
 

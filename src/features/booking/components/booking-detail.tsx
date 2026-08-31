@@ -8,7 +8,11 @@ import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder } from "../hooks/use-booking-order";
 import { bookingApi } from "../api/booking-api";
-import { getBookingStatusConfig } from "../utils/booking-status-map";
+import {
+  getBookingStatusConfig,
+  getRcTransferBadgeConfig,
+  getBalanceOverdueBadgeConfig,
+} from "../utils/booking-status-map";
 import { BookingProgressBar } from "./booking-progress-bar";
 import { CancelBookingModal } from "./cancel-booking-modal";
 import { BookingOrderSection } from "./booking-order-section";
@@ -307,6 +311,41 @@ export function BookingDetail({
               >
                 {statusConfig.label}
               </span>
+              {booking.status === "delivered" && (
+                <span
+                  className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold border ${
+                    getRcTransferBadgeConfig(booking.car?.delivered_at, booking.updated_at).badgeColor
+                  }`}
+                >
+                  {getRcTransferBadgeConfig(booking.car?.delivered_at, booking.updated_at).label}
+                </span>
+              )}
+              {getBalanceOverdueBadgeConfig(
+                booking.status,
+                booking.prebooked_at,
+                booking.balance_due_days,
+                booking.balance_due
+              ) && (
+                <span
+                  className={`inline-flex items-center px-3 py-0.5 rounded-full text-xs font-bold border ${
+                    getBalanceOverdueBadgeConfig(
+                      booking.status,
+                      booking.prebooked_at,
+                      booking.balance_due_days,
+                      booking.balance_due
+                    )!.badgeColor
+                  }`}
+                >
+                  {
+                    getBalanceOverdueBadgeConfig(
+                      booking.status,
+                      booking.prebooked_at,
+                      booking.balance_due_days,
+                      booking.balance_due
+                    )!.label
+                  }
+                </span>
+              )}
               {isFullyPaid ? (
                 <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />

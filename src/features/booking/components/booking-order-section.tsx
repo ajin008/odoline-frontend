@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder, useDeleteOrder } from "../hooks/use-booking-order";
 import { bookingApi } from "../api/booking-api";
+import { isBookingEditable } from "../utils/booking-status-map";
 import { OrderFormEditor } from "./order-form-editor";
 import type { BookingStatus } from "../types/booking-types";
 import Link from "next/link";
@@ -52,9 +53,8 @@ export function BookingOrderSection({
   const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const isTerminal =
-    bookingStatus === "cancelled" || bookingStatus === "closed";
-  const canEdit = !readOnly && !isTerminal;
+  const editable = isBookingEditable(bookingStatus);
+  const canEdit = !readOnly && editable;
 
   const handleDelete = () => {
     deleteOrderMutation.mutate(bookingId, {
@@ -166,8 +166,7 @@ export function BookingOrderSection({
     );
   }
 
-  const isActive = bookingStatus === "prebooked" || bookingStatus === "offer";
-  const showProceedBar = Boolean(isActive && !readOnly);
+  const showProceedBar = Boolean(editable && !readOnly);
 
   return (
     <div className="space-y-5 select-none font-sans pb-36 sm:pb-12">
@@ -321,11 +320,12 @@ export function BookingOrderSection({
             </div>
             <div className="space-y-1">
               <h4 className="text-xs font-bold text-ink">
-                No Order Form Added
+                {canEdit ? "No Order Form Added" : "No Order Form Was Added"}
               </h4>
               <p className="text-[11px] text-ink-subtle max-w-sm mx-auto">
-                Accessories and work charges are optional. Create an order form
-                if the buyer requested accessories.
+                {canEdit
+                  ? "Accessories and work charges are optional. Create an order form if the buyer requested accessories."
+                  : "No vehicle order form or accessories were added for this booking."}
               </p>
             </div>
 

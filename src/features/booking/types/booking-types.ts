@@ -17,6 +17,8 @@ export type PaymentType =
   | "refund"
   | "cancellation_charge";
 
+export type BookingTab = "prebooked" | "delivered" | "completed" | "cancelled";
+
 export type BookingStatus =
   | "prebooked"
   | "offer"
@@ -91,6 +93,7 @@ export interface BookingListItem {
   agreed_price: string;
   amount_paid: string;
   balance_due: string | null;
+  balance_due_days?: number | null;
   prebooked_at: string;
   cancelled_at?: string | null;
   cancel_reason?: string | null;

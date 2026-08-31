@@ -7,7 +7,11 @@ import { usePathname } from "next/navigation";
 
 import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder } from "../hooks/use-booking-order";
-import { getBookingStatusConfig } from "../utils/booking-status-map";
+import {
+  getBookingStatusConfig,
+  getRcTransferBadgeConfig,
+  getBalanceOverdueBadgeConfig,
+} from "../utils/booking-status-map";
 import { BookingProgressBar } from "./booking-progress-bar";
 import { CancelBookingModal } from "./cancel-booking-modal";
 import {
@@ -18,10 +22,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Building2,
-  AlertTriangle,
-  ChevronRight,
   ExternalLink,
+  ChevronRight,
   XCircle,
+  AlertTriangle,
 } from "lucide-react";
 
 interface BookingDetailLayoutProps {
@@ -154,10 +158,7 @@ export function BookingDetailLayout({
     pathname?.includes("/delivery/")
   ) {
     currentStageName = "Settlement & Delivery";
-  } else if (
-    pathname?.endsWith("/close") ||
-    pathname?.includes("/close/")
-  ) {
+  } else if (pathname?.endsWith("/close") || pathname?.includes("/close/")) {
     currentStageName = "Close (RC Transfer)";
   }
 
@@ -194,6 +195,49 @@ export function BookingDetailLayout({
               >
                 {statusConfig.label}
               </span>
+              {booking.status === "delivered" && (
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                    getRcTransferBadgeConfig(
+                      booking.car?.delivered_at,
+                      booking.updated_at
+                    ).badgeColor
+                  }`}
+                >
+                  {
+                    getRcTransferBadgeConfig(
+                      booking.car?.delivered_at,
+                      booking.updated_at
+                    ).label
+                  }
+                </span>
+              )}
+              {getBalanceOverdueBadgeConfig(
+                booking.status,
+                booking.prebooked_at,
+                booking.balance_due_days,
+                booking.balance_due
+              ) && (
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                    getBalanceOverdueBadgeConfig(
+                      booking.status,
+                      booking.prebooked_at,
+                      booking.balance_due_days,
+                      booking.balance_due
+                    )!.badgeColor
+                  }`}
+                >
+                  {
+                    getBalanceOverdueBadgeConfig(
+                      booking.status,
+                      booking.prebooked_at,
+                      booking.balance_due_days,
+                      booking.balance_due
+                    )!.label
+                  }
+                </span>
+              )}
             </div>
 
             {/* Header Action Button (Cancel booking - right aligned) */}
