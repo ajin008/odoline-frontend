@@ -113,18 +113,6 @@
   --color-neutral-state-light: var(--state-neutral-light);
   --color-future-state: var(--state-future);
 
-  /* Refined Professional Emerald Palette */
-  --color-emerald-50: #ecfdf5;
-  --color-emerald-100: #d1fae5;
-  --color-emerald-200: #a7f3d0;
-  --color-emerald-300: #6ee7b7;
-  --color-emerald-400: #34d399;
-  --color-emerald-500: #10b981;
-  --color-emerald-600: #059669;
-  --color-emerald-700: #047857;
-  --color-emerald-800: #065f46;
-  --color-emerald-900: #064e3b;
-
   --font-sans: var(--font-sans);
   --font-heading: var(--font-heading);
   --font-mono: var(--font-mono);
@@ -142,44 +130,6 @@ body {
 
 .font-heading {
   font-family: var(--font-heading);
-}
-
-/* Border color reset for filled & bright action buttons */
-button:is(
-  [class*="bg-accent"],
-  [class*="bg-emerald"],
-  [class*="bg-rose"],
-  [class*="bg-red-600"],
-  [class*="bg-red-500"],
-  [class*="bg-blue"],
-  [class*="bg-indigo"],
-  [class*="bg-purple"],
-  [class*="bg-amber-500"],
-  [class*="bg-amber-600"],
-  [class*="bg-[#00d66f]"],
-  [class*="bg-danger"],
-  [class*="bg-black"],
-  [class*="bg-slate-900"],
-  [class*="bg-[#171819]"]
-),
-a:is(
-  [class*="bg-accent"],
-  [class*="bg-emerald"],
-  [class*="bg-rose"],
-  [class*="bg-red-600"],
-  [class*="bg-red-500"],
-  [class*="bg-blue"],
-  [class*="bg-indigo"],
-  [class*="bg-purple"],
-  [class*="bg-amber-500"],
-  [class*="bg-amber-600"],
-  [class*="bg-[#00d66f]"],
-  [class*="bg-danger"],
-  [class*="bg-black"],
-  [class*="bg-slate-900"],
-  [class*="bg-[#171819]"]
-) {
-  border-color: transparent !important;
 }
 
 /* Ensure clean font inheritance & prevent letter collision */

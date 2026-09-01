@@ -171,10 +171,14 @@ export function CompletedSalesList() {
               car?.closed_at || booking.updated_at
             );
 
+            const dossierHref = car?.id
+              ? `/owner/sales/dossier/${car.id}`
+              : `/owner/booking/${booking.id}`;
+
             return (
               <Link
                 key={booking.id}
-                href={`/owner/booking/${booking.id}`}
+                href={dossierHref}
                 className="group block rounded-xl bg-card border border-line/70 hover:border-accent/40 p-4 shadow-2xs hover:shadow-bento transition-all duration-200"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

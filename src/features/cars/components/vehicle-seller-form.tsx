@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-object-injection */
+/* eslint-disable react-hooks/incompatible-library */
 // features/cars/components/vehicle-seller-form.tsx
 "use client";
 
@@ -20,7 +22,10 @@ import {
 
 import { FormInput } from "@/src/components/ui/form-input";
 import { FormTextarea } from "@/src/components/ui/form-textarea";
-import { CustomSelect, type CustomSelectOption } from "@/src/components/ui/custom-select";
+import {
+  CustomSelect,
+  type CustomSelectOption,
+} from "@/src/components/ui/custom-select";
 import {
   createCarSchema,
   type CreateCarFormInput,
@@ -34,15 +39,39 @@ import { INDIAN_CAR_BRANDS } from "../type/info";
 
 const fuelOptions: CustomSelectOption<string>[] = [
   { value: "petrol", label: "Petrol", icon: <Fuel className="h-3.5 w-3.5" /> },
-  { value: "diesel", label: "Diesel", icon: <Fuel className="h-3.5 w-3.5 text-amber-500" /> },
-  { value: "cng", label: "CNG", icon: <Flame className="h-3.5 w-3.5 text-emerald-500" /> },
-  { value: "electric", label: "Electric (EV)", icon: <Zap className="h-3.5 w-3.5 text-purple-500" /> },
-  { value: "hybrid", label: "Petrol Hybrid", icon: <Leaf className="h-3.5 w-3.5 text-teal-500" /> },
+  {
+    value: "diesel",
+    label: "Diesel",
+    icon: <Fuel className="h-3.5 w-3.5 text-amber-500" />,
+  },
+  {
+    value: "cng",
+    label: "CNG",
+    icon: <Flame className="h-3.5 w-3.5 text-emerald-500" />,
+  },
+  {
+    value: "electric",
+    label: "Electric (EV)",
+    icon: <Zap className="h-3.5 w-3.5 text-purple-500" />,
+  },
+  {
+    value: "hybrid",
+    label: "Petrol Hybrid",
+    icon: <Leaf className="h-3.5 w-3.5 text-teal-500" />,
+  },
 ];
 
 const transmissionOptions: CustomSelectOption<string>[] = [
-  { value: "manual", label: "Manual (M/T)", icon: <Cog className="h-3.5 w-3.5 text-accent" /> },
-  { value: "automatic", label: "Automatic (A/T)", icon: <Cpu className="h-3.5 w-3.5 text-accent" /> },
+  {
+    value: "manual",
+    label: "Manual (M/T)",
+    icon: <Cog className="h-3.5 w-3.5 text-accent" />,
+  },
+  {
+    value: "automatic",
+    label: "Automatic (A/T)",
+    icon: <Cpu className="h-3.5 w-3.5 text-accent" />,
+  },
 ];
 
 // Groups digits Indian-style (last 3, then pairs): "1234567" -> "12,34,567".
@@ -90,6 +119,7 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = useForm<CreateCarFormInput, unknown, CreateCarFormValues>({
     resolver: zodResolver(createCarSchema),
@@ -121,6 +151,93 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
         }
       : undefined,
   });
+
+  const selectedMake = watch("make");
+
+  const BRAND_MODELS: Record<string, string[]> = {
+    "Maruti Suzuki": [
+      "Swift",
+      "Baleno",
+      "Brezza",
+      "Dzire",
+      "Ertiga",
+      "WagonR",
+      "Alto",
+      "Fronx",
+      "Grand Vitara",
+      "Jimny",
+      "Ciaz",
+      "XL6",
+      "Ignis",
+      "S-Presso",
+    ],
+    Hyundai: [
+      "Creta",
+      "Venue",
+      "i20",
+      "Verna",
+      "Exter",
+      "Aura",
+      "Grand i10 Nios",
+      "Alcazar",
+      "Tucson",
+      "Ioniq 5",
+    ],
+    "Tata Motors": [
+      "Nexon",
+      "Punch",
+      "Harrier",
+      "Safari",
+      "Altroz",
+      "Tiago",
+      "Tigor",
+      "Curvv",
+    ],
+    Mahindra: [
+      "Thar",
+      "XUV700",
+      "Scorpio-N",
+      "Scorpio Classic",
+      "XUV300",
+      "XUV400",
+      "Bolero",
+      "Bolero Neo",
+    ],
+    Kia: ["Seltos", "Sonet", "Carens", "EV6"],
+    Toyota: [
+      "Fortuner",
+      "Innova Crysta",
+      "Innova Hycross",
+      "Glanza",
+      "Urban Cruiser Taisor",
+      "Hilux",
+      "Camry",
+    ],
+    Honda: ["City", "Elevate", "Amaze"],
+    Volkswagen: ["Virtus", "Taigun", "Tiguan"],
+    Skoda: ["Slavia", "Kushaq", "Kodiaq"],
+    "MG Motor": ["Hector", "Astor", "ZSEV", "Comet EV", "Gloster"],
+    Renault: ["Kiger", "Triber", "Kwid"],
+    Nissan: ["Magnite"],
+    Citroën: ["C3", "C3 Aircross", "eC3", "C5 Aircross"],
+    Jeep: ["Compass", "Meridian", "Wrangler"],
+    BMW: ["3 Series", "5 Series", "X1", "X3", "X5", "7 Series", "M3", "M5"],
+    "Mercedes-Benz": [
+      "C-Class",
+      "E-Class",
+      "S-Class",
+      "GLA",
+      "GLC",
+      "GLE",
+      "GLS",
+    ],
+    Audi: ["A4", "A6", "Q3", "Q5", "Q7", "e-tron"],
+  };
+
+  const modelSuggestions =
+    selectedMake && typeof selectedMake === "string"
+      ? BRAND_MODELS[selectedMake]
+      : undefined;
 
   const onSubmit = handleSubmit((values) => {
     const refinedValues = {
@@ -177,11 +294,20 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
             )}
           />
 
-          <FormInput
-            label="Model"
-            placeholder="e.g. Swift"
-            error={errors.model?.message}
-            {...register("model")}
+          <Controller
+            name="model"
+            control={control}
+            render={({ field: { onChange, value, ref } }) => (
+              <FormInput
+                label="Model"
+                placeholder="Select or type model (e.g. Swift)"
+                ref={ref}
+                value={typeof value === "string" ? value : ""}
+                suggestions={modelSuggestions}
+                error={errors.model?.message}
+                onChange={(e) => onChange(e.target.value)}
+              />
+            )}
           />
 
           <Controller

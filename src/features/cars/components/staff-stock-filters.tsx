@@ -1,15 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, X, RotateCcw, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { Search, X, RotateCcw, SlidersHorizontal, Fuel, Flame, Zap, Leaf } from "lucide-react";
+import { CustomSelect, type CustomSelectOption } from "@/src/components/ui/custom-select";
 
-const FUEL_OPTIONS = [
+const FUEL_OPTIONS: CustomSelectOption<string>[] = [
   { value: "", label: "All Fuel Types" },
-  { value: "petrol", label: "Petrol" },
-  { value: "diesel", label: "Diesel" },
-  { value: "electric", label: "Electric" },
-  { value: "hybrid", label: "Hybrid" },
-  { value: "cng", label: "CNG" },
+  { value: "petrol", label: "Petrol", icon: <Fuel className="h-3.5 w-3.5 text-blue-500" /> },
+  { value: "diesel", label: "Diesel", icon: <Fuel className="h-3.5 w-3.5 text-amber-500" /> },
+  { value: "electric", label: "Electric (EV)", icon: <Zap className="h-3.5 w-3.5 text-purple-500" /> },
+  { value: "hybrid", label: "Hybrid", icon: <Leaf className="h-3.5 w-3.5 text-teal-500" /> },
+  { value: "cng", label: "CNG", icon: <Flame className="h-3.5 w-3.5 text-emerald-500" /> },
 ];
 
 interface StaffStockFiltersProps {
@@ -69,7 +70,7 @@ export function StaffStockFilters({
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder="Search vehicles by make, model, variant, or registration..."
-          className="w-full h-11 rounded-xl border border-line bg-card pl-10 pr-10 text-xs sm:text-sm font-medium text-ink outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/15 placeholder:text-ink-subtle/70 shadow-2xs"
+          className="w-full h-11 rounded-xl border border-line bg-card pl-10 pr-10 text-xs sm:text-sm font-medium text-ink outline-none transition-all focus:border-accent placeholder:text-ink-subtle/70 shadow-none focus:shadow-none focus:ring-0"
         />
         {searchInput && (
           <button
@@ -95,24 +96,19 @@ export function StaffStockFilters({
           </span>
 
           {/* Custom Select Dropdown: Fuel Type */}
-          <div className="relative shrink-0">
-            <select
-              value={fuelType}
-              onChange={(e) => onFuelTypeChange(e.target.value)}
-              className={`h-8 rounded-lg border px-3 pr-7 text-xs font-semibold appearance-none outline-none transition-all cursor-pointer ${
-                fuelType
-                  ? "bg-accent/15 border-accent text-accent font-bold shadow-2xs"
-                  : "bg-card border-line text-ink-subtle hover:text-ink hover:border-line/80"
-              }`}
-            >
-              {FUEL_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink-subtle pointer-events-none" />
-          </div>
+          <CustomSelect
+            options={FUEL_OPTIONS}
+            value={fuelType}
+            onChange={onFuelTypeChange}
+            placeholder="All Fuel Types"
+            searchable={false}
+            className="shrink-0"
+            buttonClassName={`h-8 px-3 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
+              fuelType
+                ? "bg-accent/15 border-accent text-accent font-bold"
+                : "bg-card border-line/70 text-ink-subtle hover:text-ink hover:border-line"
+            }`}
+          />
 
           {/* Custom Price Range Inputs Group */}
           <div className="flex items-center gap-1 bg-card border border-line rounded-lg p-1 h-8 shrink-0">

@@ -27,6 +27,7 @@ export const endpoints = {
     photoDelete: (id: string, photoId: string) => `/cars/${id}/photos/${photoId}`,
     photoPrimary: (id: string, photoId: string) => `/cars/${id}/photos/${photoId}/primary`,
     photoFile: (id: string, photoId: string) => `/cars/${id}/photos/${photoId}/file`,
+    dossier: (id: string) => `/cars/${id}/dossier`,
   },
 
   refurbItems: {
