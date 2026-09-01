@@ -319,21 +319,21 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
       {/* ------------------------------------------------------------- */}
       {/* MAIN 12-COLUMN SAAS WORKSPACE GRID                            */}
       {/* ------------------------------------------------------------- */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 xl:gap-6 items-start">
         {/* =========================================================== */}
         {/* LEFT COLUMN: VEHICLE HERO + TIMELINE JOURNEY               */}
         {/* =========================================================== */}
         <div
-          className={`lg:col-span-8 space-y-6 ${
+          className={`xl:col-span-8 space-y-6 ${
             mobileTab !== "journey" ? "hidden md:block" : ""
           }`}
         >
           {/* VEHICLE CASE FILE HERO BENTO CARD */}
           <div className="rounded-2xl bg-card border border-line p-4 sm:p-6 shadow-bento space-y-5">
-            <div className="flex flex-col md:flex-row gap-5 items-stretch">
+            <div className="flex flex-col xl:flex-row gap-5 items-stretch">
               {/* Photo Frame Container */}
-              <div className="w-full md:w-72 lg:w-80 shrink-0 space-y-2 flex flex-col">
-                <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden bg-inset border border-line group">
+              <div className="w-full xl:w-80 shrink-0 space-y-2 flex flex-col">
+                <div className="relative aspect-[16/9] sm:aspect-[2/1] xl:aspect-[16/10] w-full rounded-xl overflow-hidden bg-inset border border-line group">
                   {currentPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -1217,77 +1217,80 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
             </div>
           </div>
 
-          {/* VEHICLE QUICK PASSPORT */}
-          <div className="rounded-2xl bg-card border border-line p-5 shadow-2xs space-y-3">
-            <h3 className="text-xs font-extrabold text-ink uppercase tracking-wider border-b border-line/50 pb-2">
-              Vehicle Quick Passport
-            </h3>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-line/40">
-                <span className="text-ink-muted">Make &amp; Model</span>
-                <span className="font-bold text-ink text-right">
-                  {car.make} {car.model}
-                </span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-line/40">
-                <span className="text-ink-muted">Year</span>
-                <span className="font-mono font-bold text-ink">{car.year}</span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-line/40">
-                <span className="text-ink-muted">Reg Number</span>
-                <span className="font-mono font-bold text-ink">
-                  {car.reg_number}
-                </span>
-              </div>
-              <div className="flex justify-between py-1 border-b border-line/40">
-                <span className="text-ink-muted">Fuel / Transmission</span>
-                <span className="font-bold text-ink capitalize">
-                  {car.fuel_type || "N/A"} · {car.transmission || "N/A"}
-                </span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-muted">Distance Driven</span>
-                <span className="font-mono font-bold text-ink">
-                  {car.km_driven
-                    ? `${formatIndianNumber(car.km_driven)} km`
-                    : "N/A"}
-                </span>
+          {/* TABLET / DESKTOP RESPONSIVE SUB-GRID */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-5">
+            {/* VEHICLE QUICK PASSPORT */}
+            <div className="rounded-2xl bg-card border border-line p-5 shadow-2xs space-y-3">
+              <h3 className="text-xs font-extrabold text-ink uppercase tracking-wider border-b border-line/50 pb-2">
+                Vehicle Quick Passport
+              </h3>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between py-1 border-b border-line/40">
+                  <span className="text-ink-muted">Make &amp; Model</span>
+                  <span className="font-bold text-ink text-right">
+                    {car.make} {car.model}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-line/40">
+                  <span className="text-ink-muted">Year</span>
+                  <span className="font-mono font-bold text-ink">{car.year}</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-line/40">
+                  <span className="text-ink-muted">Reg Number</span>
+                  <span className="font-mono font-bold text-ink">
+                    {car.reg_number}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-line/40">
+                  <span className="text-ink-muted">Fuel / Transmission</span>
+                  <span className="font-bold text-ink capitalize">
+                    {car.fuel_type || "N/A"} · {car.transmission || "N/A"}
+                  </span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-ink-muted">Distance Driven</span>
+                  <span className="font-mono font-bold text-ink">
+                    {car.km_driven
+                      ? `${formatIndianNumber(car.km_driven)} km`
+                      : "N/A"}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* TRANSACTION PARTIES CARD */}
-          <div className="rounded-2xl bg-card border border-line p-5 shadow-2xs space-y-3">
-            <h3 className="text-xs font-extrabold text-ink uppercase tracking-wider border-b border-line/50 pb-2">
-              Transaction Stakeholders
-            </h3>
-            <div className="space-y-2.5 text-xs">
-              <div className="space-y-0.5">
-                <span className="text-[10px] text-ink-subtle font-bold uppercase tracking-wider">
-                  Customer Buyer
-                </span>
-                <p className="font-bold text-ink">
-                  {booking.customer?.name || "N/A"}
-                </p>
-                <p className="text-ink-muted font-mono text-[11px]">
-                  {booking.customer?.phone || ""}
-                </p>
-              </div>
-              <div className="space-y-0.5">
-                <span className="text-[10px] text-ink-subtle font-bold uppercase tracking-wider">
-                  Sales Representative Credited
-                </span>
-                <p className="font-bold text-ink">
-                  {sale.sold_by?.name || "Staff"}
-                </p>
-              </div>
-              <div className="space-y-0.5">
-                <span className="text-[10px] text-ink-subtle font-bold uppercase tracking-wider">
-                  RC Transfer Closed By
-                </span>
-                <p className="font-bold text-ink">
-                  {sale.closed_by?.name || "Staff"}
-                </p>
+            {/* TRANSACTION PARTIES CARD */}
+            <div className="rounded-2xl bg-card border border-line p-5 shadow-2xs space-y-3">
+              <h3 className="text-xs font-extrabold text-ink uppercase tracking-wider border-b border-line/50 pb-2">
+                Transaction Stakeholders
+              </h3>
+              <div className="space-y-2.5 text-xs">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-ink-subtle font-bold uppercase tracking-wider">
+                    Customer Buyer
+                  </span>
+                  <p className="font-bold text-ink">
+                    {booking.customer?.name || "N/A"}
+                  </p>
+                  <p className="text-ink-muted font-mono text-[11px]">
+                    {booking.customer?.phone || ""}
+                  </p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-ink-subtle font-bold uppercase tracking-wider">
+                    Sales Representative Credited
+                  </span>
+                  <p className="font-bold text-ink">
+                    {sale.sold_by?.name || "Staff"}
+                  </p>
+                </div>
+                <div className="space-y-0.5">
+                  <span className="text-[10px] text-ink-subtle font-bold uppercase tracking-wider">
+                    RC Transfer Closed By
+                  </span>
+                  <p className="font-bold text-ink">
+                    {sale.closed_by?.name || "Staff"}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
