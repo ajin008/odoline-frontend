@@ -1,5 +1,5 @@
 // components/layout/owner/nav-items.ts
-import { LayoutDashboard, TrendingUp, Car, CalendarCheck, Users, Settings, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Layers, Receipt, Car, CalendarCheck, Users, Settings, type LucideIcon } from "lucide-react";
 
 export interface NavItem {
   label: string;
@@ -16,7 +16,8 @@ export const ownerNavItems: NavItem[] = [
     icon: LayoutDashboard,
     mobile: true,
   },
-  { label: "Sales", href: "/owner/sales", icon: TrendingUp, mobile: true },
+  { label: "CRM", href: "/owner/crm", icon: Layers, mobile: true },
+  { label: "Sales", href: "/owner/sales", icon: Receipt, mobile: true },
   { label: "Inventory", href: "/owner/inventory", icon: Car, mobile: true },
   { label: "Booking", href: "/owner/booking", icon: CalendarCheck, mobile: true },
   { label: "Team", href: "/owner/team", icon: Users, mobile: true },

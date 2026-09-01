@@ -134,7 +134,7 @@ export function BookingDetailLayout({
   const isFullyPaid = balanceDueNum <= 0;
 
   const leadHref = readOnly
-    ? `/owner/sales`
+    ? `/owner/crm`
     : booking.lead?.id
     ? `/staff/leads/${booking.lead.id}`
     : null;

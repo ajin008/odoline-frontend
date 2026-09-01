@@ -267,7 +267,7 @@ export function BookingDetail({
       : 0;
 
   const leadHref = readOnly
-    ? `/owner/sales`
+    ? `/owner/crm`
     : booking.lead?.id
     ? `/staff/leads/${booking.lead.id}`
     : null;

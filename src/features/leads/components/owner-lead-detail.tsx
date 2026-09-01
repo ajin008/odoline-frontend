@@ -133,7 +133,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
     return (
       <div className="w-full space-y-5 font-sans select-none max-w-6xl">
         <Link
-          href="/owner/sales?tab=all"
+          href="/owner/crm?tab=all"
           className="inline-flex items-center gap-2 text-xs font-semibold text-ink-subtle hover:text-ink transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -219,7 +219,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
         {/* Row 1: Breadcrumb Navigation Link */}
         <div className="flex items-center justify-between gap-2 border-b border-line/40 pb-2.5">
           <Link
-            href="/owner/sales?tab=all"
+            href="/owner/crm?tab=all"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-subtle hover:text-accent transition-colors group cursor-pointer min-w-0"
           >
             <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform shrink-0" />

@@ -375,7 +375,7 @@ export function UnassignedLeadsQueue() {
                 <div className="min-w-0 space-y-1 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <Link
-                      href={`/owner/sales/leads/${lead.id}`}
+                      href={`/owner/crm/leads/${lead.id}`}
                       className="text-sm font-bold text-ink hover:text-accent truncate"
                     >
                       {customerName}

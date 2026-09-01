@@ -1,10 +1,10 @@
-import { SalesShell } from "@/src/features/leads/components/sales-shell";
+import { OwnerSalesShell } from "@/src/features/sales/components/owner-sales-shell";
 
 export const metadata = {
-  title: "Sales & CRM Pipeline | Owner Terminal",
-  description: "Track dealership-wide lead conversion metrics, sales stage breakdown, and unassigned lead queues.",
+  title: "Sales & Revenue | Owner Terminal",
+  description: "View dealership completed sales records, closed bookings, and sales performance.",
 };
 
 export default function SalesPage() {
-  return <SalesShell />;
+  return <OwnerSalesShell />;
 }

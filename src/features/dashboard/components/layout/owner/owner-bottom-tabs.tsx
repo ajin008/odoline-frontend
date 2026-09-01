@@ -13,14 +13,20 @@ export function OwnerBottomTabs() {
   const { data: stats } = useDashboardStats();
   const inStockCount = stats?.total_stock ?? 0;
 
-  // Primary mobile bottom bar items: Dashboard, Sales, Inventory, Team
+  // Primary mobile bottom bar items: Dashboard, CRM, Inventory, Team
   const primaryItems = ownerNavItems.filter(
-    (i) => i.href !== "/owner/booking" && i.href !== "/owner/settings"
+    (i) =>
+      i.href !== "/owner/sales" &&
+      i.href !== "/owner/booking" &&
+      i.href !== "/owner/settings"
   );
 
-  // Overflow items in "More" sheet: Booking, Settings
+  // Overflow items in "More" sheet: Sales, Booking, Settings
   const overflowItems = ownerNavItems.filter(
-    (i) => i.href === "/owner/booking" || i.href === "/owner/settings"
+    (i) =>
+      i.href === "/owner/sales" ||
+      i.href === "/owner/booking" ||
+      i.href === "/owner/settings"
   );
 
   const isOverflowActive = overflowItems.some((item) =>

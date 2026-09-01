@@ -40,7 +40,7 @@ export function SalesShell() {
 
   const handleTabChange = (key: SalesTabKey) => {
     setActiveTab(key);
-    router.replace(`/owner/sales?tab=${key}`, { scroll: false });
+    router.replace(`/owner/crm?tab=${key}`, { scroll: false });
   };
 
   return (
@@ -108,7 +108,7 @@ export function SalesShell() {
           <LeadList
             showStaffFilter={true}
             showAssignedRep={true}
-            baseHref="/owner/sales/leads"
+            baseHref="/owner/crm/leads"
           />
         )}
 
