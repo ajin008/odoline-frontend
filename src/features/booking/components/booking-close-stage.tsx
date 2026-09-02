@@ -447,16 +447,16 @@ export function BookingCloseStage({
 
   return (
     <div className="space-y-6 select-none font-sans pb-12">
-      {/* Header Banner */}
-      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
+      {/* Header Banner (Border-Free Pastel Emerald) */}
+      <div className="rounded-2xl bg-emerald-100/80 text-emerald-950 p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-200/90 text-emerald-900 shrink-0">
           <CheckCircle2 className="h-5 w-5" />
         </div>
         <div className="space-y-1">
-          <div className="font-bold text-sm text-emerald-800 dark:text-emerald-300">
+          <div className="font-extrabold text-sm text-emerald-950">
             Booking Transaction Closed — RC Transfer Recorded
           </div>
-          <div className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed font-medium">
+          <div className="text-xs text-emerald-900 leading-relaxed font-medium">
             RC transfer document uploaded and deal officially closed. The car is
             marked closed and transaction completed.
           </div>
@@ -467,7 +467,7 @@ export function BookingCloseStage({
       <div className="rounded-2xl border border-line bg-card p-5 sm:p-6 space-y-6 shadow-xs">
         <div className="flex items-center justify-between gap-3 pb-4 border-b border-line">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100/90 text-emerald-800">
               <FileCheck className="h-4 w-4" />
             </div>
             <div>
@@ -479,7 +479,7 @@ export function BookingCloseStage({
               </p>
             </div>
           </div>
-          <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-[10px] font-black uppercase tracking-wider">
+          <span className="px-3 py-1 rounded-lg bg-emerald-100/90 text-emerald-800 font-mono text-[10px] font-extrabold uppercase tracking-wider">
             Closed &amp; Completed
           </span>
         </div>

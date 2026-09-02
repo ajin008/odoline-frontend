@@ -191,13 +191,13 @@ export function BookingDetailLayout({
                 {booking.booking_number}
               </h1>
               <span
-                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${statusConfig.badgeColor}`}
+                className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-extrabold ${statusConfig.badgeColor}`}
               >
                 {statusConfig.label}
               </span>
               {booking.status === "delivered" && (
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                  className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-extrabold ${
                     getRcTransferBadgeConfig(
                       booking.car?.delivered_at,
                       booking.updated_at
@@ -219,7 +219,7 @@ export function BookingDetailLayout({
                 booking.balance_due
               ) && (
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${
+                  className={`inline-flex items-center px-3 py-1 rounded-lg text-xs font-extrabold ${
                     getBalanceOverdueBadgeConfig(
                       booking.status,
                       booking.prebooked_at,
@@ -256,13 +256,13 @@ export function BookingDetailLayout({
 
           <div className="flex items-center gap-2 flex-wrap">
             {isFullyPaid ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-extrabold bg-emerald-100/90 text-emerald-800">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-700" />
                 <span>Fully Paid</span>
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-extrabold bg-amber-100/90 text-amber-900">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0 text-amber-800" />
                 <span>Balance Pending</span>
               </span>
             )}

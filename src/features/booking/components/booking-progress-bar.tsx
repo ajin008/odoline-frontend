@@ -86,25 +86,17 @@ export function BookingProgressBar({
                 pathname.includes(`/${stage.id}/`))
           );
 
-          // Inline style rule: Finished = #d8f1b7 (Pastel Green), Active View = #dbeafe (Blue BG, border-0)
-          const style = isActiveRoute
-            ? { backgroundColor: "#dbeafe" }
-            : isDone
-            ? { backgroundColor: "#d8f1b7" }
-            : undefined;
-
           const cardContent = (
             <div
               className={`relative flex items-center gap-2 sm:gap-2.5 p-2.5 sm:p-3 rounded-xl border-0 transition-all h-full shadow-xs ${
                 isActiveRoute
-                  ? "text-blue-950"
+                  ? "bg-sky-100/90 text-sky-950"
                   : isDone
-                  ? "text-emerald-950"
+                  ? "bg-emerald-100/90 text-emerald-950"
                   : isClickable
                   ? "bg-inset/70 text-ink hover:bg-inset"
                   : "bg-inset/30 text-ink-subtle opacity-40 cursor-not-allowed select-none"
               }`}
-              style={style}
               title={
                 !isClickable
                   ? "Available after vehicle delivery"
@@ -115,9 +107,9 @@ export function BookingProgressBar({
               <div
                 className={`flex h-6 sm:h-7 w-6 sm:w-7 items-center justify-center rounded-lg font-mono text-[11px] sm:text-xs font-bold shrink-0 transition-colors ${
                   isActiveRoute
-                    ? "bg-blue-900 text-white shadow-xs font-extrabold"
+                    ? "bg-sky-700 text-white shadow-xs font-extrabold"
                     : isDone
-                    ? "bg-emerald-800 text-white shadow-xs"
+                    ? "bg-emerald-700 text-white shadow-xs"
                     : isClickable
                     ? "bg-card border border-line text-ink-subtle font-bold"
                     : "bg-card border border-line text-ink-subtle opacity-60"
@@ -138,7 +130,7 @@ export function BookingProgressBar({
                   <span
                     className={`line-clamp-2 ${
                       isActiveRoute
-                        ? "text-blue-950 font-extrabold"
+                        ? "text-sky-950 font-extrabold"
                         : isDone
                         ? "text-emerald-950 font-extrabold"
                         : ""
@@ -147,14 +139,14 @@ export function BookingProgressBar({
                     {stage.label}
                   </span>
                   {isActiveRoute && (
-                    <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-blue-900 animate-pulse shrink-0 hidden xs:block" />
+                    <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-sky-700 animate-pulse shrink-0 hidden xs:block" />
                   )}
                 </div>
 
                 {/* Status Badge */}
                 <div>
                   {isActiveRoute ? (
-                    <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-md bg-blue-900 text-white font-mono font-black text-[8px] sm:text-[9px] tracking-wider shadow-xs">
+                    <span className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 rounded-md bg-sky-700 text-white font-mono font-black text-[8px] sm:text-[9px] tracking-wider shadow-xs">
                       <span>• ACTIVE</span>
                     </span>
                   ) : isDone ? (
