@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 "use client";
 
 import {
@@ -59,7 +60,10 @@ export function formatXAxisLabel(key: string, bucket: TrendBucket): string {
     const [y, m, d] = key.split("-").map(Number);
     if (!y || !m || !d) return key;
     const date = new Date(y, m - 1, d);
-    const shortDate = date.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    const shortDate = date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+    });
     return `Wk of ${shortDate}`;
   }
 
@@ -68,7 +72,9 @@ export function formatXAxisLabel(key: string, bucket: TrendBucket): string {
     const [y, m] = key.split("-").map(Number);
     if (!y || !m) return key;
     const date = new Date(y, m - 1, 1);
-    return date.toLocaleDateString("en-IN", { month: "short", year: "2-digit" }).replace(" ", " '");
+    return date
+      .toLocaleDateString("en-IN", { month: "short", year: "2-digit" })
+      .replace(" ", " '");
   }
 
   if (bucket === "year") {
@@ -86,7 +92,11 @@ export function formatTooltipTitle(key: string, bucket: TrendBucket): string {
     const [y, m, d] = key.split("-").map(Number);
     if (!y || !m || !d) return key;
     const date = new Date(y, m - 1, d);
-    return date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
   }
 
   if (bucket === "week") {
@@ -94,7 +104,11 @@ export function formatTooltipTitle(key: string, bucket: TrendBucket): string {
     const [y, m, d] = key.split("-").map(Number);
     if (!y || !m || !d) return key;
     const date = new Date(y, m - 1, d);
-    const longDate = date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" });
+    const longDate = date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
     return `Week of ${longDate}`;
   }
 
@@ -185,11 +199,7 @@ export function PerformanceLoadingState() {
   );
 }
 
-export function PerformanceDateBadge({
-  label,
-}: {
-  label: string;
-}) {
+export function PerformanceDateBadge({ label }: { label: string }) {
   if (!label) return null;
   return (
     <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-inset border border-line/50 text-[11px] font-mono font-medium text-ink-subtle shrink-0">
@@ -200,11 +210,7 @@ export function PerformanceDateBadge({
 }
 
 /** The 3 KPI cards (Enquiries / Bookings / Deliveries) — shared by owner + staff views. */
-export function PerformanceKpiCards({
-  totals,
-}: {
-  totals: PerformanceTotals;
-}) {
+export function PerformanceKpiCards({ totals }: { totals: PerformanceTotals }) {
   const cards = [
     {
       key: "enquiries",
@@ -313,7 +319,8 @@ export function PerformanceTrendChart({
               {bucketTitleMap[bucket] ?? "Performance Trend"}
             </h3>
             <p className="text-[11px] text-ink-subtle">
-              {bucketSubtitleMap[bucket] ?? "Enquiries, bookings & deliveries by period"}
+              {bucketSubtitleMap[bucket] ??
+                "Enquiries, bookings & deliveries by period"}
             </p>
           </div>
         </div>
@@ -324,9 +331,12 @@ export function PerformanceTrendChart({
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-inset border border-line/60 text-ink-subtle">
             <BarChart3 className="h-4 w-4 text-accent" />
           </div>
-          <p className="text-xs font-semibold text-ink-muted">No activity to chart</p>
+          <p className="text-xs font-semibold text-ink-muted">
+            No activity to chart
+          </p>
           <p className="text-[11px] text-ink-subtle text-center max-w-xs">
-            There are no enquiries, bookings, or deliveries recorded for this period.
+            There are no enquiries, bookings, or deliveries recorded for this
+            period.
           </p>
         </div>
       ) : (
@@ -412,4 +422,3 @@ export function PerformanceTrendChart({
     </div>
   );
 }
-
