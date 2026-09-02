@@ -3,13 +3,13 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { OverviewPlaceholder } from "./overview-placeholder";
+import { SalesOverviewDashboard } from "./sales-overview-dashboard";
 import { CompletedSalesList } from "./completed-sales-list";
 import { Receipt, TrendingUp } from "lucide-react";
 
 const SALES_SUBTABS = [
-  { key: "completed", label: "Completed Sales", icon: Receipt },
   { key: "overview", label: "Overview", icon: TrendingUp },
+  { key: "completed", label: "Completed Sales", icon: Receipt },
 ] as const;
 
 type SalesSubtabKey = (typeof SALES_SUBTABS)[number]["key"];
@@ -22,7 +22,7 @@ export function OwnerSalesShell() {
   const initialSubtab: SalesSubtabKey =
     subtabParam && SALES_SUBTABS.some((t) => t.key === subtabParam)
       ? subtabParam
-      : "completed";
+      : "overview";
 
   const [activeSubtab, setActiveSubtab] =
     useState<SalesSubtabKey>(initialSubtab);
@@ -76,17 +76,6 @@ export function OwnerSalesShell() {
                   }`}
                 />
                 <span>{tab.label}</span>
-                {tab.key === "overview" && (
-                  <span
-                    className={`ml-0.5 px-1.5 py-0.2 rounded-full text-[9px] font-bold uppercase tracking-wider transition-colors ${
-                      isActive
-                        ? "bg-inverse/20 text-inverse"
-                        : "bg-accent/15 text-accent"
-                    }`}
-                  >
-                    Soon
-                  </span>
-                )}
               </button>
             );
           })}
@@ -98,7 +87,7 @@ export function OwnerSalesShell() {
       {/* ------------------------------------------------------------- */}
       <div className="pt-0.5">
         {activeSubtab === "completed" && <CompletedSalesList />}
-        {activeSubtab === "overview" && <OverviewPlaceholder />}
+        {activeSubtab === "overview" && <SalesOverviewDashboard />}
       </div>
     </div>
   );

@@ -96,6 +96,13 @@ export const endpoints = {
     cars: "/export/cars",
   },
 
+  salesPerformance: {
+    overview: "/sales/performance/overview",
+    staff: "/sales/performance/staff",
+    staffDetail: (staffId: string) => `/sales/performance/staff/${staffId}`,
+    me: "/sales/performance/me",
+  },
+
   attendance: {
     today: "/attendance/me/today",
     clockIn: "/attendance/clock-in",

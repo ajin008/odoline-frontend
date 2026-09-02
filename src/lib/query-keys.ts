@@ -89,6 +89,17 @@ export const queryKeys = {
       ["attendance", "me", "heatmap", month] as const,
   },
 
+  salesPerformance: {
+    all: ["sales-performance"] as const,
+    overview: (period?: string) =>
+      ["sales-performance", "overview", { period }] as const,
+    staffList: ["sales-performance", "staff-list"] as const,
+    staffDetail: (staffId: string, period?: string) =>
+      ["sales-performance", "staff", staffId, { period }] as const,
+    me: (period?: string) =>
+      ["sales-performance", "me", { period }] as const,
+  },
+
   booking: {
     all: ["bookings"] as const,
     list: (tab: string = "prebooked", role?: string) =>
