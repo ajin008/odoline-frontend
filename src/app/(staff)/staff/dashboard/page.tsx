@@ -8,6 +8,7 @@ import { useMe } from "@/src/features/auth/hooks/use-me";
 import { CroDashboard } from "@/src/features/leads/components/cro-dashboard";
 import { useMyAtRisk } from "@/src/features/leads/hooks/use-my-at-risk";
 import { useInfiniteCars } from "@/src/features/cars/hooks/use-infinite-cars";
+import { useMyPerformance } from "@/src/features/sales/hooks/use-sales-performance";
 import {
   Car,
   CalendarCheck,
@@ -17,8 +18,6 @@ import {
   Flame,
   CheckCircle2,
   Calendar,
-  Sparkles,
-  Lock,
 } from "lucide-react";
 
 export default function StaffDashboardPage() {
@@ -37,6 +36,10 @@ export default function StaffDashboardPage() {
   });
 
   const availableCarsCount = carsData?.pages[0]?.data?.length ?? 0;
+
+  const { data: myPerformance, isLoading: isLoadingBookings } =
+    useMyPerformance("this_month");
+  const bookingsThisMonth = myPerformance?.totals.bookings ?? 0;
 
   const [greeting, setGreeting] = useState("");
   const [dateTimeStr, setDateTimeStr] = useState("");
@@ -320,39 +323,39 @@ export default function StaffDashboardPage() {
               </div>
             </Link>
 
-            {/* Card 2: Bookings — Customer Tokens (COMING SOON PLACEHOLDER) */}
-            <div className="flex flex-col justify-between rounded-xl sm:rounded-2xl border border-dashed border-line/80 bg-card/40 p-3.5 sm:p-5 opacity-85 select-none relative overflow-hidden min-h-[130px] sm:min-h-[145px]">
+            {/* Card 2: Bookings — This Month's Booking Count */}
+            <Link
+              href="/staff/booking"
+              className="group flex flex-col justify-between rounded-xl sm:rounded-2xl border border-line bg-card p-3.5 sm:p-5 shadow-xs hover:border-accent/40 active:scale-[0.98] transition-all cursor-pointer min-h-[130px] sm:min-h-[145px]"
+            >
               <div className="flex items-center justify-between gap-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-ink-subtle truncate">
-                    Bookings
-                  </span>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                    <Sparkles className="h-2.5 w-2.5 shrink-0" />
-                    Coming Soon
-                  </span>
-                </div>
-                <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-inset/50 text-ink-subtle/60 border border-line/50 shrink-0">
+                <span className="text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase text-ink-subtle truncate">
+                  Bookings
+                </span>
+                <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-lg sm:rounded-xl bg-inset text-ink-subtle border border-line group-hover:text-accent group-hover:border-accent/30 transition-colors shrink-0">
                   <CalendarCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[2px]" />
                 </div>
               </div>
 
-              <div className="my-1.5 sm:my-3 space-y-0.5 sm:space-y-1">
-                <h4 className="text-xs sm:text-sm font-bold text-ink font-sans flex items-center gap-1.5">
-                  <span>Customer Tokens</span>
-                  <Lock className="h-3 w-3 text-ink-subtle/70 shrink-0" />
-                </h4>
-                <p className="text-[10px] sm:text-xs text-ink-subtle leading-tight sm:leading-relaxed line-clamp-2 sm:line-clamp-none">
-                  Advance booking tokens and deal closing workflows will launch
-                  in the next release phase.
+              <div className="my-1.5 sm:my-3">
+                <div className="flex items-baseline gap-2">
+                  <span className="font-heading text-2xl sm:text-3xl font-extrabold tracking-tight text-ink block leading-none">
+                    {isLoadingBookings ? "…" : bookingsThisMonth}
+                  </span>
+                  <span className="text-[10px] sm:text-xs font-semibold text-ink-subtle">
+                    This Month
+                  </span>
+                </div>
+                <p className="text-[10px] sm:text-xs text-ink-subtle mt-1 sm:mt-1.5 leading-tight sm:leading-relaxed">
+                  Prebookings made by you this month.
                 </p>
               </div>
 
-              <div className="pt-1.5 sm:pt-2.5 border-t border-line/40 flex items-center justify-between text-[10px] sm:text-xs font-medium text-ink-subtle/60">
-                <span>Feature Preview</span>
-                <span className="text-[9px] sm:text-[10px] font-mono">v4.1</span>
+              <div className="pt-1.5 sm:pt-2.5 border-t border-line/60 flex items-center justify-between text-[10px] sm:text-xs font-bold text-accent group-hover:translate-x-0.5 transition-transform">
+                <span>View Bookings</span>
+                <ArrowRight className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
               </div>
-            </div>
+            </Link>
           </div>
         </div>
 
