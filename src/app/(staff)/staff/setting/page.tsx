@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { User, Calendar } from "lucide-react";
+import { User, Calendar, TrendingUp } from "lucide-react";
 import { StaffMyProfile } from "@/src/features/team/components/staff-my-profile";
 import { StaffAttendanceHeatmap } from "@/src/features/team/components/staff-attendance-heatmap";
+import { StaffMyPerformance } from "@/src/features/sales/components/staff-my-performance";
 
-type SettingsSubtab = "profile" | "attendance";
+type SettingsSubtab = "profile" | "attendance" | "performance";
 
 export default function StaffSettingPage() {
   const [activeSubtab, setActiveSubtab] = useState<SettingsSubtab>("profile");
@@ -28,41 +29,64 @@ export default function StaffSettingPage() {
       </div>
 
       {/* 2. Segmented Subtabs Control Bar (Responsive w-fit on Desktop, Full-width scrollable on Mobile) */}
-      <div className="inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line w-full sm:w-fit overflow-x-auto scrollbar-none">
+      <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-fit no-scrollbar shrink-0">
         <button
           type="button"
           onClick={() => setActiveSubtab("profile")}
-          className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeSubtab === "profile"
-              ? "bg-accent text-inverse shadow-xs font-bold"
-              : "text-ink-subtle hover:text-ink hover:bg-card/50"
+              ? "bg-accent text-inverse shadow-xs"
+              : "text-ink-muted hover:text-ink"
           }`}
         >
-          <User className="h-3.5 w-3.5 shrink-0" />
-          <span>My Profile</span>
+          <User
+            className={`h-3.5 w-3.5 shrink-0 ${
+              activeSubtab === "profile" ? "stroke-[2.5px]" : "stroke-[2px]"
+            }`}
+          />
+          <span>Profile</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveSubtab("attendance")}
-          className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeSubtab === "attendance"
-              ? "bg-accent text-inverse shadow-xs font-bold"
-              : "text-ink-subtle hover:text-ink hover:bg-card/50"
+              ? "bg-accent text-inverse shadow-xs"
+              : "text-ink-muted hover:text-ink"
           }`}
         >
-          <Calendar className="h-3.5 w-3.5 shrink-0" />
-          <span>My Attendance</span>
+          <Calendar
+            className={`h-3.5 w-3.5 shrink-0 ${
+              activeSubtab === "attendance" ? "stroke-[2.5px]" : "stroke-[2px]"
+            }`}
+          />
+          <span>Attendance</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSubtab("performance")}
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+            activeSubtab === "performance"
+              ? "bg-accent text-inverse shadow-xs"
+              : "text-ink-muted hover:text-ink"
+          }`}
+        >
+          <TrendingUp
+            className={`h-3.5 w-3.5 shrink-0 ${
+              activeSubtab === "performance" ? "stroke-[2.5px]" : "stroke-[2px]"
+            }`}
+          />
+          <span>Performance</span>
         </button>
       </div>
 
       {/* 3. Subtab Active Content */}
       <div className="pt-1">
-        {activeSubtab === "profile" ? (
-          <StaffMyProfile />
-        ) : (
-          <StaffAttendanceHeatmap isMe={true} />
-        )}
+        {activeSubtab === "profile" && <StaffMyProfile />}
+        {activeSubtab === "attendance" && <StaffAttendanceHeatmap isMe={true} />}
+        {activeSubtab === "performance" && <StaffMyPerformance />}
       </div>
     </div>
   );

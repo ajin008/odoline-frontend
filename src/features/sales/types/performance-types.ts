@@ -20,11 +20,18 @@ export interface PerformanceTotals {
   deliveries: number;
 }
 
+export type TrendBucket = "day" | "week" | "month" | "year";
+
 export interface PerformanceTrendPoint {
-  month: string; // "YYYY-MM"
+  key: string;
   enquiries: number;
   bookings: number;
   deliveries: number;
+}
+
+export interface PerformanceTrendData {
+  bucket: TrendBucket;
+  points: PerformanceTrendPoint[];
 }
 
 export interface PerformanceStaffInfo {
@@ -35,7 +42,7 @@ export interface PerformanceStaffInfo {
 export interface SalesPerformanceData {
   period: PerformancePeriod;
   totals: PerformanceTotals;
-  trend: PerformanceTrendPoint[];
+  trend: PerformanceTrendData;
   staff?: PerformanceStaffInfo | null;
 }
 
@@ -44,3 +51,4 @@ export interface PerformanceStaffListItem {
   name: string;
   role: "sales" | "cro";
 }
+
