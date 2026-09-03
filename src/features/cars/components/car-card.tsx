@@ -4,15 +4,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import {
-  MapPin,
-  FileText,
-  Wrench,
-  CheckCircle2,
-  AlertCircle,
-  Calendar,
-  X,
-} from "lucide-react";
+import { MapPin, FileText, Wrench, Calendar, X } from "lucide-react";
 import type { Car } from "../api/cars-api";
 import { CarThumbnail } from "./car-thumbnail";
 import { DocCompletenessBadge } from "./doc-completeness-badge";
@@ -144,7 +136,10 @@ export function CarCard({ car }: { car: Car }) {
                     {formattedStockAddedDate}
                   </span>
                   {typeof holdingDays === "number" && (
-                    <Badge variant="success" className="px-1.5 py-0.5 text-[10px] font-mono">
+                    <Badge
+                      variant="success"
+                      className="px-1.5 py-0.5 text-[10px] font-mono"
+                    >
                       {holdingDays === 0
                         ? "Stocked Today"
                         : holdingDays === 1
@@ -217,7 +212,10 @@ export function CarCard({ car }: { car: Car }) {
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
                   Asking Price
                 </span>
-                <Badge variant="success" className="text-xs font-mono font-bold">
+                <Badge
+                  variant="success"
+                  className="text-xs font-mono font-bold"
+                >
                   {formattedAskingPrice}
                 </Badge>
               </div>
