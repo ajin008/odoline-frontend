@@ -89,10 +89,10 @@ export function IntakeShell({ carId }: { carId: string }) {
       <div className="flex items-center justify-between gap-4 mb-4">
         <Link
           href="/owner/inventory"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold tracking-tight text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-xs font-bold tracking-tight text-ink-subtle hover:text-ink transition-colors cursor-pointer"
         >
-          <ArrowLeft className="h-3.5 w-3.5 stroke-[2.5px]" />
-          Back to Inventory
+          <ArrowLeft className="h-3.5 w-3.5 stroke-[2.25px]" />
+          <span>Back to Inventory</span>
         </Link>
 
         {isDeletable && (
@@ -163,7 +163,7 @@ export function IntakeShell({ carId }: { carId: string }) {
       </div>
 
       {/* Primary Intake Steps Segmented Switch Control */}
-      <div className="flex w-full sm:w-max gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line no-scrollbar">
+      <div className="grid grid-cols-3 sm:flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0 overflow-x-auto no-scrollbar">
         {TABS.map((t) => {
           const isLocked = t.key === "refurbishment" && !isDocsComplete;
 
@@ -172,12 +172,12 @@ export function IntakeShell({ carId }: { carId: string }) {
               key={t.key}
               onClick={() => handleTabClick(t.key)}
               className={[
-                "flex-1 sm:flex-initial text-center shrink-0 rounded-md px-3 sm:px-4 py-2 text-xs font-bold font-sans transition-all duration-200 cursor-pointer",
+                "h-full text-center rounded-lg px-2.5 sm:px-3.5 flex items-center justify-center gap-1.5 text-[11px] sm:text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap",
                 tab === t.key
-                  ? "bg-accent text-inverse shadow-sm"
+                  ? "bg-accent text-inverse shadow-xs font-bold"
                   : isLocked
-                  ? "text-ink-subtle opacity-60 cursor-not-allowed"
-                  : "text-ink-muted hover:text-ink",
+                  ? "text-ink-subtle opacity-60 cursor-not-allowed font-medium"
+                  : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium",
               ].join(" ")}
             >
               <div className="flex items-center justify-center gap-1.5">

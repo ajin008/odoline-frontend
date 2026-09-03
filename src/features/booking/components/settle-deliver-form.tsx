@@ -557,123 +557,110 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
           )}
         </div>
 
-        {/* Live Grid with borderless pastel background boxes */}
-        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2.5 text-xs">
-          {/* Agreed Price - Neutral Pastel */}
-          <div className="p-3 rounded-xl border-0 space-y-0.5 bg-inset/70">
-            <span className="text-[10px] font-bold text-ink-subtle uppercase leading-tight block">
-              Agreed Price
-            </span>
-            <div className="font-mono font-bold text-ink text-xs">
-              {formatLakhsCrores(agreedNum)}
+        {/* E-Commerce Billing Invoice Table (Row-by-Row) */}
+        <div className="rounded-xl border border-line/60 bg-inset/40 p-4 space-y-3 font-sans text-xs">
+          {/* Section 1: Charges & Vehicle Price */}
+          <div className="space-y-2">
+            {/* Row 1: Agreed Vehicle Price */}
+            <div className="flex items-center justify-between py-0.5">
+              <span className="text-ink-subtle font-medium">Agreed Vehicle Price</span>
+              <div className="text-right font-mono">
+                <span className="font-semibold text-ink">{formatCurrency(agreedNum)}</span>
+                <span className="text-[11px] text-ink-subtle ml-2">({formatLakhsCrores(agreedNum)})</span>
+              </div>
             </div>
-            <div className="font-mono text-[10px] text-ink-subtle">
-              {formatCurrency(agreedNum)}
+
+            {/* Row 2: Accessories & Add-ons */}
+            <div className="flex items-center justify-between py-0.5">
+              <span className="text-ink-subtle font-medium">Accessories &amp; Add-ons</span>
+              <div className="text-right font-mono">
+                <span className="font-semibold text-ink">+ {formatCurrency(accessoriesNum)}</span>
+                <span className="text-[11px] text-ink-subtle ml-2">({formatLakhsCrores(accessoriesNum)})</span>
+              </div>
+            </div>
+
+            {/* Row 3: RTO & Insurance */}
+            <div className="flex items-center justify-between py-0.5">
+              <span className="text-ink-subtle font-medium">RTO &amp; Insurance</span>
+              <div className="text-right font-mono">
+                <span className="font-semibold text-ink">+ {formatCurrency(rtoNum + insuranceNum)}</span>
+                <span className="text-[11px] text-ink-subtle ml-2">({formatLakhsCrores(rtoNum + insuranceNum)})</span>
+              </div>
             </div>
           </div>
 
-          {/* Accessories - Neutral Pastel */}
-          <div className="p-3 rounded-xl border-0 space-y-0.5 bg-inset/70">
-            <span className="text-[10px] font-bold text-ink-subtle uppercase leading-tight block">
-              Accessories
-            </span>
-            <div className="font-mono font-bold text-ink text-xs">
-              {formatLakhsCrores(accessoriesNum)}
-            </div>
-            <div className="font-mono text-[10px] text-ink-subtle">
-              {formatCurrency(accessoriesNum)}
+          {/* Row 4: Grand Total Row */}
+          <div className="border-t border-line/60 pt-2.5 flex items-center justify-between font-bold">
+            <span className="text-ink uppercase tracking-wider text-xs">Grand Total Payable</span>
+            <div className="text-right font-mono text-sm">
+              <span className="text-ink">{formatCurrency(grandTotalNum)}</span>
+              <span className="text-xs text-accent ml-2">({formatLakhsCrores(grandTotalNum)})</span>
             </div>
           </div>
 
-          {/* RTO + Insurance - Neutral Pastel */}
-          <div className="p-3 rounded-xl border-0 space-y-0.5 bg-inset/70">
-            <span className="text-[10px] font-bold text-ink-subtle uppercase leading-tight block">
-              RTO + Insurance
-            </span>
-            <div className="font-mono font-bold text-ink text-xs">
-              {formatLakhsCrores(rtoNum + insuranceNum)}
+          {/* Section 2: Payments & Collections */}
+          <div className="border-t border-line/50 pt-2.5 space-y-2">
+            {/* Row 5: Already Paid */}
+            <div className="flex items-center justify-between py-0.5">
+              <span className="text-ink-subtle font-medium flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>Already Paid (Advance)</span>
+              </span>
+              <div className="text-right font-mono">
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">- {formatCurrency(alreadyPaidNum)}</span>
+                <span className="text-[11px] text-ink-subtle ml-2">({formatLakhsCrores(alreadyPaidNum)})</span>
+              </div>
             </div>
-            <div className="font-mono text-[10px] text-ink-subtle">
-              {formatCurrency(rtoNum + insuranceNum)}
+
+            {/* Row 6: Collecting Now */}
+            <div className="flex items-center justify-between py-0.5">
+              <span className="text-ink-subtle font-medium flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                <span>Collecting Now (This Settlement)</span>
+              </span>
+              <div className="text-right font-mono">
+                <span className="font-semibold text-accent">- {formatCurrency(collectingNowNum)}</span>
+                <span className="text-[11px] text-ink-subtle ml-2">({formatLakhsCrores(collectingNowNum)})</span>
+              </div>
             </div>
           </div>
 
-          {/* Grand Total - Pastel Teal */}
+          {/* Row 7: Net Balance Remaining Highlighted Row */}
           <div
-            className="p-3 rounded-xl border-0 space-y-0.5"
-            style={{ backgroundColor: "#97d8d0" }}
-          >
-            <span className="text-[10px] font-extrabold text-[#0a3832] uppercase leading-tight block">
-              Grand Total
-            </span>
-            <div className="font-mono font-extrabold text-[#0a2723] text-xs">
-              {formatLakhsCrores(grandTotalNum)}
-            </div>
-            <div className="font-mono text-[10px] text-[#0a3832]/80 font-semibold">
-              {formatCurrency(grandTotalNum)}
-            </div>
-          </div>
-
-          {/* Already Paid - Pastel Green */}
-          <div
-            className="p-3 rounded-xl border-0 space-y-0.5"
-            style={{ backgroundColor: "#d8f1b7" }}
-          >
-            <span className="text-[10px] font-extrabold text-emerald-900 uppercase leading-tight block">
-              Already Paid
-            </span>
-            <div className="font-mono font-extrabold text-emerald-950 text-xs">
-              {formatLakhsCrores(alreadyPaidNum)}
-            </div>
-            <div className="font-mono text-[10px] text-emerald-900/80 font-semibold">
-              {formatCurrency(alreadyPaidNum)}
-            </div>
-          </div>
-
-          {/* Collecting Now - Pastel Blue */}
-          <div
-            className="p-3 rounded-xl border-0 space-y-0.5"
-            style={{ backgroundColor: "#dbeafe" }}
-          >
-            <span className="text-[10px] font-extrabold text-blue-900 uppercase leading-tight block">
-              Collecting Now
-            </span>
-            <div className="font-mono font-extrabold text-blue-950 text-xs">
-              {formatLakhsCrores(collectingNowNum)}
-            </div>
-            <div className="font-mono text-[10px] text-blue-900/80 font-semibold">
-              {formatCurrency(collectingNowNum)}
-            </div>
-          </div>
-
-          {/* Remaining - Pastel Amber (Shortfall) or Pastel Green (Cleared) */}
-          <div
-            className="p-3 rounded-xl border-0 space-y-0.5 col-span-2 md:col-span-1"
+            className="border-0 flex items-center justify-between font-bold rounded-xl p-3 mt-1"
             style={{
               backgroundColor: isFullyCovered ? "#d8f1b7" : "#fae9cf",
             }}
           >
             <span
-              className={`text-[10px] font-extrabold uppercase tracking-wider block leading-tight ${
-                isFullyCovered ? "text-emerald-900" : "text-amber-900"
-              }`}
-            >
-              Remaining
-            </span>
-            <div
-              className={`font-mono font-extrabold text-xs ${
+              className={`uppercase tracking-wider text-xs flex items-center gap-1.5 font-extrabold ${
                 isFullyCovered ? "text-emerald-950" : "text-amber-950"
               }`}
             >
-              {shortfallNum > 0
-                ? formatLakhsCrores(shortfallNum)
-                : "₹0 (Cleared)"}
+              {isFullyCovered ? (
+                <CheckCircle2 className="h-4 w-4 text-emerald-900 shrink-0" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-amber-900 shrink-0" />
+              )}
+              <span>Net Balance Remaining</span>
+            </span>
+
+            <div
+              className={`text-right font-mono text-sm font-extrabold ${
+                isFullyCovered ? "text-emerald-950" : "text-amber-950"
+              }`}
+            >
+              {shortfallNum > 0 ? (
+                <>
+                  <span>{formatCurrency(shortfallNum)}</span>
+                  <span className="text-xs opacity-85 ml-2 font-bold">
+                    ({formatLakhsCrores(shortfallNum)} Shortfall)
+                  </span>
+                </>
+              ) : (
+                <span>₹0 (Cleared &amp; Fully Paid)</span>
+              )}
             </div>
-            {shortfallNum > 0 && (
-              <div className="font-mono text-[10px] text-amber-900/80 font-semibold">
-                {formatCurrency(shortfallNum)}
-              </div>
-            )}
           </div>
         </div>
 

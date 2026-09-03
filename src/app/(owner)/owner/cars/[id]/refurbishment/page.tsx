@@ -15,10 +15,10 @@ export default async function RefurbishmentWizardPage({
       <div className="flex flex-col items-start">
         <Link
           href={`/owner/cars/${id}/documents`}
-          className="mb-4 inline-flex items-center gap-1.5 rounded-xl bg-accent px-4 py-2 text-xs font-bold text-inverse shadow-sm transition-all hover:bg-accent-hover active:scale-[0.98]"
+          className="mb-4 inline-flex items-center gap-1.5 text-xs font-bold tracking-tight text-ink-subtle hover:text-ink transition-colors cursor-pointer"
         >
-          <ArrowLeft className="h-3.5 w-3.5 stroke-[2.5px]" />
-          Back to Documents
+          <ArrowLeft className="h-3.5 w-3.5 stroke-[2.25px]" />
+          <span>Back to Documents</span>
         </Link>
 
         <div className="w-full border-b border-line pb-4">
