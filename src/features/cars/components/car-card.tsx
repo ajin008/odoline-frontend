@@ -87,12 +87,6 @@ export function CarCard({ car }: { car: Car }) {
               <span>{holdingDays}d in stock</span>
             </div>
           )}
-
-          <DocCompletenessBadge
-            car={car}
-            variant="overlay"
-            className="absolute top-2 right-2 z-10"
-          />
         </div>
 
         {/* Content Section */}

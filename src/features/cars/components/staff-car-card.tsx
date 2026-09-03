@@ -14,7 +14,6 @@ import {
 import type { Car } from "../api/cars-api";
 import { formatIndianNumber } from "@/src/lib/formatters";
 
-import { DocCompletenessBadge } from "./doc-completeness-badge";
 import { Badge } from "@/src/components/ui/badge";
 
 function getDaysInStock(car: Car): number {
@@ -49,7 +48,9 @@ export function StaffCarCard({ car }: { car: Car }) {
 
   // Calculate stock age in days
   const daysInStock = getDaysInStock(car);
-  const bookedDateFormatted = car.booked_at ? formatDateIST(car.booked_at) : null;
+  const bookedDateFormatted = car.booked_at
+    ? formatDateIST(car.booked_at)
+    : null;
 
   const cardContent = (
     <>
@@ -84,12 +85,18 @@ export function StaffCarCard({ car }: { car: Car }) {
 
         {/* Status Badge */}
         {isBooked ? (
-          <Badge variant="neutral" className="absolute top-2.5 right-2.5 uppercase tracking-wider">
+          <Badge
+            variant="neutral"
+            className="absolute top-2.5 right-2.5 uppercase tracking-wider"
+          >
             <BookmarkCheck className="h-3 w-3 stroke-[2.25px]" />
             <span>BOOKED</span>
           </Badge>
         ) : (
-          <Badge variant="success" className="absolute top-2.5 right-2.5 uppercase tracking-wider">
+          <Badge
+            variant="success"
+            className="absolute top-2.5 right-2.5 uppercase tracking-wider"
+          >
             <ShieldCheck className="h-3 w-3 stroke-[2.25px]" />
             <span>IN STOCK</span>
           </Badge>
@@ -112,13 +119,6 @@ export function StaffCarCard({ car }: { car: Car }) {
             </>
           )}
         </div>
-
-        {/* Required Docs Completeness Alert Badge (FIX-7b) */}
-        <DocCompletenessBadge
-          car={car}
-          variant="overlay"
-          className="absolute bottom-2.5 right-2.5"
-        />
       </div>
 
       {/* Details Container */}
