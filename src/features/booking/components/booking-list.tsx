@@ -40,8 +40,17 @@ export function BookingList({
   basePath = "/staff/booking",
   role,
 }: BookingListProps = {}) {
-  const [activeTab, setActiveTab] = useState<BookingTab>("prebooked");
+  const isOwner = role === "owner" || basePath.startsWith("/owner");
+  const [selectedTab, setSelectedTab] = useState<BookingTab>("prebooked");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Derived state during render: staff cannot access completed tab
+  const activeTab: BookingTab =
+    !isOwner && selectedTab === "completed" ? "prebooked" : selectedTab;
+
+  const setActiveTab = (tab: BookingTab) => {
+    setSelectedTab(tab);
+  };
 
   const {
     data,
@@ -163,7 +172,7 @@ export function BookingList({
               {activeTab === "prebooked"
                 ? "Prebooked"
                 : activeTab === "delivered"
-                ? "Delivered"
+                ? "RC Pending"
                 : activeTab === "completed"
                 ? "Completed"
                 : "Cancelled"}
@@ -344,15 +353,19 @@ export function BookingList({
 
       {/* 2. Controls & Search Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-line/60 pb-3">
-        {/* Status Subtabs (Four Tabs: Prebooked / Delivered / Completed / Cancelled) */}
-        <div className="flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0 overflow-x-auto">
+        {/* Status Subtabs (Grid on Mobile, Flex on Desktop to perfectly fit viewport) */}
+        <div
+          className={`grid ${
+            isOwner ? "grid-cols-4" : "grid-cols-3"
+          } sm:flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0`}
+        >
           <button
             type="button"
             onClick={() => {
               setActiveTab("prebooked");
               setSearchQuery("");
             }}
-            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+            className={`h-full text-center rounded-lg px-1.5 sm:px-3.5 flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
               activeTab === "prebooked"
                 ? "bg-accent text-inverse shadow-xs font-bold"
                 : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
@@ -368,31 +381,33 @@ export function BookingList({
               setActiveTab("delivered");
               setSearchQuery("");
             }}
-            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+            className={`h-full text-center rounded-lg px-1.5 sm:px-3.5 flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
               activeTab === "delivered"
                 ? "bg-purple-600 text-white dark:bg-purple-500 shadow-xs font-bold"
                 : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
             }`}
           >
             <Truck className="h-3.5 w-3.5 shrink-0" />
-            <span>Delivered</span>
+            <span>RC Pending</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("completed");
-              setSearchQuery("");
-            }}
-            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
-              activeTab === "completed"
-                ? "bg-emerald-700 text-white dark:bg-emerald-600 shadow-xs font-bold"
-                : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
-            }`}
-          >
-            <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-            <span>Completed</span>
-          </button>
+          {isOwner && (
+            <button
+              type="button"
+              onClick={() => {
+                setActiveTab("completed");
+                setSearchQuery("");
+              }}
+              className={`h-full text-center rounded-lg px-1 sm:px-3.5 flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                activeTab === "completed"
+                  ? "bg-emerald-700 text-white dark:bg-emerald-600 shadow-xs font-bold"
+                  : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
+              }`}
+            >
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+              <span>Completed</span>
+            </button>
+          )}
 
           <button
             type="button"
@@ -400,7 +415,7 @@ export function BookingList({
               setActiveTab("cancelled");
               setSearchQuery("");
             }}
-            className={`flex-1 sm:flex-initial h-full text-center rounded-lg px-3.5 flex items-center justify-center gap-1.5 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+            className={`h-full text-center rounded-lg px-1.5 sm:px-3.5 flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
               activeTab === "cancelled"
                 ? "bg-slate-700 text-white dark:bg-slate-800 shadow-xs font-bold"
                 : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
@@ -534,7 +549,7 @@ export function BookingList({
                   : activeTab === "prebooked"
                   ? "No prebooked bookings yet"
                   : activeTab === "delivered"
-                  ? "No delivered bookings yet"
+                  ? "No RC-pending bookings yet"
                   : activeTab === "completed"
                   ? "No completed sales yet"
                   : "No cancelled bookings yet"}
