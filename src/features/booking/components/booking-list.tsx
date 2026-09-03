@@ -40,13 +40,14 @@ export function BookingList({
   basePath = "/staff/booking",
   role,
 }: BookingListProps = {}) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isOwner = role === "owner" || basePath.startsWith("/owner");
   const [selectedTab, setSelectedTab] = useState<BookingTab>("prebooked");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Derived state during render: staff cannot access completed tab
+  // Derived state during render: completed tab is no longer on booking list
   const activeTab: BookingTab =
-    !isOwner && selectedTab === "completed" ? "prebooked" : selectedTab;
+    selectedTab === "completed" ? "prebooked" : selectedTab;
 
   const setActiveTab = (tab: BookingTab) => {
     setSelectedTab(tab);
@@ -173,16 +174,12 @@ export function BookingList({
                 ? "Prebooked"
                 : activeTab === "delivered"
                 ? "RC Pending"
-                : activeTab === "completed"
-                ? "Completed"
                 : "Cancelled"}
             </span>
             {activeTab === "prebooked" ? (
               <Flame className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
             ) : activeTab === "delivered" ? (
               <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
-            ) : activeTab === "completed" ? (
-              <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-500" />
             ) : (
               <CalendarX className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-rose-500" />
             )}
@@ -195,9 +192,7 @@ export function BookingList({
         {/* Card 2: Total Value */}
         <div className="rounded-2xl border border-line bg-card p-3 sm:p-4 space-y-1">
           <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
-            <span>
-              {activeTab === "completed" ? "Total Sales Value" : "Total Agreed"}
-            </span>
+            <span>Total Agreed</span>
             <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-accent" />
           </div>
           <div className="text-lg sm:text-2xl font-bold font-mono text-ink truncate">
@@ -291,33 +286,6 @@ export function BookingList({
               </div>
             </div>
           </>
-        ) : activeTab === "completed" ? (
-          <>
-            {/* Card 3: Total Collected */}
-            <div
-              className="rounded-2xl border-0 p-3 sm:p-4 space-y-1"
-              style={{ backgroundColor: "#d8f1b7" }}
-            >
-              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-emerald-900 uppercase tracking-wider">
-                <span>Total Collected</span>
-                <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-800" />
-              </div>
-              <div className="text-lg sm:text-2xl font-bold font-mono text-emerald-950 truncate">
-                {formatCurrency(kpiStats.paidSum)}
-              </div>
-            </div>
-
-            {/* Card 4: Fully Closed Status */}
-            <div className="rounded-2xl border border-line bg-inset p-3 sm:p-4 space-y-1">
-              <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-bold text-ink-subtle uppercase tracking-wider">
-                <span>Status</span>
-                <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div className="text-sm sm:text-base font-bold font-sans text-ink truncate mt-1">
-                Fully Closed
-              </div>
-            </div>
-          </>
         ) : (
           <>
             {/* Card 3: Total Retained (Cancelled Tab) */}
@@ -353,12 +321,8 @@ export function BookingList({
 
       {/* 2. Controls & Search Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-line/60 pb-3">
-        {/* Status Subtabs (Grid on Mobile, Flex on Desktop to perfectly fit viewport) */}
-        <div
-          className={`grid ${
-            isOwner ? "grid-cols-4" : "grid-cols-3"
-          } sm:flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0`}
-        >
+        {/* Status Subtabs (Three Tabs: Prebooked / RC Pending / Cancelled) */}
+        <div className="grid grid-cols-3 sm:flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0">
           <button
             type="button"
             onClick={() => {
@@ -390,24 +354,6 @@ export function BookingList({
             <Truck className="h-3.5 w-3.5 shrink-0" />
             <span>RC Pending</span>
           </button>
-
-          {isOwner && (
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("completed");
-                setSearchQuery("");
-              }}
-              className={`h-full text-center rounded-lg px-1 sm:px-3.5 flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
-                activeTab === "completed"
-                  ? "bg-emerald-700 text-white dark:bg-emerald-600 shadow-xs font-bold"
-                  : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
-              }`}
-            >
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-              <span>Completed</span>
-            </button>
-          )}
 
           <button
             type="button"
@@ -536,8 +482,6 @@ export function BookingList({
                 <Flame className="h-6 w-6 text-accent" />
               ) : activeTab === "delivered" ? (
                 <Truck className="h-6 w-6 text-purple-500" />
-              ) : activeTab === "completed" ? (
-                <CheckCircle2 className="h-6 w-6 text-emerald-500" />
               ) : (
                 <CalendarX className="h-6 w-6 text-rose-500" />
               )}
@@ -550,8 +494,6 @@ export function BookingList({
                   ? "No prebooked bookings yet"
                   : activeTab === "delivered"
                   ? "No RC-pending bookings yet"
-                  : activeTab === "completed"
-                  ? "No completed sales yet"
                   : "No cancelled bookings yet"}
               </h3>
               <p className="text-xs text-ink-subtle max-w-sm mx-auto">
@@ -561,8 +503,6 @@ export function BookingList({
                   ? "When leads are closed as won and prebooked, their booking records will appear in this table."
                   : activeTab === "delivered"
                   ? "Vehicles that have been delivered to customers awaiting RC transfer will be listed here."
-                  : activeTab === "completed"
-                  ? "Sales that have completed RC transfer and full closure will be listed here."
                   : "Cancelled vehicle bookings and refund details will be listed here."}
               </p>
             </div>
@@ -609,8 +549,6 @@ export function BookingList({
                 <Flame className="h-5 w-5 text-accent" />
               ) : activeTab === "delivered" ? (
                 <Truck className="h-5 w-5 text-purple-500" />
-              ) : activeTab === "completed" ? (
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
               ) : (
                 <CalendarX className="h-5 w-5 text-rose-500" />
               )}

@@ -25,7 +25,7 @@ export function useUpdateCarMargin(carId: string) {
   return useMutation({
     mutationFn: (margin: string) => carsApi.updateMargin(carId, margin),
     onSuccess: () => {
-      toast.success("Margin updated & selling price recalculated");
+      toast.success("Margin updated.");
       queryClient.invalidateQueries({ queryKey: queryKeys.cars.detail(carId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.cars.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats });

@@ -1,4 +1,5 @@
 import type { BookingStatus } from "../types/booking-types";
+import { BADGE_VARIANT_STYLES } from "@/src/components/ui/badge";
 
 export interface BookingStatusConfig {
   label: string;
@@ -10,42 +11,42 @@ const statusConfigMap = new Map<BookingStatus, BookingStatusConfig>([
     "prebooked",
     {
       label: "Prebooked",
-      badgeColor: "bg-emerald-100/90 text-emerald-800",
+      badgeColor: BADGE_VARIANT_STYLES.success,
     },
   ],
   [
     "offer",
     {
       label: "Offer & Accessories",
-      badgeColor: "bg-blue-100/90 text-blue-800",
+      badgeColor: BADGE_VARIANT_STYLES.info,
     },
   ],
   [
     "settlement",
     {
       label: "Settlement Pending",
-      badgeColor: "bg-amber-100/90 text-amber-900",
+      badgeColor: BADGE_VARIANT_STYLES.warning,
     },
   ],
   [
     "delivered",
     {
       label: "Vehicle Delivered",
-      badgeColor: "bg-purple-100/90 text-purple-800",
+      badgeColor: BADGE_VARIANT_STYLES.neutral,
     },
   ],
   [
     "closed",
     {
       label: "Closed Sale",
-      badgeColor: "bg-slate-100 text-slate-700",
+      badgeColor: BADGE_VARIANT_STYLES.neutral,
     },
   ],
   [
     "cancelled",
     {
       label: "Cancelled",
-      badgeColor: "bg-rose-100/90 text-rose-800",
+      badgeColor: BADGE_VARIANT_STYLES.danger,
     },
   ],
 ]);
@@ -56,7 +57,7 @@ export function getBookingStatusConfig(
   return (
     statusConfigMap.get(status) ?? {
       label: status,
-      badgeColor: "bg-slate-100 text-slate-700",
+      badgeColor: BADGE_VARIANT_STYLES.neutral,
     }
   );
 }
@@ -78,8 +79,7 @@ export function getRcTransferBadgeConfig(
   if (!dateStr) {
     return {
       label: "RC Pending",
-      badgeColor:
-        "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+      badgeColor: BADGE_VARIANT_STYLES.info,
       isOverdue: false,
       daysCount: 0,
     };
@@ -95,8 +95,7 @@ export function getRcTransferBadgeConfig(
   if (isOverdue) {
     return {
       label: daysCount > 0 ? `RC Overdue (${daysCount}d)` : "RC Overdue",
-      badgeColor:
-        "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30",
+      badgeColor: BADGE_VARIANT_STYLES.warning,
       isOverdue: true,
       daysCount,
     };
@@ -104,8 +103,7 @@ export function getRcTransferBadgeConfig(
 
   return {
     label: daysCount > 0 ? `RC Pending (${daysCount}d)` : "RC Pending",
-    badgeColor:
-      "bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20",
+    badgeColor: BADGE_VARIANT_STYLES.info,
     isOverdue: false,
     daysCount,
   };
@@ -158,8 +156,7 @@ export function getBalanceOverdueBadgeConfig(
 
   return {
     label: daysOverdue > 0 ? `Balance Overdue (${daysOverdue}d)` : "Balance Overdue",
-    badgeColor:
-      "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30 font-semibold",
+    badgeColor: BADGE_VARIANT_STYLES.warning,
     isOverdue: true,
     daysOverdue,
   };
@@ -171,4 +168,3 @@ export function isBookingEditable(status?: BookingStatus | string | null): boole
   if (!status) return false;
   return (EDITABLE_BOOKING_STATUSES as string[]).includes(status);
 }
-

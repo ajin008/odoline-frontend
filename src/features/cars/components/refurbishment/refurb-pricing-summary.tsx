@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { formatCurrency } from "../../utils/refurbishment-helpers";
 import { useUpdateCarMargin } from "../../hooks/use-car";
+import { useMe } from "@/src/features/auth/hooks/use-me";
 import { Loader2, TrendingUp } from "lucide-react";
 
 interface RefurbPricingSummaryProps {
@@ -23,6 +24,9 @@ export function RefurbPricingSummary({
   landingNum,
   initialMargin,
 }: RefurbPricingSummaryProps) {
+  const { data: user } = useMe();
+  const isOwner = !user || user.role === "owner";
+
   const [marginInput, setMarginInput] = useState(
     initialMargin ? String(initialMargin) : ""
   );
@@ -36,14 +40,14 @@ export function RefurbPricingSummary({
     setMarginInput(e.target.value);
   };
 
-  const handleBlurOrSubmit = () => {
+  const handleSave = () => {
     const numericVal = Number(marginInput);
-    if (!isNaN(numericVal) && numericVal !== initialMargin) {
+    if (!isNaN(numericVal)) {
       updateMarginMutation.mutate(marginInput);
     }
   };
 
-  const currentMargin = Number(marginInput) || 0;
+  const currentMargin = Number(marginInput) || initialMargin || 0;
   const liveSellingPrice = landingNum + currentMargin;
 
   return (
@@ -62,7 +66,7 @@ export function RefurbPricingSummary({
         </span>
       </div>
 
-      {/* Grid Matrix: Responsive 2-col on Mobile, 5-col Flow on Desktop */}
+      {/* Grid Matrix: 5 Read-Only Pastel Display Cards (Without borders) */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 items-stretch">
         {/* 1. Purchase Amount Card */}
         <div className="flex flex-col justify-between rounded-xl bg-[#f1f5f9] p-3.5 transition-all hover:bg-[#e2e8f0]">
@@ -94,37 +98,17 @@ export function RefurbPricingSummary({
           </p>
         </div>
 
-        {/* 4. Profit Margin Input Card */}
-        <div className="flex flex-col justify-between rounded-xl bg-[#fef3c7] p-3.5 transition-all hover:bg-[#fde68a] focus-within:bg-[#fde68a]">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#d97706]">
-              + Profit Margin
-            </p>
-            {updateMarginMutation.isPending && (
-              <Loader2 className="h-3 w-3 animate-spin text-[#d97706]" />
-            )}
-          </div>
-          <div className="flex items-center gap-1 mt-1">
-            <span className="text-xs text-[#92400e] font-bold font-mono">
-              ₹
-            </span>
-            <input
-              type="number"
-              placeholder="0"
-              value={marginInput}
-              onChange={handleMarginChange}
-              onBlur={handleBlurOrSubmit}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.currentTarget.blur();
-                }
-              }}
-              className="w-full bg-transparent border-none p-0 text-sm font-bold text-[#92400e] focus:outline-none focus:ring-0 font-mono"
-            />
-          </div>
+        {/* 4. Profit Margin Display Card (Read-Only) */}
+        <div className="flex flex-col justify-between rounded-xl bg-[#fef3c7] p-3.5 transition-all hover:bg-[#fde68a]">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#d97706]">
+            + Profit Margin
+          </p>
+          <p className="text-sm font-bold text-[#92400e] mt-1 font-mono">
+            ₹{formatCurrency(currentMargin)}
+          </p>
         </div>
 
-        {/* 5. Live Selling Price Hero Card (Spans full width on Mobile) */}
+        {/* 5. Target Selling Price Hero Card */}
         <div className="col-span-2 lg:col-span-1 flex flex-col justify-between rounded-xl bg-[#d1fae5] p-3.5 transition-all hover:bg-[#a7f3d0]">
           <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#059669]">
             Target Selling Price
@@ -134,6 +118,69 @@ export function RefurbPricingSummary({
           </p>
         </div>
       </div>
+
+      {/* Owner-Only Form Control: Set Profit Margin (₹) */}
+      {isOwner && (
+        <div className="rounded-xl border border-line bg-inset p-4 sm:p-5 space-y-3 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <label
+                htmlFor="set-profit-margin-input"
+                className="text-xs font-bold text-ink font-sans flex items-center gap-1.5 cursor-pointer"
+              >
+                Set Profit Margin (₹)
+              </label>
+              <p className="text-[11px] text-ink-subtle font-sans mt-0.5">
+                Configure showroom profit margin to recalculate the target selling price.
+              </p>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSave();
+              }}
+              className="flex items-center gap-2.5 w-full sm:w-auto"
+            >
+              <div className="relative flex-1 sm:w-56">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold font-mono text-ink-muted">
+                  ₹
+                </span>
+                <input
+                  id="set-profit-margin-input"
+                  type="number"
+                  placeholder="e.g. 25000"
+                  value={marginInput}
+                  onChange={handleMarginChange}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSave();
+                    }
+                  }}
+                  className="w-full rounded-lg border border-line bg-card py-2 pl-7 pr-3 text-xs font-bold font-mono text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={
+                  updateMarginMutation.isPending ||
+                  marginInput.trim() === "" ||
+                  Number(marginInput) === initialMargin
+                }
+                className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-accent px-4 py-2 text-xs font-bold text-inverse shadow-xs transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+              >
+                {updateMarginMutation.isPending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  "Save"
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

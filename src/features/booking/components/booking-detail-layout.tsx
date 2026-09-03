@@ -12,6 +12,7 @@ import {
   getRcTransferBadgeConfig,
   getBalanceOverdueBadgeConfig,
 } from "../utils/booking-status-map";
+import { Badge } from "@/src/components/ui/badge";
 import { BookingProgressBar } from "./booking-progress-bar";
 import { CancelBookingModal } from "./cancel-booking-modal";
 import {
@@ -256,15 +257,15 @@ export function BookingDetailLayout({
 
           <div className="flex items-center gap-2 flex-wrap">
             {isFullyPaid ? (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-extrabold bg-emerald-100/90 text-emerald-800">
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-700" />
+              <Badge variant="success" className="px-3 py-1 text-xs font-extrabold">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                 <span>Fully Paid</span>
-              </span>
+              </Badge>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-extrabold bg-amber-100/90 text-amber-900">
-                <AlertCircle className="h-3.5 w-3.5 shrink-0 text-amber-800" />
+              <Badge variant="warning" className="px-3 py-1 text-xs font-extrabold">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                 <span>Balance Pending</span>
-              </span>
+              </Badge>
             )}
           </div>
 

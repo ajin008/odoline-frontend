@@ -15,6 +15,9 @@ import {
 } from "lucide-react";
 import type { Car } from "../api/cars-api";
 import { CarThumbnail } from "./car-thumbnail";
+import { DocCompletenessBadge } from "./doc-completeness-badge";
+import { CAR_STATUS_CONFIG } from "../status-config";
+import { Badge } from "@/src/components/ui/badge";
 
 export function CarCard({ car }: { car: Car }) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -25,6 +28,11 @@ export function CarCard({ car }: { car: Car }) {
   }, []);
 
   const isInStock = car.status.toLowerCase() === "in_stock";
+  const statusConfig = CAR_STATUS_CONFIG[car.status.toLowerCase()] || {
+    label: car.status.replace("_", " "),
+    variant: "neutral" as const,
+    badge: "bg-neutral-state-light text-neutral-state border-neutral-state/20",
+  };
 
   const docsSummary = car.progress_summary?.documents;
   const refurbSummary = car.progress_summary?.refurbishment;
@@ -83,19 +91,16 @@ export function CarCard({ car }: { car: Car }) {
             onPreview={(url) => setPreviewUrl(url)}
           />
           {isInStock && holdingDays !== null && (
-            <div
-              className={[
-                "absolute top-2 left-2 z-10 flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold font-mono tracking-tight shadow-sm backdrop-blur-xs border select-none",
-                holdingDays >= 45
-                  ? "bg-red-600/90 text-white border-red-500/50"
-                  : holdingDays >= 30
-                  ? "bg-amber-600/90 text-white border-amber-500/50"
-                  : "bg-black/60 text-white/90 border-white/20",
-              ].join(" ")}
-            >
+            <div className="absolute top-2 left-2 z-10 flex items-center rounded-md bg-black text-white px-2 py-0.5 text-[10px] font-bold font-mono tracking-tight shadow-xs backdrop-blur-md select-none">
               <span>{holdingDays}d in stock</span>
             </div>
           )}
+
+          <DocCompletenessBadge
+            car={car}
+            variant="overlay"
+            className="absolute top-2 right-2 z-10"
+          />
         </div>
 
         {/* Content Section */}
@@ -114,24 +119,12 @@ export function CarCard({ car }: { car: Car }) {
                 </h3>
               </div>
 
-              <span
-                className={[
-                  "text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-md shrink-0 mt-0.5 border shadow-sm text-white",
-                  car.status.toLowerCase() === "purchasing"
-                    ? "bg-amber-500 border-amber-600/30"
-                    : car.status.toLowerCase() === "in_refurbishment"
-                    ? "bg-indigo-600 border-indigo-700/30"
-                    : car.status.toLowerCase() === "in_stock"
-                    ? "bg-emerald-600 border-emerald-700/30"
-                    : car.status.toLowerCase() === "refurb_complete"
-                    ? "bg-teal-600 border-teal-700/30"
-                    : car.status.toLowerCase() === "booked"
-                    ? "bg-purple-600 border-purple-700/30"
-                    : "bg-zinc-700 border-zinc-800/30",
-                ].join(" ")}
+              <Badge
+                variant={statusConfig.variant}
+                className="uppercase tracking-widest text-[9px] mt-0.5"
               >
-                {car.status.replace("_", " ")}
-              </span>
+                {statusConfig.label}
+              </Badge>
             </div>
 
             {/* Specs & Timestamp Sub-line */}
@@ -151,13 +144,13 @@ export function CarCard({ car }: { car: Car }) {
                     {formattedStockAddedDate}
                   </span>
                   {typeof holdingDays === "number" && (
-                    <span className="bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 px-1.5 py-0.5 rounded text-[10px] font-mono font-bold">
+                    <Badge variant="success" className="px-1.5 py-0.5 text-[10px] font-mono">
                       {holdingDays === 0
                         ? "Stocked Today"
                         : holdingDays === 1
                         ? "1 Day in Stock"
                         : `${holdingDays} Days in Stock`}
-                    </span>
+                    </Badge>
                   )}
                 </>
               )}
@@ -178,36 +171,14 @@ export function CarCard({ car }: { car: Car }) {
             {(docsSummary || refurbSummary) && (
               <div className="pt-2 border-t border-line/50 space-y-2 text-[11px] font-sans">
                 {/* Document Progress Summary Badge */}
-                {docsSummary && (
-                  <div className="flex items-center justify-between gap-1.5">
-                    <div className="flex items-center gap-1.5 text-ink-muted min-w-0">
-                      <FileText className="h-3.5 w-3.5 shrink-0 text-ink-subtle" />
-                      <span className="truncate">Docs:</span>
-                    </div>
-
-                    {/* 1. RED / DANGER: Mandatory Hard Docs Missing */}
-                    {docsSummary.hard_docs_complete === false ||
-                    (docsSummary.pending_required &&
-                      docsSummary.pending_required > 0) ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-rose-600 px-2 py-0.5 rounded-md shadow-sm border border-rose-700/30 shrink-0">
-                        <AlertCircle className="h-3 w-3 text-white stroke-[2.5px]" />
-                        Mandatory Docs Missing
-                      </span>
-                    ) : docsSummary.has_pending ? (
-                      /* 2. YELLOW / WARNING: Soft / Optional Docs Pending */
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-amber-500 px-2 py-0.5 rounded-md shadow-sm border border-amber-600/30 shrink-0">
-                        <AlertCircle className="h-3 w-3 text-white stroke-[2.5px]" />
-                        Docs Pending
-                      </span>
-                    ) : (
-                      /* 3. GREEN / SUCCESS: All Docs Uploaded */
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-md shadow-sm border border-emerald-700/30 shrink-0">
-                        <CheckCircle2 className="h-3 w-3 text-white stroke-[2.5px]" />
-                        Docs Complete
-                      </span>
-                    )}
+                <div className="flex items-center justify-between gap-1.5">
+                  <div className="flex items-center gap-1.5 text-ink-muted min-w-0">
+                    <FileText className="h-3.5 w-3.5 shrink-0 text-ink-subtle" />
+                    <span className="truncate">Docs:</span>
                   </div>
-                )}
+
+                  <DocCompletenessBadge car={car} variant="inline" />
+                </div>
 
                 {/* Refurbishment Progress Summary */}
                 {refurbSummary && (
@@ -246,9 +217,9 @@ export function CarCard({ car }: { car: Car }) {
                 <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-muted">
                   Asking Price
                 </span>
-                <span className="text-xs font-bold font-mono text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                <Badge variant="success" className="text-xs font-mono font-bold">
                   {formattedAskingPrice}
-                </span>
+                </Badge>
               </div>
             )}
           </div>

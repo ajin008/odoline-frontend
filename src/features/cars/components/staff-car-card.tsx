@@ -14,6 +14,9 @@ import {
 import type { Car } from "../api/cars-api";
 import { formatIndianNumber } from "@/src/lib/formatters";
 
+import { DocCompletenessBadge } from "./doc-completeness-badge";
+import { Badge } from "@/src/components/ui/badge";
+
 function getDaysInStock(car: Car): number {
   if (car.days_in_stock != null) return car.days_in_stock;
   const dateStr = car.stock_added_at || car.created_at;
@@ -75,28 +78,28 @@ export function StaffCarCard({ car }: { car: Car }) {
         )}
 
         {/* Reg Number Pill */}
-        <div className="absolute top-2.5 left-2.5 rounded-md bg-black/70 px-2 py-0.5 text-[10px] font-mono font-bold text-white backdrop-blur-md">
+        <div className="absolute top-2.5 left-2.5 rounded-md bg-black text-white px-2 py-0.5 text-[10px] font-mono font-bold backdrop-blur-md select-none">
           {car.reg_number || "NO-REG"}
         </div>
 
         {/* Status Badge */}
         {isBooked ? (
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-md bg-amber-600/90 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-md uppercase tracking-wider">
-            <BookmarkCheck className="h-3 w-3 stroke-[2.5px]" />
+          <Badge variant="neutral" className="absolute top-2.5 right-2.5 uppercase tracking-wider">
+            <BookmarkCheck className="h-3 w-3 stroke-[2.25px]" />
             <span>BOOKED</span>
-          </div>
+          </Badge>
         ) : (
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 rounded-md bg-emerald-500/90 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-md uppercase tracking-wider">
-            <ShieldCheck className="h-3 w-3 stroke-[2.5px]" />
+          <Badge variant="success" className="absolute top-2.5 right-2.5 uppercase tracking-wider">
+            <ShieldCheck className="h-3 w-3 stroke-[2.25px]" />
             <span>IN STOCK</span>
-          </div>
+          </Badge>
         )}
 
         {/* Stock Age or Booking Ref Badge on Photo Overlay */}
-        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-md bg-black/75 px-2 py-0.5 text-[10px] font-mono font-bold text-white backdrop-blur-md border border-white/10">
+        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1 rounded-md bg-black text-white px-2 py-0.5 text-[10px] font-mono font-bold backdrop-blur-md select-none">
           {isBooked ? (
             <>
-              <Tag className="h-3 w-3 text-amber-400 stroke-[2.25px]" />
+              <Tag className="h-3 w-3 text-white/80 stroke-[2.25px]" />
               <span>
                 {car.booking_number ? `#${car.booking_number}` : "Booked"}
                 {bookedDateFormatted ? ` · ${bookedDateFormatted}` : ""}
@@ -104,11 +107,18 @@ export function StaffCarCard({ car }: { car: Car }) {
             </>
           ) : (
             <>
-              <Clock className="h-3 w-3 text-accent stroke-[2.25px]" />
+              <Clock className="h-3 w-3 text-white/80 stroke-[2.25px]" />
               <span>{daysInStock}d in stock</span>
             </>
           )}
         </div>
+
+        {/* Required Docs Completeness Alert Badge (FIX-7b) */}
+        <DocCompletenessBadge
+          car={car}
+          variant="overlay"
+          className="absolute bottom-2.5 right-2.5"
+        />
       </div>
 
       {/* Details Container */}

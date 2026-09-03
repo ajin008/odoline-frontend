@@ -78,6 +78,13 @@ export interface Car {
 
   // Enriched progress summary metadata
   progress_summary?: ProgressSummary;
+
+  // FIX-7a required docs completeness fields
+  required_docs_total?: number;
+  required_docs_present?: number;
+  pending_docs_count?: number;
+  pending_docs?: string[];
+  docs_complete?: boolean;
 }
 
 /** Pagination metadata that comes back alongside every cars list page. */

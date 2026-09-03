@@ -11,6 +11,7 @@ import {
   buildDocFilename,
 } from "@/src/features/booking/utils/doc-actions";
 import { formatIndianNumber } from "@/src/lib/formatters";
+import { Badge } from "@/src/components/ui/badge";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -624,9 +625,9 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                       </h3>
                     </div>
                     {/* BORDER-FREE PASTEL BADGE */}
-                    <span className="text-xs font-mono font-extrabold bg-amber-100/90 text-amber-900 px-2.5 py-0.5 rounded-md">
+                    <Badge variant="warning" className="text-xs font-mono font-extrabold px-2.5 py-0.5">
                       Total: {formatCurrencyStr(refurbishment.refurb_total)}
-                    </span>
+                    </Badge>
                   </div>
 
                   {refurbishment.items.length === 0 ? (

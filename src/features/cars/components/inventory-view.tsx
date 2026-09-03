@@ -19,7 +19,6 @@ const SUB_TABS = [
   { key: "pipeline", label: "Pipeline", statuses: PIPELINE_STATUSES },
   { key: "in_stock", label: "In Stock", statuses: ["in_stock"] },
   { key: "booked", label: "Booked", statuses: ["booked"] },
-  { key: "delivered", label: "Delivered", statuses: ["delivered"] },
 ] as const;
 
 type TabKey = (typeof SUB_TABS)[number]["key"];
