@@ -5,11 +5,11 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SalesOverviewDashboard } from "./sales-overview-dashboard";
 import { CompletedSalesList } from "./completed-sales-list";
-import { Receipt, TrendingUp } from "lucide-react";
+import { IndianRupee, TrendingUp } from "lucide-react";
 
 const SALES_SUBTABS = [
   { key: "overview", label: "Overview", icon: TrendingUp },
-  { key: "completed", label: "Completed Sales", icon: Receipt },
+  { key: "completed", label: "Completed Sales", icon: IndianRupee },
 ] as const;
 
 type SalesSubtabKey = (typeof SALES_SUBTABS)[number]["key"];
