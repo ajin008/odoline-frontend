@@ -178,16 +178,16 @@ export function BookingDeliveryStage({
 
   return (
     <div className="space-y-5 select-none font-sans">
-      {/* Delivery Confirmation Header Banner */}
-      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 shrink-0">
+      {/* Delivery Confirmation Header Banner (Border-Free Pastel Emerald) */}
+      <div className="rounded-2xl border-none bg-[#d1fae5] p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#a7f3d0] text-[#065f46] shrink-0">
           <CheckCircle2 className="h-5 w-5" />
         </div>
         <div className="space-y-1">
-          <div className="font-bold text-sm text-emerald-800 dark:text-emerald-300">
+          <div className="font-bold text-sm text-[#065f46]">
             Vehicle Handover Completed
           </div>
-          <div className="text-xs text-emerald-700 dark:text-emerald-400 leading-relaxed">
+          <div className="text-xs text-[#047857] leading-relaxed font-medium">
             The vehicle has been delivered to the customer. Gate pass and handover details logged.
           </div>
         </div>

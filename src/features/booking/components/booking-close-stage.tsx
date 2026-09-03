@@ -206,25 +206,25 @@ export function BookingCloseStage({
   if (isDelivered && !readOnly) {
     return (
       <div className="space-y-6 select-none font-sans pb-12">
-        {/* Header Status Banner */}
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0">
+        {/* Header Status Banner (Border-Free Pastel Amber) */}
+        <div className="rounded-2xl border-none bg-[#fef3c7] p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#fde68a] text-[#92400e] shrink-0">
             <FileCheck className="h-5 w-5" />
           </div>
           <div className="space-y-1">
-            <div className="font-bold text-sm text-amber-800 dark:text-amber-300">
+            <div className="font-bold text-sm text-[#78350f]">
               Vehicle Delivered — Awaiting RC Transfer &amp; Closure
             </div>
-            <div className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed font-medium">
+            <div className="text-xs text-[#92400e] leading-relaxed font-medium">
               Upload the RC transfer document, record the transfer date, and
               complete the final sale closure workflow.
             </div>
           </div>
         </div>
 
-        {/* Warning Callout Banner */}
-        <div className="rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4 flex items-center gap-3 text-xs text-rose-600 dark:text-rose-400 font-semibold shadow-xs">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-rose-500" />
+        {/* Warning Callout Banner (Border-Free Pastel Rose) */}
+        <div className="rounded-2xl border-none bg-[#ffe4e6] p-4 flex items-center gap-3 text-xs text-[#9f1239] font-semibold shadow-xs">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-[#be123c]" />
           <span>
             This finalizes the sale — the car will be marked closed and removed
             from active inventory.
@@ -401,15 +401,15 @@ export function BookingCloseStage({
   if (isDelivered && readOnly) {
     return (
       <div className="space-y-5 select-none font-sans">
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 shrink-0">
+        <div className="rounded-2xl border-none bg-[#fef3c7] p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#fde68a] text-[#92400e] shrink-0">
             <Clock className="h-5 w-5" />
           </div>
           <div className="space-y-1">
-            <div className="font-bold text-sm text-amber-800 dark:text-amber-300">
+            <div className="font-bold text-sm text-[#78350f]">
               Vehicle Delivered — Pending RC Transfer &amp; Closure
             </div>
-            <div className="text-xs text-amber-700 dark:text-amber-400 leading-relaxed">
+            <div className="text-xs text-[#92400e] leading-relaxed font-medium">
               Vehicle has been delivered to the customer. Awaiting assigned
               sales staff to record the official RC transfer and finalize deal
               closure.
@@ -448,15 +448,15 @@ export function BookingCloseStage({
   return (
     <div className="space-y-6 select-none font-sans pb-12">
       {/* Header Banner (Border-Free Pastel Emerald) */}
-      <div className="rounded-2xl bg-emerald-100/80 text-emerald-950 p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-200/90 text-emerald-900 shrink-0">
+      <div className="rounded-2xl border-none bg-[#d1fae5] p-4 sm:p-5 flex items-start gap-3.5 shadow-xs">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#a7f3d0] text-[#065f46] shrink-0">
           <CheckCircle2 className="h-5 w-5" />
         </div>
         <div className="space-y-1">
-          <div className="font-extrabold text-sm text-emerald-950">
+          <div className="font-extrabold text-sm text-[#065f46]">
             Booking Transaction Closed — RC Transfer Recorded
           </div>
-          <div className="text-xs text-emerald-900 leading-relaxed font-medium">
+          <div className="text-xs text-[#047857] leading-relaxed font-medium">
             RC transfer document uploaded and deal officially closed. The car is
             marked closed and transaction completed.
           </div>

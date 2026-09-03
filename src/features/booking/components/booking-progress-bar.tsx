@@ -26,15 +26,15 @@ export function BookingProgressBar({
 
   if (isCancelled) {
     return (
-      <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 sm:p-5 flex items-start gap-3.5 text-xs text-rose-600 dark:text-rose-400 select-none shadow-xs font-sans">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500/20 text-rose-500 shrink-0">
+      <div className="rounded-2xl border-none bg-[#ffe4e6] p-4 sm:p-5 flex items-start gap-3.5 text-xs text-[#9f1239] select-none shadow-xs font-sans">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#fecdd3] text-[#be123c] shrink-0">
           <XCircle className="h-5 w-5" />
         </div>
         <div className="space-y-1">
-          <div className="font-bold text-sm text-rose-700 dark:text-rose-300">
+          <div className="font-bold text-sm text-[#9f1239]">
             Booking Transaction Cancelled
           </div>
-          <div className="text-xs text-rose-600/90 dark:text-rose-400/90 leading-relaxed">
+          <div className="text-xs text-[#be123c] leading-relaxed font-medium">
             {cancelReason
               ? `Reason: ${cancelReason}`
               : "This booking agreement was marked as cancelled. No further pipeline stage progression is available."}

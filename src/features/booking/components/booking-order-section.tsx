@@ -148,17 +148,17 @@ export function BookingOrderSection({
     <div className="space-y-5 select-none font-sans pb-36 sm:pb-12">
       {/* Guided Next-Stage Proceed Banner */}
       {showProceedBar && (
-        <div className="rounded-2xl border border-accent/30 bg-accent/5 p-4 sm:p-5 space-y-4 shadow-xs font-sans">
+        <div className="rounded-2xl border-none bg-[#e0f2fe] p-4 sm:p-5 space-y-4 shadow-xs font-sans">
           <div className="space-y-1">
-            <div className="text-xs font-bold text-ink uppercase tracking-wider flex items-center gap-2">
-              <ArrowRight className="h-4 w-4 text-accent shrink-0" />
+            <div className="text-xs font-bold text-[#0369a1] uppercase tracking-wider flex items-center gap-2">
+              <ArrowRight className="h-4 w-4 text-[#0284c7] shrink-0" />
               <span>Next Guided Pipeline Step</span>
             </div>
-            <div className="text-xs text-ink-subtle leading-relaxed">
+            <div className="text-xs text-[#0c4a6e] leading-relaxed font-medium">
               Order form &amp; accessories updated. Proceed to final settlement and vehicle delivery handover.
             </div>
           </div>
-          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-accent/20">
+          <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 pt-3 border-t border-[#bae6fd]">
             <Link
               href={`${basePath}/${bookingId}/agreement`}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-card border border-line text-xs font-bold text-ink hover:bg-inset transition-colors cursor-pointer shadow-xs min-h-[44px] sm:min-h-0"
