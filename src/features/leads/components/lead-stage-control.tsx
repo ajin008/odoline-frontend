@@ -691,10 +691,10 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
       {/* Won Details Banner (if already WON) */}
       {currentStage === "won" && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-2 text-xs">
-          <div className="flex items-center justify-between font-semibold text-emerald-600 dark:text-emerald-400">
+        <div className="rounded-xl border border-success/20 bg-success-light p-4 space-y-2 text-xs">
+          <div className="flex items-center justify-between font-semibold text-success">
             <span className="flex items-center gap-1.5">
-              <Trophy className="h-4 w-4" />
+              <Trophy className="h-4 w-4 text-success" />
               Won Deal Snapshot
             </span>
             {lead.won_at && (
@@ -708,7 +708,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-emerald-500/20 text-ink">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-success/20 text-ink">
             <div>
               <span className="text-ink-subtle">Purchased Car: </span>
               <span className="font-bold">
@@ -718,9 +718,11 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
               </span>
             </div>
             <div>
-              <span className="text-ink-subtle font-mono">Agreed Price: </span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">
-                {formatCurrency(lead.won_price)}
+              <span className="text-ink-subtle">Final Sale Price: </span>
+              <span className="font-bold font-mono text-success">
+                {lead.won_price
+                  ? `₹${Number(lead.won_price).toLocaleString("en-IN")}`
+                  : "N/A"}
               </span>
             </div>
           </div>
@@ -729,10 +731,10 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
 
       {/* Lost Details Banner (if already LOST) */}
       {currentStage === "lost" && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 space-y-2 text-xs">
-          <div className="flex items-center justify-between font-semibold text-red-500">
+        <div className="rounded-xl border border-danger/20 bg-danger-light p-4 space-y-2 text-xs">
+          <div className="flex items-center justify-between font-semibold text-danger">
             <span className="flex items-center gap-1.5">
-              <XCircle className="h-4 w-4" />
+              <XCircle className="h-4 w-4 text-danger" />
               Lost Lead Reason
             </span>
             {lead.lost_at && (
@@ -746,7 +748,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
             )}
           </div>
 
-          <p className="text-ink font-medium pt-1 border-t border-red-500/20">
+          <p className="text-ink font-medium pt-1 border-t border-danger/20">
             &ldquo;{lead.lost_reason || "No reason specified"}&rdquo;
           </p>
         </div>

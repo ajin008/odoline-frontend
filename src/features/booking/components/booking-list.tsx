@@ -347,7 +347,7 @@ export function BookingList({
             }}
             className={`h-full text-center rounded-lg px-1.5 sm:px-3.5 flex items-center justify-center gap-1 sm:gap-1.5 text-[11px] sm:text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
               activeTab === "delivered"
-                ? "bg-purple-600 text-white dark:bg-purple-500 shadow-xs font-bold"
+                ? "bg-accent text-inverse shadow-xs font-bold"
                 : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
             }`}
           >

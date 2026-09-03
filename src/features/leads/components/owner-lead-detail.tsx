@@ -11,6 +11,7 @@ import { LeadFollowUps } from "./lead-follow-ups";
 import { LeadInterestedCars } from "./lead-interested-cars";
 import type { LeadPriority } from "../types/lead-types";
 import { CustomSelect } from "@/src/components/ui/custom-select";
+import { Badge } from "@/src/components/ui/badge";
 import {
   ArrowLeft,
   User,
@@ -215,25 +216,25 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
       {/* ------------------------------------------------------------- */}
       {/* BREADCRUMB & TOP HEADER UNIT                                  */}
       {/* ------------------------------------------------------------- */}
-      <div className="rounded-2xl border border-line/60 bg-card p-4 sm:p-5 space-y-3.5 shadow-xs">
+      <div className="rounded-2xl border border-line/60 bg-card p-4 sm:p-5 space-y-3.5">
         {/* Row 1: Breadcrumb Navigation Link */}
         <div className="flex items-center justify-between gap-2 border-b border-line/40 pb-2.5">
           <Link
             href="/owner/crm?tab=all"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-ink-subtle hover:text-accent transition-colors group cursor-pointer min-w-0"
           >
-            <ArrowLeft className="h-3.5 w-3.5 group-hover:-translate-x-0.5 transition-transform shrink-0" />
-            <span className="truncate">Sales &amp; CRM</span>
-            <span className="text-line shrink-0">/</span>
-            <span className="shrink-0">Leads</span>
-            <span className="text-line shrink-0">/</span>
+            <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5 shrink-0" />
+            <span>Sales &amp; CRM</span>
+            <span>/</span>
+            <span>Leads</span>
+            <span>/</span>
             <span className="text-ink font-bold truncate">{customerName}</span>
           </Link>
 
-          <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider shrink-0">
+          <Badge variant="success" className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span>Read-Only Owner View</span>
-          </span>
+          </Badge>
         </div>
 
         {/* Row 2: Customer Title + Badges + Unified Staff Action Card */}
@@ -251,9 +252,9 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
                 {priority.label}
               </span>
 
-              <span className="inline-flex items-center rounded-md bg-surface border border-line/60 px-2.5 py-0.5 text-xs font-semibold text-ink">
+              <Badge variant="neutral" className="px-2.5 py-0.5 text-xs font-semibold">
                 {stageLabel}
-              </span>
+              </Badge>
             </div>
 
             <p className="text-[11px] text-ink-subtle font-mono truncate">
@@ -262,7 +263,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
           </div>
 
           {/* Unified Single Staff Card + Reassign Action Button */}
-          <div className="flex items-center gap-3 bg-inset/70 border border-line/60 p-2 pl-3.5 rounded-xl shrink-0 w-full md:w-auto justify-between md:justify-start shadow-xs">
+          <div className="flex items-center gap-3 bg-inset/70 border border-line/60 p-2 pl-3.5 rounded-xl shrink-0 w-full md:w-auto justify-between md:justify-start">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-card border border-line/60 text-accent shrink-0">
                 <UserCheck className="h-4 w-4" />
@@ -284,7 +285,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
                   setSelectedStaffId(lead.assigned_to || "");
                   setIsAssignOpen(true);
                 }}
-                className="flex items-center gap-1.5 rounded-lg bg-accent text-inverse hover:opacity-90 px-3 py-1.5 text-xs font-bold shadow-xs transition-all cursor-pointer shrink-0"
+                className="flex items-center gap-1.5 rounded-lg bg-accent text-inverse hover:opacity-90 px-3 py-1.5 text-xs font-bold transition-all cursor-pointer shrink-0"
               >
                 <span>Reassign</span>
               </button>
@@ -296,7 +297,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
       {/* ------------------------------------------------------------- */}
       {/* SALES PIPELINE STAGE STEPPER BANNER & AUDIT LOG               */}
       {/* ------------------------------------------------------------- */}
-      <div className="rounded-2xl border border-line/60 bg-card p-4 sm:p-5 space-y-4 shadow-xs">
+      <div className="rounded-2xl border border-line/60 bg-card p-4 sm:p-5 space-y-4">
         <div className="flex items-center justify-between gap-2 border-b border-line/50 pb-3">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted flex items-center gap-2">
             <History className="h-4 w-4 text-accent" />
@@ -329,18 +330,18 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
 
             if (status === "completed") {
               containerClass =
-                "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-bold";
+                "bg-success-light border-success/20 text-success font-bold";
               icon = (
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
               );
             } else if (status === "current") {
               containerClass =
-                "bg-accent text-inverse font-bold shadow-xs border-accent";
-              icon = <Flame className="h-3.5 w-3.5 text-inverse shrink-0" />;
+                "bg-accent-light border-accent/30 text-accent font-bold";
+              icon = <Flame className="h-3.5 w-3.5 text-accent shrink-0" />;
             } else if (status === "lost") {
               containerClass =
-                "bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400 font-bold opacity-60";
-              icon = <XCircle className="h-3.5 w-3.5 text-rose-500 shrink-0" />;
+                "bg-danger-light border-danger/20 text-danger font-bold opacity-60";
+              icon = <XCircle className="h-3.5 w-3.5 text-danger shrink-0" />;
             }
 
             return (
@@ -438,7 +439,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
         {/* Left Column: Customer Details, Budget, Interested Vehicles (60%) */}
         <div className="space-y-5 lg:col-span-7">
           {/* Customer Information Card */}
-          <div className="rounded-2xl border border-line/60 bg-card p-5 space-y-4 shadow-xs">
+          <div className="rounded-2xl border border-line/60 bg-card p-5 space-y-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted flex items-center gap-2">
               <User className="h-4 w-4 text-accent" />
               Customer Information
@@ -487,7 +488,7 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
           </div>
 
           {/* Budget & Requirements Card */}
-          <div className="rounded-2xl border border-line/60 bg-card p-5 space-y-4 shadow-xs">
+          <div className="rounded-2xl border border-line/60 bg-card p-5 space-y-4">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-ink-muted flex items-center gap-2">
               <IndianRupee className="h-4 w-4 text-accent" />
               Budget &amp; Requirements
@@ -503,21 +504,21 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
 
               {/* Won Deal Summary Card */}
               {isWon && (
-                <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 space-y-2">
+                <div className="rounded-xl border border-success/20 bg-success-light p-4 space-y-2">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 text-xs">
-                      <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="font-bold text-success flex items-center gap-1.5 text-xs">
+                      <CheckCircle2 className="h-4 w-4 text-success" />
                       Closed Won Deal
                     </span>
                     {lead.won_price && (
-                      <span className="font-bold font-mono text-sm text-emerald-700 dark:text-emerald-300">
+                      <span className="font-bold font-mono text-sm text-success">
                         {formatCurrency(lead.won_price)}
                       </span>
                     )}
                   </div>
 
                   {lead.won_car && (
-                    <div className="pt-2 border-t border-emerald-500/20 text-xs text-ink space-y-1">
+                    <div className="pt-2 border-t border-success/20 text-xs text-ink space-y-1">
                       <p className="font-bold">
                         Purchased Vehicle: {lead.won_car.year}{" "}
                         {lead.won_car.make} {lead.won_car.model}
@@ -532,9 +533,9 @@ export function OwnerLeadDetail({ leadId }: OwnerLeadDetailProps) {
 
               {/* Lost Lead Summary Card */}
               {isLost && (
-                <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 space-y-1.5">
-                  <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5 text-xs">
-                    <XCircle className="h-4 w-4 text-rose-500" />
+                <div className="rounded-xl border border-danger/20 bg-danger-light p-4 space-y-1.5">
+                  <span className="font-bold text-danger flex items-center gap-1.5 text-xs">
+                    <XCircle className="h-4 w-4 text-danger" />
                     Closed Lost Lead
                   </span>
                   <p className="text-xs text-ink italic leading-relaxed">

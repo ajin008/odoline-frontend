@@ -171,7 +171,7 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/staff/leads"
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle hover:bg-hover hover:text-ink transition-colors shrink-0 shadow-xs"
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-card border border-line text-ink-subtle hover:bg-hover hover:text-ink transition-colors shrink-0"
           >
             <ArrowLeft className="h-4.5 w-4.5" />
           </Link>
@@ -200,7 +200,7 @@ export function LeadDetail({ leadId }: LeadDetailProps) {
           <button
             type="button"
             onClick={() => setIsEditOpen(true)}
-            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-line hover:border-accent/40 text-ink-subtle hover:text-accent text-xs font-semibold shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-line hover:border-accent/40 text-ink-subtle hover:text-accent text-xs font-semibold active:scale-95 transition-all cursor-pointer shrink-0"
           >
             <Edit3 className="h-3.5 w-3.5" />
             <span>Edit Details</span>

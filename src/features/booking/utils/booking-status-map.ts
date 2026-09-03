@@ -32,7 +32,7 @@ const statusConfigMap = new Map<BookingStatus, BookingStatusConfig>([
     "delivered",
     {
       label: "Vehicle Delivered",
-      badgeColor: BADGE_VARIANT_STYLES.neutral,
+      badgeColor: BADGE_VARIANT_STYLES.success,
     },
   ],
   [
@@ -79,7 +79,7 @@ export function getRcTransferBadgeConfig(
   if (!dateStr) {
     return {
       label: "RC Pending",
-      badgeColor: BADGE_VARIANT_STYLES.info,
+      badgeColor: BADGE_VARIANT_STYLES.warning,
       isOverdue: false,
       daysCount: 0,
     };
@@ -103,7 +103,7 @@ export function getRcTransferBadgeConfig(
 
   return {
     label: daysCount > 0 ? `RC Pending (${daysCount}d)` : "RC Pending",
-    badgeColor: BADGE_VARIANT_STYLES.info,
+    badgeColor: BADGE_VARIANT_STYLES.warning,
     isOverdue: false,
     daysCount,
   };
