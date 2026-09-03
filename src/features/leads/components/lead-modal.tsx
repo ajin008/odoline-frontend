@@ -189,6 +189,7 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
     reset,
     control,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<CreateLeadFormData>({
     resolver: zodResolver(createLeadFormSchema),
@@ -640,6 +641,9 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
                     onChange={(e) => {
                       const raw = parseRawNumber(e.target.value);
                       setValue("budget_min", raw, { shouldValidate: true });
+                      if (budgetMaxRaw) {
+                        trigger("budget_max");
+                      }
                     }}
                     className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-ink outline-none transition-colors font-mono ${
                       errors.budget_min
@@ -674,6 +678,9 @@ export function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps) {
                     onChange={(e) => {
                       const raw = parseRawNumber(e.target.value);
                       setValue("budget_max", raw, { shouldValidate: true });
+                      if (budgetMinRaw) {
+                        trigger("budget_max");
+                      }
                     }}
                     className={`w-full rounded-lg border bg-surface px-3 py-2 text-sm text-ink outline-none transition-colors font-mono ${
                       errors.budget_max

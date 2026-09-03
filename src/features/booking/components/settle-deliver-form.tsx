@@ -22,7 +22,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
-  DollarSign,
+  IndianRupee,
   Building,
   FileText,
   CreditCard,
@@ -167,7 +167,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
       <div className="rounded-2xl border border-line bg-card p-5 space-y-4 shadow-xs">
         <div className="flex items-center justify-between border-b border-line/40 pb-3">
           <div className="flex items-center gap-2">
-            <DollarSign className="h-4.5 w-4.5 text-accent" />
+            <IndianRupee className="h-4.5 w-4.5 text-accent" />
             <h3 className="text-sm font-bold text-ink font-sans">
               Section A — Final Settlement Charges
             </h3>

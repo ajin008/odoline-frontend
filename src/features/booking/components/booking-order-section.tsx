@@ -7,6 +7,7 @@ import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder, useDeleteOrder } from "../hooks/use-booking-order";
 import { bookingApi } from "../api/booking-api";
 import { isBookingEditable } from "../utils/booking-status-map";
+import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
 import { OrderFormEditor } from "./order-form-editor";
 import type { BookingStatus } from "../types/booking-types";
 import Link from "next/link";
@@ -95,33 +96,19 @@ export function BookingOrderSection({
   const handleDownloadOrderPdf = async () => {
     if (!order || !booking) return;
     setIsDownloading(true);
+    const filename = buildDocFilename(
+      "Order-Form",
+      booking.booking_number,
+      booking.customer?.name
+    );
     try {
-      const blob = await bookingApi.getOrderPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Order-${booking.booking_number}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success("Order form PDF downloaded");
-    } catch (err: unknown) {
-      let message = "Failed to download order PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore parse error
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
+      await downloadPdfDocument({
+        fetchBlob: () => bookingApi.getOrderPdf(booking.id),
+        filename,
+        docTitle: "Order form PDF",
+      });
+    } catch {
+      // handled inside helper
     } finally {
       setIsDownloading(false);
     }
@@ -129,34 +116,23 @@ export function BookingOrderSection({
 
   const handleShareOrder = async () => {
     if (!order || !booking) return;
-
-    const carStr = booking.car
-      ? `${booking.car.year} ${booking.car.make} ${booking.car.model}${
-          booking.car.reg_number ? ` (${booking.car.reg_number})` : ""
-        }`
-      : "Vehicle";
-
-    const shareText = `Cars4 Order — ${booking.booking_number}\nCustomer: ${
-      booking.customer?.name || "Customer"
-    } · ${carStr}\nAccessories total: ${formatCurrency(order.total)}`;
-
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Cars4 Order — ${booking.booking_number}`,
-          text: shareText,
-        });
-        return;
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") return;
-      }
-    }
+    const customerName = booking.customer?.name || "Customer";
+    const filename = buildDocFilename(
+      "Order-Form",
+      booking.booking_number,
+      customerName
+    );
+    const shareText = `Cars4 Order Form — ${booking.booking_number} — ${customerName}`;
 
     try {
-      await navigator.clipboard.writeText(shareText);
-      toast.success("Order summary copied to clipboard");
+      await sharePdfDocument({
+        fetchBlob: () => bookingApi.getOrderPdf(booking.id),
+        filename,
+        shareTitle: `Cars4 Order Form ${booking.booking_number}`,
+        shareText,
+      });
     } catch {
-      toast.error("Failed to copy summary to clipboard");
+      // handled inside helper
     }
   };
 

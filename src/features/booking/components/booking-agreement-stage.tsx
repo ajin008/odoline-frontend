@@ -7,6 +7,7 @@ import { useMe } from "@/src/features/auth/hooks/use-me";
 import { bookingApi } from "../api/booking-api";
 import { toast } from "sonner";
 import { isBookingEditable } from "../utils/booking-status-map";
+import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
 import { EditAgreementModal } from "./edit-agreement-modal";
 import Link from "next/link";
 import {
@@ -110,33 +111,19 @@ export function BookingAgreementStage({
   const handleDownloadAgreement = async () => {
     if (!booking) return;
     setIsDownloading(true);
+    const filename = buildDocFilename(
+      "Advance-Agreement-Receipt",
+      booking.booking_number,
+      booking.customer?.name
+    );
     try {
-      const blob = await bookingApi.getAgreementPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Agreement-${booking.booking_number}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success("Agreement PDF downloaded");
-    } catch (err: unknown) {
-      let message = "Failed to download agreement PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore parse error
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
+      await downloadPdfDocument({
+        fetchBlob: () => bookingApi.getAgreementPdf(booking.id),
+        filename,
+        docTitle: "Advance Agreement PDF",
+      });
+    } catch {
+      // handled inside helper
     } finally {
       setIsDownloading(false);
     }
@@ -144,38 +131,23 @@ export function BookingAgreementStage({
 
   const handleShare = async () => {
     if (!booking) return;
-
-    const carStr = booking.car
-      ? `${booking.car.year} ${booking.car.make} ${booking.car.model}${
-          booking.car.reg_number ? ` (${booking.car.reg_number})` : ""
-        }`
-      : "Vehicle";
-
-    const shareText = `Cars4 Booking ${booking.booking_number}\nBuyer: ${
-      booking.customer?.name || "Customer"
-    }\nCar: ${carStr}\nAgreed: ${formatCurrency(
-      booking.agreed_price
-    )} · Advance: ${formatCurrency(
-      booking.amount_paid
-    )} · Balance: ${formatCurrency(booking.balance_due)}`;
-
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Cars4 Booking ${booking.booking_number}`,
-          text: shareText,
-        });
-        return;
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") return;
-      }
-    }
+    const customerName = booking.customer?.name || "Customer";
+    const filename = buildDocFilename(
+      "Advance-Agreement-Receipt",
+      booking.booking_number,
+      customerName
+    );
+    const shareText = `Cars4 Booking Agreement — ${booking.booking_number} — ${customerName}`;
 
     try {
-      await navigator.clipboard.writeText(shareText);
-      toast.success("Agreement summary copied to clipboard");
+      await sharePdfDocument({
+        fetchBlob: () => bookingApi.getAgreementPdf(booking.id),
+        filename,
+        shareTitle: `Cars4 Booking Agreement ${booking.booking_number}`,
+        shareText,
+      });
     } catch {
-      toast.error("Failed to copy summary to clipboard");
+      // handled inside helper
     }
   };
 

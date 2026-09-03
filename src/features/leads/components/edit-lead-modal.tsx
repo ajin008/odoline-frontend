@@ -85,7 +85,7 @@ const editLeadSchema = z
       if (!isNaN(min) && !isNaN(max) && min > max) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Minimum budget cannot exceed maximum budget",
+          message: "Max budget cannot be less than min budget",
           path: ["budget_max"],
         });
       }

@@ -67,6 +67,19 @@ export const createLeadFormSchema = z
         path: ["source_note"],
       });
     }
+
+    if (data.budget_min && data.budget_max) {
+      const min = Number(data.budget_min);
+      const max = Number(data.budget_max);
+      if (!isNaN(min) && !isNaN(max) && min > max) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Max budget cannot be less than min budget",
+          path: ["budget_max"],
+        });
+      }
+    }
   });
 
 export type CreateLeadFormData = z.infer<typeof createLeadFormSchema>;
+

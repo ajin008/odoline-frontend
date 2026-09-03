@@ -65,47 +65,47 @@ export function RefurbPricingSummary({
       {/* Grid Matrix: Responsive 2-col on Mobile, 5-col Flow on Desktop */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 items-stretch">
         {/* 1. Purchase Amount Card */}
-        <div className="flex flex-col justify-between rounded-lg border border-line bg-inset p-3.5 transition-all hover:bg-card">
-          <p className="text-[10px] font-mono font-semibold uppercase text-ink-muted">
+        <div className="flex flex-col justify-between rounded-xl bg-[#f1f5f9] p-3.5 transition-all hover:bg-[#e2e8f0]">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#475569]">
             Purchase Price
           </p>
-          <p className="text-sm font-bold text-ink mt-1 font-mono">
+          <p className="text-sm font-bold text-[#0f172a] mt-1 font-mono">
             ₹{formatCurrency(purchaseNum)}
           </p>
         </div>
 
         {/* 2. Refurbishment Cost Card */}
-        <div className="flex flex-col justify-between rounded-lg border border-accent/20 bg-accent-light/30 p-3.5 transition-all hover:bg-accent-light/50">
-          <p className="text-[10px] font-mono font-semibold uppercase text-accent">
+        <div className="flex flex-col justify-between rounded-xl bg-[#e0f2fe] p-3.5 transition-all hover:bg-[#bae6fd]">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#0284c7]">
             + Refurb Cost
           </p>
-          <p className="text-sm font-bold text-accent mt-1 font-mono">
+          <p className="text-sm font-bold text-[#0369a1] mt-1 font-mono">
             ₹{formatCurrency(refurbNum)}
           </p>
         </div>
 
         {/* 3. Landing Price (Break-Even) Card */}
-        <div className="flex flex-col justify-between rounded-lg border border-accent/40 bg-accent/10 dark:bg-accent/15 p-3.5 shadow-xs">
-          <p className="text-[10px] font-mono font-semibold uppercase text-accent">
+        <div className="flex flex-col justify-between rounded-xl bg-[#e0e7ff] p-3.5 transition-all hover:bg-[#c7d2fe]">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#4f46e5]">
             = Landing Price
           </p>
-          <p className="text-sm font-bold text-ink mt-1 font-mono">
+          <p className="text-sm font-bold text-[#3730a3] mt-1 font-mono">
             ₹{formatCurrency(landingNum)}
           </p>
         </div>
 
         {/* 4. Profit Margin Input Card */}
-        <div className="flex flex-col justify-between rounded-lg border border-line bg-inset p-3.5 transition-all focus-within:border-accent focus-within:bg-card">
+        <div className="flex flex-col justify-between rounded-xl bg-[#fef3c7] p-3.5 transition-all hover:bg-[#fde68a] focus-within:bg-[#fde68a]">
           <div className="flex items-center justify-between">
-            <p className="text-[10px] font-mono font-semibold uppercase text-ink-muted">
+            <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#d97706]">
               + Profit Margin
             </p>
             {updateMarginMutation.isPending && (
-              <Loader2 className="h-3 w-3 animate-spin text-accent" />
+              <Loader2 className="h-3 w-3 animate-spin text-[#d97706]" />
             )}
           </div>
           <div className="flex items-center gap-1 mt-1">
-            <span className="text-xs text-ink-muted font-bold font-mono">
+            <span className="text-xs text-[#92400e] font-bold font-mono">
               ₹
             </span>
             <input
@@ -119,17 +119,17 @@ export function RefurbPricingSummary({
                   e.currentTarget.blur();
                 }
               }}
-              className="w-full bg-transparent border-none p-0 text-sm font-bold text-ink focus:outline-none focus:ring-0 font-mono"
+              className="w-full bg-transparent border-none p-0 text-sm font-bold text-[#92400e] focus:outline-none focus:ring-0 font-mono"
             />
           </div>
         </div>
 
         {/* 5. Live Selling Price Hero Card (Spans full width on Mobile) */}
-        <div className="col-span-2 lg:col-span-1 flex flex-col justify-between rounded-lg bg-emerald-600 p-3.5 text-white shadow-sm">
-          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-emerald-100">
+        <div className="col-span-2 lg:col-span-1 flex flex-col justify-between rounded-xl bg-[#d1fae5] p-3.5 transition-all hover:bg-[#a7f3d0]">
+          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#059669]">
             Target Selling Price
           </p>
-          <p className="text-base sm:text-lg font-extrabold text-white mt-0.5 font-mono">
+          <p className="text-base sm:text-lg font-extrabold text-[#065f46] mt-0.5 font-mono">
             ₹{formatCurrency(liveSellingPrice)}
           </p>
         </div>

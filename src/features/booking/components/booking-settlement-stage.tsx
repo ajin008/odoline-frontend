@@ -6,6 +6,7 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { bookingApi } from "../api/booking-api";
+import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
 import { SettleDeliverForm } from "./settle-deliver-form";
 import {
   ShieldCheck,
@@ -155,33 +156,19 @@ export function BookingSettlementStage({
   const handleDownloadSettlementPdf = async () => {
     if (!booking) return;
     setIsSettlementDownloading(true);
+    const filename = buildDocFilename(
+      "Settlement-Statement",
+      booking.booking_number,
+      booking.customer?.name
+    );
     try {
-      const blob = await bookingApi.getSettlementPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Settlement-${booking.booking_number}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success("Settlement PDF downloaded");
-    } catch (err: unknown) {
-      let message = "Failed to download settlement PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
+      await downloadPdfDocument({
+        fetchBlob: () => bookingApi.getSettlementPdf(booking.id),
+        filename,
+        docTitle: "Settlement PDF",
+      });
+    } catch {
+      // handled inside helper
     } finally {
       setIsSettlementDownloading(false);
     }
@@ -189,36 +176,23 @@ export function BookingSettlementStage({
 
   const handleShareSettlement = async () => {
     if (!booking) return;
-
-    const carStr = booking.car
-      ? `${booking.car.year} ${booking.car.make} ${booking.car.model}${
-          booking.car.reg_number ? ` (${booking.car.reg_number})` : ""
-        }`
-      : "Vehicle";
-
-    const shareText = `Cars4 Settlement Form - Booking ${booking.booking_number}\nBuyer: ${
-      booking.customer?.name || "Customer"
-    }\nCar: ${carStr}\nGrand Total: ${formatCurrency(
-      booking.grand_total || booking.agreed_price
-    )} · Total Paid: ${formatCurrency(booking.amount_paid)}`;
-
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Cars4 Settlement Form ${booking.booking_number}`,
-          text: shareText,
-        });
-        return;
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") return;
-      }
-    }
+    const customerName = booking.customer?.name || "Customer";
+    const filename = buildDocFilename(
+      "Settlement-Statement",
+      booking.booking_number,
+      customerName
+    );
+    const shareText = `Cars4 Settlement Statement — ${booking.booking_number} — ${customerName}`;
 
     try {
-      await navigator.clipboard.writeText(shareText);
-      toast.success("Settlement summary copied to clipboard");
+      await sharePdfDocument({
+        fetchBlob: () => bookingApi.getSettlementPdf(booking.id),
+        filename,
+        shareTitle: `Cars4 Settlement Form ${booking.booking_number}`,
+        shareText,
+      });
     } catch {
-      toast.error("Failed to copy summary to clipboard");
+      // handled inside helper
     }
   };
 
@@ -254,33 +228,19 @@ export function BookingSettlementStage({
   const handleDownloadDeliveryPdf = async () => {
     if (!booking) return;
     setIsDeliveryDownloading(true);
+    const filename = buildDocFilename(
+      "Delivery-Note",
+      booking.booking_number,
+      booking.customer?.name
+    );
     try {
-      const blob = await bookingApi.getDeliveryPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Delivery-${booking.booking_number}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success("Delivery note PDF downloaded");
-    } catch (err: unknown) {
-      let message = "Failed to download delivery note PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
+      await downloadPdfDocument({
+        fetchBlob: () => bookingApi.getDeliveryPdf(booking.id),
+        filename,
+        docTitle: "Delivery note PDF",
+      });
+    } catch {
+      // handled inside helper
     } finally {
       setIsDeliveryDownloading(false);
     }
@@ -288,36 +248,23 @@ export function BookingSettlementStage({
 
   const handleShareDelivery = async () => {
     if (!booking) return;
-
-    const carStr = booking.car
-      ? `${booking.car.year} ${booking.car.make} ${booking.car.model}${
-          booking.car.reg_number ? ` (${booking.car.reg_number})` : ""
-        }`
-      : "Vehicle";
-
-    const shareText = `Cars4 Delivery Note - Booking ${booking.booking_number}\nBuyer: ${
-      booking.customer?.name || "Customer"
-    }\nCar: ${carStr}\nChassis: ${booking.delivery?.chassis_number || "—"}\nEngine: ${
-      booking.delivery?.engine_number || "—"
-    }`;
-
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Cars4 Delivery Note ${booking.booking_number}`,
-          text: shareText,
-        });
-        return;
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === "AbortError") return;
-      }
-    }
+    const customerName = booking.customer?.name || "Customer";
+    const filename = buildDocFilename(
+      "Delivery-Note",
+      booking.booking_number,
+      customerName
+    );
+    const shareText = `Cars4 Delivery Note — ${booking.booking_number} — ${customerName}`;
 
     try {
-      await navigator.clipboard.writeText(shareText);
-      toast.success("Delivery note summary copied to clipboard");
+      await sharePdfDocument({
+        fetchBlob: () => bookingApi.getDeliveryPdf(booking.id),
+        filename,
+        shareTitle: `Cars4 Delivery Note ${booking.booking_number}`,
+        shareText,
+      });
     } catch {
-      toast.error("Failed to copy summary to clipboard");
+      // handled inside helper
     }
   };
 

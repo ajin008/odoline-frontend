@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection */
 "use client";
 
 import { useState } from "react";
@@ -5,6 +6,10 @@ import Link from "next/link";
 import { isAxiosError } from "axios";
 import { useDossier } from "../hooks/use-dossier";
 import { bookingApi } from "@/src/features/booking/api/booking-api";
+import {
+  downloadPdfDocument,
+  buildDocFilename,
+} from "@/src/features/booking/utils/doc-actions";
 import { formatIndianNumber } from "@/src/lib/formatters";
 import { toast } from "sonner";
 import {
@@ -197,29 +202,26 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
   ) => {
     setActivePdfLoading(`dl_${docKey}`);
     try {
-      let blob: Blob;
-      if (docKey === "agreement")
-        blob = await bookingApi.getAgreementPdf(bookingId);
-      else if (docKey === "order")
-        blob = await bookingApi.getOrderPdf(bookingId);
-      else if (docKey === "settlement")
-        blob = await bookingApi.getSettlementPdf(bookingId);
-      else blob = await bookingApi.getDeliveryPdf(bookingId);
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    } catch (err: unknown) {
-      const msg = isAxiosError(err)
-        ? err.response?.data?.error?.message || err.message
-        : err instanceof Error
-        ? err.message
-        : "Failed to download PDF";
-      toast.error(msg);
+      const docTitleMap: Record<string, string> = {
+        agreement: "Agreement PDF",
+        order: "Order Form PDF",
+        settlement: "Settlement PDF",
+        delivery: "Delivery Note PDF",
+      };
+      await downloadPdfDocument({
+        fetchBlob: () => {
+          if (docKey === "agreement")
+            return bookingApi.getAgreementPdf(bookingId);
+          if (docKey === "order") return bookingApi.getOrderPdf(bookingId);
+          if (docKey === "settlement")
+            return bookingApi.getSettlementPdf(bookingId);
+          return bookingApi.getDeliveryPdf(bookingId);
+        },
+        filename,
+        docTitle: docTitleMap[docKey] || "PDF",
+      });
+    } catch {
+      // handled inside helper
     } finally {
       setActivePdfLoading(null);
     }
@@ -333,7 +335,7 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
             <div className="flex flex-col xl:flex-row gap-5 items-stretch">
               {/* Photo Frame Container */}
               <div className="w-full xl:w-80 shrink-0 space-y-2 flex flex-col">
-                <div className="relative aspect-[16/9] sm:aspect-[2/1] xl:aspect-[16/10] w-full rounded-xl overflow-hidden bg-inset border border-line group">
+                <div className="relative aspect-video sm:aspect-2/1 xl:aspect-16/10 w-full rounded-xl overflow-hidden bg-inset border border-line group">
                   {currentPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -802,7 +804,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                               handleDownloadPdf(
                                 "agreement",
                                 booking.id,
-                                `Agreement_${booking.booking_number}.pdf`
+                                buildDocFilename(
+                                  "Advance-Agreement-Receipt",
+                                  booking.booking_number,
+                                  booking.customer?.name
+                                )
                               )
                             }
                             className="px-2.5 py-1 rounded-md bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
@@ -866,7 +872,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                                 handleDownloadPdf(
                                   "order",
                                   booking.id,
-                                  `Order_${booking.booking_number}.pdf`
+                                  buildDocFilename(
+                                    "Order-Form",
+                                    booking.booking_number,
+                                    booking.customer?.name
+                                  )
                                 )
                               }
                               className="px-2.5 py-1 rounded-md bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
@@ -928,7 +938,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                               handleDownloadPdf(
                                 "settlement",
                                 booking.id,
-                                `Settlement_${booking.booking_number}.pdf`
+                                buildDocFilename(
+                                  "Settlement-Statement",
+                                  booking.booking_number,
+                                  booking.customer?.name
+                                )
                               )
                             }
                             className="px-2.5 py-1 rounded-md bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
@@ -985,7 +999,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                               handleDownloadPdf(
                                 "delivery",
                                 booking.id,
-                                `Delivery_${booking.booking_number}.pdf`
+                                buildDocFilename(
+                                  "Delivery-Note",
+                                  booking.booking_number,
+                                  booking.customer?.name
+                                )
                               )
                             }
                             className="px-2.5 py-1 rounded-md bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer disabled:opacity-50"
@@ -1233,7 +1251,9 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                 </div>
                 <div className="flex justify-between py-1 border-b border-line/40">
                   <span className="text-ink-muted">Year</span>
-                  <span className="font-mono font-bold text-ink">{car.year}</span>
+                  <span className="font-mono font-bold text-ink">
+                    {car.year}
+                  </span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-line/40">
                   <span className="text-ink-muted">Reg Number</span>
