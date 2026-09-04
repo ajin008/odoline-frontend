@@ -5,6 +5,7 @@ import type { AxiosError } from "axios";
 import { leadApi } from "../api/lead-api";
 import { queryKeys } from "@/src/lib/query-keys";
 import { toast } from "sonner";
+import { useMe } from "@/src/features/auth/hooks/use-me";
 
 interface ApiErrorPayload {
   error?: {
@@ -61,9 +62,13 @@ export function useAssignLead() {
  * Fetch active sales staff with their active lead load for owner picker.
  */
 export function useStaffLoad() {
+  const { data: user } = useMe();
+  const isAllowed = user?.role === "owner" || user?.role === "cro";
+
   return useQuery({
     queryKey: queryKeys.leads.staffLoad,
     queryFn: () => leadApi.getStaffLoad(),
+    enabled: isAllowed,
   });
 }
 

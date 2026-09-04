@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/src/lib/query-keys";
 import { performanceApi } from "../api/performance-api";
+import { useMe } from "@/src/features/auth/hooks/use-me";
 
 /** Dealership-wide totals + trend for the selected period (owner only). */
 export function useSalesOverview(period?: string) {
@@ -14,9 +15,13 @@ export function useSalesOverview(period?: string) {
 
 /** Active sales/cro reps for the owner's staff selector dropdown. */
 export function usePerformanceStaffList() {
+  const { data: user } = useMe();
+  const isAllowed = user?.role === "owner" || user?.role === "cro";
+
   return useQuery({
     queryKey: queryKeys.salesPerformance.staffList,
     queryFn: () => performanceApi.getStaffList(),
+    enabled: isAllowed,
   });
 }
 

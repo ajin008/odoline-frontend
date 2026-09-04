@@ -39,9 +39,9 @@ export const PERIOD_OPTIONS = [
 export type PeriodKey = (typeof PERIOD_OPTIONS)[number]["key"];
 
 export const SERIES_COLORS = {
-  enquiries: "#6366f1", // indigo-500
+  enquiries: "#2563eb", // blue-600
   bookings: "#10b981", // emerald-500
-  deliveries: "#a855f7", // purple-500
+  deliveries: "#f59e0b", // amber-500
 };
 
 export function formatXAxisLabel(key: string, bucket: TrendBucket): string {
@@ -218,7 +218,7 @@ export function PerformanceKpiCards({ totals }: { totals: PerformanceTotals }) {
       value: totals.enquiries,
       icon: UserPlus,
       color:
-        "text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
+        "text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/20",
       subtitle: "Leads created in period",
     },
     {
@@ -236,7 +236,7 @@ export function PerformanceKpiCards({ totals }: { totals: PerformanceTotals }) {
       value: totals.deliveries,
       icon: Truck,
       color:
-        "text-purple-600 dark:text-purple-400 bg-purple-500/10 border-purple-500/20",
+        "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20",
       subtitle: "Delivered in period",
     },
   ];
@@ -307,9 +307,16 @@ export function PerformanceTrendChart({
     year: "Enquiries, bookings & deliveries by year",
   };
 
+  // On mobile, if there are more than 7 data points, dynamically calculate scrollable width
+  // so bars + gaps + X-axis date labels are spacious and legible.
+  const isMobileScrollable = chartData.length > 7;
+  const calculatedWidth = isMobileScrollable
+    ? Math.max(chartData.length * 44, 360)
+    : undefined;
+
   return (
-    <div className="rounded-xl border border-line/60 bg-card p-4 sm:p-6 space-y-4 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line/40 pb-4">
+    <div className="rounded-xl border border-line/60 bg-card p-3.5 sm:p-6 space-y-3 sm:space-y-4 font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-line/40 pb-3 sm:pb-4">
         <div className="flex items-center gap-2.5">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 border border-accent/20 text-accent shrink-0">
             <BarChart3 className="h-4 w-4 stroke-[2px]" />
@@ -340,82 +347,99 @@ export function PerformanceTrendChart({
           </p>
         </div>
       ) : (
-        <div className="h-56 sm:h-64 w-full overflow-x-auto no-scrollbar">
-          <div className="h-full min-w-[340px] sm:min-w-0">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartData}
-                margin={{ top: 8, right: 8, left: -22, bottom: 8 }}
-                barGap={3}
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="var(--line, rgba(0,0,0,0.06))"
-                  opacity={0.5}
-                />
-                <XAxis
-                  dataKey="label"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 10, fill: "var(--ink-subtle, #64748b)" }}
-                  interval="preserveStartEnd"
-                  minTickGap={12}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{
-                    fontSize: 10,
-                    fill: "var(--ink-subtle, #64748b)",
-                    fontFamily: "monospace",
-                  }}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  labelFormatter={(_label, payload) => {
-                    const originalKey = payload?.[0]?.payload?.key;
-                    return formatTooltipTitle(originalKey ?? _label, bucket);
-                  }}
-                  contentStyle={{
-                    borderRadius: 10,
-                    border: "1px solid var(--line, rgba(0,0,0,0.1))",
-                    background: "var(--card, #fff)",
-                    color: "var(--ink, #000)",
-                    fontSize: 11,
-                    fontFamily: "inherit",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-                  }}
-                  cursor={{ fill: "rgba(44, 122, 255, 0.04)" }}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: 11, fontWeight: 600 }}
-                  iconType="circle"
-                  iconSize={8}
-                />
-                <Bar
-                  dataKey="enquiries"
-                  name="Enquiries"
-                  fill={SERIES_COLORS.enquiries}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={20}
-                />
-                <Bar
-                  dataKey="bookings"
-                  name="Bookings"
-                  fill={SERIES_COLORS.bookings}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={20}
-                />
-                <Bar
-                  dataKey="deliveries"
-                  name="Deliveries"
-                  fill={SERIES_COLORS.deliveries}
-                  radius={[4, 4, 0, 0]}
-                  maxBarSize={20}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+        <div className="space-y-2">
+          {isMobileScrollable && (
+            <div className="flex items-center justify-between sm:hidden text-[10px] text-ink-subtle font-medium px-1">
+              <span className="flex items-center gap-1 font-mono text-accent">
+                ← Swipe to view full trend →
+              </span>
+              <span className="font-mono text-ink-subtle">
+                {chartData.length} dates
+              </span>
+            </div>
+          )}
+          <div className="h-64 sm:h-72 w-full overflow-x-auto no-scrollbar rounded-lg">
+            <div
+              className="h-full min-w-full"
+              style={{
+                width: calculatedWidth ? `${calculatedWidth}px` : "100%",
+              }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={chartData}
+                  margin={{ top: 12, right: 12, left: -20, bottom: 12 }}
+                  barGap={3}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="var(--line, rgba(0,0,0,0.06))"
+                    opacity={0.5}
+                  />
+                  <XAxis
+                    dataKey="label"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fill: "var(--ink-subtle, #64748b)" }}
+                    interval={0}
+                    minTickGap={10}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 10,
+                      fill: "var(--ink-subtle, #64748b)",
+                      fontFamily: "monospace",
+                    }}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    labelFormatter={(_label, payload) => {
+                      const originalKey = payload?.[0]?.payload?.key;
+                      return formatTooltipTitle(originalKey ?? _label, bucket);
+                    }}
+                    contentStyle={{
+                      borderRadius: 10,
+                      border: "1px solid var(--line, rgba(0,0,0,0.1))",
+                      background: "var(--card, #fff)",
+                      color: "var(--ink, #000)",
+                      fontSize: 11,
+                      fontFamily: "inherit",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    }}
+                    cursor={{ fill: "rgba(44, 122, 255, 0.04)" }}
+                  />
+                  <Legend
+                    wrapperStyle={{ fontSize: 11, fontWeight: 600, paddingTop: 6 }}
+                    iconType="circle"
+                    iconSize={8}
+                  />
+                  <Bar
+                    dataKey="enquiries"
+                    name="Enquiries"
+                    fill={SERIES_COLORS.enquiries}
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={16}
+                  />
+                  <Bar
+                    dataKey="bookings"
+                    name="Bookings"
+                    fill={SERIES_COLORS.bookings}
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={16}
+                  />
+                  <Bar
+                    dataKey="deliveries"
+                    name="Deliveries"
+                    fill={SERIES_COLORS.deliveries}
+                    radius={[4, 4, 0, 0]}
+                    maxBarSize={16}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       )}

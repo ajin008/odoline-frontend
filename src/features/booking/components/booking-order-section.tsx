@@ -382,12 +382,15 @@ export function BookingOrderSection({
             )}
 
             {/* Total Footer Bar */}
-            <div className="flex items-center justify-between p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
-              <span className="text-xs font-bold text-ink flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <div
+              className="flex items-center justify-between p-3.5 rounded-xl border-0"
+              style={{ backgroundColor: "#d8f1b7" }}
+            >
+              <span className="text-xs font-extrabold text-emerald-950 flex items-center gap-1.5 uppercase tracking-wider">
+                <CheckCircle2 className="h-4 w-4 text-emerald-900 shrink-0" />
                 <span>Order Accessories Total:</span>
               </span>
-              <span className="text-base font-bold font-mono text-emerald-600 dark:text-emerald-400">
+              <span className="text-base font-extrabold font-mono text-emerald-950">
                 {formatCurrency(order.total)}
               </span>
             </div>

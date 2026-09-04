@@ -132,21 +132,27 @@ export default function StaffFollowUpsPage() {
         </div>
       </div>
 
-      {/* Segmented Tab Controls (Full Width 3-column grid on mobile, compact on desktop) */}
-      <div className="w-full sm:w-auto grid grid-cols-3 sm:flex sm:inline-flex items-center gap-1 p-1 rounded-xl bg-inset/80 border border-line">
+      {/* Segmented Subtabs Control Bar */}
+      <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-fit no-scrollbar shrink-0">
         <button
           type="button"
           onClick={() => setActiveBucket("today")}
-          className={`flex items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full text-center ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeBucket === "today"
               ? "bg-accent text-inverse shadow-xs font-bold"
-              : "text-ink-subtle hover:text-ink hover:bg-card/50"
+              : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
           }`}
         >
           <Clock className="h-3.5 w-3.5 shrink-0" />
           <span>Today</span>
           {todayList && todayList.length > 0 && (
-            <span className="ml-0.5 rounded-md bg-inverse/20 px-1.5 py-0.2 text-[10px] font-mono">
+            <span
+              className={`ml-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold ${
+                activeBucket === "today"
+                  ? "bg-inverse/20 text-inverse"
+                  : "bg-line/60 text-ink-muted"
+              }`}
+            >
               {todayList.length}
             </span>
           )}
@@ -155,22 +161,16 @@ export default function StaffFollowUpsPage() {
         <button
           type="button"
           onClick={() => setActiveBucket("overdue")}
-          className={`flex items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full text-center ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeBucket === "overdue"
-              ? "bg-rose-600 text-white shadow-xs font-bold"
-              : "text-rose-500 dark:text-rose-400 hover:text-rose-600 hover:bg-rose-500/10"
+              ? "bg-accent text-inverse shadow-xs font-bold"
+              : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
           }`}
         >
           <Clock className="h-3.5 w-3.5 shrink-0" />
           <span>Overdue</span>
           {overdueCount > 0 && (
-            <span
-              className={`ml-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold ${
-                activeBucket === "overdue"
-                  ? "bg-white/20 text-white"
-                  : "bg-rose-500/20 text-rose-500 dark:text-rose-400 border border-rose-500/30"
-              }`}
-            >
+            <span className="ml-0.5 rounded-md bg-rose-500 text-white px-1.5 py-0.5 text-[10px] font-mono font-bold shadow-xs">
               {overdueCount}
             </span>
           )}
@@ -179,14 +179,25 @@ export default function StaffFollowUpsPage() {
         <button
           type="button"
           onClick={() => setActiveBucket("upcoming")}
-          className={`flex items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer w-full text-center ${
+          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeBucket === "upcoming"
               ? "bg-accent text-inverse shadow-xs font-bold"
-              : "text-ink-subtle hover:text-ink hover:bg-card/50"
+              : "text-ink-muted hover:text-ink hover:bg-card/50 font-medium"
           }`}
         >
           <Calendar className="h-3.5 w-3.5 shrink-0" />
           <span>Upcoming</span>
+          {upcomingList && upcomingList.length > 0 && (
+            <span
+              className={`ml-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-mono font-bold ${
+                activeBucket === "upcoming"
+                  ? "bg-inverse/20 text-inverse"
+                  : "bg-line/60 text-ink-muted"
+              }`}
+            >
+              {upcomingList.length}
+            </span>
+          )}
         </button>
       </div>
 
