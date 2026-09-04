@@ -56,15 +56,14 @@ export function formatXAxisLabel(key: string, bucket: TrendBucket): string {
   }
 
   if (bucket === "week") {
-    // "2026-08-31" -> "Wk of 31 Aug"
+    // "2026-08-31" -> "31 Aug"
     const [y, m, d] = key.split("-").map(Number);
     if (!y || !m || !d) return key;
     const date = new Date(y, m - 1, d);
-    const shortDate = date.toLocaleDateString("en-IN", {
+    return date.toLocaleDateString("en-IN", {
       day: "numeric",
       month: "short",
     });
-    return `Wk of ${shortDate}`;
   }
 
   if (bucket === "month") {
@@ -311,7 +310,7 @@ export function PerformanceTrendChart({
   // so bars + gaps + X-axis date labels are spacious and legible.
   const isMobileScrollable = chartData.length > 7;
   const calculatedWidth = isMobileScrollable
-    ? Math.max(chartData.length * 44, 360)
+    ? Math.max(chartData.length * 56, 360)
     : undefined;
 
   return (
@@ -382,8 +381,8 @@ export function PerformanceTrendChart({
                     axisLine={false}
                     tickLine={false}
                     tick={{ fontSize: 10, fill: "var(--ink-subtle, #64748b)" }}
-                    interval={0}
-                    minTickGap={10}
+                    interval="preserveStartEnd"
+                    minTickGap={12}
                   />
                   <YAxis
                     axisLine={false}

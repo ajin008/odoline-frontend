@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { BRAND } from "@/src/config/brand";
 import { useLogin } from "../hooks/use-login";
 import { BackgroundPattern } from "./background-pattern";
 import { Eye, EyeOff, ArrowRight, Lock } from "lucide-react";
@@ -22,8 +23,8 @@ export function LoginForm() {
         <div className="md:hidden flex items-center justify-between pt-1">
           <div className="flex items-center gap-2.5">
             <Image
-              src="/icons/icon-192.png"
-              alt="Cars4 Logo"
+              src={BRAND.logoPath}
+              alt={`${BRAND.companyName} Logo`}
               width={36}
               height={36}
               className="rounded-xl object-contain shadow-xs"
@@ -31,11 +32,13 @@ export function LoginForm() {
             />
             <div>
               <span className="font-heading text-lg font-bold tracking-tight text-ink block leading-none">
-                Cars4
+                {BRAND.companyName}
               </span>
-              <span className="text-[10px] font-mono font-medium text-ink-subtle">
-                Showroom OS
-              </span>
+              {BRAND.tagline && (
+                <span className="text-[10px] font-mono font-medium text-ink-subtle">
+                  {BRAND.tagline}
+                </span>
+              )}
             </div>
           </div>
 
@@ -50,15 +53,15 @@ export function LoginForm() {
           <div>
             <div className="flex items-center gap-2.5">
               <Image
-                src="/icons/icon-192.png"
-                alt="Cars4 Logo"
+                src={BRAND.logoPath}
+                alt={`${BRAND.companyName} Logo`}
                 width={36}
                 height={36}
                 className="rounded-xl object-contain"
                 priority
               />
               <span className="font-heading text-lg font-semibold tracking-tight text-ink">
-                Cars4
+                {BRAND.companyName}
               </span>
             </div>
           </div>
@@ -71,7 +74,7 @@ export function LoginForm() {
               Every car, customer, and rupee — in one place.
             </h1>
             <p className="text-sm text-ink-muted leading-relaxed max-w-sm">
-              Welcome back. Authorized Cars4 team members sign in to manage terminal operations.
+              Welcome back. Authorized {BRAND.companyName} team members sign in to manage terminal operations.
             </p>
           </div>
 
