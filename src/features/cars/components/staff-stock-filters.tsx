@@ -89,59 +89,63 @@ export function StaffStockFilters({
 
       {/* 2. Custom Filter Controls Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-0.5">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none max-w-full">
-          <span className="text-[11px] font-bold text-ink-subtle uppercase tracking-wider flex items-center gap-1.5 shrink-0 mr-1">
-            <SlidersHorizontal className="h-3.5 w-3.5 text-accent shrink-0" />
-            <span className="hidden sm:inline">Filters:</span>
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-[11px] font-bold text-ink-subtle uppercase tracking-wider flex items-center gap-1.5 shrink-0 mr-1 hidden sm:flex">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-accent shrink-0" />
+              <span>Filters:</span>
+            </span>
 
-          {/* Custom Select Dropdown: Fuel Type */}
-          <CustomSelect
-            options={FUEL_OPTIONS}
-            value={fuelType}
-            onChange={onFuelTypeChange}
-            placeholder="All Fuel Types"
-            searchable={false}
-            className="shrink-0"
-            buttonClassName={`h-8 px-3 rounded-lg border text-xs font-semibold transition-all cursor-pointer ${
-              fuelType
-                ? "bg-accent/15 border-accent text-accent font-bold"
-                : "bg-card border-line/70 text-ink-subtle hover:text-ink hover:border-line"
-            }`}
-          />
+            {/* Custom Select Dropdown: Fuel Type */}
+            <div className="flex-1 sm:flex-none min-w-0">
+              <CustomSelect
+                options={FUEL_OPTIONS}
+                value={fuelType}
+                onChange={onFuelTypeChange}
+                placeholder="All Fuel Types"
+                searchable={false}
+                className="w-full sm:w-auto"
+                buttonClassName={`h-9 sm:h-8 px-3 rounded-lg border text-xs font-semibold transition-all cursor-pointer w-full sm:w-auto ${
+                  fuelType
+                    ? "bg-accent/15 border-accent text-accent font-bold"
+                    : "bg-card border-line/70 text-ink-subtle hover:text-ink hover:border-line"
+                }`}
+              />
+            </div>
 
-          {/* Custom Price Range Inputs Group */}
-          <div className="flex items-center gap-1 bg-card border border-line rounded-lg p-1 h-8 shrink-0">
-            <span className="text-[11px] font-bold text-ink-subtle px-1">₹</span>
-            <input
-              type="number"
-              placeholder="Min"
-              value={minPrice ?? ""}
-              onChange={(e) =>
-                onMinPriceChange(
-                  e.target.value ? Number(e.target.value) : undefined
-                )
-              }
-              className="w-16 h-full bg-transparent text-xs font-mono font-semibold text-ink placeholder:text-ink-subtle/60 outline-none"
-            />
-            <span className="text-ink-subtle/40 text-xs">-</span>
-            <input
-              type="number"
-              placeholder="Max"
-              value={maxPrice ?? ""}
-              onChange={(e) =>
-                onMaxPriceChange(
-                  e.target.value ? Number(e.target.value) : undefined
-                )
-              }
-              className="w-16 h-full bg-transparent text-xs font-mono font-semibold text-ink placeholder:text-ink-subtle/60 outline-none"
-            />
+            {/* Custom Price Range Inputs Group */}
+            <div className="flex-1 sm:flex-none flex items-center justify-between gap-1 bg-card border border-line rounded-lg p-1 h-9 sm:h-8 min-w-0">
+              <span className="text-[11px] font-bold text-ink-subtle px-1 shrink-0">₹</span>
+              <input
+                type="number"
+                placeholder="Min"
+                value={minPrice ?? ""}
+                onChange={(e) =>
+                  onMinPriceChange(
+                    e.target.value ? Number(e.target.value) : undefined
+                  )
+                }
+                className="w-full min-w-0 sm:w-16 h-full bg-transparent text-xs font-mono font-semibold text-ink placeholder:text-ink-subtle/60 outline-none"
+              />
+              <span className="text-ink-subtle/40 text-xs shrink-0">-</span>
+              <input
+                type="number"
+                placeholder="Max"
+                value={maxPrice ?? ""}
+                onChange={(e) =>
+                  onMaxPriceChange(
+                    e.target.value ? Number(e.target.value) : undefined
+                  )
+                }
+                className="w-full min-w-0 sm:w-16 h-full bg-transparent text-xs font-mono font-semibold text-ink placeholder:text-ink-subtle/60 outline-none"
+              />
+            </div>
           </div>
         </div>
 
         {/* Active Filter Counter & Reset Control */}
         {activeFilterCount > 0 && (
-          <div className="flex items-center gap-2 shrink-0 pt-1 sm:pt-0">
+          <div className="flex items-center justify-between sm:justify-start gap-2 shrink-0 pt-0.5 sm:pt-0">
             <span className="text-[11px] font-bold text-accent bg-accent/15 px-2 py-0.5 rounded-md border border-accent/20">
               {activeFilterCount} active filter{activeFilterCount > 1 ? "s" : ""}
             </span>

@@ -33,7 +33,7 @@ export default function StaffSettingPage() {
         <button
           type="button"
           onClick={() => setActiveSubtab("profile")}
-          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial min-w-0 h-full text-center rounded-md px-2 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeSubtab === "profile"
               ? "bg-accent text-inverse shadow-xs"
               : "text-ink-muted hover:text-ink"
@@ -50,7 +50,7 @@ export default function StaffSettingPage() {
         <button
           type="button"
           onClick={() => setActiveSubtab("attendance")}
-          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial min-w-0 h-full text-center rounded-md px-2 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeSubtab === "attendance"
               ? "bg-accent text-inverse shadow-xs"
               : "text-ink-muted hover:text-ink"
@@ -67,7 +67,7 @@ export default function StaffSettingPage() {
         <button
           type="button"
           onClick={() => setActiveSubtab("performance")}
-          className={`flex-1 sm:flex-initial h-full text-center rounded-md px-3 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
+          className={`flex-1 sm:flex-initial min-w-0 h-full text-center rounded-md px-2 sm:px-4 flex items-center justify-center gap-1.5 sm:gap-2 text-xs font-bold tracking-tight transition-all duration-200 cursor-pointer whitespace-nowrap ${
             activeSubtab === "performance"
               ? "bg-accent text-inverse shadow-xs"
               : "text-ink-muted hover:text-ink"

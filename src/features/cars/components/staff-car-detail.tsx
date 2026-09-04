@@ -173,9 +173,15 @@ export function StaffCarDetail({ carId }: { carId: string }) {
             <span className="text-xs font-mono font-bold text-ink-muted uppercase">
               {car.make}
             </span>
-            <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 border border-emerald-500/20 uppercase tracking-wider">
-              IN STOCK
-            </span>
+            {Boolean(car.is_booked || car.status === "booked") ? (
+              <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600 border border-amber-500/20 uppercase tracking-wider">
+                BOOKED
+              </span>
+            ) : (
+              <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 border border-emerald-500/20 uppercase tracking-wider">
+                IN STOCK
+              </span>
+            )}
           </div>
 
           {/* Vehicle Title & Reg Number */}

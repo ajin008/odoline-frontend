@@ -137,7 +137,7 @@ export function InventoryView() {
       {/* Grid Matrix Output Flow */}
       <div className="pt-1">
         <CarList
-          statuses={[...activeTab.statuses]}
+          statuses={activeTab.statuses}
           sort={active === "in_stock" ? stockSort : undefined}
           search={active === "in_stock" ? search : undefined}
         />

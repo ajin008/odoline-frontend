@@ -197,9 +197,12 @@ export function StaffCarCard({ car }: { car: Car }) {
 
   if (isBooked) {
     return (
-      <div className="group flex flex-col rounded-xl border border-line bg-card/60 opacity-75 overflow-hidden select-none cursor-default">
+      <Link
+        href={`/staff/stock/${car.id}`}
+        className="group flex flex-col rounded-xl border border-line/70 bg-card/60 opacity-80 overflow-hidden transition-all duration-200 hover:border-line active:scale-[0.99] select-none cursor-pointer"
+      >
         {cardContent}
-      </div>
+      </Link>
     );
   }
 

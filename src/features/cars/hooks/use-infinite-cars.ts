@@ -21,7 +21,7 @@ export function useInfiniteCars({
   min_price,
   max_price,
 }: {
-  statuses?: string[];
+  statuses?: readonly string[] | string[];
   sort?: string;
   search?: string;
   fuel_type?: string;
@@ -39,7 +39,7 @@ export function useInfiniteCars({
     }),
     queryFn: ({ pageParam }) =>
       carsApi.getList({
-        statuses,
+        statuses: statuses ? [...statuses] : undefined,
         sort,
         search,
         fuel_type,
@@ -50,6 +50,8 @@ export function useInfiniteCars({
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.pagination.next_cursor ?? undefined,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 }
 
@@ -83,5 +85,7 @@ export function useInfiniteStaffStock({
       }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.pagination.next_cursor ?? undefined,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 }

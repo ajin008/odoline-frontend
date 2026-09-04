@@ -27,13 +27,25 @@ export const queryKeys = {
     // Infinite (cursor-paginated) lists — statuses/sort/search identify a
     // distinct scroll; changing any of them starts a fresh cache entry.
     infinite: (params: {
-      statuses?: string[];
+      statuses?: readonly string[] | string[];
       sort?: string;
       search?: string;
       fuel_type?: string;
       min_price?: number;
       max_price?: number;
-    }) => ["cars", "infinite", params] as const,
+    }) => {
+      const statusesKey = params.statuses
+        ? [...params.statuses].sort().join(",")
+        : undefined;
+      return [
+        "cars",
+        "infinite",
+        {
+          ...params,
+          statuses: statusesKey,
+        },
+      ] as const;
+    },
   },
 
   dashboard: {

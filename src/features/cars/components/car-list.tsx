@@ -11,7 +11,7 @@ export function CarList({
   sort,
   search,
 }: {
-  statuses?: string[];
+  statuses?: readonly string[] | string[];
   sort?: string;
   search?: string;
 }) {
