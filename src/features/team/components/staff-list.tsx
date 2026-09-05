@@ -148,7 +148,7 @@ export function StaffList({
                   : "text-blue-700 dark:text-blue-300 bg-blue-500/10 border-blue-500/25"
               }`}
             >
-              {staff.role === "cro" ? "CRO" : "Sales"}
+              {staff.role === "cro" ? "CRE" : "Sales"}
             </span>
 
             {/* Department Badge */}

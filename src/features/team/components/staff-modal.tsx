@@ -316,7 +316,7 @@ export function StaffModal({ isOpen, onClose, staff }: StaffModalProps) {
               }
               options={[
                 { value: "sales", label: "Sales" },
-                { value: "cro", label: "CRO — Customer Relations Officer" },
+                { value: "cro", label: "CRE — Customer Relationship Executive" },
               ]}
               placeholder="Select Role"
               {...register("role")}
