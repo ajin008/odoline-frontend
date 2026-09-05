@@ -231,15 +231,15 @@ export function ProfileSettings() {
       {/* ------------------------------------------------------------- */}
       {/* PART 2: SHOWROOM INFORMATION                                 */}
       {/* ------------------------------------------------------------- */}
-      <div className="rounded-xl border border-line/60 bg-card p-5 sm:p-6 space-y-6">
+      <div className="rounded-2xl border border-line/60 bg-card p-5 sm:p-6 space-y-6 shadow-2xs">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line/40 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent shrink-0">
-              <Building2 className="h-4.5 w-4.5 stroke-[2.5px]" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-line/40 pb-5">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 border border-accent/20 text-accent shrink-0 shadow-2xs">
+              <Building2 className="h-5 w-5 stroke-[2.25px]" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-ink tracking-tight font-sans">
+              <h3 className="text-base font-bold text-ink tracking-tight font-sans">
                 Showroom Registry Information
               </h3>
               <p className="text-xs text-ink-muted mt-0.5">
@@ -248,60 +248,77 @@ export function ProfileSettings() {
             </div>
           </div>
 
-          <span className="text-[10px] font-mono font-bold uppercase tracking-wider border border-line/60 px-2 py-0.5 rounded-md bg-inset text-ink-subtle self-start sm:self-auto">
-            Read-Only Identity
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider border border-line/60 px-2.5 py-1 rounded-lg bg-inset text-ink-subtle self-start sm:self-auto shrink-0">
+            <Lock className="h-3 w-3 text-ink-subtle/70" />
+            <span>Read-Only Identity</span>
           </span>
         </div>
 
         {/* Showroom Logo Control (Uploadable) */}
         <ShowroomLogoControl />
 
-        <div className="border-t border-line/40 pt-4">
+        <div className="border-t border-line/40 pt-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-ink-subtle font-mono">
+              Dealership Contact &amp; Identity
+            </h4>
+          </div>
+
           {/* Readonly Showroom Identity Fields Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Showroom Name */}
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
                 Showroom Name
               </label>
-              <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
-                <span>{config?.showroom_name || "Cars4 Showroom"}</span>
-                <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
+              <div className="h-10 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between shadow-2xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Building2 className="h-4 w-4 text-accent shrink-0 stroke-[2px]" />
+                  <span className="truncate">{config?.showroom_name || "Cars4 Showroom"}</span>
+                </div>
+                <Lock className="h-3.5 w-3.5 text-ink-subtle/50 shrink-0 ml-2" />
               </div>
             </div>
 
             {/* Showroom Phone */}
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
                 Contact Phone
               </label>
-              <div className="h-9.5 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5 text-accent shrink-0" />
+              <div className="h-10 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between shadow-2xs">
+                <div className="flex items-center gap-2.5">
+                  <Phone className="h-4 w-4 text-accent shrink-0 stroke-[2px]" />
                   <span className="font-mono">
                     {config?.showroom_phone1
                       ? `+91 ${config.showroom_phone1}`
                       : "—"}
                   </span>
                 </div>
-                <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
+                <Lock className="h-3.5 w-3.5 text-ink-subtle/50 shrink-0 ml-2" />
               </div>
             </div>
 
             {/* Showroom Address (Wide Spanning Field) */}
-            <div className="space-y-1 sm:col-span-2">
-              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block flex items-center gap-1">
-                <MapPin className="h-3 w-3 text-accent shrink-0" />
-                <span>Primary Address</span>
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="text-[10px] font-mono font-bold uppercase tracking-wider text-ink-subtle block">
+                Primary Address
               </label>
-              <div className="rounded-xl border border-line/60 bg-surface px-3.5 py-2.5 text-xs font-medium text-ink flex items-center justify-between">
-                <span className="leading-relaxed break-words flex-1 pr-2">
-                  {config?.showroom_address || "—"}
-                </span>
-                <Lock className="h-3 w-3 text-ink-subtle/40 shrink-0 ml-2" />
+              <div className="min-h-10 rounded-xl border border-line/60 bg-surface px-3.5 py-2.5 text-xs font-medium text-ink flex items-start justify-between gap-3 shadow-2xs">
+                <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                  <MapPin className="h-4 w-4 text-accent shrink-0 stroke-[2px] mt-0.5" />
+                  <span className="leading-relaxed break-words font-semibold text-ink">
+                    {config?.showroom_address || "—"}
+                  </span>
+                </div>
+                <Lock className="h-3.5 w-3.5 text-ink-subtle/50 shrink-0 mt-0.5" />
               </div>
             </div>
           </div>
+
+          <p className="text-[11px] text-ink-muted pt-1 flex items-center gap-1.5">
+            <span className="h-1 w-1 rounded-full bg-accent shrink-0" />
+            <span>Dealership registry details are managed centrally. Contact platform administration to request official updates.</span>
+          </p>
         </div>
       </div>
     </div>
