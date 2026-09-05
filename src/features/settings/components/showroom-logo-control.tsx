@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useConfig } from "../hooks/use-config";
 import { useUploadLogo } from "../hooks/use-upload-logo";
-import { Upload, Loader2, Check, X, Building2, Camera, Image as ImageIcon } from "lucide-react";
+import { Upload, Loader2, Check, X, Building2, Camera } from "lucide-react";
 import { toast } from "sonner";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -184,8 +184,10 @@ export function ShowroomLogoControl() {
               </div>
 
               <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium leading-normal">
-                Draft logo selected: <strong className="font-semibold">{selectedFile.name}</strong> (
-                {(selectedFile.size / 1024).toFixed(0)} KB). Click <strong>Save New Logo</strong> to publish.
+                Draft logo selected:{" "}
+                <strong className="font-semibold">{selectedFile.name}</strong> (
+                {(selectedFile.size / 1024).toFixed(0)} KB). Click{" "}
+                <strong>Save New Logo</strong> to publish.
               </p>
             </div>
           ) : (
@@ -200,13 +202,17 @@ export function ShowroomLogoControl() {
                 >
                   <Upload className="h-3.5 w-3.5 text-accent stroke-[2.25px]" />
                   <span>
-                    {config?.showroom_logo_url ? "Change Brand Logo" : "Upload Brand Logo"}
+                    {config?.showroom_logo_url
+                      ? "Change Brand Logo"
+                      : "Upload Brand Logo"}
                   </span>
                 </button>
               </div>
 
               <p className="text-[11px] text-ink-muted leading-relaxed">
-                PNG, JPEG or WebP logo with transparent or light backdrop (max 10MB). Used on printed PDF receipts, sales agreements, and official documents.
+                PNG, JPEG or WebP logo with transparent or light backdrop (max
+                10MB). Used on printed PDF receipts, sales agreements, and
+                official documents.
               </p>
             </div>
           )}
