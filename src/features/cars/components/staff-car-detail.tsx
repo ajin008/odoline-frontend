@@ -35,6 +35,7 @@ import { useRefurbishmentItems } from "../hooks/use-refurbishment";
 import { formatIndianNumber } from "@/src/lib/formatters";
 import { DOCUMENT_CONFIGS, DocumentType } from "../type/document-types";
 import { documentsApi } from "../api/documents-api";
+import { shareCarDocument } from "../utils/share-car-document";
 import { CarPhotoGallery } from "./car-photo-gallery";
 import { CarShareModal } from "./car-share-modal";
 
@@ -57,6 +58,7 @@ export function StaffCarDetail({ carId }: { carId: string }) {
     name: string;
   } | null>(null);
   const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
+  const [loadingShareId, setLoadingShareId] = useState<string | null>(null);
   const docFileInputRef = useRef<HTMLInputElement>(null);
 
   if (isCarLoading) {
@@ -153,6 +155,26 @@ export function StaffCarDetail({ carId }: { carId: string }) {
     } finally {
       setLoadingDocId(null);
     }
+  };
+
+  const handleShareDocument = async (
+    docId: string,
+    label: string,
+    originalName?: string,
+    mimeType?: string
+  ) => {
+    if (!car) return;
+    setLoadingShareId(docId);
+    await shareCarDocument({
+      carId: car.id,
+      documentId: docId,
+      docLabel: label,
+      originalName,
+      mimeType,
+      regNumber: car.reg_number,
+      makeModel: `${car.make} ${car.model}`,
+    });
+    setLoadingShareId(null);
   };
 
   return (
@@ -580,26 +602,55 @@ export function StaffCarDetail({ carId }: { carId: string }) {
 
                   <div className="flex items-center gap-2 pt-2.5 border-t border-line/60">
                     {uploadedDoc ? (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleViewDocument(
-                            uploadedDoc.id,
-                            cfg.label,
-                            uploadedDoc.mime_type,
-                            uploadedDoc.file_path
-                          )
-                        }
-                        disabled={loadingDocId === uploadedDoc.id}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md bg-card border border-line text-xs font-semibold text-ink hover:text-accent transition-colors cursor-pointer disabled:opacity-50"
-                      >
-                        {loadingDocId === uploadedDoc.id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin stroke-[2.25px]" />
-                        ) : (
-                          <Eye className="h-3.5 w-3.5 stroke-[2.25px]" />
-                        )}
-                        <span>View Document</span>
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleViewDocument(
+                              uploadedDoc.id,
+                              cfg.label,
+                              uploadedDoc.mime_type,
+                              uploadedDoc.file_path
+                            )
+                          }
+                          disabled={
+                            loadingDocId === uploadedDoc.id ||
+                            loadingShareId === uploadedDoc.id
+                          }
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md bg-card border border-line text-xs font-semibold text-ink hover:text-accent transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          {loadingDocId === uploadedDoc.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin stroke-[2.25px]" />
+                          ) : (
+                            <Eye className="h-3.5 w-3.5 stroke-[2.25px]" />
+                          )}
+                          <span>View</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleShareDocument(
+                              uploadedDoc.id,
+                              cfg.label,
+                              uploadedDoc.original_name,
+                              uploadedDoc.mime_type
+                            )
+                          }
+                          disabled={
+                            loadingDocId === uploadedDoc.id ||
+                            loadingShareId === uploadedDoc.id
+                          }
+                          className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md bg-card border border-line text-xs font-semibold text-ink hover:text-accent transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          {loadingShareId === uploadedDoc.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin stroke-[2.25px]" />
+                          ) : (
+                            <Share2 className="h-3.5 w-3.5 stroke-[2.25px]" />
+                          )}
+                          <span>Share</span>
+                        </button>
+                      </>
                     ) : (
                       <button
                         type="button"

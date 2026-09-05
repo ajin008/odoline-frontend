@@ -38,9 +38,12 @@ export function IntakeShell({ carId }: { carId: string }) {
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("vehicle");
 
   const uploadedTypes = new Set(documents.map((d) => d.document_type));
-  const pendingDocsCount = DOCUMENT_CONFIGS.filter(
-    (cfg) => !uploadedTypes.has(cfg.type)
-  ).length;
+  const pendingDocsCount =
+    typeof car?.pending_docs_count === "number"
+      ? car.pending_docs_count
+      : DOCUMENT_CONFIGS.filter(
+          (cfg) => !cfg.optional && !uploadedTypes.has(cfg.type)
+        ).length;
 
   const isDocsComplete = car?.progress_summary?.documents
     ? car.progress_summary.documents.hard_docs_complete !== false &&

@@ -14,6 +14,7 @@ import {
   Check,
   X,
   ExternalLink,
+  Share2,
 } from "lucide-react";
 import {
   DOCUMENT_CONFIGS,
@@ -22,6 +23,8 @@ import {
 } from "../type/document-types";
 import { useCarDocuments } from "../hooks/use-documents";
 import { useDocumentActions } from "../hooks/use-document-actions";
+import { useCar } from "../hooks/use-car";
+import { shareCarDocument } from "../utils/share-car-document";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 
 interface DocumentsGridProps {
@@ -69,6 +72,7 @@ export function DocumentsGrid({
 
   const isIntakePage = pathname.endsWith("/intake");
 
+  const { data: car } = useCar(carId);
   const { data: documents = [], isLoading } = useCarDocuments(carId);
 
   const {
@@ -88,6 +92,7 @@ export function DocumentsGrid({
     name?: string;
   } | null>(null);
   const [loadingPreviewId, setLoadingPreviewId] = useState<string | null>(null);
+  const [loadingShareId, setLoadingShareId] = useState<string | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const handleConfirmDelete = () => {
@@ -126,6 +131,27 @@ export function DocumentsGrid({
         name: doc.original_name,
       });
     }
+  };
+
+  const handleShareDocument = async (
+    doc: {
+      id: string;
+      mime_type?: string;
+      original_name?: string;
+    },
+    docLabel: string
+  ) => {
+    setLoadingShareId(doc.id);
+    await shareCarDocument({
+      carId,
+      documentId: doc.id,
+      docLabel,
+      originalName: doc.original_name,
+      mimeType: doc.mime_type,
+      regNumber: car?.reg_number,
+      makeModel: car ? `${car.make} ${car.model}` : undefined,
+    });
+    setLoadingShareId(null);
   };
 
   if (isLoading) {
@@ -277,25 +303,51 @@ export function DocumentsGrid({
                 {/* Card Action Controls */}
                 <div className="mt-4 border-t border-line/60 pt-3">
                   {uploadedDoc ? (
-                    <div className="flex items-center justify-between">
-                      <button
-                        type="button"
-                        onClick={() => handleViewPreview(uploadedDoc)}
-                        disabled={loadingPreviewId === uploadedDoc.id}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-900 transition-colors cursor-pointer disabled:opacity-50"
-                      >
-                        {loadingPreviewId === uploadedDoc.id ? (
-                          <Loader2 className="h-3.5 w-3.5 stroke-[2.5px] animate-spin" />
-                        ) : (
-                          <Eye className="h-3.5 w-3.5 stroke-[2.5px]" />
-                        )}
-                        {isPdf ? "View PDF" : "View Document"}
-                      </button>
+                    <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleViewPreview(uploadedDoc)}
+                          disabled={
+                            loadingPreviewId === uploadedDoc.id ||
+                            loadingShareId === uploadedDoc.id
+                          }
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-900 transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                          {loadingPreviewId === uploadedDoc.id ? (
+                            <Loader2 className="h-3.5 w-3.5 stroke-[2.5px] animate-spin" />
+                          ) : (
+                            <Eye className="h-3.5 w-3.5 stroke-[2.5px]" />
+                          )}
+                          {isPdf ? "View PDF" : "View"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleShareDocument(uploadedDoc, config.label)
+                          }
+                          disabled={
+                            loadingPreviewId === uploadedDoc.id ||
+                            loadingShareId === uploadedDoc.id
+                          }
+                          className="inline-flex items-center gap-1 text-xs font-bold text-ink-muted hover:text-ink transition-colors cursor-pointer disabled:opacity-50 px-1.5 py-0.5 rounded-md hover:bg-inset"
+                          title="Share document"
+                        >
+                          {loadingShareId === uploadedDoc.id ? (
+                            <Loader2 className="h-3.5 w-3.5 stroke-[2.5px] animate-spin" />
+                          ) : (
+                            <Share2 className="h-3.5 w-3.5 stroke-[2.5px]" />
+                          )}
+                          <span>Share</span>
+                        </button>
+                      </div>
+
                       <button
                         type="button"
                         onClick={() => setDeleteTargetId(uploadedDoc.id)}
                         disabled={isDeleting}
-                        className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-ink-subtle hover:text-danger hover:bg-danger-light transition-colors cursor-pointer disabled:opacity-50"
+                        className="inline-flex items-center justify-center h-7 w-7 rounded-lg text-ink-subtle hover:text-danger hover:bg-danger-light transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                         title="Delete document"
                       >
                         <Trash2 className="h-3.5 w-3.5 stroke-[2px]" />
