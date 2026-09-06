@@ -424,7 +424,8 @@ export function DocumentsGrid({
                           {files.map((file) => (
                             <div
                               key={file.id}
-                              className="relative aspect-square rounded-lg overflow-hidden border border-line bg-inset group/thumb"
+                              onClick={() => handleViewPreview(file)}
+                              className="relative aspect-square rounded-lg overflow-hidden border border-line bg-inset group/thumb cursor-pointer"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -433,23 +434,29 @@ export function DocumentsGrid({
                                 className="h-full w-full object-cover transition-transform duration-200 group-hover/thumb:scale-105"
                               />
 
-                              {/* Hover Action Overlay */}
-                              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/thumb:opacity-100 flex items-center justify-center gap-1.5 transition-opacity">
+                              {/* Hover & Touch Action Overlay */}
+                              <div className="absolute inset-0 bg-black/50 opacity-100 sm:opacity-0 sm:group-hover/thumb:opacity-100 flex items-center justify-center gap-1.5 transition-opacity">
                                 <button
                                   type="button"
-                                  onClick={() => handleViewPreview(file)}
-                                  className="h-6 w-6 rounded-md bg-white/20 hover:bg-white/40 text-white flex items-center justify-center transition-colors cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleViewPreview(file);
+                                  }}
+                                  className="h-6 w-6 rounded-md bg-white/25 hover:bg-white/40 text-white flex items-center justify-center transition-colors cursor-pointer shadow-xs"
                                   title="View full image"
                                 >
-                                  <Eye className="h-3 w-3 stroke-[2.5px]" />
+                                  <Eye className="h-3.5 w-3.5 stroke-[2.25px]" />
                                 </button>
                                 <button
                                   type="button"
-                                  onClick={() => setDeleteTargetId(file.id)}
-                                  className="h-6 w-6 rounded-md bg-rose-600/80 hover:bg-rose-600 text-white flex items-center justify-center transition-colors cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setDeleteTargetId(file.id);
+                                  }}
+                                  className="h-6 w-6 rounded-md bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center transition-colors cursor-pointer shadow-xs"
                                   title="Delete image"
                                 >
-                                  <Trash2 className="h-3 w-3 stroke-[2.5px]" />
+                                  <Trash2 className="h-3.5 w-3.5 stroke-[2.25px]" />
                                 </button>
                               </div>
                             </div>
