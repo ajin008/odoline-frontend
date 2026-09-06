@@ -80,7 +80,7 @@ export function StaffBottomTabs() {
             <span className="font-sans leading-none">Dashboard</span>
           </Link>
 
-          {/* 2. Stock */}
+          {/* 2. Inventory */}
           <Link
             href="/staff/stock"
             onClick={() => setIsMoreOpen(false)}
@@ -107,7 +107,7 @@ export function StaffBottomTabs() {
                 }`}
               />
             </div>
-            <span className="font-sans leading-none">Stock</span>
+            <span className="font-sans leading-none">Inventory</span>
           </Link>
 
           {/* 3. CENTER PLUS BUTTON FOR CREATING NEW LEADS */}

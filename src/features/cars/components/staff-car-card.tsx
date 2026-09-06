@@ -14,8 +14,6 @@ import {
 import type { Car } from "../api/cars-api";
 import { formatIndianNumber } from "@/src/lib/formatters";
 
-import { Badge } from "@/src/components/ui/badge";
-
 function getDaysInStock(car: Car): number {
   if (car.days_in_stock != null) return car.days_in_stock;
   const dateStr = car.stock_added_at || car.created_at;
@@ -85,21 +83,15 @@ export function StaffCarCard({ car }: { car: Car }) {
 
         {/* Status Badge */}
         {isBooked ? (
-          <Badge
-            variant="neutral"
-            className="absolute top-2.5 right-2.5 uppercase tracking-wider"
-          >
-            <BookmarkCheck className="h-3 w-3 stroke-[2.25px]" />
+          <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold font-mono tracking-wider uppercase bg-emerald-600 text-white border border-emerald-600 shadow-xs select-none shrink-0">
+            <BookmarkCheck className="h-3 w-3 stroke-[2.25px] text-white" />
             <span>BOOKED</span>
-          </Badge>
+          </span>
         ) : (
-          <Badge
-            variant="success"
-            className="absolute top-2.5 right-2.5 uppercase tracking-wider"
-          >
-            <ShieldCheck className="h-3 w-3 stroke-[2.25px]" />
+          <span className="absolute top-2.5 right-2.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold font-mono tracking-wider uppercase bg-emerald-600 text-white border border-emerald-600 shadow-xs select-none shrink-0">
+            <ShieldCheck className="h-3 w-3 stroke-[2.25px] text-white" />
             <span>IN STOCK</span>
-          </Badge>
+          </span>
         )}
 
         {/* Stock Age or Booking Ref Badge on Photo Overlay */}

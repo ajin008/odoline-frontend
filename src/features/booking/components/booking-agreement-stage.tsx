@@ -247,120 +247,219 @@ export function BookingAgreementStage({
         </div>
       </div>
 
-      {/* Bento Card A: Financial Agreement Breakdown */}
-      <div className="rounded-2xl border border-line bg-card p-5 space-y-5 shadow-xs">
-        <div className="flex items-center justify-between border-b border-line/40 pb-3 flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <Receipt className="h-4.5 w-4.5 text-accent" />
-            <h3 className="text-sm font-bold text-ink font-sans">
-              Financial Terms &amp; Collection Progress
-            </h3>
-          </div>
-          <div className="flex items-center gap-2">
-            {canEdit && (
-              <button
-                type="button"
-                onClick={() => setIsEditOpen(true)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
-                title="Edit Agreement Details"
-              >
-                <Edit3 className="h-3.5 w-3.5 text-accent" />
-                <span>Edit</span>
-              </button>
-            )}
-            <span className="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-              {pctPaid}% Paid
+      {/* Bento Card A: Financial Agreement Breakdown / Cancellation Summary */}
+      {booking.status === "cancelled" ? (
+        <div className="rounded-2xl border border-line bg-card p-5 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-line/40 pb-3 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4.5 w-4.5 text-rose-500 shrink-0" />
+              <h3 className="text-sm font-bold text-ink font-sans">
+                Cancellation Summary
+              </h3>
+            </div>
+            <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-500/10 text-rose-600 dark:text-rose-400 px-2.5 py-0.5 rounded-full border-0">
+              Booking Transaction Cancelled
             </span>
           </div>
-        </div>
 
-        {/* 3 Metrics Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {/* Agreed Price */}
-          <div className="bg-inset/70 p-4 rounded-xl border border-line/50 space-y-1">
-            <div className="text-[10px] font-bold text-ink-subtle uppercase tracking-wider">
-              Agreed Deal Price
-            </div>
-            <div className="text-xl font-bold font-mono text-ink">
-              {formatCurrency(booking.agreed_price)}
-            </div>
-          </div>
-
-          {/* Total Paid */}
-          <div
-            className="p-4 rounded-xl border-0 space-y-1"
-            style={{ backgroundColor: "#d8f1b7" }}
-          >
-            <div className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider">
-              Advance Amount Paid
-            </div>
-            <div className="text-xl font-bold font-mono text-emerald-950">
-              {formatCurrency(booking.amount_paid)}
-            </div>
-          </div>
-
-          {/* Balance Due */}
-          <div
-            className="p-4 rounded-xl border-0 space-y-1"
-            style={{ backgroundColor: "#fae9cf" }}
-          >
-            <div className="text-[10px] font-bold text-amber-900 uppercase tracking-wider">
-              Net Balance Due
-            </div>
-            <div className="text-xl font-bold font-mono text-amber-950">
-              {formatCurrency(booking.balance_due)}
-            </div>
-          </div>
-        </div>
-
-        {/* Payment Collection Progress Bar */}
-        <div className="space-y-1.5 bg-inset/40 p-3.5 rounded-xl border border-line/40">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-ink">
-              Payment Collection Progress
+          {/* Cancel Reason Callout */}
+          <div className="bg-inset p-4 rounded-xl border border-line/40 space-y-1 font-sans">
+            <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">
+              Cancellation Reason
             </span>
-            <span className="font-mono text-ink-subtle">
-              {formatCurrency(booking.amount_paid)} of{" "}
-              {formatCurrency(booking.agreed_price)}
-            </span>
+            <p className="text-xs font-semibold text-ink leading-relaxed">
+              {booking.cancel_reason || "No specific cancellation reason recorded."}
+            </p>
           </div>
-          <div className="h-2 w-full bg-inset rounded-full overflow-hidden border border-line/60">
+
+          {/* 3 Cancellation Financial Cards Grid (Pastel colors, no borders) */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Advance Received (Pastel Green) */}
             <div
-              className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-              style={{ width: `${pctPaid}%` }}
-            />
+              className="p-4 rounded-xl border-0 space-y-1"
+              style={{ backgroundColor: "#d8f1b7" }}
+            >
+              <span className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider block">
+                Advance Received
+              </span>
+              <div className="text-xl font-bold font-mono text-emerald-950">
+                {formatCurrency(
+                  booking.advance_total ||
+                    String(
+                      (booking.payments || [])
+                        .filter((p) =>
+                          ["advance", "part_payment", "settlement"].includes(p.type)
+                        )
+                        .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                    )
+                )}
+              </div>
+            </div>
+
+            {/* Refunded to Customer (Pastel Sky Blue) */}
+            <div
+              className="p-4 rounded-xl border-0 space-y-1"
+              style={{ backgroundColor: "#e0f2fe" }}
+            >
+              <span className="text-[10px] font-bold text-sky-900 uppercase tracking-wider block">
+                Refunded to Customer
+              </span>
+              <div className="text-xl font-bold font-mono text-sky-950">
+                {formatCurrency(
+                  booking.refunded_total ||
+                    String(
+                      (booking.payments || [])
+                        .filter((p) => p.type === "refund")
+                        .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                    )
+                )}
+              </div>
+            </div>
+
+            {/* Retained Non-Refundable Charge (Pastel Amber/Peach) */}
+            <div
+              className="p-4 rounded-xl border-0 space-y-1"
+              style={{ backgroundColor: "#fae9cf" }}
+            >
+              <span className="text-[10px] font-bold text-amber-900 uppercase tracking-wider block">
+                Retained (Non-Refundable)
+              </span>
+              <div className="text-xl font-bold font-mono text-amber-950">
+                {formatCurrency(
+                  booking.amount_retained ||
+                    String(
+                      Math.max(
+                        0,
+                        (booking.payments || [])
+                          .filter((p) =>
+                            ["advance", "part_payment", "settlement"].includes(p.type)
+                          )
+                          .reduce((sum, p) => sum + Number(p.amount || 0), 0) -
+                          (booking.payments || [])
+                            .filter((p) => p.type === "refund")
+                            .reduce((sum, p) => sum + Number(p.amount || 0), 0)
+                      )
+                    )
+                )}
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Agreement Terms Meta */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-inset/30 p-3.5 rounded-xl border border-line/40">
-          {booking.balance_due_days ? (
-            <div className="space-y-0.5">
-              <span className="text-ink-subtle font-medium">
-                Balance Settlement Window:
+      ) : (
+        <div className="rounded-2xl border border-line bg-card p-5 space-y-5 shadow-xs">
+          <div className="flex items-center justify-between border-b border-line/40 pb-3 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Receipt className="h-4.5 w-4.5 text-accent" />
+              <h3 className="text-sm font-bold text-ink font-sans">
+                Financial Terms &amp; Collection Progress
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              {canEdit && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditOpen(true)}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
+                  title="Edit Agreement Details"
+                >
+                  <Edit3 className="h-3.5 w-3.5 text-accent" />
+                  <span>Edit</span>
+                </button>
+              )}
+              <span className="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                {pctPaid}% Paid
               </span>
-              <div className="font-bold text-ink flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5 text-amber-500" />
-                <span>Within {booking.balance_due_days} working days</span>
+            </div>
+          </div>
+
+          {/* 3 Metrics Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {/* Agreed Price */}
+            <div className="bg-inset/70 p-4 rounded-xl border border-line/50 space-y-1">
+              <div className="text-[10px] font-bold text-ink-subtle uppercase tracking-wider">
+                Agreed Deal Price
+              </div>
+              <div className="text-xl font-bold font-mono text-ink">
+                {formatCurrency(booking.agreed_price)}
               </div>
             </div>
-          ) : null}
 
-          {booking.advance_receipt_no ? (
-            <div className="space-y-0.5">
-              <span className="text-ink-subtle font-medium">
-                Advance Receipt Reference:
-              </span>
-              <div className="font-bold text-ink font-mono">
-                Ref #{booking.advance_receipt_no}{" "}
-                {booking.advance_receipt_date
-                  ? `(dtd ${formatDateIST(booking.advance_receipt_date)})`
-                  : ""}
+            {/* Total Paid */}
+            <div
+              className="p-4 rounded-xl border-0 space-y-1"
+              style={{ backgroundColor: "#d8f1b7" }}
+            >
+              <div className="text-[10px] font-bold text-emerald-900 uppercase tracking-wider">
+                Advance Amount Paid
+              </div>
+              <div className="text-xl font-bold font-mono text-emerald-950">
+                {formatCurrency(booking.amount_paid)}
               </div>
             </div>
-          ) : null}
+
+            {/* Balance Due */}
+            <div
+              className="p-4 rounded-xl border-0 space-y-1"
+              style={{ backgroundColor: "#fae9cf" }}
+            >
+              <div className="text-[10px] font-bold text-amber-900 uppercase tracking-wider">
+                Net Balance Due
+              </div>
+              <div className="text-xl font-bold font-mono text-amber-950">
+                {formatCurrency(booking.balance_due)}
+              </div>
+            </div>
+          </div>
+
+          {/* Payment Collection Progress Bar */}
+          <div className="space-y-1.5 bg-inset/40 p-3.5 rounded-xl border border-line/40">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-semibold text-ink">
+                Payment Collection Progress
+              </span>
+              <span className="font-mono text-ink-subtle">
+                {formatCurrency(booking.amount_paid)} of{" "}
+                {formatCurrency(booking.agreed_price)}
+              </span>
+            </div>
+            <div className="h-2 w-full bg-inset rounded-full overflow-hidden border border-line/60">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                style={{ width: `${pctPaid}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Agreement Terms Meta */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-inset/30 p-3.5 rounded-xl border border-line/40">
+            {booking.balance_due_days ? (
+              <div className="space-y-0.5">
+                <span className="text-ink-subtle font-medium">
+                  Balance Settlement Window:
+                </span>
+                <div className="font-bold text-ink flex items-center gap-1.5">
+                  <Clock className="h-3.5 w-3.5 text-amber-500" />
+                  <span>Within {booking.balance_due_days} working days</span>
+                </div>
+              </div>
+            ) : null}
+
+            {booking.advance_receipt_no ? (
+              <div className="space-y-0.5">
+                <span className="text-ink-subtle font-medium">
+                  Advance Receipt Reference:
+                </span>
+                <div className="font-bold text-ink font-mono">
+                  Ref #{booking.advance_receipt_no}{" "}
+                  {booking.advance_receipt_date
+                    ? `(dtd ${formatDateIST(booking.advance_receipt_date)})`
+                    : ""}
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Bento Card B: Payments Ledger Audit Trail */}
       <div className="rounded-2xl border border-line bg-card p-5 space-y-4 shadow-xs">

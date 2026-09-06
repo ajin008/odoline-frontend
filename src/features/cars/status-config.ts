@@ -10,8 +10,8 @@ export const CAR_STATUS_CONFIG: Record<
   purchasing: { label: "Purchasing", variant: "warning", badge: BADGE_VARIANT_STYLES.warning },
   in_refurbishment: { label: "In Refurbishment", variant: "info", badge: BADGE_VARIANT_STYLES.info },
   refurb_complete: { label: "Refurb Complete", variant: "info", badge: BADGE_VARIANT_STYLES.info },
-  in_stock: { label: "In Stock", variant: "success", badge: BADGE_VARIANT_STYLES.success },
-  booked: { label: "Booked", variant: "neutral", badge: BADGE_VARIANT_STYLES.neutral },
+  in_stock: { label: "In Stock", variant: "success", badge: "bg-emerald-600 text-white border-emerald-600" },
+  booked: { label: "Booked", variant: "success", badge: "bg-emerald-600 text-white border-emerald-600" },
   delivered: { label: "Delivered", variant: "neutral", badge: BADGE_VARIANT_STYLES.neutral },
   closed: { label: "Closed", variant: "neutral", badge: BADGE_VARIANT_STYLES.neutral },
 };

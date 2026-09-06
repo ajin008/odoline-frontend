@@ -126,11 +126,42 @@ export function getLakhsCroresText(value: number | string | null | undefined): s
   if (isNaN(num) || num <= 0) return "";
 
   if (num >= 10000000) {
-    return `${(num / 10000000).toFixed(2)} Cr`;
+    const cr = (num / 10000000).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+    return `${cr} Cr`;
   } else if (num >= 100000) {
-    return `${(num / 100000).toFixed(2)} Lac`;
+    const lac = (num / 100000).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+    return `${lac} Lac`;
   } else if (num >= 1000) {
-    return `${(num / 1000).toFixed(2)} K`;
+    const k = (num / 1000).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+    return `${k} K`;
   }
   return "";
 }
+
+/**
+ * Formats compact text (e.g. "50k", "1.023 lac", "1.5 lac", "2 cr") for numeric amounts.
+ * Examples:
+ *   5000     -> "5k"
+ *   50000    -> "50k"
+ *   102300   -> "1.023 lac"
+ *   150000   -> "1.5 lac"
+ *   20000000 -> "2 cr"
+ */
+export function formatCompactAmount(value: number | string | null | undefined): string {
+  if (value === null || value === undefined || value === "") return "";
+  const num = typeof value === "number" ? value : Number(String(value).replace(/,/g, ""));
+  if (isNaN(num) || num <= 0) return "";
+
+  if (num >= 10000000) {
+    const cr = (num / 10000000).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+    return `${cr} cr`;
+  } else if (num >= 100000) {
+    const lac = (num / 100000).toFixed(4).replace(/0+$/, "").replace(/\.$/, "");
+    return `${lac} lac`;
+  } else if (num >= 1000) {
+    const k = (num / 1000).toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+    return `${k}k`;
+  }
+  return "";
+}
+

@@ -145,9 +145,10 @@ export const carsApi = {
   },
 
   /**
-   * GET /cars/staff/stock — dedicated staff stock list (in_stock + booked cars, available first).
+   * GET /cars/staff/stock — dedicated staff inventory list (filtered by availability).
    */
   async getStaffStock({
+    availability,
     sort,
     search,
     fuel_type,
@@ -156,6 +157,7 @@ export const carsApi = {
     cursor,
     limit,
   }: {
+    availability?: "in_stock" | "booked";
     sort?: string;
     search?: string;
     fuel_type?: string;
@@ -165,6 +167,7 @@ export const carsApi = {
     limit?: number;
   } = {}): Promise<CarsPage> {
     const params: Record<string, string | number> = {};
+    if (availability) params.availability = availability;
     if (sort) params.sort = sort;
     if (search?.trim()) params.search = search.trim();
     if (fuel_type?.trim()) params.fuel_type = fuel_type.trim();

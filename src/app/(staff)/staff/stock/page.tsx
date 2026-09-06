@@ -6,7 +6,15 @@ import { StaffCarCard } from "@/src/features/cars/components/staff-car-card";
 import { StaffStockFilters } from "@/src/features/cars/components/staff-stock-filters";
 import { Car, Loader2, RefreshCw } from "lucide-react";
 
+const SUB_TABS = [
+  { key: "in_stock" as const, label: "In Stock" },
+  { key: "booked" as const, label: "Booked" },
+] as const;
+
+type AvailabilityKey = (typeof SUB_TABS)[number]["key"];
+
 export default function StaffStockPage() {
+  const [availability, setAvailability] = useState<AvailabilityKey>("in_stock");
   const [search, setSearch] = useState("");
   const [fuelType, setFuelType] = useState("");
   const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
@@ -30,6 +38,7 @@ export default function StaffStockPage() {
     isFetchingNextPage,
     refetch,
   } = useInfiniteStaffStock({
+    availability,
     sort: "newest",
     search,
     fuel_type: fuelType,
@@ -63,15 +72,15 @@ export default function StaffStockPage() {
   const allItems = data?.pages.flatMap((page) => page.data) || [];
 
   return (
-    <div className="w-full space-y-6 font-sans select-none">
+    <div className="w-full space-y-5 font-sans select-none">
       {/* Header Section */}
       <div className="flex items-center justify-between border-b border-line/60 pb-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight text-ink font-sans">
-            Showroom Car Stock
+            Showroom Inventory
           </h1>
           <p className="text-xs text-ink-muted mt-0.5">
-            Search and filter active showroom vehicles, asking prices, and vehicle specifications.
+            Search and filter live showroom vehicles, active customer bookings, asking prices, and specifications.
           </p>
         </div>
 
@@ -83,6 +92,25 @@ export default function StaffStockPage() {
           <RefreshCw className="h-3.5 w-3.5 stroke-[2px]" />
           <span>Refresh</span>
         </button>
+      </div>
+
+      {/* Sub-tabs Navigation */}
+      <div className="flex h-9 items-center gap-1 overflow-x-auto rounded-lg bg-inset p-1 border border-line/40 w-full sm:w-fit no-scrollbar shrink-0">
+        {SUB_TABS.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setAvailability(tab.key)}
+            className={[
+              "flex-1 sm:flex-initial h-full text-center rounded-md px-3.5 sm:px-4 flex items-center justify-center text-xs font-bold tracking-tight font-sans transition-all duration-200 cursor-pointer whitespace-nowrap",
+              availability === tab.key
+                ? "bg-accent text-inverse shadow-xs"
+                : "text-ink-muted hover:text-ink",
+            ].join(" ")}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Search & Filters Toolbar */}
@@ -116,7 +144,7 @@ export default function StaffStockPage() {
       ) : isError ? (
         <div className="rounded-xl border border-red-200 bg-red-50/50 p-8 text-center space-y-3">
           <p className="text-sm font-semibold text-red-600">
-            Failed to load showroom stock.
+            Failed to load showroom inventory.
           </p>
           <button
             type="button"
@@ -133,10 +161,14 @@ export default function StaffStockPage() {
           </div>
           <div className="space-y-1">
             <h3 className="text-sm font-bold text-ink font-sans">
-              No Vehicles Matching Search
+              {availability === "booked"
+                ? "No Booked Vehicles Found"
+                : "No Vehicles Matching Search"}
             </h3>
             <p className="text-xs text-ink-subtle max-w-sm mx-auto">
-              No vehicles found for the current search query or price filters. Try adjusting your filters or search terms.
+              {availability === "booked"
+                ? "There are currently no customer-booked vehicles matching your filters."
+                : "No available vehicles found for the current search query or price filters."}
             </p>
           </div>
           {search || fuelType || minPrice || maxPrice ? (
@@ -176,7 +208,9 @@ export default function StaffStockPage() {
           {/* End of List State */}
           {!hasNextPage && allItems.length > 0 && (
             <div className="py-6 text-center text-xs font-medium text-ink-subtle font-sans border-t border-line/40 mt-4">
-              You&apos;ve reached the end of the showroom stock.
+              {availability === "booked"
+                ? "You've reached the end of booked vehicles."
+                : "You've reached the end of available inventory."}
             </div>
           )}
         </>

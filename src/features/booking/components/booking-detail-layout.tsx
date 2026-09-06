@@ -255,19 +255,21 @@ export function BookingDetailLayout({
             )}
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
-            {isFullyPaid ? (
-              <Badge variant="success" className="px-3 py-1 text-xs font-extrabold">
-                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                <span>Fully Paid</span>
-              </Badge>
-            ) : (
-              <Badge variant="warning" className="px-3 py-1 text-xs font-extrabold">
-                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                <span>Balance Pending</span>
-              </Badge>
-            )}
-          </div>
+          {booking.status !== "cancelled" && (
+            <div className="flex items-center gap-2 flex-wrap">
+              {isFullyPaid ? (
+                <Badge variant="success" className="px-3 py-1 text-xs font-extrabold">
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                  <span>Fully Paid</span>
+                </Badge>
+              ) : (
+                <Badge variant="warning" className="px-3 py-1 text-xs font-extrabold">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                  <span>Balance Pending</span>
+                </Badge>
+              )}
+            </div>
+          )}
 
           <div className="text-xs text-ink-subtle flex items-center gap-2 flex-wrap font-medium">
             <div className="flex items-center gap-1">

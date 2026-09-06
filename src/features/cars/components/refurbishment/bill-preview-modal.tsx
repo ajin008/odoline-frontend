@@ -1,7 +1,8 @@
 // src/features/cars/components/refurbishment/bill-preview-modal.tsx
 "use client";
 
-import { X } from "lucide-react";
+import { X, Download, Share2 } from "lucide-react";
+import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 
 interface BillPreviewModalProps {
   billPreviewUrl: string | null;
@@ -13,6 +14,8 @@ export function BillPreviewModal({
   onClose,
 }: BillPreviewModalProps) {
   if (!billPreviewUrl) return null;
+
+  const billFilename = "refurbishment-bill.jpg";
 
   return (
     <div
@@ -29,15 +32,33 @@ export function BillPreviewModal({
             Vendor Bill Preview
           </h3>
           <div className="flex items-center gap-2">
-            <a
-              href={billPreviewUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              className="inline-flex items-center gap-1.5 rounded-lg bg-inset px-3 py-1.5 text-xs font-bold text-ink hover:bg-line transition-colors"
+            <button
+              type="button"
+              onClick={() => downloadFile({ url: billPreviewUrl, filename: billFilename })}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-inset border border-line px-3 py-1.5 text-xs font-bold text-ink-muted hover:text-ink hover:bg-line/40 transition-colors cursor-pointer"
+              title="Download Bill"
             >
-              Download File
-            </a>
+              <Download className="h-3.5 w-3.5 stroke-[2px]" />
+              <span className="hidden sm:inline">Download</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                shareFile({
+                  url: billPreviewUrl,
+                  filename: billFilename,
+                  title: "Vendor Refurbishment Bill",
+                  mimeType: "image/jpeg",
+                })
+              }
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-3 py-1.5 rounded-lg cursor-pointer"
+              title="Share Bill"
+            >
+              <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+
             <button
               type="button"
               onClick={onClose}

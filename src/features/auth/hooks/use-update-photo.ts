@@ -30,6 +30,7 @@ export function useUpdatePhoto() {
       toast.success("Profile photo updated successfully");
       queryClient.setQueryData(queryKeys.me, updatedUser);
       queryClient.invalidateQueries({ queryKey: queryKeys.me });
+      queryClient.invalidateQueries({ queryKey: queryKeys.staff.me });
     },
     onError: () => {
       toast.error("Failed to update profile photo. Please try another image.");
@@ -48,7 +49,9 @@ export function useRemovePhoto() {
       toast.success("Profile photo removed successfully");
       queryClient.setQueryData(queryKeys.me, updatedUser);
       queryClient.invalidateQueries({ queryKey: queryKeys.me });
+      queryClient.invalidateQueries({ queryKey: queryKeys.staff.me });
     },
+
     onError: () => {
       toast.error("Failed to remove profile photo.");
     },

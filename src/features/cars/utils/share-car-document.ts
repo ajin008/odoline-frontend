@@ -23,18 +23,23 @@ export async function shareCarDocument({
 }: ShareCarDocumentParams): Promise<void> {
   const loadingToastId = toast.loading("Preparing document for sharing...");
   try {
-    // 1. Fetch presigned 15-minute download URL
-    const presignedUrl = await documentsApi.getPresignedUrl(carId, documentId);
-
-    // 2. Download blob content
-    const res = await fetch(presignedUrl);
-    if (!res.ok) {
-      throw new Error(`Failed to download file (${res.status})`);
+    // 1. Fetch document binary blob via backend API proxy (bypasses CORS)
+    let blob: Blob;
+    try {
+      blob = await documentsApi.downloadFileBlob(carId, documentId);
+    } catch {
+      // Fallback: try presigned download URL
+      const presignedUrl = await documentsApi.getPresignedUrl(carId, documentId);
+      const res = await fetch(presignedUrl);
+      if (!res.ok) {
+        throw new Error(`Failed to download file (${res.status})`);
+      }
+      blob = await res.blob();
     }
-    const blob = await res.blob();
+
     toast.dismiss(loadingToastId);
 
-    // 3. Determine file type & extension
+    // 2. Determine file type & extension
     const type = mimeType || blob.type || "application/pdf";
     let ext = ".pdf";
     if (type.includes("jpeg") || type.includes("jpg")) ext = ".jpg";
@@ -53,7 +58,7 @@ export async function shareCarDocument({
     const shareTitle = `${docLabel}${makeModel ? ` - ${makeModel}` : ""}`;
     const shareText = `Document: ${docLabel}${regNumber ? ` (${regNumber})` : ""}`;
 
-    // 4. Mobile Native Web-Share check
+    // 3. Mobile Native Web-Share (shares actual file directly to WhatsApp/Social Apps)
     let canShareFiles = false;
     if (
       typeof navigator !== "undefined" &&
@@ -83,7 +88,7 @@ export async function shareCarDocument({
       }
     }
 
-    // 5. Desktop / Fallback workflow (FIX-2 pattern)
+    // 4. Desktop / Non-Mobile workflow: Automatically download file to computer
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -92,16 +97,8 @@ export async function shareCarDocument({
     a.click();
     document.body.removeChild(a);
 
-    try {
-      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(shareText);
-      }
-    } catch {
-      // ignore clipboard errors
-    }
-
     toast.success(
-      "Document downloaded — attach the file in WhatsApp Web.",
+      "Document file downloaded to your device — attach in WhatsApp Web.",
       {
         action: {
           label: "Open WhatsApp Web",

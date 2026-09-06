@@ -52,7 +52,11 @@ export const createCarSchema = z.object({
   purchase_amount: numberFromString.pipe(
     z.number().positive("Enter the purchase amount")
   ),
-  seller_name: z.string().min(1, "Seller name is required").max(100),
+  seller_name: z
+    .string()
+    .min(1, "Seller name is required")
+    .max(100)
+    .transform((v) => v.toUpperCase().trim()),
   seller_phone: z
     .string()
     .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),

@@ -8,35 +8,53 @@ export function useDocumentActions(carId: string) {
   const uploadMutation = useUploadDocument(carId);
   const deleteMutation = useDeleteDocument(carId);
 
-  const uploadAndCompress = async (file: File, documentType: DocumentType) => {
-    const isImage = file.type.startsWith("image/");
+  const uploadAndCompressFiles = async (
+    files: File[],
+    documentType: DocumentType
+  ) => {
+    if (!files || files.length === 0) return;
+
+    const hasImages = files.some((f) => f.type.startsWith("image/"));
     const loadingToastId = toast.loading(
-      isImage ? "Compressing and uploading..." : "Uploading document..."
+      hasImages
+        ? `Compressing and uploading ${files.length} file${files.length > 1 ? "s" : ""}...`
+        : `Uploading document...`
     );
 
     try {
-      let fileToUpload = file;
-
-      if (isImage) {
-        const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-          initialQuality: 0.8,
-        };
-        fileToUpload = await imageCompression(file, options);
-      }
+      const processedFiles = await Promise.all(
+        files.map(async (file) => {
+          if (file.type.startsWith("image/")) {
+            try {
+              const options = {
+                maxSizeMB: 1,
+                maxWidthOrHeight: 1920,
+                useWebWorker: true,
+                initialQuality: 0.8,
+              };
+              return await imageCompression(file, options);
+            } catch {
+              return file;
+            }
+          }
+          return file;
+        })
+      );
 
       uploadMutation.mutate(
-        { carId, documentType, file: fileToUpload },
+        { carId, documentType, files: processedFiles },
         { onSettled: () => toast.dismiss(loadingToastId) }
       );
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("[Document Upload Error]:", error);
       toast.dismiss(loadingToastId);
-      toast.error("Failed to process the document. Please try another file.");
+      toast.error("Failed to process documents. Please try another file.");
     }
+  };
+
+  const uploadAndCompress = async (file: File, documentType: DocumentType) => {
+    await uploadAndCompressFiles([file], documentType);
   };
 
   // NEW FUNCTION: Returns the URL instead of opening a window
@@ -58,6 +76,7 @@ export function useDocumentActions(carId: string) {
 
   return {
     uploadAndCompress,
+    uploadAndCompressFiles,
     fetchDocumentUrl,
     deleteDocument,
     isUploading: uploadMutation.isPending,

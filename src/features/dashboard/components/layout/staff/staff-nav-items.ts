@@ -31,7 +31,7 @@ export const staffNavSections: StaffNavSection[] = [
       },
       {
         href: "/staff/stock",
-        label: "Stock",
+        label: "Inventory",
         icon: Car,
         mobile: true,
       },

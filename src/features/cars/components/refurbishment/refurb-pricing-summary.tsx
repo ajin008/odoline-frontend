@@ -7,6 +7,7 @@ import { formatCurrency } from "../../utils/refurbishment-helpers";
 import { useUpdateCarMargin } from "../../hooks/use-car";
 import { useMe } from "@/src/features/auth/hooks/use-me";
 import { Loader2, TrendingUp } from "lucide-react";
+import { formatCompactAmount } from "@/src/lib/formatters";
 
 interface RefurbPricingSummaryProps {
   carId: string;
@@ -49,6 +50,8 @@ export function RefurbPricingSummary({
 
   const currentMargin = Number(marginInput) || initialMargin || 0;
   const liveSellingPrice = landingNum + currentMargin;
+  const inputCompactBadge = formatCompactAmount(marginInput);
+  const displayCompactBadge = formatCompactAmount(currentMargin);
 
   return (
     <div className="space-y-4 select-none font-sans">
@@ -100,9 +103,16 @@ export function RefurbPricingSummary({
 
         {/* 4. Profit Margin Display Card (Read-Only) */}
         <div className="flex flex-col justify-between rounded-xl bg-[#fef3c7] p-3.5 transition-all hover:bg-[#fde68a]">
-          <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#d97706]">
-            + Profit Margin
-          </p>
+          <div className="flex items-center justify-between gap-1">
+            <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#d97706]">
+              + Profit Margin
+            </p>
+            {displayCompactBadge && (
+              <span className="text-[10px] font-mono font-bold text-[#b45309] bg-[#fde68a] px-1.5 py-0.5 rounded border border-[#f59e0b]/30">
+                {displayCompactBadge}
+              </span>
+            )}
+          </div>
           <p className="text-sm font-bold text-[#92400e] mt-1 font-mono">
             ₹{formatCurrency(currentMargin)}
           </p>
@@ -143,7 +153,7 @@ export function RefurbPricingSummary({
               className="flex items-center gap-2.5 w-full sm:w-auto"
             >
               <div className="relative flex-1 sm:w-56">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold font-mono text-ink-muted">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold font-mono text-ink-muted pointer-events-none">
                   ₹
                 </span>
                 <input
@@ -158,8 +168,15 @@ export function RefurbPricingSummary({
                       handleSave();
                     }
                   }}
-                  className="w-full rounded-lg border border-line bg-card py-2 pl-7 pr-3 text-xs font-bold font-mono text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className={`w-full rounded-lg border border-line bg-card py-2 pl-7 text-xs font-bold font-mono text-ink focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent ${
+                    inputCompactBadge ? "pr-20" : "pr-3"
+                  }`}
                 />
+                {inputCompactBadge && (
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[10px] font-mono font-bold text-accent bg-accent-light/80 px-1.5 py-0.5 rounded border border-accent/20">
+                    {inputCompactBadge}
+                  </span>
+                )}
               </div>
 
               <button
@@ -184,3 +201,4 @@ export function RefurbPricingSummary({
     </div>
   );
 }
+

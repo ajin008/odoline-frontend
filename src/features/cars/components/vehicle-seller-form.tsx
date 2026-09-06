@@ -22,6 +22,7 @@ import {
 
 import { FormInput } from "@/src/components/ui/form-input";
 import { FormTextarea } from "@/src/components/ui/form-textarea";
+import { getLakhsCroresText } from "@/src/lib/formatters";
 import {
   CustomSelect,
   type CustomSelectOption,
@@ -432,6 +433,7 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
         <FormTextarea
           label="Accident / Replacement History"
           placeholder="Detail major records, replacements, structural fixes or leave blank..."
+          helperText="Paste WhatsApp messages or history records directly — input auto-expands to display all lines."
           error={errors.accident_history?.message}
           {...register("accident_history")}
         />
@@ -439,6 +441,7 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
         <FormTextarea
           label="Specifications & Key Features"
           placeholder="Free text — engine capacity, variant, key features, selling points..."
+          helperText="Paste feature lists or specs from WhatsApp/social media."
           error={errors.specifications?.message}
           {...register("specifications")}
         />
@@ -447,24 +450,30 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
           <Controller
             name="purchase_amount"
             control={control}
-            render={({ field: { onChange, value, ref } }) => (
-              <FormInput
-                label="Purchase Amount"
-                type="text"
-                inputMode="numeric"
-                prefix="₹"
-                placeholder="4,50,000"
-                ref={ref}
-                value={formatIndianNumber(String(value ?? ""))}
-                error={errors.purchase_amount?.message}
-                onChange={(e) => {
-                  const rawDigits = e.target.value.replace(/,/g, "");
-                  if (/^\d*$/.test(rawDigits)) {
-                    onChange(rawDigits);
-                  }
-                }}
-              />
-            )}
+            render={({ field: { onChange, value, ref } }) => {
+              const lakhsBadge = getLakhsCroresText(
+                value as string | number | null | undefined
+              );
+              return (
+                <FormInput
+                  label="Purchase Amount"
+                  type="text"
+                  inputMode="numeric"
+                  prefix="₹"
+                  placeholder="4,50,000"
+                  ref={ref}
+                  value={formatIndianNumber(String(value ?? ""))}
+                  error={errors.purchase_amount?.message}
+                  helperText={lakhsBadge ? `${lakhsBadge}` : undefined}
+                  onChange={(e) => {
+                    const rawDigits = e.target.value.replace(/,/g, "");
+                    if (/^\d*$/.test(rawDigits)) {
+                      onChange(rawDigits);
+                    }
+                  }}
+                />
+              );
+            }}
           />
         </div>
       </section>
@@ -487,11 +496,22 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
         </div>
 
         <div className="grid grid-cols-1 gap-x-4 gap-y-5 sm:grid-cols-2">
-          <FormInput
-            label="Seller Name"
-            placeholder="Full name as written on RC"
-            error={errors.seller_name?.message}
-            {...register("seller_name")}
+          <Controller
+            name="seller_name"
+            control={control}
+            render={({ field: { onChange, value, ref } }) => (
+              <FormInput
+                label="Seller Name"
+                placeholder="Full name as written on RC"
+                ref={ref}
+                value={typeof value === "string" ? value : ""}
+                error={errors.seller_name?.message}
+                onChange={(e) => {
+                  onChange(e.target.value.toUpperCase());
+                }}
+                className="uppercase"
+              />
+            )}
           />
           <FormInput
             label="Seller Contact Number"

@@ -179,7 +179,9 @@ export interface BookingDetail {
   created_at: string;
   updated_at: string;
   amount_paid: string;
-  balance_due: string;
+  balance_due: string | null;
+  advance_total?: string | null;
+  refunded_total?: string | null;
   amount_retained?: string | null;
   accessories_total?: string;
   grand_total?: string;

@@ -14,7 +14,7 @@ import {
 import { useRefurbishmentItems } from "../hooks/use-refurbishment";
 import { useCar, useAddToCartStock } from "../hooks/use-car";
 import { useCarDocuments } from "../hooks/use-documents";
-import { DOCUMENT_CONFIGS } from "../type/document-types";
+import { DOCUMENT_CONFIGS, GroupedDocType } from "../type/document-types";
 import { calculateRefurbTotals } from "../utils/refurbishment-helpers";
 import { RefurbPricingSummary } from "./refurbishment/refurb-pricing-summary";
 import { AddRefurbItemForm } from "./refurbishment/add-refurb-item-form";
@@ -51,7 +51,7 @@ export function RefurbishmentTab({
 
   const isAlreadyInStock = car?.status === "in_stock";
 
-  const uploadedDocTypes = new Set(documents.map((doc) => doc.document_type));
+  const uploadedDocTypes = new Set((documents as GroupedDocType[]).map((doc) => doc.doc_type || (doc as unknown as { document_type?: string }).document_type));
   const missingHardDocs = DOCUMENT_CONFIGS.filter(
     (cfg) => cfg.isHardDoc && !uploadedDocTypes.has(cfg.type)
   );

@@ -20,7 +20,6 @@ import {
   Clock,
   Coins,
   Download,
-  ExternalLink,
   Eye,
   FileCheck2,
   FileText,
@@ -37,7 +36,9 @@ import {
   UserCheck,
   Wrench,
   X,
+  Share2,
 } from "lucide-react";
+import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 
 interface VehicleDossierProps {
   carId: string;
@@ -1368,15 +1369,43 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                 {previewDocUrl.title}
               </h3>
               <div className="flex items-center gap-2">
-                <a
-                  href={previewDocUrl.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 text-ink-muted hover:text-ink rounded-lg bg-inset border border-line transition-colors"
-                  title="Open in new tab"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </a>
+                {(() => {
+                  const vehiclePrefix = `${car.reg_number ? car.reg_number : `${car.make}_${car.model}`}`;
+                  const docFilename = `${vehiclePrefix}_${previewDocUrl.title || "Document"}.pdf`;
+
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => downloadFile({ url: previewDocUrl.url, filename: docFilename })}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-ink-muted bg-inset hover:bg-line/40 border border-line cursor-pointer"
+                        title="Download Document"
+                      >
+                        <Download className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Download</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          shareFile({
+                            url: previewDocUrl.url,
+                            filename: docFilename,
+                            title: `${car.make} ${car.model} - ${previewDocUrl.title}`,
+                            text: car.reg_number ? `Registration: ${car.reg_number}` : undefined,
+                            mimeType: "application/pdf",
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-2.5 py-1 rounded-lg cursor-pointer"
+                        title="Share Document"
+                      >
+                        <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Share</span>
+                      </button>
+                    </>
+                  );
+                })()}
+
                 <button
                   type="button"
                   onClick={() => setPreviewDocUrl(null)}
@@ -1402,13 +1431,53 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
       {/* ------------------------------------------------------------- */}
       {isLightboxOpen && currentPhoto && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
-          <button
-            type="button"
-            onClick={() => setIsLightboxOpen(false)}
-            className="absolute top-4 right-4 text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors cursor-pointer z-10"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+            {(() => {
+              const vehiclePrefix = `${car.reg_number ? car.reg_number : `${car.make}_${car.model}`}`;
+              const photoFilename = `${vehiclePrefix}-photo-${selectedPhotoIndex + 1}.jpg`;
+
+              return (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => downloadFile({ url: currentPhoto, filename: photoFilename })}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
+                    title="Download Photo"
+                  >
+                    <Download className="h-3.5 w-3.5 stroke-[2px]" />
+                    <span className="hidden sm:inline">Download</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      shareFile({
+                        url: currentPhoto,
+                        filename: photoFilename,
+                        title: `${car.make} ${car.model} Photo`,
+                        text: car.reg_number ? `Registration: ${car.reg_number}` : undefined,
+                        mimeType: "image/jpeg",
+                      })
+                    }
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-300 bg-emerald-500/20 hover:bg-emerald-500/30 transition-colors cursor-pointer"
+                    title="Share Photo"
+                  >
+                    <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
+                    <span className="hidden sm:inline">Share</span>
+                  </button>
+                </>
+              );
+            })()}
+
+            <button
+              type="button"
+              onClick={() => setIsLightboxOpen(false)}
+              className="text-white bg-white/10 hover:bg-white/20 p-2 rounded-full transition-colors cursor-pointer"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+
           <div className="max-w-5xl max-h-[90vh] relative flex flex-col items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

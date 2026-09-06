@@ -1,36 +1,35 @@
 import { apiClient } from "@/src/lib/api-client";
 import { endpoints } from "@/src/lib/endpoints";
-import { DocumentType, CarDocument } from "../type/document-types";
+import {
+  GroupedDocType,
+  UploadDocumentPayload,
+  normalizeGroupedDocuments,
+} from "../type/document-types";
 
-export interface UploadDocumentPayload {
-  carId: string;
-  documentType: DocumentType;
-  file: File;
-}
+export type { UploadDocumentPayload };
 
 export const documentsApi = {
-  /** Fetch all uploaded documents for a specific car */
-  async getList(carId: string): Promise<CarDocument[]> {
+  /** Fetch all uploaded documents for a specific car (normalized to grouped structure) */
+  async getList(carId: string): Promise<GroupedDocType[]> {
     const res = await apiClient.get(endpoints.cars.documents(carId));
-    return res.data.data;
+    return normalizeGroupedDocuments(res.data.data || []);
   },
 
-  /** Upload a document image */
+  /** Upload multiple document images or a PDF */
   async upload({
     carId,
     documentType,
-    file,
-  }: UploadDocumentPayload): Promise<CarDocument> {
+    files,
+  }: UploadDocumentPayload): Promise<GroupedDocType> {
     const formData = new FormData();
-    formData.append("file", file);
     formData.append("doc_type", documentType);
+    for (const file of files) {
+      formData.append("files", file);
+    }
 
     const res = await apiClient.post(
       endpoints.cars.documents(carId),
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
+      formData
     );
     return res.data.data;
   },
@@ -41,6 +40,15 @@ export const documentsApi = {
       `${endpoints.cars.documents(carId)}/${documentId}/download`
     );
     return res.data.data.url;
+  },
+
+  /** Download raw document file blob directly from backend (bypasses CORS) */
+  async downloadFileBlob(carId: string, documentId: string): Promise<Blob> {
+    const res = await apiClient.get(
+      `${endpoints.cars.documents(carId)}/${documentId}/file`,
+      { responseType: "blob" }
+    );
+    return res.data;
   },
 
   /** Delete a document */

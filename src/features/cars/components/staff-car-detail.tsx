@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -11,8 +11,6 @@ import {
   Wrench,
   CheckCircle2,
   Clock,
-  Upload,
-  Eye,
   Loader2,
   Sparkles,
   ChevronLeft,
@@ -24,42 +22,37 @@ import {
   Calendar,
   Layers,
   Palette,
-  ExternalLink,
   X,
+  Copy,
+  Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useCar } from "../hooks/use-car";
 import { useCarPhotos } from "../hooks/use-car-photos";
-import { useCarDocuments, useUploadDocument } from "../hooks/use-documents";
+import { useCarDocuments } from "../hooks/use-documents";
 import { useRefurbishmentItems } from "../hooks/use-refurbishment";
 import { formatIndianNumber } from "@/src/lib/formatters";
-import { DOCUMENT_CONFIGS, DocumentType } from "../type/document-types";
-import { documentsApi } from "../api/documents-api";
-import { shareCarDocument } from "../utils/share-car-document";
 import { CarPhotoGallery } from "./car-photo-gallery";
 import { CarShareModal } from "./car-share-modal";
+import { DocumentsGrid } from "./documents-grid";
+import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 
 export function StaffCarDetail({ carId }: { carId: string }) {
   const { data: car, isLoading: isCarLoading, isError } = useCar(carId);
   const { data: photos = [] } = useCarPhotos(carId);
   const { data: documents = [] } = useCarDocuments(carId);
   const { data: refurbItems = [] } = useRefurbishmentItems(carId);
-  const uploadDoc = useUploadDocument(carId);
 
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
-  const [activeTab, setActiveTab] = useState<"overview" | "photos" | "refurb" | "docs">(
-    "overview"
-  );
-  const [docUploadType, setDocUploadType] = useState<DocumentType | null>(null);
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "photos" | "refurb" | "docs"
+  >("overview");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [docPreview, setDocPreview] = useState<{
     url: string;
     mimeType: string;
     name: string;
   } | null>(null);
-  const [loadingDocId, setLoadingDocId] = useState<string | null>(null);
-  const [loadingShareId, setLoadingShareId] = useState<string | null>(null);
-  const docFileInputRef = useRef<HTMLInputElement>(null);
 
   if (isCarLoading) {
     return (
@@ -110,71 +103,32 @@ export function StaffCarDetail({ carId }: { carId: string }) {
     ? `₹${formatIndianNumber(Number(car.selling_price))}`
     : "Price on Request";
 
-  const completedRefurbCount = refurbItems.filter((i) => i.status === "done").length;
+  const completedRefurbCount = refurbItems.filter(
+    (i) => i.status === "done"
+  ).length;
 
   const handleShareClick = () => {
     setIsShareModalOpen(true);
   };
 
-  const handleDocFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !docUploadType) return;
-
+  const handleCopySpecs = async () => {
+    if (!car?.specifications) return;
     try {
-      await uploadDoc.mutateAsync({
-        carId: car.id,
-        file,
-        documentType: docUploadType,
-      });
-      setDocUploadType(null);
+      await navigator.clipboard.writeText(car.specifications);
+      toast.success("Specifications copied to clipboard");
     } catch {
-      // Error handled in hook
+      toast.error("Failed to copy specifications");
     }
   };
 
-  const handleViewDocument = async (
-    docId: string,
-    label: string,
-    mimeType?: string,
-    filePath?: string
-  ) => {
-    setLoadingDocId(docId);
+  const handleCopyAccidentHistory = async () => {
+    if (!car?.accident_history) return;
     try {
-      const url = await documentsApi.getPresignedUrl(car.id, docId);
-      const isPdf =
-        (mimeType && mimeType.toLowerCase().includes("pdf")) ||
-        (filePath && filePath.toLowerCase().endsWith(".pdf")) ||
-        url.toLowerCase().includes(".pdf");
-      setDocPreview({
-        url,
-        mimeType: isPdf ? "application/pdf" : "image/jpeg",
-        name: label,
-      });
+      await navigator.clipboard.writeText(car.accident_history);
+      toast.success("Accident history copied to clipboard");
     } catch {
-      toast.error("Failed to generate document preview URL");
-    } finally {
-      setLoadingDocId(null);
+      toast.error("Failed to copy accident history");
     }
-  };
-
-  const handleShareDocument = async (
-    docId: string,
-    label: string,
-    originalName?: string,
-    mimeType?: string
-  ) => {
-    if (!car) return;
-    setLoadingShareId(docId);
-    await shareCarDocument({
-      carId: car.id,
-      documentId: docId,
-      docLabel: label,
-      originalName,
-      mimeType,
-      regNumber: car.reg_number,
-      makeModel: `${car.make} ${car.model}`,
-    });
-    setLoadingShareId(null);
   };
 
   return (
@@ -196,11 +150,11 @@ export function StaffCarDetail({ carId }: { carId: string }) {
               {car.make}
             </span>
             {Boolean(car.is_booked || car.status === "booked") ? (
-              <span className="rounded-md bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-600 border border-amber-500/20 uppercase tracking-wider">
+              <span className="rounded-md bg-emerald-600 text-white border border-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                 BOOKED
               </span>
             ) : (
-              <span className="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-600 border border-emerald-500/20 uppercase tracking-wider">
+              <span className="rounded-md bg-emerald-600 text-white border border-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                 IN STOCK
               </span>
             )}
@@ -208,7 +162,10 @@ export function StaffCarDetail({ carId }: { carId: string }) {
 
           {/* Vehicle Title & Reg Number */}
           <h1 className="text-xl sm:text-2xl font-bold text-ink font-heading leading-tight">
-            {car.model} <span className="text-base font-normal text-ink-subtle">({car.year})</span>
+            {car.model}{" "}
+            <span className="text-base font-normal text-ink-subtle">
+              ({car.year})
+            </span>
           </h1>
         </div>
 
@@ -238,7 +195,9 @@ export function StaffCarDetail({ carId }: { carId: string }) {
             ) : (
               <div className="flex h-full w-full flex-col items-center justify-center text-ink-subtle">
                 <ImageIcon className="h-10 w-10 stroke-[1.5px] opacity-40 mb-1.5" />
-                <span className="text-xs font-medium">No Showroom Photos Uploaded</span>
+                <span className="text-xs font-medium">
+                  No Showroom Photos Uploaded
+                </span>
               </div>
             )}
 
@@ -460,11 +419,23 @@ export function StaffCarDetail({ carId }: { carId: string }) {
         <div className="space-y-4">
           {car.specifications ? (
             <div className="rounded-xl border border-line bg-card p-5 space-y-3">
-              <div className="flex items-center gap-2 border-b border-line/60 pb-3">
-                <Sparkles className="h-4 w-4 text-accent stroke-[2px]" />
-                <h3 className="text-sm font-bold text-ink font-heading">
-                  Specifications & Key Features
-                </h3>
+              <div className="flex items-center justify-between border-b border-line/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-accent stroke-[2px]" />
+                  <h3 className="text-sm font-bold text-ink font-heading">
+                    Specifications & Key Features
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCopySpecs}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-ink-muted bg-inset hover:bg-line/40 hover:text-ink border border-line transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
+                  title="Copy Specifications to clipboard"
+                >
+                  <Copy className="h-3.5 w-3.5 stroke-[2px]" />
+                  <span>Copy Specs</span>
+                </button>
               </div>
               <p className="text-xs text-ink-subtle whitespace-pre-wrap leading-relaxed font-sans">
                 {car.specifications}
@@ -478,11 +449,23 @@ export function StaffCarDetail({ carId }: { carId: string }) {
 
           {car.accident_history && (
             <div className="rounded-xl border border-line bg-card p-5 space-y-3">
-              <div className="flex items-center gap-2 border-b border-line/60 pb-3">
-                <ShieldCheck className="h-4 w-4 text-accent stroke-[2px]" />
-                <h3 className="text-sm font-bold text-ink font-heading">
-                  Accident & Replacement History
-                </h3>
+              <div className="flex items-center justify-between border-b border-line/60 pb-3">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-accent stroke-[2px]" />
+                  <h3 className="text-sm font-bold text-ink font-heading">
+                    Accident & Replacement History
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleCopyAccidentHistory}
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-ink-muted bg-inset hover:bg-line/40 hover:text-ink border border-line transition-all cursor-pointer shadow-2xs active:scale-95 shrink-0"
+                  title="Copy Accident History to clipboard"
+                >
+                  <Copy className="h-3.5 w-3.5 stroke-[2px]" />
+                  <span>Copy History</span>
+                </button>
               </div>
               <p className="text-xs text-ink-subtle whitespace-pre-wrap leading-relaxed font-sans">
                 {car.accident_history}
@@ -552,124 +535,10 @@ export function StaffCarDetail({ carId }: { carId: string }) {
         </div>
       )}
 
-      {/* Tab Panel 4: Vehicle Documents (View + Upload Only) */}
+      {/* Tab Panel 4: Vehicle Documents */}
       {activeTab === "docs" && (
-        <div className="rounded-xl border border-line bg-card p-5 space-y-4">
-          <div className="flex items-center justify-between border-b border-line/60 pb-3">
-            <div>
-              <h3 className="text-sm font-bold text-ink font-heading">
-                Vehicle Documents & Records
-              </h3>
-              <p className="text-xs text-ink-subtle">
-                View presigned document files or upload missing vehicle documents.
-              </p>
-            </div>
-          </div>
-
-          <input
-            type="file"
-            ref={docFileInputRef}
-            onChange={handleDocFileSelect}
-            className="hidden"
-          />
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
-            {DOCUMENT_CONFIGS.map((cfg) => {
-              const uploadedDoc = documents.find(
-                (d) => d.document_type === cfg.type
-              );
-
-              return (
-                <div
-                  key={cfg.type}
-                  className="flex flex-col justify-between rounded-lg border border-line bg-inset/60 p-3.5 space-y-3"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <p className="text-xs font-bold text-ink font-sans">
-                        {cfg.label}
-                      </p>
-                      <p className="text-[10px] text-ink-subtle">
-                        {cfg.description}
-                      </p>
-                    </div>
-                    {uploadedDoc ? (
-                      <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 stroke-[2.25px]" />
-                    ) : (
-                      <Clock className="h-4 w-4 text-amber-500 shrink-0 stroke-[2.25px]" />
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-2.5 border-t border-line/60">
-                    {uploadedDoc ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleViewDocument(
-                              uploadedDoc.id,
-                              cfg.label,
-                              uploadedDoc.mime_type,
-                              uploadedDoc.file_path
-                            )
-                          }
-                          disabled={
-                            loadingDocId === uploadedDoc.id ||
-                            loadingShareId === uploadedDoc.id
-                          }
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md bg-card border border-line text-xs font-semibold text-ink hover:text-accent transition-colors cursor-pointer disabled:opacity-50"
-                        >
-                          {loadingDocId === uploadedDoc.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin stroke-[2.25px]" />
-                          ) : (
-                            <Eye className="h-3.5 w-3.5 stroke-[2.25px]" />
-                          )}
-                          <span>View</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleShareDocument(
-                              uploadedDoc.id,
-                              cfg.label,
-                              uploadedDoc.original_name,
-                              uploadedDoc.mime_type
-                            )
-                          }
-                          disabled={
-                            loadingDocId === uploadedDoc.id ||
-                            loadingShareId === uploadedDoc.id
-                          }
-                          className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md bg-card border border-line text-xs font-semibold text-ink hover:text-accent transition-colors cursor-pointer disabled:opacity-50"
-                        >
-                          {loadingShareId === uploadedDoc.id ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin stroke-[2.25px]" />
-                          ) : (
-                            <Share2 className="h-3.5 w-3.5 stroke-[2.25px]" />
-                          )}
-                          <span>Share</span>
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDocUploadType(cfg.type);
-                          docFileInputRef.current?.click();
-                        }}
-                        disabled={uploadDoc.isPending}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md bg-accent text-xs font-bold text-white hover:bg-accent/90 transition-colors cursor-pointer disabled:opacity-50"
-                      >
-                        <Upload className="h-3.5 w-3.5 stroke-[2.25px]" />
-                        <span>Upload File</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div className="space-y-4">
+          <DocumentsGrid carId={car.id} />
         </div>
       )}
 
@@ -709,16 +578,62 @@ export function StaffCarDetail({ carId }: { carId: string }) {
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href={docPreview.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1 rounded-md hover:bg-inset cursor-pointer"
-                  title="Open in new tab"
-                >
-                  <ExternalLink className="h-3.5 w-3.5 stroke-[2px]" />
-                  <span className="hidden sm:inline">Open in Tab</span>
-                </a>
+                {(() => {
+                  const vehiclePrefix = car
+                    ? `${
+                        car.reg_number
+                          ? car.reg_number
+                          : `${car.make}_${car.model}`
+                      }`
+                    : "Vehicle";
+                  const ext =
+                    docPreview.mimeType === "application/pdf" ? ".pdf" : ".jpg";
+                  const docFilename = `${vehiclePrefix}_${
+                    docPreview.name || "Document"
+                  }${ext}`;
+
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          downloadFile({
+                            url: docPreview.url,
+                            filename: docFilename,
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1.5 rounded-lg bg-inset hover:bg-line/40 border border-line cursor-pointer"
+                        title="Download File"
+                      >
+                        <Download className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Download</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          shareFile({
+                            url: docPreview.url,
+                            filename: docFilename,
+                            title: `${
+                              car ? `${car.make} ${car.model}` : "Vehicle"
+                            } - ${docPreview.name || "Document"}`,
+                            text: car?.reg_number
+                              ? `Registration: ${car.reg_number}`
+                              : undefined,
+                            mimeType: docPreview.mimeType,
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-2.5 py-1.5 rounded-lg cursor-pointer"
+                        title="Share File"
+                      >
+                        <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Share</span>
+                      </button>
+                    </>
+                  );
+                })()}
+
                 <button
                   type="button"
                   onClick={() => setDocPreview(null)}

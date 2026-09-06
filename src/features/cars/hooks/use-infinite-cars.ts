@@ -56,15 +56,17 @@ export function useInfiniteCars({
 }
 
 /**
- * Cursor-paginated staff stock list (in_stock + booked cars).
+ * Cursor-paginated staff inventory list (filtered by availability).
  */
 export function useInfiniteStaffStock({
+  availability = "in_stock",
   sort,
   search,
   fuel_type,
   min_price,
   max_price,
 }: {
+  availability?: "in_stock" | "booked";
   sort?: string;
   search?: string;
   fuel_type?: string;
@@ -72,9 +74,14 @@ export function useInfiniteStaffStock({
   max_price?: number;
 } = {}) {
   return useInfiniteQuery({
-    queryKey: ["cars", "staff-stock", { sort, search, fuel_type, min_price, max_price }],
+    queryKey: [
+      "cars",
+      "staff-stock",
+      { availability, sort, search, fuel_type, min_price, max_price },
+    ],
     queryFn: ({ pageParam }) =>
       carsApi.getStaffStock({
+        availability,
         sort,
         search,
         fuel_type,

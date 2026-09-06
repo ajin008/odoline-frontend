@@ -9,8 +9,10 @@ import { useDeleteCar } from "../hooks/use-delete-car";
 import { VehicleSellerForm } from "./vehicle-seller-form";
 import { DocumentsGrid } from "./documents-grid";
 import { useCarDocuments } from "../hooks/use-documents";
-import { DOCUMENT_CONFIGS } from "../type/document-types";
+import { DOCUMENT_CONFIGS, GroupedDocType } from "../type/document-types";
 import { RefurbishmentTab } from "./refurbishment-tab";
+import { CarPhotoGallery } from "./car-photo-gallery";
+import { useCarPhotos } from "../hooks/use-car-photos";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 
 import { CarSubtabSkeleton } from "./car-subtab-skeleton";
@@ -25,6 +27,7 @@ const DELETABLE_STATUSES = [
 const TABS = [
   { key: "vehicle", label: "Vehicle & Seller" },
   { key: "documents", label: "Documents" },
+  { key: "photos", label: "Photos" },
   { key: "refurbishment", label: "Refurbishment" },
 ] as const;
 
@@ -34,10 +37,11 @@ export function IntakeShell({ carId }: { carId: string }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const { data: documents = [] } = useCarDocuments(carId);
+  const { data: photos = [] } = useCarPhotos(carId);
 
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("vehicle");
 
-  const uploadedTypes = new Set(documents.map((d) => d.document_type));
+  const uploadedTypes = new Set((documents as GroupedDocType[]).map((d) => d.doc_type || (d as unknown as { document_type?: string }).document_type));
   const pendingDocsCount =
     typeof car?.pending_docs_count === "number"
       ? car.pending_docs_count
@@ -166,7 +170,7 @@ export function IntakeShell({ carId }: { carId: string }) {
       </div>
 
       {/* Primary Intake Steps Segmented Switch Control */}
-      <div className="grid grid-cols-3 sm:flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0 overflow-x-auto no-scrollbar">
+      <div className="grid grid-cols-4 sm:flex h-9 items-center gap-1 rounded-xl bg-inset p-1 border border-line/40 w-full sm:w-fit shrink-0 overflow-x-auto no-scrollbar">
         {TABS.map((t) => {
           const isLocked = t.key === "refurbishment" && !isDocsComplete;
 
@@ -197,6 +201,17 @@ export function IntakeShell({ carId }: { carId: string }) {
                     {pendingDocsCount}
                   </span>
                 )}
+                {t.key === "photos" && photos.length > 0 && (
+                  <span
+                    className={`inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
+                      tab === t.key
+                        ? "bg-inverse text-accent"
+                        : "bg-accent/15 text-accent"
+                    }`}
+                  >
+                    {photos.length}
+                  </span>
+                )}
               </div>
             </button>
           );
@@ -208,6 +223,8 @@ export function IntakeShell({ carId }: { carId: string }) {
         {tab === "vehicle" && <VehicleSellerForm car={car} />}
 
         {tab === "documents" && <DocumentsGrid carId={car.id} />}
+
+        {tab === "photos" && <CarPhotoGallery carId={car.id} isOwner={true} />}
 
         {tab === "refurbishment" && <RefurbishmentTab carId={car.id} />}
       </div>
@@ -227,3 +244,4 @@ export function IntakeShell({ carId }: { carId: string }) {
     </div>
   );
 }
+

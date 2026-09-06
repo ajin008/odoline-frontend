@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Camera,
   Upload,
@@ -9,6 +10,9 @@ import {
   Loader2,
   X,
   ImageIcon,
+  Download,
+  Share2,
+  ArrowRight,
 } from "lucide-react";
 import {
   useCarPhotos,
@@ -16,17 +20,26 @@ import {
   useDeleteCarPhoto,
   useSetPrimaryCarPhoto,
 } from "../hooks/use-car-photos";
+import { useCar } from "../hooks/use-car";
 import type { CarPhoto } from "../api/car-photos-api";
+import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 
 interface CarPhotoGalleryProps {
   carId: string;
   isOwner?: boolean;
+  isWizardMode?: boolean;
 }
 
-export function CarPhotoGallery({ carId, isOwner = true }: CarPhotoGalleryProps) {
+export function CarPhotoGallery({
+  carId,
+  isOwner = true,
+  isWizardMode = false,
+}: CarPhotoGalleryProps) {
+  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<CarPhoto | null>(null);
 
+  const { data: car } = useCar(carId);
   const { data: photos = [], isLoading, isError } = useCarPhotos(carId);
   const uploadPhoto = useUploadCarPhoto(carId);
   const deletePhoto = useDeleteCarPhoto(carId);
@@ -179,6 +192,31 @@ export function CarPhotoGallery({ carId, isOwner = true }: CarPhotoGalleryProps)
         </div>
       )}
 
+      {/* Wizard Step Progression Button */}
+      {isWizardMode && (
+        <div className="flex justify-end pt-4 border-t border-line/60">
+          <div className="flex flex-col sm:flex-row-reverse items-center gap-2.5 w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() =>
+                router.push(`/owner/cars/${carId}/refurbishment`)
+              }
+              className="w-full sm:w-auto min-w-45 inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-bold text-inverse transition-all hover:bg-accent-hover active:scale-[0.98] cursor-pointer"
+            >
+              Next: Refurbishment
+              <ArrowRight className="h-4 w-4 stroke-[2.5px]" />
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/owner/inventory")}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-xl border border-line bg-inset px-4 py-3 text-xs font-bold text-ink-muted hover:text-ink hover:bg-card transition-all cursor-pointer"
+            >
+              Leave for Now
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Photo Lightbox Modal */}
       {selectedPhoto && (
         <div
@@ -202,13 +240,55 @@ export function CarPhotoGallery({ carId, isOwner = true }: CarPhotoGalleryProps)
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setSelectedPhoto(null)}
-                className="rounded-lg p-1.5 text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
-              >
-                <X className="h-5 w-5 stroke-[2.25px]" />
-              </button>
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const vehiclePrefix = car
+                    ? `${car.reg_number ? car.reg_number : `${car.make}_${car.model}`}`
+                    : "Car";
+                  const photoIdx = photos.findIndex((p) => p.id === selectedPhoto.id);
+                  const photoFilename = `${vehiclePrefix}-photo-${photoIdx >= 0 ? photoIdx + 1 : "1"}.jpg`;
+
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => downloadFile({ url: selectedPhoto.url, filename: photoFilename })}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1.5 rounded-lg bg-inset hover:bg-line/40 border border-line cursor-pointer"
+                        title="Download Photo"
+                      >
+                        <Download className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Download</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          shareFile({
+                            url: selectedPhoto.url,
+                            filename: photoFilename,
+                            title: `${car ? `${car.make} ${car.model}` : "Vehicle"} Photo`,
+                            text: car?.reg_number ? `Registration: ${car.reg_number}` : undefined,
+                            mimeType: "image/jpeg",
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-2.5 py-1.5 rounded-lg cursor-pointer"
+                        title="Share Photo"
+                      >
+                        <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Share</span>
+                      </button>
+                    </>
+                  );
+                })()}
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedPhoto(null)}
+                  className="rounded-lg p-1.5 text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
+                >
+                  <X className="h-5 w-5 stroke-[2.25px]" />
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-center bg-inset p-4 min-h-[300px]">

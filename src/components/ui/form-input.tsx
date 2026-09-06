@@ -9,6 +9,7 @@ interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
   prefix?: string;
+  helperText?: React.ReactNode;
   /**
    * Suggested values shown as a custom theme-aware popover dropdown menu.
    * Unlike a rigid <select>, the user can still type any custom text.
@@ -22,6 +23,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       label,
       error,
       prefix,
+      helperText,
       suggestions,
       className = "",
       id,
@@ -106,12 +108,19 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
     return (
       <div ref={containerRef} className="relative space-y-1.5 font-sans">
-        <label
-          htmlFor={inputId}
-          className="block text-xs font-semibold tracking-tight text-ink-muted"
-        >
-          {label}
-        </label>
+        <div className="flex items-center justify-between gap-2">
+          <label
+            htmlFor={inputId}
+            className="block text-xs font-semibold tracking-tight text-ink-muted"
+          >
+            {label}
+          </label>
+          {helperText && (
+            <span className="inline-flex items-center text-[11px] font-mono font-bold tracking-tight text-accent bg-accent-light/60 border border-accent/20 px-2 py-0.5 rounded-md animate-in fade-in duration-150">
+              {helperText}
+            </span>
+          )}
+        </div>
 
         <div className="relative">
           {prefix && (

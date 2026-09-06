@@ -4,6 +4,7 @@
 import Image from "next/image";
 import { Car as CarIcon, Image as ImageIcon, Eye } from "lucide-react";
 import { useCarDocuments, usePresignedUrl } from "../hooks/use-documents";
+import { GroupedDocType } from "../type/document-types";
 
 export function CarThumbnail({
   carId,
@@ -19,22 +20,23 @@ export function CarThumbnail({
     enabled: !initialThumbnailUrl,
   });
 
-  const purchasePhoto = documents?.find(
-    (d) => d.document_type === "purchase_photo"
+  const purchasePhotoGroup = (documents as GroupedDocType[] | undefined)?.find(
+    (d) => d.doc_type === "purchase_photo"
   );
+  const purchasePhotoFile = purchasePhotoGroup?.files?.[0];
 
   // Cached presigned URL fallback if needed
   const { data: presignedUrl, isLoading: urlLoading } = usePresignedUrl(
     carId,
-    purchasePhoto?.id,
-    { enabled: !initialThumbnailUrl && !purchasePhoto?.url && !!purchasePhoto }
+    purchasePhotoFile?.id,
+    { enabled: !initialThumbnailUrl && !purchasePhotoFile?.file_url && !!purchasePhotoFile }
   );
 
-  const imageUrl = initialThumbnailUrl || purchasePhoto?.url || presignedUrl;
+  const imageUrl = initialThumbnailUrl || purchasePhotoFile?.file_url || presignedUrl;
 
   const isLoading =
     !initialThumbnailUrl &&
-    (docsLoading || (!!purchasePhoto && !purchasePhoto?.url && urlLoading));
+    (docsLoading || (!!purchasePhotoFile && !purchasePhotoFile?.file_url && urlLoading));
 
   // Loading State
   if (isLoading) {
