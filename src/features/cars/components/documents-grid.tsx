@@ -420,12 +420,12 @@ export function DocumentsGrid({
                         </div>
                       ) : (
                         /* Images Grid */
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="flex flex-wrap gap-2.5 pt-1">
                           {files.map((file) => (
                             <div
                               key={file.id}
                               onClick={() => handleViewPreview(file)}
-                              className="relative aspect-square rounded-lg overflow-hidden border border-line bg-inset group/thumb cursor-pointer"
+                              className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden border border-line bg-inset group/thumb cursor-pointer shrink-0 shadow-2xs hover:shadow-md transition-all"
                             >
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
@@ -434,15 +434,15 @@ export function DocumentsGrid({
                                 className="h-full w-full object-cover transition-transform duration-200 group-hover/thumb:scale-105"
                               />
 
-                              {/* Hover & Touch Action Overlay */}
-                              <div className="absolute inset-0 bg-black/50 opacity-100 sm:opacity-0 sm:group-hover/thumb:opacity-100 flex items-center justify-center gap-1.5 transition-opacity">
+                              {/* Action Overlay (Always visible across mobile, tablet & desktop) */}
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center gap-2 opacity-90 transition-opacity hover:opacity-100">
                                 <button
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleViewPreview(file);
                                   }}
-                                  className="h-6 w-6 rounded-md bg-white/25 hover:bg-white/40 text-white flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+                                  className="h-7 w-7 rounded-lg bg-white/30 hover:bg-white/50 text-white flex items-center justify-center transition-colors cursor-pointer shadow-xs border border-white/20"
                                   title="View full image"
                                 >
                                   <Eye className="h-3.5 w-3.5 stroke-[2.25px]" />
@@ -453,7 +453,7 @@ export function DocumentsGrid({
                                     e.stopPropagation();
                                     setDeleteTargetId(file.id);
                                   }}
-                                  className="h-6 w-6 rounded-md bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center transition-colors cursor-pointer shadow-xs"
+                                  className="h-7 w-7 rounded-lg bg-rose-600/90 hover:bg-rose-600 text-white flex items-center justify-center transition-colors cursor-pointer shadow-xs border border-rose-500/30"
                                   title="Delete image"
                                 >
                                   <Trash2 className="h-3.5 w-3.5 stroke-[2.25px]" />
