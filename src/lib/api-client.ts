@@ -1,5 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { env } from "../utils/env";
+import { getQueryClient } from "./query-client";
+import { queryKeys } from "./query-keys";
 
 // ── 1. The ONE instance every feature imports ─────────────────
 export const apiClient = axios.create({
@@ -79,6 +81,12 @@ apiClient.interceptors.response.use(
       return apiClient(originalRequest); // retry the request that started this
     } catch (refreshError) {
       processQueue(refreshError); // refresh dead → fail everyone
+      // Set query cache to null so useAuth() recognizes status = "unauthenticated"
+      try {
+        const queryClient = getQueryClient();
+        queryClient.setQueryData(queryKeys.me, null);
+      } catch {}
+
       // Don't reload if we're already on /login — e.g. useMe() checking
       // "is anyone logged in?" from the login page itself will 401 + fail
       // to refresh perfectly normally. Redirecting-to-login-from-login is
