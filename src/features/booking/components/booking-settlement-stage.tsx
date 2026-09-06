@@ -444,7 +444,9 @@ export function BookingSettlementStage({
                     <Building2 className="h-3.5 w-3.5 text-accent" />
                     <span>Finance Company / Lender:</span>
                   </span>
-                  <div className="font-bold text-ink">{settlement.finance_company}</div>
+                  <div className="font-bold text-ink uppercase font-mono">
+                    {settlement.finance_company}
+                  </div>
                 </div>
               )}
 

@@ -41,11 +41,6 @@ export function LoginForm() {
               )}
             </div>
           </div>
-
-          <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold tracking-wider text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>ONLINE</span>
-          </span>
         </div>
 
         {/* Left Editorial Branding Section (Desktop only) */}

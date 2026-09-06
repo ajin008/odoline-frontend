@@ -125,7 +125,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
       settlement: {
         rto_charges: values.rto_charges?.trim() || null,
         insurance_charges: values.insurance_charges?.trim() || null,
-        finance_company: values.finance_company?.trim() || null,
+        finance_company: values.finance_company?.trim().toUpperCase() || null,
         remark: values.remark?.trim() || null,
       },
       delivery: {
@@ -242,8 +242,12 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
             <input
               type="text"
               placeholder="e.g. HDFC Bank / Axis Bank"
-              {...register("finance_company")}
-              className="w-full h-9 rounded-xl border border-line/60 bg-inset px-3 text-xs font-medium text-ink focus:border-accent focus:bg-card focus:outline-none transition-all"
+              {...register("finance_company", {
+                onChange: (e) => {
+                  e.target.value = e.target.value.toUpperCase();
+                },
+              })}
+              className="w-full h-9 rounded-xl border border-line/60 bg-inset px-3 text-xs font-semibold text-ink focus:border-accent focus:bg-card focus:outline-none transition-all uppercase placeholder:normal-case font-mono"
             />
             {errors.finance_company && (
               <p className="text-[11px] font-semibold text-rose-500">

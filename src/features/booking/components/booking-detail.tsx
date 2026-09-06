@@ -22,8 +22,6 @@ import {
   User,
   Car as CarIcon,
   Calendar,
-  CheckCircle2,
-  AlertCircle,
   Building2,
   CreditCard,
   AlertTriangle,
@@ -230,8 +228,6 @@ export function BookingDetail({
   const statusConfig = getBookingStatusConfig(booking.status);
   const agreedNum = Number(booking.agreed_price || 0);
   const paidNum = Number(booking.amount_paid || 0);
-  const balanceDueNum = Number(booking.balance_due || 0);
-  const isFullyPaid = balanceDueNum <= 0;
 
   const pctPaid =
     agreedNum > 0
@@ -318,17 +314,7 @@ export function BookingDetail({
                   }
                 </span>
               )}
-              {isFullyPaid ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  <span>Fully Paid</span>
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                  <span>Balance Pending</span>
-                </span>
-              )}
+
             </div>
 
             <div className="text-xs text-ink-subtle flex items-center gap-2 flex-wrap font-medium">

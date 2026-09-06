@@ -12,7 +12,6 @@ import {
   getRcTransferBadgeConfig,
   getBalanceOverdueBadgeConfig,
 } from "../utils/booking-status-map";
-import { Badge } from "@/src/components/ui/badge";
 import { BookingProgressBar } from "./booking-progress-bar";
 import { CancelBookingModal } from "./cancel-booking-modal";
 import {
@@ -20,8 +19,6 @@ import {
   User,
   Car as CarIcon,
   Calendar,
-  CheckCircle2,
-  AlertCircle,
   Building2,
   ExternalLink,
   ChevronRight,
@@ -131,8 +128,6 @@ export function BookingDetailLayout({
   }
 
   const statusConfig = getBookingStatusConfig(booking.status);
-  const balanceDueNum = Number(booking.balance_due || 0);
-  const isFullyPaid = balanceDueNum <= 0;
 
   const leadHref = readOnly
     ? `/owner/crm`
@@ -255,21 +250,7 @@ export function BookingDetailLayout({
             )}
           </div>
 
-          {booking.status !== "cancelled" && (
-            <div className="flex items-center gap-2 flex-wrap">
-              {isFullyPaid ? (
-                <Badge variant="success" className="px-3 py-1 text-xs font-extrabold">
-                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                  <span>Fully Paid</span>
-                </Badge>
-              ) : (
-                <Badge variant="warning" className="px-3 py-1 text-xs font-extrabold">
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                  <span>Balance Pending</span>
-                </Badge>
-              )}
-            </div>
-          )}
+
 
           <div className="text-xs text-ink-subtle flex items-center gap-2 flex-wrap font-medium">
             <div className="flex items-center gap-1">
