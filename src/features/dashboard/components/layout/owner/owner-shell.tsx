@@ -4,37 +4,35 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
-import { useMe } from "@/src/features/auth/hooks/use-me";
+import { useAuth } from "@/src/features/auth/hooks/use-me";
+import { AuthSplash } from "@/src/features/auth/component/auth-splash";
 import { OwnerSidebar } from "./owner-sidebar";
 import { OwnerNavbar } from "./owner-navbar";
 import { OwnerBottomTabs } from "./owner-bottom-tabs";
 
 export function OwnerShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { data: user, isLoading, error } = useMe();
+  const { user, status, error } = useAuth();
   const isUnauthorized = isAxiosError(error) && error.response?.status === 401;
 
-  // Redirect if not logged in (401) or not an owner. Other failures (e.g. a
-  // transient 5xx) are not treated as "logged out" — they just fail to load.
+  // Redirect ONLY after the auth check resolves (status !== "loading")
   useEffect(() => {
-    if (isUnauthorized || (user && !user.is_active)) {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated" || isUnauthorized || (user && !user.is_active)) {
       router.replace("/login");
-    } else if (user && user.role !== "owner") {
+    } else if (status === "authenticated" && user && user.role !== "owner") {
       router.replace("/staff/dashboard");
     }
-  }, [user, isUnauthorized, router]);
+  }, [user, status, isUnauthorized, router]);
 
-  // While the session is being verified, show the loading spinner.
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-canvas">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-line border-t-accent" />
-      </div>
-    );
+  // While session is being verified, show the clean branded splash
+  if (status === "loading") {
+    return <AuthSplash />;
   }
 
-  // Not an owner → render nothing while the redirect above kicks in.
-  if (!user || user.role !== "owner") {
+  // Not an owner or unauthenticated → render nothing while redirect kicks in
+  if (status !== "authenticated" || !user || user.role !== "owner" || !user.is_active) {
     return null;
   }
 

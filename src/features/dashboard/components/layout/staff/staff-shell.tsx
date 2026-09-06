@@ -3,34 +3,33 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isAxiosError } from "axios";
-import { useMe } from "@/src/features/auth/hooks/use-me";
+import { useAuth } from "@/src/features/auth/hooks/use-me";
+import { AuthSplash } from "@/src/features/auth/component/auth-splash";
 import { StaffSidebar } from "./staff-sidebar";
 import { StaffNavbar } from "./staff-navbar";
 import { StaffBottomTabs } from "./staff-bottom-tabs";
 
 export function StaffShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { data: user, isLoading, error } = useMe();
+  const { user, status, error } = useAuth();
   const isUnauthorized = isAxiosError(error) && error.response?.status === 401;
 
   // Role guard: non-owner staff (sales and cro) with is_active === true can access staff routes
   useEffect(() => {
-    if (isUnauthorized || (user && !user.is_active)) {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated" || isUnauthorized || (user && !user.is_active)) {
       router.replace("/login");
-    } else if (user && user.role === "owner") {
+    } else if (status === "authenticated" && user && user.role === "owner") {
       router.replace("/owner/dashboard");
     }
-  }, [user, isUnauthorized, router]);
+  }, [user, status, isUnauthorized, router]);
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-canvas">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-line border-t-accent" />
-      </div>
-    );
+  if (status === "loading") {
+    return <AuthSplash />;
   }
 
-  if (!user || user.role === "owner" || !user.is_active) {
+  if (status !== "authenticated" || !user || user.role === "owner" || !user.is_active) {
     return null;
   }
 

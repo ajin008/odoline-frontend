@@ -21,3 +21,45 @@ export function useMe() {
     staleTime: 5 * 60 * 1000, // user rarely changes; keep fresh 5 min
   });
 }
+
+export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+
+export interface UseAuthReturn {
+  status: AuthStatus;
+  user: ReturnType<typeof useMe>["data"];
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  isUnauthenticated: boolean;
+  error: ReturnType<typeof useMe>["error"];
+  isError: boolean;
+  isSuccess: boolean;
+}
+
+/**
+ * Three-state authentication hook (loading | authenticated | unauthenticated).
+ * Initial state on app open is ALWAYS "loading" while GET /auth/me is in flight.
+ */
+export function useAuth(): UseAuthReturn {
+  const { data: user, isLoading, isError, error, isSuccess } = useMe();
+
+  let status: AuthStatus = "loading";
+  if (isLoading) {
+    status = "loading";
+  } else if (user) {
+    status = "authenticated";
+  } else {
+    status = "unauthenticated";
+  }
+
+  return {
+    status,
+    user,
+    isLoading: status === "loading",
+    isAuthenticated: status === "authenticated",
+    isUnauthenticated: status === "unauthenticated",
+    error,
+    isError,
+    isSuccess,
+  };
+}
+
