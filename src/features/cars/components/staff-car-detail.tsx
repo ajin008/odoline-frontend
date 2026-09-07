@@ -669,7 +669,7 @@ export function StaffCarDetail({ carId }: { carId: string }) {
                       ? endpoints.cars.documentFile(carId, docPreview.id)
                       : docPreview.url
                   }
-                  title="PDF Document Preview"
+                  title={docPreview.name || "PDF Document Preview"}
                   className="w-full h-[75vh] min-h-[480px] rounded-lg border border-line bg-card"
                 />
               ) : (

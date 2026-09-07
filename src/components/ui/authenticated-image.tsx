@@ -1,8 +1,31 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useSyncExternalStore } from "react";
 import { apiClient } from "@/src/lib/api-client";
-import { Loader2, ImageOff, FileWarning } from "lucide-react";
+import {
+  Loader2,
+  ImageOff,
+  FileWarning,
+  FileText,
+  ExternalLink,
+  Download,
+  Share2,
+} from "lucide-react";
+import { downloadFile, shareFile } from "@/src/lib/file-actions";
+
+function checkIsMobileDevice(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  const isTouchMobile = /Android|iPhone|iPad|iPod/i.test(ua);
+  const hasCoarsePointer = !!window.matchMedia?.("(pointer: coarse)").matches;
+  return isTouchMobile || (hasCoarsePointer && navigator.maxTouchPoints > 1);
+}
+
+const emptySubscribe = () => () => {};
+
+function useIsMobileDevice(): boolean {
+  return useSyncExternalStore(emptySubscribe, checkIsMobileDevice, () => false);
+}
 
 /**
  * Rewrites a direct-S3 (or other legacy) URL to the equivalent same-origin
@@ -172,15 +195,16 @@ export interface AuthenticatedIframeProps
   errorClassName?: string;
 }
 
-/** Same authenticated-blob-stream approach as AuthenticatedImage, for PDF previews. */
 export function AuthenticatedIframe({
   src,
   className = "",
   loadingClassName = "",
   errorClassName = "",
+  title,
   ...props
 }: AuthenticatedIframeProps) {
   const { objectUrl, isLoading, isError } = useAuthenticatedObjectUrl(src);
+  const isMobile = useIsMobileDevice();
 
   if (isLoading) {
     return (
@@ -207,5 +231,76 @@ export function AuthenticatedIframe({
     );
   }
 
-  return <iframe src={objectUrl} className={className} {...props} />;
+  const docTitle = (title as string) || "PDF Document";
+
+  // Mobile / Tablet view: Mobile browser engines (iOS Safari, Mobile Chrome) disable inline iframe PDF rendering.
+  // Render a clean, mobile-tailored viewer card that lets users open full-screen in native PDF viewer, download, or share.
+  if (isMobile) {
+    return (
+      <div
+        className={`flex flex-col items-center justify-center p-6 bg-card border border-line rounded-2xl text-center space-y-4 shadow-xs w-full max-w-sm mx-auto my-auto ${className}`}
+      >
+        <div className="h-16 w-16 rounded-2xl bg-accent/10 text-accent flex items-center justify-center border border-accent/20 shadow-xs">
+          <FileText className="h-8 w-8 stroke-[1.75]" />
+        </div>
+        <div className="space-y-1">
+          <h4 className="text-sm font-bold text-ink truncate max-w-[260px]">
+            {docTitle}
+          </h4>
+          <p className="text-xs text-ink-subtle">
+            Mobile browsers display PDFs best in full screen
+          </p>
+        </div>
+        <div className="flex flex-col w-full gap-2 pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              if (objectUrl) {
+                window.open(objectUrl, "_blank");
+              }
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-accent hover:bg-accent/90 active:scale-[0.98] transition-all shadow-xs cursor-pointer"
+          >
+            <ExternalLink className="h-4 w-4 stroke-[2px]" />
+            <span>Open / View PDF</span>
+          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                void downloadFile({
+                  url: src || undefined,
+                  fetchBlob: () => fetch(objectUrl).then((r) => r.blob()),
+                  fileName: `${docTitle}.pdf`,
+                  mimeType: "application/pdf",
+                });
+              }}
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-ink bg-inset hover:bg-line/40 border border-line transition-colors cursor-pointer"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Download</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                void shareFile({
+                  url: src || undefined,
+                  fetchBlob: () => fetch(objectUrl).then((r) => r.blob()),
+                  fileName: `${docTitle}.pdf`,
+                  title: docTitle,
+                  mimeType: "application/pdf",
+                });
+              }}
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors cursor-pointer"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              <span>Share</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return <iframe src={objectUrl} className={className} title={title} {...props} />;
 }

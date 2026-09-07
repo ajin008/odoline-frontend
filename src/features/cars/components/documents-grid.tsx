@@ -725,7 +725,7 @@ export function DocumentsGrid({
                       ? endpoints.cars.documentFile(carId, previewItem.id)
                       : previewItem.url
                   }
-                  title="PDF Document Preview"
+                  title={previewItem.name || "PDF Document Preview"}
                   className="w-full h-[75vh] min-h-[480px] rounded-lg border border-line bg-card shadow-xs"
                 />
               ) : (

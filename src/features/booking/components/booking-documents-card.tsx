@@ -22,8 +22,8 @@ import {
 } from "../hooks/use-booking-documents";
 import type { BookingDocumentFile } from "../types/booking-types";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
-import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
-import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
+import { downloadFile, shareFile } from "@/src/lib/file-actions";
+import { AuthenticatedImage, AuthenticatedIframe } from "@/src/components/ui/authenticated-image";
 
 interface BookingDocumentsCardProps {
   bookingId: string;
@@ -576,7 +576,7 @@ export function BookingDocumentsCard({
             {/* Modal Body */}
             <div className="flex-1 overflow-hidden bg-inset p-3 flex items-center justify-center min-h-[60vh]">
               {previewItem.mimeType === "application/pdf" ? (
-                <iframe
+                <AuthenticatedIframe
                   src={previewItem.url}
                   title={previewItem.name || title}
                   className="w-full h-[75vh] min-h-[480px] rounded-xl border border-line bg-card shadow-xs"
