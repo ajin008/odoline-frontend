@@ -37,21 +37,36 @@ export async function shareCarDocument({
       blob = await res.blob();
     }
 
+    if (!blob || blob.size === 0) {
+      throw new Error("Empty document file");
+    }
+
     toast.dismiss(loadingToastId);
 
     // 2. Determine file type & extension
-    const type = mimeType || blob.type || "application/pdf";
+    const type =
+      mimeType ||
+      (blob.type && blob.type !== "application/octet-stream" ? blob.type : "application/pdf");
     let ext = ".pdf";
     if (type.includes("jpeg") || type.includes("jpg")) ext = ".jpg";
     else if (type.includes("png")) ext = ".png";
     else if (type.includes("webp")) ext = ".webp";
     else if (originalName && originalName.includes(".")) {
-      ext = "." + originalName.split(".").pop();
+      const parts = originalName.split(".");
+      const rawExt = parts[parts.length - 1];
+      if (rawExt) ext = `.${rawExt}`;
     }
 
-    const cleanLabel = docLabel.trim().replace(/[^a-zA-Z0-9]/g, "-");
+    let cleanLabel = docLabel.trim().replace(/[^a-zA-Z0-9]/g, "-");
+    if (!cleanLabel || /^blob$/i.test(cleanLabel)) {
+      cleanLabel = "Document";
+    }
+    cleanLabel = cleanLabel.replace(/[-_.]blob$/i, "");
+
     const cleanReg = regNumber ? regNumber.trim().replace(/[^a-zA-Z0-9]/g, "-") : "";
-    const filename = cleanReg ? `${cleanLabel}-${cleanReg}${ext}` : `${cleanLabel}${ext}`;
+    const filename = cleanReg
+      ? `${cleanReg}-${cleanLabel}${ext}`
+      : `${cleanLabel}${ext}`;
 
     const file = new File([blob], filename, { type });
 
@@ -114,7 +129,7 @@ export async function shareCarDocument({
     }, 120000);
   } catch (err: unknown) {
     toast.dismiss(loadingToastId);
-    const msg = err instanceof Error ? err.message : "Failed to share document";
+    const msg = err instanceof Error ? err.message : "Download failed, please retry";
     toast.error(msg);
   }
 }

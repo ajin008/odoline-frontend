@@ -34,6 +34,18 @@ async function extractErrorMessage(err: unknown, fallback: string): Promise<stri
   return fallback;
 }
 
+function sanitizePdfFilename(filename: string, fallback: string = "document.pdf"): string {
+  let clean = (filename || "").trim().replace(/[^a-zA-Z0-9_\-\.]/g, "_");
+  if (!clean || /^blob$/i.test(clean)) {
+    clean = fallback;
+  }
+  clean = clean.replace(/[-_.]blob$/i, "");
+  if (!clean.toLowerCase().endsWith(".pdf")) {
+    clean = `${clean.replace(/\.[a-zA-Z0-9]+$/, "")}.pdf`;
+  }
+  return clean;
+}
+
 /**
  * Downloads a PDF file to disk and displays a toast with a "View" action
  * that opens the PDF in a new tab.
@@ -45,12 +57,17 @@ export async function downloadPdfDocument({
 }: DownloadPdfOptions): Promise<void> {
   try {
     const blob = await fetchBlob();
+    if (!blob || blob.size === 0) {
+      throw new Error(`Empty ${docTitle} file received`);
+    }
+
+    const cleanFilename = sanitizePdfFilename(filename, `${docTitle}.pdf`);
     const url = URL.createObjectURL(blob);
 
     // 1. Trigger file download to disk
     const a = document.createElement("a");
     a.href = url;
-    a.download = filename;
+    a.download = cleanFilename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -89,7 +106,12 @@ export async function sharePdfDocument({
 }: SharePdfOptions): Promise<void> {
   try {
     const blob = await fetchBlob();
-    const file = new File([blob], filename, { type: "application/pdf" });
+    if (!blob || blob.size === 0) {
+      throw new Error("Empty PDF file received");
+    }
+
+    const cleanFilename = sanitizePdfFilename(filename, "document.pdf");
+    const file = new File([blob], cleanFilename, { type: "application/pdf" });
 
     let canShareFiles = false;
     if (
@@ -125,7 +147,7 @@ export async function sharePdfDocument({
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = filename;
+    a.download = cleanFilename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -179,4 +201,3 @@ export function buildDocFilename(
     ? `${docPrefix}-${bookingNumber}-${cleanName}.pdf`
     : `${docPrefix}-${bookingNumber}.pdf`;
 }
-

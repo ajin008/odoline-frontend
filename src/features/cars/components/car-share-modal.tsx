@@ -98,8 +98,16 @@ export function CarShareModal({
 
   // Helper to convert any Image Blob to clean JPEG File (WhatsApp & OS Share demand image/jpeg for image captions)
   const blobToJpegFile = async (blob: Blob, filename: string): Promise<File> => {
+    let cleanName = filename.replace(/[^a-zA-Z0-9_\-]/g, "_");
+    if (!cleanName || /^blob$/i.test(cleanName)) {
+      cleanName = car.reg_number
+        ? car.reg_number.trim().replace(/[^a-zA-Z0-9]/g, "-")
+        : `${car.make}_${car.model}`.replace(/\s+/g, "_");
+    }
+    const finalFilename = `${cleanName}.jpg`;
+
     if (blob.type === "image/jpeg") {
-      return new File([blob], `${filename}.jpg`, { type: "image/jpeg" });
+      return new File([blob], finalFilename, { type: "image/jpeg" });
     }
 
     return new Promise<File>((resolve) => {
@@ -119,13 +127,13 @@ export function CarShareModal({
         canvas.toBlob(
           (jpegBlob) => {
             URL.revokeObjectURL(blobUrl);
-            if (jpegBlob) {
+            if (jpegBlob && jpegBlob.size > 0) {
               resolve(
-                new File([jpegBlob], `${filename}.jpg`, { type: "image/jpeg" })
+                new File([jpegBlob], finalFilename, { type: "image/jpeg" })
               );
             } else {
               resolve(
-                new File([blob], `${filename}.jpg`, { type: "image/jpeg" })
+                new File([blob], finalFilename, { type: "image/jpeg" })
               );
             }
           },
@@ -135,7 +143,7 @@ export function CarShareModal({
       };
       img.onerror = () => {
         URL.revokeObjectURL(blobUrl);
-        resolve(new File([blob], `${filename}.jpg`, { type: "image/jpeg" }));
+        resolve(new File([blob], finalFilename, { type: "image/jpeg" }));
       };
       img.src = blobUrl;
     });
@@ -155,13 +163,18 @@ export function CarShareModal({
           blob = await carPhotosApi.getPhotoFileBlob(car.id, photo.id);
         } else {
           const response = await fetch(photo.url);
+          if (!response.ok) {
+            throw new Error(`Fetch failed: ${response.status}`);
+          }
           blob = await response.blob();
         }
 
-        const safeFilename = `${car.make}_${car.model}_photo_${i + 1}`.replace(
-          /\s+/g,
-          "_"
-        );
+        if (!blob || blob.size === 0) continue;
+
+        const vehiclePrefix = car.reg_number
+          ? car.reg_number.trim().replace(/[^a-zA-Z0-9]/g, "-")
+          : `${car.make}_${car.model}`.replace(/\s+/g, "_");
+        const safeFilename = `${vehiclePrefix}-photo-${i + 1}`;
         const jpegFile = await blobToJpegFile(blob, safeFilename);
         files.push(jpegFile);
       } catch {
@@ -175,6 +188,7 @@ export function CarShareModal({
   // Download Raw Image Binary Files to device
   const handleDownloadPhotos = async () => {
     const selectedPhotos = allPhotos.filter((p) => selectedIds.has(p.id));
+    let downloadedCount = 0;
 
     for (let i = 0; i < selectedPhotos.length; i++) {
       const photo = selectedPhotos.at(i);
@@ -185,20 +199,40 @@ export function CarShareModal({
           blob = await carPhotosApi.getPhotoFileBlob(car.id, photo.id);
         } else {
           const response = await fetch(photo.url);
+          if (!response.ok) {
+            throw new Error(`Fetch failed: ${response.status}`);
+          }
           blob = await response.blob();
         }
+
+        if (!blob || blob.size === 0) continue;
+
+        const ext = blob.type.includes("png")
+          ? ".png"
+          : blob.type.includes("webp")
+          ? ".webp"
+          : ".jpg";
+        const vehiclePrefix = car.reg_number
+          ? car.reg_number.trim().replace(/[^a-zA-Z0-9]/g, "-")
+          : `${car.make}_${car.model}`.replace(/\s+/g, "_");
+        const fileName = `${vehiclePrefix}-photo-${i + 1}${ext}`;
 
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = `${car.make}_${car.model}_photo_${i + 1}.jpg`;
+        link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        URL.revokeObjectURL(blobUrl);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+        downloadedCount++;
       } catch {
         // Skip failed download
       }
+    }
+
+    if (downloadedCount === 0) {
+      toast.error("Download failed, please retry");
     }
   };
 
