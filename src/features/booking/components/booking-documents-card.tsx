@@ -343,7 +343,7 @@ export function BookingDocumentsCard({
                       className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden border border-line bg-inset group/thumb cursor-pointer shrink-0 shadow-2xs hover:shadow-md transition-all"
                     >
                       <AuthenticatedImage
-                        src={file.presigned_url || file.file_url || file.file_path || `/bookings/${bookingId}/documents/${file.id}/file`}
+                        src={`/bookings/${bookingId}/documents/${file.id}/file`}
                         alt={file.original_name || file.file_name}
                         className="h-full w-full object-cover transition-transform duration-200 group-hover/thumb:scale-105"
                       />
