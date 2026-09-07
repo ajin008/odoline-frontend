@@ -35,6 +35,7 @@ import { formatIndianNumber } from "@/src/lib/formatters";
 import { CarPhotoGallery } from "./car-photo-gallery";
 import { CarShareModal } from "./car-share-modal";
 import { DocumentsGrid } from "./documents-grid";
+import { documentsApi } from "../api/documents-api";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 
 export function StaffCarDetail({ carId }: { carId: string }) {
@@ -49,6 +50,7 @@ export function StaffCarDetail({ carId }: { carId: string }) {
   >("overview");
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [docPreview, setDocPreview] = useState<{
+    id?: string;
     url: string;
     mimeType: string;
     name: string;
@@ -598,8 +600,11 @@ export function StaffCarDetail({ carId }: { carId: string }) {
                         type="button"
                         onClick={() =>
                           downloadFile({
-                            url: docPreview.url,
-                            filename: docFilename,
+                            fetchBlob: docPreview.id
+                              ? () => documentsApi.downloadFileBlob(carId, docPreview.id!)
+                              : undefined,
+                            url: docPreview.id ? undefined : docPreview.url,
+                            fileName: docFilename,
                           })
                         }
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1.5 rounded-lg bg-inset hover:bg-line/40 border border-line cursor-pointer"
@@ -613,8 +618,11 @@ export function StaffCarDetail({ carId }: { carId: string }) {
                         type="button"
                         onClick={() =>
                           shareFile({
-                            url: docPreview.url,
-                            filename: docFilename,
+                            fetchBlob: docPreview.id
+                              ? () => documentsApi.downloadFileBlob(carId, docPreview.id!)
+                              : undefined,
+                            url: docPreview.id ? undefined : docPreview.url,
+                            fileName: docFilename,
                             title: `${
                               car ? `${car.make} ${car.model}` : "Vehicle"
                             } - ${docPreview.name || "Document"}`,

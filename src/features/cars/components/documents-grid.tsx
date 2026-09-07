@@ -29,6 +29,7 @@ import { useCarDocuments } from "../hooks/use-documents";
 import { useDocumentActions } from "../hooks/use-document-actions";
 import { useCar } from "../hooks/use-car";
 import { shareCarDocument } from "../utils/share-car-document";
+import { documentsApi } from "../api/documents-api";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 
@@ -92,6 +93,7 @@ export function DocumentsGrid({
     null
   );
   const [previewItem, setPreviewItem] = useState<{
+    id?: string;
     url: string;
     mimeType: string;
     name?: string;
@@ -197,6 +199,7 @@ export function DocumentsGrid({
   }) => {
     if (doc.file_url) {
       setPreviewItem({
+        id: doc.id,
         url: doc.file_url,
         mimeType: doc.mime_type || "image/jpeg",
         name: doc.original_name,
@@ -209,6 +212,7 @@ export function DocumentsGrid({
     setLoadingPreviewId(null);
     if (url) {
       setPreviewItem({
+        id: doc.id,
         url,
         mimeType: doc.mime_type || "image/jpeg",
         name: doc.original_name,
@@ -659,8 +663,11 @@ export function DocumentsGrid({
                         type="button"
                         onClick={() =>
                           downloadFile({
-                            url: previewItem.url,
-                            filename: docFilename,
+                            fetchBlob: previewItem.id
+                              ? () => documentsApi.downloadFileBlob(carId, previewItem.id!)
+                              : undefined,
+                            url: previewItem.id ? undefined : previewItem.url,
+                            fileName: docFilename,
                           })
                         }
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1.5 rounded-lg bg-inset hover:bg-line/40 border border-line cursor-pointer"
@@ -674,8 +681,11 @@ export function DocumentsGrid({
                         type="button"
                         onClick={() =>
                           shareFile({
-                            url: previewItem.url,
-                            filename: docFilename,
+                            fetchBlob: previewItem.id
+                              ? () => documentsApi.downloadFileBlob(carId, previewItem.id!)
+                              : undefined,
+                            url: previewItem.id ? undefined : previewItem.url,
+                            fileName: docFilename,
                             title: `${
                               car ? `${car.make} ${car.model}` : "Vehicle"
                             } - ${previewItem.name || "Document"}`,

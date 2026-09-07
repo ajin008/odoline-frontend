@@ -12,6 +12,7 @@
 
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
+import { apiClient } from "@/src/lib/api-client";
 
 export interface FileActionSource {
   /** Direct URL to fetch (presigned URL, static asset, iframe src, etc). Provide this OR fetchBlob. */
@@ -169,25 +170,49 @@ async function fetchSourceBlob(source: Pick<FileActionSource, "url" | "fetchBlob
       throw await toFileFetchError(err);
     }
   } else if (source.url) {
-    let response: Response;
     try {
-      response = await fetch(source.url);
-    } catch {
-      // `fetch()` throwing here (rather than resolving with a non-ok status) means
-      // either the network is genuinely down, or — very common for direct S3/CDN
-      // URLs — the response lacks CORS headers. An `<img>`/iframe can still load
-      // the same URL fine; only the JS-level `fetch()` needed for File/Blob
-      // construction is blocked. Callers fall back to opening the raw URL directly.
-      throw new FileFetchError(
-        "Couldn't fetch the file directly (network or CORS issue).",
-        undefined,
-        true
-      );
+      let fetchUrl = source.url;
+
+      // Extract carId & photoId from S3 URL or API path
+      const photoMatch = fetchUrl.match(/cars\/([a-f0-9\-]+)\/photos\/([a-f0-9\-]+)/i);
+      // Extract carId & docId from S3 URL or API path
+      const docMatch = fetchUrl.match(/cars\/([a-f0-9\-]+)\/documents\/([a-f0-9\-]+)/i);
+      // Extract refurb itemId from S3 URL or API path
+      const refurbMatch = fetchUrl.match(/refurbishment\/items\/([a-f0-9\-]+)/i);
+
+      if (photoMatch && photoMatch[1] && photoMatch[2]) {
+        const [, carId, photoId] = photoMatch;
+        fetchUrl = `/cars/${carId}/photos/${photoId}/file`;
+      } else if (docMatch && docMatch[1] && docMatch[2]) {
+        const [, carId, docId] = docMatch;
+        fetchUrl = `/cars/${carId}/documents/${docId}/file`;
+      } else if (refurbMatch && refurbMatch[1]) {
+        const [, itemId] = refurbMatch;
+        fetchUrl = `/refurbishment/items/${itemId}/file`;
+      }
+
+      if (
+        fetchUrl.startsWith("/") ||
+        fetchUrl.includes("/api/") ||
+        fetchUrl.includes("/cars/") ||
+        fetchUrl.includes("/refurbishment/")
+      ) {
+        const res = await apiClient.get(fetchUrl, { responseType: "blob" });
+        blob = res.data;
+      } else if (fetchUrl.includes("s3.amazonaws.com") || fetchUrl.includes(".s3.")) {
+        throw new FileFetchError(
+          "Direct browser S3 fetches are disabled. File downloads must be routed through the backend streaming endpoint."
+        );
+      } else {
+        const response = await fetch(fetchUrl);
+        if (!response.ok) {
+          throw new FileFetchError(httpStatusMessage(response.status), response.status);
+        }
+        blob = await response.blob();
+      }
+    } catch (err) {
+      throw await toFileFetchError(err);
     }
-    if (!response.ok) {
-      throw new FileFetchError(httpStatusMessage(response.status), response.status);
-    }
-    blob = await response.blob();
   } else {
     throw new FileFetchError("No file source provided.");
   }

@@ -34,7 +34,7 @@ export function BillPreviewModal({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => downloadFile({ url: billPreviewUrl, filename: billFilename })}
+              onClick={() => downloadFile({ url: billPreviewUrl, fileName: billFilename })}
               className="inline-flex items-center gap-1.5 rounded-lg bg-inset border border-line px-3 py-1.5 text-xs font-bold text-ink-muted hover:text-ink hover:bg-line/40 transition-colors cursor-pointer"
               title="Download Bill"
             >
@@ -47,7 +47,7 @@ export function BillPreviewModal({
               onClick={() =>
                 shareFile({
                   url: billPreviewUrl,
-                  filename: billFilename,
+                  fileName: billFilename,
                   title: "Vendor Refurbishment Bill",
                   mimeType: "image/jpeg",
                 })

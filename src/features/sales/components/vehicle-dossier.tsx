@@ -39,6 +39,8 @@ import {
   Share2,
 } from "lucide-react";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { documentsApi } from "@/src/features/cars/api/documents-api";
+import { carPhotosApi } from "@/src/features/cars/api/car-photos-api";
 
 interface VehicleDossierProps {
   carId: string;
@@ -49,9 +51,10 @@ function formatDateIST(dateStr: string | null | undefined): string {
   const d = new Date(dateStr);
   if (isNaN(d.getTime())) return "N/A";
   return d.toLocaleDateString("en-IN", {
-    day: "numeric",
+    day: "2-digit",
     month: "short",
     year: "numeric",
+    timeZone: "Asia/Kolkata",
   });
 }
 
@@ -95,6 +98,7 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
 
   // Document modal preview state
   const [previewDocUrl, setPreviewDocUrl] = useState<{
+    id?: string;
     url: string;
     title: string;
   } | null>(null);
@@ -595,6 +599,7 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                             type="button"
                             onClick={() =>
                               setPreviewDocUrl({
+                                id: doc.id,
                                 url: doc.file_url,
                                 title: doc.file_name || doc.doc_type,
                               })
@@ -1377,7 +1382,15 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                     <>
                       <button
                         type="button"
-                        onClick={() => downloadFile({ url: previewDocUrl.url, filename: docFilename })}
+                        onClick={() =>
+                          downloadFile({
+                            fetchBlob: previewDocUrl.id
+                              ? () => documentsApi.downloadFileBlob(car.id, previewDocUrl.id!)
+                              : undefined,
+                            url: previewDocUrl.id ? undefined : previewDocUrl.url,
+                            fileName: docFilename,
+                          })
+                        }
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-ink-muted bg-inset hover:bg-line/40 border border-line cursor-pointer"
                         title="Download Document"
                       >
@@ -1389,8 +1402,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                         type="button"
                         onClick={() =>
                           shareFile({
-                            url: previewDocUrl.url,
-                            filename: docFilename,
+                            fetchBlob: previewDocUrl.id
+                              ? () => documentsApi.downloadFileBlob(car.id, previewDocUrl.id!)
+                              : undefined,
+                            url: previewDocUrl.id ? undefined : previewDocUrl.url,
+                            fileName: docFilename,
                             title: `${car.make} ${car.model} - ${previewDocUrl.title}`,
                             text: car.reg_number ? `Registration: ${car.reg_number}` : undefined,
                             mimeType: "application/pdf",
@@ -1435,12 +1451,25 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
             {(() => {
               const vehiclePrefix = `${car.reg_number ? car.reg_number : `${car.make}_${car.model}`}`;
               const photoFilename = `${vehiclePrefix}-photo-${selectedPhotoIndex + 1}.jpg`;
+              const photoObj =
+                car.photos && typeof car.photos[selectedPhotoIndex] === "object"
+                  ? (car.photos[selectedPhotoIndex] as { id?: string })
+                  : null;
+              const photoId = photoObj?.id;
 
               return (
                 <>
                   <button
                     type="button"
-                    onClick={() => downloadFile({ url: currentPhoto, filename: photoFilename })}
+                    onClick={() =>
+                      downloadFile({
+                        fetchBlob: photoId
+                          ? () => carPhotosApi.getPhotoFileBlob(car.id, photoId)
+                          : undefined,
+                        url: photoId ? undefined : currentPhoto,
+                        fileName: photoFilename,
+                      })
+                    }
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-white/10 hover:bg-white/20 transition-colors cursor-pointer"
                     title="Download Photo"
                   >
@@ -1452,8 +1481,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                     type="button"
                     onClick={() =>
                       shareFile({
-                        url: currentPhoto,
-                        filename: photoFilename,
+                        fetchBlob: photoId
+                          ? () => carPhotosApi.getPhotoFileBlob(car.id, photoId)
+                          : undefined,
+                        url: photoId ? undefined : currentPhoto,
+                        fileName: photoFilename,
                         title: `${car.make} ${car.model} Photo`,
                         text: car.reg_number ? `Registration: ${car.reg_number}` : undefined,
                         mimeType: "image/jpeg",

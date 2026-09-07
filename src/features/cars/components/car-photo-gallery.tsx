@@ -21,7 +21,7 @@ import {
   useSetPrimaryCarPhoto,
 } from "../hooks/use-car-photos";
 import { useCar } from "../hooks/use-car";
-import type { CarPhoto } from "../api/car-photos-api";
+import { carPhotosApi, type CarPhoto } from "../api/car-photos-api";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 
 interface CarPhotoGalleryProps {
@@ -252,7 +252,12 @@ export function CarPhotoGallery({
                     <>
                       <button
                         type="button"
-                        onClick={() => downloadFile({ url: selectedPhoto.url, filename: photoFilename })}
+                        onClick={() =>
+                          downloadFile({
+                            fetchBlob: () => carPhotosApi.getPhotoFileBlob(carId, selectedPhoto.id),
+                            fileName: photoFilename,
+                          })
+                        }
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1.5 rounded-lg bg-inset hover:bg-line/40 border border-line cursor-pointer"
                         title="Download Photo"
                       >
@@ -264,8 +269,8 @@ export function CarPhotoGallery({
                         type="button"
                         onClick={() =>
                           shareFile({
-                            url: selectedPhoto.url,
-                            filename: photoFilename,
+                            fetchBlob: () => carPhotosApi.getPhotoFileBlob(carId, selectedPhoto.id),
+                            fileName: photoFilename,
                             title: `${car ? `${car.make} ${car.model}` : "Vehicle"} Photo`,
                             text: car?.reg_number ? `Registration: ${car.reg_number}` : undefined,
                             mimeType: "image/jpeg",

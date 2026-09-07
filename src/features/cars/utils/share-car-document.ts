@@ -1,8 +1,4 @@
 // src/features/cars/utils/share-car-document.ts
-//
-// FIX-24: business logic only (choosing the blob source + building a clean
-// car/document-specific filename & title). The actual fetch/sanitize/share/
-// download mechanics live in the single shared module src/lib/file-actions.ts.
 import { shareFile } from "@/src/lib/file-actions";
 import { documentsApi } from "../api/documents-api";
 
@@ -40,19 +36,7 @@ export async function shareCarDocument({
   const shareText = `Document: ${docLabel}${regNumber ? ` (${regNumber})` : ""}`;
 
   await shareFile({
-    fetchBlob: async () => {
-      try {
-        return await documentsApi.downloadFileBlob(carId, documentId);
-      } catch {
-        // Fallback: try presigned download URL if the proxied blob endpoint fails
-        const presignedUrl = await documentsApi.getPresignedUrl(carId, documentId);
-        const res = await fetch(presignedUrl);
-        if (!res.ok) {
-          throw new Error(`Failed to download file (${res.status})`);
-        }
-        return res.blob();
-      }
-    },
+    fetchBlob: () => documentsApi.downloadFileBlob(carId, documentId),
     fileName,
     title: shareTitle,
     text: shareText,

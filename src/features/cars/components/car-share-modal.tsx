@@ -16,6 +16,7 @@ import type { Car } from "../api/cars-api";
 import { carPhotosApi, type CarPhoto } from "../api/car-photos-api";
 import { formatIndianNumber } from "@/src/lib/formatters";
 import { canShareFiles, shareOrSaveFile } from "@/src/lib/file-actions";
+import { apiClient } from "@/src/lib/api-client";
 
 interface CarShareModalProps {
   isOpen: boolean;
@@ -150,7 +151,7 @@ export function CarShareModal({
     });
   };
 
-  // Fetch presigned image binary from S3 and convert to JPEG File
+  // Fetch presigned image binary from backend and convert to JPEG File
   const fetchImageFiles = async (): Promise<File[]> => {
     const selectedPhotos = allPhotos.filter((p) => selectedIds.has(p.id));
     const files: File[] = [];
@@ -163,11 +164,8 @@ export function CarShareModal({
         if (photo.id && photo.id !== "primary" && photo.id !== "fallback") {
           blob = await carPhotosApi.getPhotoFileBlob(car.id, photo.id);
         } else {
-          const response = await fetch(photo.url);
-          if (!response.ok) {
-            throw new Error(`Fetch failed: ${response.status}`);
-          }
-          blob = await response.blob();
+          const res = await apiClient.get(photo.url, { responseType: "blob" });
+          blob = res.data;
         }
 
         if (!blob || blob.size === 0) continue;
@@ -199,11 +197,8 @@ export function CarShareModal({
         if (photo.id && photo.id !== "primary" && photo.id !== "fallback") {
           blob = await carPhotosApi.getPhotoFileBlob(car.id, photo.id);
         } else {
-          const response = await fetch(photo.url);
-          if (!response.ok) {
-            throw new Error(`Fetch failed: ${response.status}`);
-          }
-          blob = await response.blob();
+          const res = await apiClient.get(photo.url, { responseType: "blob" });
+          blob = res.data;
         }
 
         if (!blob || blob.size === 0) continue;
