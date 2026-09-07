@@ -256,6 +256,31 @@ export interface SettleDeliverPayload {
   payments: SettleDeliverPaymentPayload[];
 }
 
+export interface BookingDocumentFile {
+  id: string;
+  booking_id: string;
+  doc_type: string;
+  file_path: string;
+  file_url: string;
+  presigned_url?: string | null;
+  original_name?: string;
+  file_name?: string;
+  file_size_kb?: number;
+  mime_type: string;
+  uploaded_by?: string;
+  created_at: string;
+}
+
+export interface GroupedBookingDocType {
+  doc_type: string;
+  kind: "pdf" | "image";
+  files: BookingDocumentFile[];
+  count: number;
+}
+
+export type GroupedBookingDocuments = Record<string, GroupedBookingDocType>;
+
+
 
 
 

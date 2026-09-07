@@ -21,6 +21,7 @@ import {
   Download,
   Printer,
 } from "lucide-react";
+import { BookingDocumentsCard } from "./booking-documents-card";
 
 interface BookingDeliveryStageProps {
   bookingId: string;
@@ -301,6 +302,17 @@ export function BookingDeliveryStage({
               {delivery?.delivery_place || "Main Showroom"}
             </div>
           </div>
+        </div>
+
+        {/* Delivery & Handover Photos Card */}
+        <div className="pt-2">
+          <BookingDocumentsCard
+            bookingId={booking.id}
+            docType="delivery_image"
+            title="Delivery & Handover Photos"
+            description="Vehicle delivery handover photos."
+            readOnly={readOnly || booking.status === "closed"}
+          />
         </div>
 
         {/* Timestamp Meta */}

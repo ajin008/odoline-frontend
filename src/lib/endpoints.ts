@@ -133,6 +133,9 @@ export const endpoints = {
     deliveryPdf: (id: string) => `/bookings/${id}/delivery/pdf`,
     settleDeliver: (id: string) => `/bookings/${id}/settle-deliver`,
     close: (id: string) => `/bookings/${id}/close`,
+    documents: (id: string) => `/bookings/${id}/documents`,
+    documentFile: (id: string, docId: string) => `/bookings/${id}/documents/${docId}/file`,
+    documentDelete: (id: string, docId: string) => `/bookings/${id}/documents/${docId}`,
   },
 } as const;
 

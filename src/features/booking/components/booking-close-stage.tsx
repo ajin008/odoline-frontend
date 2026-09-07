@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,12 +21,10 @@ import {
   FileText,
   UploadCloud,
   Loader2,
-  ExternalLink,
-  X,
-  File,
-  Image as ImageIcon,
   Check,
 } from "lucide-react";
+
+import { BookingDocumentsCard } from "./booking-documents-card";
 
 interface BookingCloseStageProps {
   bookingId: string;
@@ -45,12 +43,6 @@ function formatDateIST(dateStr: string | null | undefined): string {
   });
 }
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
 const getTodayString = () => new Date().toISOString().split("T")[0];
 
 export function BookingCloseStage({
@@ -60,10 +52,7 @@ export function BookingCloseStage({
 }: BookingCloseStageProps) {
   const { data: booking, isLoading, isError } = useBooking(bookingId);
   const closeBookingMutation = useCloseBooking();
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
+  const [rcFilesCount, setRcFilesCount] = useState<number>(0);
 
   const {
     register,
@@ -143,54 +132,16 @@ export function BookingCloseStage({
     );
   }
 
-  // Handle file selection & validation
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/webp",
-      "application/pdf",
-    ];
-
-    if (!allowedTypes.includes(file.type) && !file.type.startsWith("image/")) {
-      setFileError("Only JPG, PNG, WEBP images and PDF documents are allowed");
-      setSelectedFile(null);
-      return;
-    }
-
-    const maxSize = 10 * 1024 * 1024; // 10 MB
-    if (file.size > maxSize) {
-      setFileError("File size exceeds 10MB limit");
-      setSelectedFile(null);
-      return;
-    }
-
-    setFileError(null);
-    setSelectedFile(file);
-  };
-
-  const handleClearFile = () => {
-    setSelectedFile(null);
-    setFileError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
   // Form submit handler
   const onSubmit = (values: CloseBookingFormValues) => {
-    if (!selectedFile) {
-      setFileError("RC document file is required to complete closure");
-      toast.error("Please upload the RC transfer document");
+    if (rcFilesCount === 0) {
+      toast.error(
+        "At least one RC transfer document is required to complete closure"
+      );
       return;
     }
 
     const formData = new FormData();
-    formData.append("rc_document", selectedFile);
     formData.append("rc_transfer_date", values.rc_transfer_date);
     if (values.rc_note && values.rc_note.trim()) {
       formData.append("rc_note", values.rc_note.trim());
@@ -251,81 +202,15 @@ export function BookingCloseStage({
           </div>
 
           <div className="space-y-5">
-            {/* RC Document File Input */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-ink flex items-center justify-between">
-                <span>
-                  RC Document <span className="text-rose-500">*</span>
-                </span>
-                <span className="text-[11px] font-normal text-ink-muted">
-                  JPG, PNG, WEBP or PDF (Max 10MB)
-                </span>
-              </label>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/webp,application/pdf"
-                onChange={handleFileChange}
-                className="hidden"
-                id="rc-document-file-input"
-              />
-
-              {!selectedFile ? (
-                <label
-                  htmlFor="rc-document-file-input"
-                  className={`flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
-                    fileError
-                      ? "border-rose-500/50 bg-rose-500/5"
-                      : "border-line bg-inset/50 hover:bg-inset hover:border-accent/50"
-                  }`}
-                >
-                  <UploadCloud className="h-8 w-8 text-ink-subtle mb-2" />
-                  <span className="text-xs font-bold text-ink mb-0.5">
-                    Click to browse or upload RC document
-                  </span>
-                  <span className="text-[11px] text-ink-muted">
-                    Supports image scans and PDF files
-                  </span>
-                </label>
-              ) : (
-                <div className="flex items-center justify-between p-3.5 rounded-xl border border-line bg-inset/70">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/10 text-accent shrink-0">
-                      {selectedFile.type === "application/pdf" ? (
-                        <File className="h-5 w-5" />
-                      ) : (
-                        <ImageIcon className="h-5 w-5" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-ink truncate">
-                        {selectedFile.name}
-                      </p>
-                      <p className="text-[11px] text-ink-muted">
-                        {formatFileSize(selectedFile.size)} ·{" "}
-                        {selectedFile.type || "Document"}
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleClearFile}
-                    className="p-1.5 rounded-lg text-ink-muted hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
-                    title="Remove file"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {fileError && (
-                <p className="text-xs font-semibold text-rose-500 flex items-center gap-1">
-                  <AlertTriangle className="h-3.5 w-3.5" />
-                  <span>{fileError}</span>
-                </p>
-              )}
-            </div>
+            {/* Multi-File RC Transfer Document Card */}
+            <BookingDocumentsCard
+              bookingId={booking.id}
+              docType="rc_transfer"
+              title="RC Transfer Proof"
+              description="Upload 1 PDF document or up to 20 image scans (front/back/pages) of the transferred RC book."
+              required={true}
+              onFilesCountChange={setRcFilesCount}
+            />
 
             {/* RC Transfer Date & Note */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -376,18 +261,18 @@ export function BookingCloseStage({
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-line">
             <button
               type="submit"
-              disabled={closeBookingMutation.isPending || !selectedFile}
+              disabled={closeBookingMutation.isPending || rcFilesCount === 0}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-accent text-inverse font-bold text-xs transition-opacity hover:opacity-95 disabled:opacity-50 shadow-md cursor-pointer min-h-[44px]"
             >
               {closeBookingMutation.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Uploading RC &amp; Completing Booking...</span>
+                  <span>Completing Booking...</span>
                 </>
               ) : (
                 <>
                   <Check className="h-4 w-4" />
-                  <span>Upload RC &amp; Complete Booking</span>
+                  <span>Complete Booking</span>
                 </>
               )}
             </button>
@@ -435,7 +320,7 @@ export function BookingCloseStage({
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-inset border border-line text-xs font-semibold text-ink hover:bg-card transition-colors cursor-pointer"
           >
             <ShieldCheck className="h-3.5 w-3.5 text-accent" />
-            <span>View Settlement &amp; Delivery Document</span>
+            <span>View Settlement &amp; Delivery Stage Document</span>
           </Link>
         </div>
       </div>
@@ -507,37 +392,23 @@ export function BookingCloseStage({
           </div>
         </div>
 
-        {/* RC Document Attachment View */}
-        {delivery?.rc_document_url ? (
-          <div className="p-4 rounded-xl border border-line bg-inset/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent shrink-0">
-                <FileText className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-ink">
-                  RC Transfer Document Proof
-                </p>
-                <p className="text-[11px] text-ink-subtle">
-                  Private upload stored securely in S3
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => window.open(delivery.rc_document_url!, "_blank")}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-accent text-inverse font-bold text-xs transition-opacity hover:opacity-95 shadow-xs cursor-pointer"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              <span>View / Download RC Document</span>
-            </button>
-          </div>
-        ) : (
-          <div className="p-4 rounded-xl border border-line bg-inset/40 text-center text-xs font-medium text-ink-muted">
-            RC document file reference unavailable.
-          </div>
-        )}
+        {/* RC & Delivery Documents View */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <BookingDocumentsCard
+            bookingId={booking.id}
+            docType="rc_transfer"
+            title="RC Transfer Proof Documents"
+            description="Official RC transfer proof uploaded on booking closure."
+            readOnly={true}
+          />
+          <BookingDocumentsCard
+            bookingId={booking.id}
+            docType="delivery_image"
+            title="Delivery & Handover Photos"
+            description="Vehicle delivery handover photos."
+            readOnly={true}
+          />
+        </div>
 
         {/* Navigation back to earlier docs */}
         <div className="pt-2 flex justify-start">

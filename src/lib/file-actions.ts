@@ -177,6 +177,8 @@ async function fetchSourceBlob(source: Pick<FileActionSource, "url" | "fetchBlob
       const photoMatch = fetchUrl.match(/cars\/([a-f0-9\-]+)\/photos\/([a-f0-9\-]+)/i);
       // Extract carId & docId from S3 URL or API path
       const docMatch = fetchUrl.match(/cars\/([a-f0-9\-]+)\/documents\/([a-f0-9\-]+)/i);
+      // Extract bookingId & docId from S3 URL or API path
+      const bookingDocMatch = fetchUrl.match(/bookings\/([a-f0-9\-]+)\/documents\/([a-f0-9\-]+)/i);
       // Extract refurb itemId from S3 URL or API path
       const refurbMatch = fetchUrl.match(/refurbishment\/items\/([a-f0-9\-]+)/i);
 
@@ -186,6 +188,9 @@ async function fetchSourceBlob(source: Pick<FileActionSource, "url" | "fetchBlob
       } else if (docMatch && docMatch[1] && docMatch[2]) {
         const [, carId, docId] = docMatch;
         fetchUrl = `/cars/${carId}/documents/${docId}/file`;
+      } else if (bookingDocMatch && bookingDocMatch[1] && bookingDocMatch[2]) {
+        const [, bookingId, docId] = bookingDocMatch;
+        fetchUrl = `/bookings/${bookingId}/documents/${docId}/file`;
       } else if (refurbMatch && refurbMatch[1]) {
         const [, itemId] = refurbMatch;
         fetchUrl = `/refurbishment/items/${itemId}/file`;
@@ -195,6 +200,7 @@ async function fetchSourceBlob(source: Pick<FileActionSource, "url" | "fetchBlob
         fetchUrl.startsWith("/") ||
         fetchUrl.includes("/api/") ||
         fetchUrl.includes("/cars/") ||
+        fetchUrl.includes("/bookings/") ||
         fetchUrl.includes("/refurbishment/")
       ) {
         const res = await apiClient.get(fetchUrl, { responseType: "blob" });

@@ -11,6 +11,8 @@ import type {
   SaveOrderPayload,
   EditAgreementPayload,
   SettleDeliverPayload,
+  GroupedBookingDocuments,
+  GroupedBookingDocType,
 } from "../types/booking-types";
 
 export const bookingApi = {
@@ -118,12 +120,31 @@ export const bookingApi = {
     return res.data.data;
   },
 
-  /** POST /api/v1/bookings/:id/close — Close Booking (RC transfer document upload + flip status to closed) */
+  /** POST /api/v1/bookings/:id/close — Close Booking */
   async close(id: string, formData: FormData): Promise<BookingDetail> {
     const res = await apiClient.post(endpoints.bookings.close(id), formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     return res.data.data;
+  },
+
+  /** GET /api/v1/bookings/:id/documents — List grouped booking documents */
+  async getDocuments(id: string): Promise<GroupedBookingDocuments> {
+    const res = await apiClient.get(endpoints.bookings.documents(id));
+    return res.data.data;
+  },
+
+  /** POST /api/v1/bookings/:id/documents — Upload booking documents */
+  async uploadDocuments(id: string, formData: FormData): Promise<GroupedBookingDocType> {
+    const res = await apiClient.post(endpoints.bookings.documents(id), formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data.data;
+  },
+
+  /** DELETE /api/v1/bookings/:id/documents/:docId — Delete single document */
+  async deleteDocument(id: string, docId: string): Promise<void> {
+    await apiClient.delete(endpoints.bookings.documentDelete(id, docId));
   },
 };
 
