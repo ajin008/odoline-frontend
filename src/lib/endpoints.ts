@@ -20,6 +20,7 @@ export const endpoints = {
     // addToStock: (id: string) => `/cars/${id}/add-to-stock`,
 
     documents: (id: string) => `/cars/${id}/documents`,
+    documentFile: (id: string, docId: string) => `/cars/${id}/documents/${docId}/file`,
     refurbItems: (id: string) => `/cars/${id}/refurbishment-items`,
     margin: (id: string) => `/cars/${id}/margin`,
     addToStock: (id: string) => `/cars/${id}/add-to-stock`,

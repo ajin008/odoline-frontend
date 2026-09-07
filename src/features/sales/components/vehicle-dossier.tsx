@@ -39,8 +39,9 @@ import {
   Share2,
 } from "lucide-react";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { AuthenticatedImage, AuthenticatedIframe } from "@/src/components/ui/authenticated-image";
+import { endpoints } from "@/src/lib/endpoints";
 import { carPhotosApi } from "@/src/features/cars/api/car-photos-api";
-import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
 
 interface VehicleDossierProps {
   carId: string;
@@ -174,6 +175,21 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
       : [];
   const currentPhoto =
     photoList.at(selectedPhotoIndex) ?? car.primary_photo_url;
+
+  // The dossier's `photos` field is typed as string[] (raw URLs), but the
+  // backend sometimes sends richer { id, url } entries — use the id when
+  // present to build the CAR backend stream endpoint directly; otherwise
+  // AuthenticatedImage's own S3-path rewrite is the fallback.
+  const getPhotoIdAt = (idx: number): string | undefined => {
+    const entry = car.photos?.[idx] as unknown;
+    return entry && typeof entry === "object" && "id" in entry
+      ? (entry as { id?: string }).id
+      : undefined;
+  };
+  const getPhotoSrc = (idx: number, url: string | null | undefined) => {
+    const photoId = getPhotoIdAt(idx);
+    return photoId ? endpoints.cars.photoFile(car.id, photoId) : url || undefined;
+  };
 
   const rcDocs = booking.rc_documents || booking.documents?.rc_documents || [];
   const deliveryImgs =
@@ -359,9 +375,8 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
               <div className="w-full xl:w-80 shrink-0 space-y-2 flex flex-col">
                 <div className="relative aspect-video sm:aspect-2/1 xl:aspect-16/10 w-full rounded-xl overflow-hidden bg-inset border border-line group">
                   {currentPhoto ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={currentPhoto}
+                    <AuthenticatedImage
+                      src={getPhotoSrc(selectedPhotoIndex, currentPhoto)}
                       alt={`${car.year} ${car.make} ${car.model}`}
                       className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
                       onClick={() => setIsLightboxOpen(true)}
@@ -399,9 +414,8 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                             : "border-line/70 opacity-60 hover:opacity-100"
                         }`}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={photoUrl}
+                        <AuthenticatedImage
+                          src={getPhotoSrc(idx, photoUrl)}
                           alt=""
                           className="h-full w-full object-cover"
                         />
@@ -1570,7 +1584,7 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                   className="max-w-full max-h-full object-contain rounded-lg shadow-md"
                 />
               ) : (
-                <iframe
+                <AuthenticatedIframe
                   src={previewDocUrl.url}
                   className="w-full h-full border-0"
                   title={previewDocUrl.title}
@@ -1650,9 +1664,8 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
           </div>
 
           <div className="max-w-5xl max-h-[90vh] relative flex flex-col items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={currentPhoto}
+            <AuthenticatedImage
+              src={getPhotoSrc(selectedPhotoIndex, currentPhoto)}
               alt={`${car.year} ${car.make} ${car.model}`}
               className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
             />

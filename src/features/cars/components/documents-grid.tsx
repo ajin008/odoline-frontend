@@ -32,7 +32,8 @@ import { shareCarDocument } from "../utils/share-car-document";
 import { documentsApi } from "../api/documents-api";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
-import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
+import { AuthenticatedImage, AuthenticatedIframe } from "@/src/components/ui/authenticated-image";
+import { endpoints } from "@/src/lib/endpoints";
 
 interface DocumentsGridProps {
   carId: string;
@@ -432,9 +433,8 @@ export function DocumentsGrid({
                               onClick={() => handleViewPreview(file)}
                               className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden border border-line bg-inset group/thumb cursor-pointer shrink-0 shadow-2xs hover:shadow-md transition-all"
                             >
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={file.file_url || file.file_path}
+                              <AuthenticatedImage
+                                src={endpoints.cars.documentFile(carId, file.id)}
                                 alt={file.original_name}
                                 className="h-full w-full object-cover transition-transform duration-200 group-hover/thumb:scale-105"
                               />
@@ -719,14 +719,22 @@ export function DocumentsGrid({
             {/* Modal Body */}
             <div className="flex-1 overflow-hidden bg-inset p-3 flex items-center justify-center min-h-[60vh]">
               {previewItem.mimeType === "application/pdf" ? (
-                <iframe
-                  src={previewItem.url}
+                <AuthenticatedIframe
+                  src={
+                    previewItem.id
+                      ? endpoints.cars.documentFile(carId, previewItem.id)
+                      : previewItem.url
+                  }
                   title="PDF Document Preview"
                   className="w-full h-[75vh] min-h-[480px] rounded-lg border border-line bg-card shadow-xs"
                 />
               ) : (
                 <AuthenticatedImage
-                  src={previewItem.url}
+                  src={
+                    previewItem.id
+                      ? endpoints.cars.documentFile(carId, previewItem.id)
+                      : previewItem.url
+                  }
                   alt="Document Preview"
                   className="max-h-[75vh] w-auto max-w-full rounded-lg shadow-sm object-contain"
                 />

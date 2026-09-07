@@ -37,6 +37,8 @@ import { CarShareModal } from "./car-share-modal";
 import { DocumentsGrid } from "./documents-grid";
 import { documentsApi } from "../api/documents-api";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { AuthenticatedImage, AuthenticatedIframe } from "@/src/components/ui/authenticated-image";
+import { endpoints } from "@/src/lib/endpoints";
 
 export function StaffCarDetail({ carId }: { carId: string }) {
   const { data: car, isLoading: isCarLoading, isError } = useCar(carId);
@@ -188,9 +190,12 @@ export function StaffCarDetail({ carId }: { carId: string }) {
         <div className="lg:col-span-7 space-y-3">
           <div className="relative aspect-16/10 w-full overflow-hidden rounded-xl border border-line bg-inset">
             {currentPhoto ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={currentPhoto.url}
+              <AuthenticatedImage
+                src={
+                  currentPhoto.id !== "fallback"
+                    ? endpoints.cars.photoFile(carId, currentPhoto.id)
+                    : currentPhoto.url
+                }
                 alt={`${car.make} ${car.model}`}
                 className="h-full w-full object-cover transition-transform duration-300"
               />
@@ -257,9 +262,12 @@ export function StaffCarDetail({ carId }: { carId: string }) {
                       : "border-line opacity-60 hover:opacity-100"
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photo.url}
+                  <AuthenticatedImage
+                    src={
+                      photo.id !== "fallback"
+                        ? endpoints.cars.photoFile(carId, photo.id)
+                        : photo.url
+                    }
                     alt="Thumbnail"
                     className="h-full w-full object-cover"
                   />
@@ -655,15 +663,22 @@ export function StaffCarDetail({ carId }: { carId: string }) {
             {/* Modal Body */}
             <div className="flex-1 overflow-hidden bg-inset p-3 flex items-center justify-center min-h-[60vh]">
               {docPreview.mimeType === "application/pdf" ? (
-                <iframe
-                  src={docPreview.url}
+                <AuthenticatedIframe
+                  src={
+                    docPreview.id
+                      ? endpoints.cars.documentFile(carId, docPreview.id)
+                      : docPreview.url
+                  }
                   title="PDF Document Preview"
                   className="w-full h-[75vh] min-h-[480px] rounded-lg border border-line bg-card"
                 />
               ) : (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
-                  src={docPreview.url}
+                <AuthenticatedImage
+                  src={
+                    docPreview.id
+                      ? endpoints.cars.documentFile(carId, docPreview.id)
+                      : docPreview.url
+                  }
                   alt="Document Preview"
                   className="max-h-[75vh] w-auto max-w-full rounded-lg object-contain"
                 />

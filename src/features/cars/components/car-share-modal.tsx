@@ -17,6 +17,8 @@ import { carPhotosApi, type CarPhoto } from "../api/car-photos-api";
 import { formatIndianNumber } from "@/src/lib/formatters";
 import { canShareFiles, shareOrSaveFile } from "@/src/lib/file-actions";
 import { apiClient } from "@/src/lib/api-client";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
+import { endpoints } from "@/src/lib/endpoints";
 
 interface CarShareModalProps {
   isOpen: boolean;
@@ -349,9 +351,12 @@ export function CarShareModal({
                           : "border-line opacity-60 hover:opacity-100"
                       }`}
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={photo.url}
+                      <AuthenticatedImage
+                        src={
+                          photo.id !== "primary" && photo.id !== "fallback"
+                            ? endpoints.cars.photoFile(car.id, photo.id)
+                            : photo.url
+                        }
                         alt="Vehicle thumbnail"
                         className="h-full w-full object-cover"
                       />

@@ -23,6 +23,8 @@ import {
 import { useCar } from "../hooks/use-car";
 import { carPhotosApi, type CarPhoto } from "../api/car-photos-api";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
+import { endpoints } from "@/src/lib/endpoints";
 
 interface CarPhotoGalleryProps {
   carId: string;
@@ -145,9 +147,8 @@ export function CarPhotoGallery({
                 onClick={() => setSelectedPhoto(photo)}
                 className="aspect-4/3 w-full overflow-hidden bg-inset cursor-pointer"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo.url}
+                <AuthenticatedImage
+                  src={endpoints.cars.photoFile(carId, photo.id)}
                   alt="Car photo"
                   className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
@@ -297,9 +298,8 @@ export function CarPhotoGallery({
             </div>
 
             <div className="flex items-center justify-center bg-inset p-4 min-h-[300px]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={selectedPhoto.url}
+              <AuthenticatedImage
+                src={endpoints.cars.photoFile(carId, selectedPhoto.id)}
                 alt="Enlarged car photo"
                 className="max-h-[75vh] w-auto max-w-full rounded-xl object-contain shadow-md"
               />
