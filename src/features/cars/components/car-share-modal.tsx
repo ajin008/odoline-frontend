@@ -207,20 +207,47 @@ export function CarShareModal({
 
         if (!blob || blob.size === 0) continue;
 
-        const ext = blob.type.includes("png")
-          ? ".png"
-          : blob.type.includes("webp")
-          ? ".webp"
-          : ".jpg";
         const vehiclePrefix = car.reg_number
           ? car.reg_number.trim().replace(/[^a-zA-Z0-9]/g, "-")
           : `${car.make}_${car.model}`.replace(/\s+/g, "_");
-        const fileName = `${vehiclePrefix}-photo-${i + 1}${ext}`;
+        const safeFilename = `${vehiclePrefix}-photo-${i + 1}`;
+        const jpegFile = await blobToJpegFile(blob, safeFilename);
 
+        let canShareFiles = false;
+        if (
+          typeof navigator !== "undefined" &&
+          typeof navigator.canShare === "function" &&
+          typeof navigator.share === "function"
+        ) {
+          try {
+            canShareFiles = navigator.canShare({ files: [jpegFile] });
+          } catch {
+            canShareFiles = false;
+          }
+        }
+
+        if (canShareFiles) {
+          try {
+            await navigator.share({
+              title: `${car.make} ${car.model} Photo ${i + 1}`,
+              files: [jpegFile],
+            });
+            downloadedCount++;
+            continue;
+          } catch (err: unknown) {
+            if ((err as { name?: string })?.name === "AbortError") {
+              // User cancelled native share sheet -> NOT an error
+              return;
+            }
+            // Fall back to desktop download link if native share fails
+          }
+        }
+
+        // Desktop path (<a download>):
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = fileName;
+        link.download = jpegFile.name;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

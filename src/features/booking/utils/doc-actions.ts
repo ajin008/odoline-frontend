@@ -47,8 +47,12 @@ function sanitizePdfFilename(filename: string, fallback: string = "document.pdf"
 }
 
 /**
- * Downloads a PDF file to disk and displays a toast with a "View" action
- * that opens the PDF in a new tab.
+ * Downloads a PDF document.
+ * Platform-aware:
+ * - On Mobile / Tablet (if native file sharing capability `canShare({ files })` is supported),
+ *   opens native share/save sheet ("Save to Files" / "Save to Photos").
+ * - On Desktop (or if file sharing unsupported), triggers direct `<a download>` link click
+ *   and shows a toast with a "View" action that opens the PDF in a new tab.
  */
 export async function downloadPdfDocument({
   fetchBlob,
@@ -62,6 +66,40 @@ export async function downloadPdfDocument({
     }
 
     const cleanFilename = sanitizePdfFilename(filename, `${docTitle}.pdf`);
+    const file = new File([blob], cleanFilename, { type: "application/pdf" });
+
+    // Mobile / Tablet capability detection
+    let canShareFiles = false;
+    if (
+      typeof navigator !== "undefined" &&
+      typeof navigator.canShare === "function" &&
+      typeof navigator.share === "function"
+    ) {
+      try {
+        canShareFiles = navigator.canShare({ files: [file] });
+      } catch {
+        canShareFiles = false;
+      }
+    }
+
+    if (canShareFiles) {
+      try {
+        await navigator.share({
+          title: docTitle,
+          files: [file],
+        });
+        toast.success(`${docTitle} ready / saved`);
+        return;
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === "AbortError") {
+          // User cancelled native share sheet -> NOT an error
+          return;
+        }
+        // Fall through to desktop download if native share fails
+      }
+    }
+
+    // Desktop path (<a download>)
     const url = URL.createObjectURL(blob);
 
     // 1. Trigger file download to disk

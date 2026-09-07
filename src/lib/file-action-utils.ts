@@ -76,10 +76,15 @@ export function inferMimeAndExtension(
 
 /**
  * Downloads a file with a specified descriptive filename.
+ * Platform-aware:
+ * - On Mobile / Tablet (if native file sharing capability `canShare({ files })` is supported),
+ *   opens the native share/save sheet ("Save to Files" / "Save to Photos").
+ * - On Desktop (or if file sharing unsupported), triggers direct `<a download>` link click.
  */
 export async function downloadFile({
   url,
   filename,
+  title,
   mimeType: providedMime,
 }: FileActionOptions): Promise<void> {
   const toastId = toast.loading("Downloading file...");
@@ -94,13 +99,49 @@ export async function downloadFile({
       throw new Error("Empty file");
     }
 
-    const { cleanFilename } = inferMimeAndExtension(
+    const { mimeType: resolvedMime, cleanFilename } = inferMimeAndExtension(
       url,
       filename,
       providedMime,
       blob.type
     );
 
+    const file = new File([blob], cleanFilename, { type: resolvedMime });
+    const shareTitle = title || cleanFilename;
+
+    // Mobile / Tablet capability detection: check if native file sharing is supported
+    let canShareFiles = false;
+    if (
+      typeof navigator !== "undefined" &&
+      typeof navigator.canShare === "function" &&
+      typeof navigator.share === "function"
+    ) {
+      try {
+        canShareFiles = navigator.canShare({ files: [file] });
+      } catch {
+        canShareFiles = false;
+      }
+    }
+
+    if (canShareFiles) {
+      toast.dismiss(toastId);
+      try {
+        await navigator.share({
+          title: shareTitle,
+          files: [file],
+        });
+        toast.success("File ready / saved");
+        return;
+      } catch (err: unknown) {
+        if ((err as { name?: string })?.name === "AbortError") {
+          // User cancelled native share sheet -> NOT an error
+          return;
+        }
+        // Fall back to desktop download path if native share throws an unexpected error
+      }
+    }
+
+    // Desktop path (or fallback if native file share is unsupported):
     const blobUrl = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
