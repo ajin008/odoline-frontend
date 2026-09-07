@@ -34,10 +34,15 @@ export const documentsApi = {
     return res.data.data;
   },
 
-  /** Get a 15-minute presigned URL for viewing the image */
-  async getPresignedUrl(carId: string, documentId: string): Promise<string> {
+  /** Get a presigned URL for viewing (inline) or downloading (attachment) */
+  async getPresignedUrl(
+    carId: string,
+    documentId: string,
+    disposition: "inline" | "attachment" = "inline"
+  ): Promise<string> {
     const res = await apiClient.get(
-      `${endpoints.cars.documents(carId)}/${documentId}/download`
+      `${endpoints.cars.documents(carId)}/${documentId}/download`,
+      { params: { disposition } }
     );
     return res.data.data.url;
   },
