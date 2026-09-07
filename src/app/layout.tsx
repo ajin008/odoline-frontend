@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import { Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { satoshi, cabinetGrotesk } from "./fonts";
@@ -23,6 +24,10 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${satoshi.variable} ${cabinetGrotesk.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+        <script dangerouslySetInnerHTML={{ __html: "eruda.init();" }} />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <RegisterServiceWorker />
         <Providers>
