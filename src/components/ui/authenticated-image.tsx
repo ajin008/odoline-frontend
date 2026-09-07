@@ -31,7 +31,7 @@ function toBackendStreamUrl(rawUrl: string): string {
   if (refurbMatch && refurbMatch[1]) {
     return `/refurbishment/items/${refurbMatch[1]}/file`;
   }
-  return rawUrl;
+  return rawUrl.replace(/^\/?api\/v1\//, "/");
 }
 
 /**
@@ -71,9 +71,14 @@ export function useAuthenticatedObjectUrl(src?: string | null) {
 
       try {
         // Backend-relative paths (e.g. /cars/:id/photos/:photoId/file) go straight
-        // through; a raw S3/CDN url is rewritten to the backend stream endpoint
-        // when we recognize the resource path (see toBackendStreamUrl above).
-        const fetchUrl = src!.startsWith("/") ? src! : toBackendStreamUrl(src!);
+        // through; a raw S3/CDN url or url with /api/v1 prefix is normalized to a
+        // base-relative stream endpoint (see toBackendStreamUrl above).
+        let fetchUrl = toBackendStreamUrl(src!);
+        if (fetchUrl.startsWith("/api/v1/")) {
+          fetchUrl = fetchUrl.slice(7);
+        } else if (fetchUrl.startsWith("api/v1/")) {
+          fetchUrl = "/" + fetchUrl.slice(7);
+        }
 
         const res = await apiClient.get(fetchUrl, { responseType: "blob" });
         if (!isMounted) return;
