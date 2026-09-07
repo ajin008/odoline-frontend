@@ -30,9 +30,12 @@ export interface FileActionSource {
 
 class FileFetchError extends Error {
   status?: number;
-  constructor(message: string, status?: number) {
+  /** True when `fetch()` itself threw (network down, or CORS blocked the request) — as opposed to the server replying with a non-2xx status. */
+  isNetworkError?: boolean;
+  constructor(message: string, status?: number, isNetworkError?: boolean) {
     super(message);
     this.status = status;
+    this.isNetworkError = isNetworkError;
   }
 }
 
@@ -103,11 +106,12 @@ function resolveMimeAndExtension(
 }
 
 function buildCleanFileName(rawName: string, ext: string): string {
-  let base = sanitizeNamePart(rawName, "document");
-  if (!base.toLowerCase().endsWith(ext.toLowerCase())) {
-    base = base.replace(/\.[a-zA-Z0-9]+$/, "") + ext;
-  }
-  return base;
+  // Strip any existing extension BEFORE sanitizing, so a "_blob"/"-blob" suffix
+  // that lands right before the extension (e.g. "KLBD2323_blob.jpg") is at the
+  // END of the string when the blob-strip regex runs, not buried in the middle.
+  const withoutExt = (rawName || "").replace(/\.[a-zA-Z0-9]+$/, "");
+  const base = sanitizeNamePart(withoutExt, "document");
+  return `${base}${ext}`;
 }
 
 /** Exposed for callers that build a booking document filename before calling downloadFile/shareFile. */
@@ -169,7 +173,16 @@ async function fetchSourceBlob(source: Pick<FileActionSource, "url" | "fetchBlob
     try {
       response = await fetch(source.url);
     } catch {
-      throw new FileFetchError("Network error — check your connection and retry.");
+      // `fetch()` throwing here (rather than resolving with a non-ok status) means
+      // either the network is genuinely down, or — very common for direct S3/CDN
+      // URLs — the response lacks CORS headers. An `<img>`/iframe can still load
+      // the same URL fine; only the JS-level `fetch()` needed for File/Blob
+      // construction is blocked. Callers fall back to opening the raw URL directly.
+      throw new FileFetchError(
+        "Couldn't fetch the file directly (network or CORS issue).",
+        undefined,
+        true
+      );
     }
     if (!response.ok) {
       throw new FileFetchError(httpStatusMessage(response.status), response.status);
@@ -204,6 +217,25 @@ export function canShareFiles(files: File[]): boolean {
   }
 }
 
+/**
+ * True on phones/tablets (touch-primary devices), false on desktop — even a
+ * desktop browser that happens to support `navigator.canShare({files})` (recent
+ * Chrome on Windows/macOS does). Used ONLY to decide whether the *Download*
+ * button should route through the native share/save sheet: on iOS/Android Safari
+ * & Chrome, `<a download>` on a blob: URL is silently ignored, so the share sheet
+ * is the only reliable way to save a file — but on desktop, "Download" must mean
+ * "save to disk", not "open the OS share panel".
+ */
+function isMobileOrTabletDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  if (/Android|iPhone|iPad|iPod/i.test(ua)) return true;
+  // iPadOS 13+ reports as "Macintosh" but exposes touch points; real desktop Macs don't.
+  const hasCoarsePointer =
+    typeof window !== "undefined" && !!window.matchMedia?.("(pointer: coarse)").matches;
+  return hasCoarsePointer && navigator.maxTouchPoints > 1;
+}
+
 function triggerAnchorDownload(blob: Blob, fileName: string): string {
   const blobUrl = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -216,10 +248,12 @@ function triggerAnchorDownload(blob: Blob, fileName: string): string {
 }
 
 /**
- * Lowest-level primitive: given an already-prepared File, either hands it to the
- * native share sheet (mobile) or triggers a direct `<a download>` (desktop).
- * Used directly by multi-file flows (e.g. sharing several car photos) that need
- * their own per-file business logic but must not re-implement platform detection.
+ * Lowest-level primitive for a per-file DOWNLOAD action (e.g. "Download Image
+ * Only" on a batch of car photos): on mobile/tablet, where `<a download>` on a
+ * blob: URL is unreliable, it hands the file to the native save/share sheet;
+ * on desktop it always saves directly via `<a download>`. Used by flows that
+ * need their own per-file business logic (e.g. JPEG conversion) but must not
+ * re-implement platform detection.
  */
 export async function shareOrSaveFile(
   file: File,
@@ -227,7 +261,7 @@ export async function shareOrSaveFile(
 ): Promise<"shared" | "downloaded" | "cancelled"> {
   const shareTitle = sanitizeDisplayText(title, file.name);
 
-  if (canShareFiles([file])) {
+  if (isMobileOrTabletDevice() && canShareFiles([file])) {
     try {
       await navigator.share({ title: shareTitle, files: [file] });
       return "shared";
@@ -247,13 +281,18 @@ export async function shareOrSaveFile(
 
 /**
  * Downloads a file. Platform-aware:
- * - Desktop (no native file-share support): direct `<a download>` of the blob.
- * - Mobile (native file-share supported): opens the native save/share sheet.
+ * - Desktop: ALWAYS a direct `<a download>` of the blob — never routed through
+ *   the OS share panel, even on browsers that technically support
+ *   `navigator.canShare({files})` (recent desktop Chrome does).
+ * - Mobile/tablet: `<a download>` on a blob: URL is silently ignored by Safari
+ *   (and unreliable on Android Chrome too), so the native save/share sheet is
+ *   used instead — it's the only reliable way to get a "Save" prompt there.
  *   If the user cancels, this is silent (not an error). If the sheet rejects for
- *   a real reason, we do NOT silently fall back to `<a download>` — Safari mostly
- *   ignores that attribute for blob: URLs, which is how mobile downloads used to
- *   fail silently. Instead we open the file in a new tab as a last resort so the
- *   user has something they can actually save, and surface a clear message.
+ *   a real reason, we open the file in a new tab as a last resort so the user
+ *   has something they can actually save, and surface a clear message.
+ * - If the file couldn't be fetched at all because of a network/CORS failure on
+ *   a direct URL, we still open that URL in a new tab so the user can save it
+ *   via the browser's own "save page/image" instead of dead-ending on an error.
  */
 export async function downloadFile({
   url,
@@ -270,7 +309,7 @@ export async function downloadFile({
     const shareTitle = sanitizeDisplayText(title, cleanFileName);
     const file = new File([blob], cleanFileName, { type: resolvedMime });
 
-    if (canShareFiles([file])) {
+    if (isMobileOrTabletDevice() && canShareFiles([file])) {
       toast.dismiss(toastId);
       try {
         await navigator.share({ title: shareTitle, files: [file] });
@@ -289,11 +328,22 @@ export async function downloadFile({
       }
     }
 
-    // Desktop path
+    // Desktop path (and mobile browsers that don't support file share at all)
     const blobUrl = triggerAnchorDownload(blob, cleanFileName);
     setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
     toast.success("Downloaded", { id: toastId });
   } catch (err: unknown) {
+    if (err instanceof FileFetchError && err.isNetworkError && url) {
+      // Couldn't fetch the raw URL as a blob (commonly missing CORS headers on a
+      // direct S3/CDN link). Fall back to just opening it — the browser's own
+      // "save image"/"save page" still works even though our JS fetch couldn't
+      // read the bytes.
+      window.open(url, "_blank");
+      toast.error("Couldn't download directly — opened the file in a new tab, save it from there.", {
+        id: toastId,
+      });
+      return;
+    }
     const message = err instanceof FileFetchError ? err.message : "Download failed, please retry.";
     // eslint-disable-next-line no-console
     console.error("Failed to download file:", err);
@@ -354,6 +404,16 @@ export async function shareFile({
     toast.success("Downloaded file & opened WhatsApp share");
     setTimeout(() => URL.revokeObjectURL(blobUrl), 120000);
   } catch (err: unknown) {
+    if (err instanceof FileFetchError && err.isNetworkError && url) {
+      // Same CORS/network fallback as downloadFile: we can't build a File
+      // without the bytes, so at least open the raw URL for the user to save
+      // manually instead of dead-ending on a generic error.
+      window.open(url, "_blank");
+      toast.error("Couldn't prepare the file for sharing — opened it in a new tab, save it from there.", {
+        id: toastId,
+      });
+      return;
+    }
     const message = err instanceof FileFetchError ? err.message : "Share failed, please retry.";
     // eslint-disable-next-line no-console
     console.error("Failed to share file:", err);
