@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import type { Car } from "../api/cars-api";
 import { carPhotosApi, type CarPhoto } from "../api/car-photos-api";
 import { formatIndianNumber } from "@/src/lib/formatters";
+import { canShareFiles, shareOrSaveFile } from "@/src/lib/file-actions";
 
 interface CarShareModalProps {
   isOpen: boolean;
@@ -213,45 +214,14 @@ export function CarShareModal({
         const safeFilename = `${vehiclePrefix}-photo-${i + 1}`;
         const jpegFile = await blobToJpegFile(blob, safeFilename);
 
-        let canShareFiles = false;
-        if (
-          typeof navigator !== "undefined" &&
-          typeof navigator.canShare === "function" &&
-          typeof navigator.share === "function"
-        ) {
-          try {
-            canShareFiles = navigator.canShare({ files: [jpegFile] });
-          } catch {
-            canShareFiles = false;
-          }
+        const result = await shareOrSaveFile(
+          jpegFile,
+          `${car.make} ${car.model} Photo ${i + 1}`
+        );
+        if (result === "cancelled") {
+          // User cancelled native share sheet -> NOT an error, stop the batch
+          return;
         }
-
-        if (canShareFiles) {
-          try {
-            await navigator.share({
-              title: `${car.make} ${car.model} Photo ${i + 1}`,
-              files: [jpegFile],
-            });
-            downloadedCount++;
-            continue;
-          } catch (err: unknown) {
-            if ((err as { name?: string })?.name === "AbortError") {
-              // User cancelled native share sheet -> NOT an error
-              return;
-            }
-            // Fall back to desktop download link if native share fails
-          }
-        }
-
-        // Desktop path (<a download>):
-        const blobUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = blobUrl;
-        link.download = jpegFile.name;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
         downloadedCount++;
       } catch {
         // Skip failed download
@@ -292,12 +262,7 @@ export function CarShareModal({
         files: files,
       };
 
-      if (
-        typeof navigator !== "undefined" &&
-        navigator.canShare &&
-        navigator.canShare({ files }) &&
-        navigator.share
-      ) {
+      if (canShareFiles(files)) {
         await navigator.share(shareData);
         toast.success("Shared image & specs!");
         onClose();
