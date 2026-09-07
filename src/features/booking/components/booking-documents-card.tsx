@@ -10,7 +10,6 @@ import {
   Eye,
   Loader2,
   Check,
-  X,
   Share2,
   Plus,
   Download,
@@ -23,7 +22,8 @@ import {
 import type { BookingDocumentFile } from "../types/booking-types";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 import { downloadFile, shareFile } from "@/src/lib/file-actions";
-import { AuthenticatedImage, AuthenticatedIframe } from "@/src/components/ui/authenticated-image";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
+import { DocumentPreviewModal } from "@/src/components/ui/document-preview-modal";
 
 interface BookingDocumentsCardProps {
   bookingId: string;
@@ -94,7 +94,6 @@ export function BookingDocumentsCard({
 
   const [previewItem, setPreviewItem] = useState<{
     id: string;
-    url: string;
     streamUrl: string;
     mimeType: string;
     name?: string;
@@ -190,7 +189,6 @@ export function BookingDocumentsCard({
     );
     setPreviewItem({
       id: doc.id,
-      url: doc.presigned_url || backendStreamUrl,
       streamUrl: backendStreamUrl,
       mimeType: doc.mime_type || "image/jpeg",
       name: cleanName,
@@ -392,11 +390,21 @@ export function BookingDocumentsCard({
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={() => handleDownloadDoc(files[0])}
+                      onClick={() => handleViewPreview(files[0])}
                       className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:text-emerald-900 transition-colors cursor-pointer"
                     >
                       <Eye className="h-3.5 w-3.5 stroke-[2.5px]" />
                       View PDF
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadDoc(files[0])}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-ink-muted hover:text-ink transition-colors cursor-pointer px-1.5 py-0.5 rounded-md hover:bg-inset"
+                      title="Download document"
+                    >
+                      <Download className="h-3.5 w-3.5 stroke-[2.5px]" />
+                      <span>Download</span>
                     </button>
 
                     <button
@@ -493,105 +501,16 @@ export function BookingDocumentsCard({
         variant="danger"
       />
 
-      {/* Document / Image Preview Lightbox Modal with Download & Share */}
-      {previewItem && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-6 select-none font-sans"
-          onClick={() => setPreviewItem(null)}
-        >
-          <div
-            className="relative flex flex-col max-h-[92vh] max-w-5xl w-full rounded-2xl bg-card shadow-2xl overflow-hidden border border-line"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-line px-5 py-3.5 bg-card z-10">
-              <div className="flex items-center gap-2 min-w-0">
-                <h3 className="text-sm font-bold tracking-tight text-ink font-sans truncate">
-                  {previewItem.name || title}
-                </h3>
-                {previewItem.mimeType === "application/pdf" && (
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded-md shrink-0">
-                    PDF Document
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                {(() => {
-                  const rawDocName = previewItem.name || title || `${docType}-document`;
-                  const ext = previewItem.mimeType === "application/pdf" ? ".pdf" : ".jpg";
-                  const cleanFileName = rawDocName.endsWith(ext) ? rawDocName : `${rawDocName}${ext}`;
-
-                  return (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          downloadFile({
-                            url: previewItem.streamUrl || `/bookings/${bookingId}/documents/${previewItem.id}/file`,
-                            fileName: cleanFileName,
-                            title: title,
-                            mimeType: previewItem.mimeType,
-                          })
-                        }
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1.5 rounded-lg bg-inset hover:bg-line/40 border border-line cursor-pointer"
-                        title="Download File"
-                      >
-                        <Download className="h-3.5 w-3.5 stroke-[2px]" />
-                        <span className="hidden sm:inline">Download</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          shareFile({
-                            url: previewItem.streamUrl || `/bookings/${bookingId}/documents/${previewItem.id}/file`,
-                            fileName: cleanFileName,
-                            title: `${title} - Booking Document`,
-                            text: title,
-                            mimeType: previewItem.mimeType,
-                          })
-                        }
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-2.5 py-1.5 rounded-lg cursor-pointer"
-                        title="Share File"
-                      >
-                        <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
-                        <span className="hidden sm:inline">Share</span>
-                      </button>
-                    </>
-                  );
-                })()}
-
-                <button
-                  type="button"
-                  onClick={() => setPreviewItem(null)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
-                  title="Close preview"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body */}
-            <div className="flex-1 overflow-hidden bg-inset p-3 flex items-center justify-center min-h-[60vh]">
-              {previewItem.mimeType === "application/pdf" ? (
-                <AuthenticatedIframe
-                  src={previewItem.url}
-                  title={previewItem.name || title}
-                  className="w-full h-[75vh] min-h-[480px] rounded-xl border border-line bg-card shadow-xs"
-                />
-              ) : (
-                <AuthenticatedImage
-                  src={previewItem.url}
-                  alt={previewItem.name || title}
-                  className="max-h-[75vh] w-auto max-w-full rounded-xl shadow-sm object-contain"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Document / Image Preview Modal with Download & Share */}
+      <DocumentPreviewModal
+        isOpen={Boolean(previewItem)}
+        onClose={() => setPreviewItem(null)}
+        title={previewItem?.name || title}
+        fileName={previewItem?.name || `${docType}-document`}
+        mimeType={previewItem?.mimeType || "image/jpeg"}
+        src={previewItem?.streamUrl}
+        shareText={title}
+      />
     </>
   );
 }

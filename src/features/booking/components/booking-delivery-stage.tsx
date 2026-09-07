@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { bookingApi } from "../api/booking-api";
 import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
+import { DocumentPreviewModal } from "@/src/components/ui/document-preview-modal";
 import {
   Truck,
   CheckCircle2,
@@ -44,8 +43,8 @@ export function BookingDeliveryStage({
   basePath = "/staff/booking",
 }: BookingDeliveryStageProps) {
   const { data: booking, isLoading, isError } = useBooking(bookingId);
-  const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -103,32 +102,9 @@ export function BookingDeliveryStage({
   }
 
   // PDF Handlers
-  const handleViewDeliveryPdf = async () => {
+  const handleViewDeliveryPdf = () => {
     if (!booking) return;
-    setIsPdfLoading(true);
-    try {
-      const blob = await bookingApi.getDeliveryPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-    } catch (err: unknown) {
-      let message = "Failed to load delivery note PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
-    } finally {
-      setIsPdfLoading(false);
-    }
+    setIsPreviewOpen(true);
   };
 
   const handleDownloadDeliveryPdf = async () => {
@@ -226,12 +202,11 @@ export function BookingDeliveryStage({
           <button
             type="button"
             onClick={handleViewDeliveryPdf}
-            disabled={isPdfLoading}
             className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50"
             title="View or Print Delivery Note PDF"
           >
             <Printer className="h-3.5 w-3.5" />
-            <span>{isPdfLoading ? "Opening..." : "View / Print"}</span>
+            <span>View / Print</span>
           </button>
         </div>
       </div>
@@ -323,6 +298,21 @@ export function BookingDeliveryStage({
           </div>
         )}
       </div>
+
+      {/* Document Preview Modal (View / Print) */}
+      <DocumentPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        title={`Delivery Note — ${booking.booking_number}`}
+        fileName={buildDocFilename(
+          "Delivery-Note",
+          booking.booking_number,
+          booking.customer?.name
+        )}
+        mimeType="application/pdf"
+        fetchBlob={() => bookingApi.getDeliveryPdf(booking.id)}
+        shareText={`Cars4 Delivery Note — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+      />
     </div>
   );
 }

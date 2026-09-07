@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { isAxiosError } from "axios";
 import { useBooking } from "../hooks/use-booking";
 import { useMe } from "@/src/features/auth/hooks/use-me";
 import { bookingApi } from "../api/booking-api";
-import { toast } from "sonner";
 import { isBookingEditable } from "../utils/booking-status-map";
 import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
+import { DocumentPreviewModal } from "@/src/components/ui/document-preview-modal";
 import { EditAgreementModal } from "./edit-agreement-modal";
 import Link from "next/link";
 import {
@@ -71,8 +70,8 @@ export function BookingAgreementStage({
   const { data: user } = useMe();
   const { data: booking, isLoading, isError } = useBooking(bookingId);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const editable = isBookingEditable(booking?.status);
   const canEdit = Boolean(
@@ -80,33 +79,7 @@ export function BookingAgreementStage({
   );
   const showProceedBar = Boolean(booking && editable && !readOnly);
 
-  const handleViewAgreement = async () => {
-    if (!booking) return;
-    setIsPdfLoading(true);
-    try {
-      const blob = await bookingApi.getAgreementPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-    } catch (err: unknown) {
-      let message = "Failed to load agreement PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore JSON parse failure on Blob
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
-    } finally {
-      setIsPdfLoading(false);
-    }
-  };
+  const handleViewAgreement = () => setIsPreviewOpen(true);
 
   const handleDownloadAgreement = async () => {
     if (!booking) return;
@@ -216,12 +189,11 @@ export function BookingAgreementStage({
           <button
             type="button"
             onClick={handleViewAgreement}
-            disabled={isPdfLoading}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50 min-h-[44px] sm:min-h-0"
             title="View or Print Advance Agreement PDF"
           >
             <Printer className="h-3.5 w-3.5" />
-            <span>{isPdfLoading ? "Opening..." : "View / Print"}</span>
+            <span>View / Print</span>
           </button>
 
           <button
@@ -537,6 +509,23 @@ export function BookingAgreementStage({
           booking={booking}
           isOpen={isEditOpen}
           onClose={() => setIsEditOpen(false)}
+        />
+      )}
+
+      {/* Document Preview Modal (View / Print) */}
+      {booking && (
+        <DocumentPreviewModal
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          title={`Advance Agreement — ${booking.booking_number}`}
+          fileName={buildDocFilename(
+            "Advance-Agreement-Receipt",
+            booking.booking_number,
+            booking.customer?.name
+          )}
+          mimeType="application/pdf"
+          fetchBlob={() => bookingApi.getAgreementPdf(booking.id)}
+          shareText={`Cars4 Booking Agreement — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
         />
       )}
     </div>

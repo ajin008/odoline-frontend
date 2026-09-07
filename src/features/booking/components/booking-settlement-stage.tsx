@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { bookingApi } from "../api/booking-api";
 import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
+import { DocumentPreviewModal } from "@/src/components/ui/document-preview-modal";
 import { SettleDeliverForm } from "./settle-deliver-form";
 import { BookingDocumentsCard } from "./booking-documents-card";
 import {
@@ -75,11 +74,11 @@ export function BookingSettlementStage({
   basePath = "/staff/booking",
 }: BookingSettlementStageProps) {
   const { data: booking, isLoading, isError } = useBooking(bookingId);
-  const [isSettlementLoading, setIsSettlementLoading] = useState(false);
   const [isSettlementDownloading, setIsSettlementDownloading] = useState(false);
+  const [isSettlementPreviewOpen, setIsSettlementPreviewOpen] = useState(false);
 
-  const [isDeliveryLoading, setIsDeliveryLoading] = useState(false);
   const [isDeliveryDownloading, setIsDeliveryDownloading] = useState(false);
+  const [isDeliveryPreviewOpen, setIsDeliveryPreviewOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -126,32 +125,9 @@ export function BookingSettlementStage({
   }
 
   // --- SETTLEMENT FORM PDF HANDLERS ---
-  const handleViewSettlementPdf = async () => {
+  const handleViewSettlementPdf = () => {
     if (!booking) return;
-    setIsSettlementLoading(true);
-    try {
-      const blob = await bookingApi.getSettlementPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-    } catch (err: unknown) {
-      let message = "Failed to load settlement PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
-    } finally {
-      setIsSettlementLoading(false);
-    }
+    setIsSettlementPreviewOpen(true);
   };
 
   const handleDownloadSettlementPdf = async () => {
@@ -198,32 +174,9 @@ export function BookingSettlementStage({
   };
 
   // --- DELIVERY NOTE PDF HANDLERS ---
-  const handleViewDeliveryPdf = async () => {
+  const handleViewDeliveryPdf = () => {
     if (!booking) return;
-    setIsDeliveryLoading(true);
-    try {
-      const blob = await bookingApi.getDeliveryPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-    } catch (err: unknown) {
-      let message = "Failed to load delivery note PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
-    } finally {
-      setIsDeliveryLoading(false);
-    }
+    setIsDeliveryPreviewOpen(true);
   };
 
   const handleDownloadDeliveryPdf = async () => {
@@ -337,12 +290,11 @@ export function BookingSettlementStage({
             <button
               type="button"
               onClick={handleViewSettlementPdf}
-              disabled={isSettlementLoading}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50 min-h-[44px] sm:min-h-0"
               title="View or Print Settlement Form PDF"
             >
               <Printer className="h-3.5 w-3.5" />
-              <span>{isSettlementLoading ? "Opening..." : "View / Print"}</span>
+              <span>View / Print</span>
             </button>
 
             <button
@@ -478,12 +430,11 @@ export function BookingSettlementStage({
             <button
               type="button"
               onClick={handleViewDeliveryPdf}
-              disabled={isDeliveryLoading}
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50 min-h-[44px] sm:min-h-0"
               title="View or Print Delivery Note PDF"
             >
               <Printer className="h-3.5 w-3.5" />
-              <span>{isDeliveryLoading ? "Opening..." : "View / Print"}</span>
+              <span>View / Print</span>
             </button>
 
             <button
@@ -660,6 +611,34 @@ export function BookingSettlementStage({
           </div>
         ) : null}
       </div>
+
+      {/* Document Preview Modals (View / Print) */}
+      <DocumentPreviewModal
+        isOpen={isSettlementPreviewOpen}
+        onClose={() => setIsSettlementPreviewOpen(false)}
+        title={`Settlement Statement — ${booking.booking_number}`}
+        fileName={buildDocFilename(
+          "Settlement-Statement",
+          booking.booking_number,
+          booking.customer?.name
+        )}
+        mimeType="application/pdf"
+        fetchBlob={() => bookingApi.getSettlementPdf(booking.id)}
+        shareText={`Cars4 Settlement Statement — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+      />
+      <DocumentPreviewModal
+        isOpen={isDeliveryPreviewOpen}
+        onClose={() => setIsDeliveryPreviewOpen(false)}
+        title={`Delivery Note — ${booking.booking_number}`}
+        fileName={buildDocFilename(
+          "Delivery-Note",
+          booking.booking_number,
+          booking.customer?.name
+        )}
+        mimeType="application/pdf"
+        fetchBlob={() => bookingApi.getDeliveryPdf(booking.id)}
+        shareText={`Cars4 Delivery Note — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+      />
     </div>
   );
 }

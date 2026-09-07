@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { isAxiosError } from "axios";
-import { toast } from "sonner";
 import { useBooking } from "../hooks/use-booking";
 import { useBookingOrder, useDeleteOrder } from "../hooks/use-booking-order";
 import { bookingApi } from "../api/booking-api";
 import { isBookingEditable } from "../utils/booking-status-map";
 import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
+import { DocumentPreviewModal } from "@/src/components/ui/document-preview-modal";
 import { OrderFormEditor } from "./order-form-editor";
 import type { BookingStatus } from "../types/booking-types";
 import Link from "next/link";
@@ -51,8 +50,8 @@ export function BookingOrderSection({
   const deleteOrderMutation = useDeleteOrder();
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
-  const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const editable = isBookingEditable(bookingStatus);
   const canEdit = !readOnly && editable;
@@ -65,32 +64,9 @@ export function BookingOrderSection({
     });
   };
 
-  const handleViewOrderPdf = async () => {
+  const handleViewOrderPdf = () => {
     if (!order || !booking) return;
-    setIsPdfLoading(true);
-    try {
-      const blob = await bookingApi.getOrderPdf(booking.id);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-    } catch (err: unknown) {
-      let message = "Failed to load order PDF";
-      if (isAxiosError(err)) {
-        if (err.response?.data instanceof Blob) {
-          try {
-            const text = await err.response.data.text();
-            const json = JSON.parse(text);
-            if (json.message) message = json.message;
-          } catch {
-            // ignore parse error
-          }
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
-        }
-      }
-      toast.error(message);
-    } finally {
-      setIsPdfLoading(false);
-    }
+    setIsPreviewOpen(true);
   };
 
   const handleDownloadOrderPdf = async () => {
@@ -198,14 +174,11 @@ export function BookingOrderSection({
               <button
                 type="button"
                 onClick={handleViewOrderPdf}
-                disabled={isPdfLoading}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 sm:py-1.5 rounded-xl bg-accent text-inverse text-xs font-bold transition-opacity hover:opacity-95 cursor-pointer shadow-xs disabled:opacity-50 min-h-[44px] sm:min-h-0"
                 title="View or Print Order Form PDF"
               >
                 <Printer className="h-3.5 w-3.5" />
-                <span>
-                  {isPdfLoading ? "Opening..." : "View / Print"}
-                </span>
+                <span>View / Print</span>
               </button>
 
               <button
@@ -405,6 +378,23 @@ export function BookingOrderSection({
         bookingId={bookingId}
         existingOrder={order || null}
       />
+
+      {/* Document Preview Modal (View / Print) */}
+      {order && booking && (
+        <DocumentPreviewModal
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          title={`Order Form — ${booking.booking_number}`}
+          fileName={buildDocFilename(
+            "Order-Form",
+            booking.booking_number,
+            booking.customer?.name
+          )}
+          mimeType="application/pdf"
+          fetchBlob={() => bookingApi.getOrderPdf(booking.id)}
+          shareText={`Cars4 Order Form — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+        />
+      )}
     </div>
   );
 }

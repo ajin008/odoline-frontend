@@ -12,7 +12,6 @@ import {
 } from "@/src/features/booking/utils/doc-actions";
 import { formatIndianNumber } from "@/src/lib/formatters";
 import { Badge } from "@/src/components/ui/badge";
-import { toast } from "sonner";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -38,8 +37,9 @@ import {
   X,
   Share2,
 } from "lucide-react";
-import { downloadFile, shareFile, isMobileOrTabletDevice } from "@/src/lib/file-actions";
-import { AuthenticatedImage, AuthenticatedIframe } from "@/src/components/ui/authenticated-image";
+import { downloadFile, shareFile } from "@/src/lib/file-actions";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
+import { DocumentPreviewModal } from "@/src/components/ui/document-preview-modal";
 import { endpoints } from "@/src/lib/endpoints";
 import { carPhotosApi } from "@/src/features/cars/api/car-photos-api";
 
@@ -98,11 +98,12 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
   const [isAuditHistoryOpen, setIsAuditHistoryOpen] = useState(false);
 
   // Document modal preview state
-  const [previewDocUrl, setPreviewDocUrl] = useState<{
-    id?: string;
-    url: string;
-    mimeType?: string;
+  const [previewDoc, setPreviewDoc] = useState<{
     title: string;
+    fileName: string;
+    mimeType?: string;
+    src?: string;
+    fetchBlob?: () => Promise<Blob>;
   } | null>(null);
 
   if (isLoading) {
@@ -195,48 +196,31 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
   const deliveryImgs =
     booking.delivery_images || booking.documents?.delivery_images || [];
 
-  // PDF action handlers
-  const handleViewPdf = async (docKey: string, bookingId: string) => {
-    setActivePdfLoading(`view_${docKey}`);
-    try {
-      let blob: Blob;
-      let title = "Document PDF";
-      if (docKey === "agreement") {
-        blob = await bookingApi.getAgreementPdf(bookingId);
-        title = "Advance Sale Agreement";
-      } else if (docKey === "order") {
-        blob = await bookingApi.getOrderPdf(bookingId);
-        title = "Order Form & Accessories";
-      } else if (docKey === "settlement") {
-        blob = await bookingApi.getSettlementPdf(bookingId);
-        title = "Settlement Statement";
-      } else {
-        blob = await bookingApi.getDeliveryPdf(bookingId);
-        title = "Delivery Handover Note";
-      }
-
-      const url = URL.createObjectURL(blob);
-      const docTitle = `${title} - ${car.reg_number || `${car.make} ${car.model}`}`;
-
-      if (isMobileOrTabletDevice()) {
-        window.open(url, "_blank");
-      } else {
-        setPreviewDocUrl({
-          url,
-          mimeType: "application/pdf",
-          title: docTitle,
-        });
-      }
-    } catch (err: unknown) {
-      const msg = isAxiosError(err)
-        ? err.response?.data?.error?.message || err.message
-        : err instanceof Error
-        ? err.message
-        : "Failed to generate PDF";
-      toast.error(msg);
-    } finally {
-      setActivePdfLoading(null);
-    }
+  // PDF action handlers — always open the shared in-page preview modal
+  // (Download & Share live in its header) so behavior is identical across
+  // every document type and device, instead of some falling back to
+  // window.open() on mobile/tablet.
+  const handleViewPdf = (docKey: string, bookingId: string) => {
+    const titleMap: Record<string, string> = {
+      agreement: "Advance Sale Agreement",
+      order: "Order Form & Accessories",
+      settlement: "Settlement Statement",
+      delivery: "Delivery Handover Note",
+    };
+    const fetchBlobMap: Record<string, () => Promise<Blob>> = {
+      agreement: () => bookingApi.getAgreementPdf(bookingId),
+      order: () => bookingApi.getOrderPdf(bookingId),
+      settlement: () => bookingApi.getSettlementPdf(bookingId),
+      delivery: () => bookingApi.getDeliveryPdf(bookingId),
+    };
+    const title = titleMap[docKey] || "Document PDF";
+    const docTitle = `${title} - ${car.reg_number || `${car.make} ${car.model}`}`;
+    setPreviewDoc({
+      title: docTitle,
+      fileName: docTitle,
+      mimeType: "application/pdf",
+      fetchBlob: fetchBlobMap[docKey] || fetchBlobMap.delivery,
+    });
   };
 
   const handleDownloadPdf = async (
@@ -634,11 +618,13 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                           <button
                             type="button"
                             onClick={() =>
-                              setPreviewDocUrl({
-                                id: doc.id,
-                                url: doc.file_url,
-                                mimeType: doc.mime_type || undefined,
+                              setPreviewDoc({
                                 title: doc.file_name || doc.doc_type,
+                                fileName: doc.file_name || doc.doc_type,
+                                mimeType: doc.mime_type || undefined,
+                                src: doc.id
+                                  ? endpoints.cars.documentFile(car.id, doc.id)
+                                  : doc.file_url,
                               })
                             }
                             className="w-full inline-flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors cursor-pointer"
@@ -1119,11 +1105,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                                   <button
                                     type="button"
                                     onClick={() =>
-                                      setPreviewDocUrl({
-                                        id: doc.id,
-                                        url: doc.stream_url,
-                                        mimeType: doc.mime_type || undefined,
+                                      setPreviewDoc({
                                         title: doc.file_name || `RC Transfer File ${idx + 1} - ${car.reg_number}`,
+                                        fileName: doc.file_name || `RC_Transfer_${car.reg_number}_${idx + 1}`,
+                                        mimeType: doc.mime_type || undefined,
+                                        src: doc.stream_url,
                                       })
                                     }
                                     className="px-2.5 py-1 rounded-md bg-inset hover:bg-line/40 border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer"
@@ -1157,13 +1143,18 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                             </span>
                             <button
                               type="button"
-                              onClick={() =>
-                                setPreviewDocUrl({
-                                  url: booking.documents.rc_transfer
-                                    .rc_document_url!,
+                              onClick={() => {
+                                const rcUrl =
+                                  booking.documents.rc_transfer.rc_document_url!;
+                                setPreviewDoc({
                                   title: `RC Transfer Document - ${car.reg_number}`,
-                                })
-                              }
+                                  fileName: `RC_Transfer_${car.reg_number}`,
+                                  mimeType: /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(rcUrl)
+                                    ? "image/jpeg"
+                                    : "application/pdf",
+                                  src: rcUrl,
+                                });
+                              }}
                               className="px-2.5 py-1 rounded-md bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer"
                             >
                               <Eye className="h-3 w-3 text-ink-subtle" />
@@ -1196,11 +1187,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                               <div
                                 key={img.id || idx}
                                 onClick={() =>
-                                  setPreviewDocUrl({
-                                    id: img.id,
-                                    url: img.stream_url,
-                                    mimeType: img.mime_type || "image/jpeg",
+                                  setPreviewDoc({
                                     title: img.file_name || `Delivery Photo ${idx + 1} - ${car.reg_number}`,
+                                    fileName: img.file_name || `Delivery_Photo_${car.reg_number}_${idx + 1}`,
+                                    mimeType: img.mime_type || "image/jpeg",
+                                    src: img.stream_url,
                                   })
                                 }
                                 className="group relative rounded-xl bg-inset border border-line/60 overflow-hidden flex flex-col justify-between cursor-pointer"
@@ -1513,93 +1504,20 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* DOCUMENT PREVIEW MODAL                                        */}
+      {/* DOCUMENT PREVIEW MODAL — shared with every other document view */}
+      {/* in the app (booking stages, RC transfer, delivery photos) so   */}
+      {/* View/Download/Share behave identically everywhere.             */}
       {/* ------------------------------------------------------------- */}
-      {previewDocUrl && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="relative w-full max-w-4xl h-[85vh] bg-card rounded-2xl border border-line flex flex-col overflow-hidden shadow-2xl">
-            <div className="flex items-center justify-between p-3.5 border-b border-line">
-              <h3 className="text-xs font-bold text-ink truncate">
-                {previewDocUrl.title}
-              </h3>
-              <div className="flex items-center gap-2">
-                {(() => {
-                  const vehiclePrefix = `${car.reg_number ? car.reg_number : `${car.make}_${car.model}`}`;
-                  const isImage =
-                    previewDocUrl.mimeType?.startsWith("image/") ||
-                    /\.(jpg|jpeg|png|webp|gif|svg)(\?|$)/i.test(previewDocUrl.url);
-                  const ext = isImage
-                    ? previewDocUrl.mimeType?.split("/")[1] || "jpg"
-                    : "pdf";
-                  const docFilename = `${vehiclePrefix}_${previewDocUrl.title || "Document"}.${ext}`;
-
-                  return (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          downloadFile({
-                            url: previewDocUrl.url,
-                            fileName: docFilename,
-                            mimeType: previewDocUrl.mimeType,
-                          })
-                        }
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-ink-muted bg-inset hover:bg-line/40 border border-line cursor-pointer"
-                        title="Download Document"
-                      >
-                        <Download className="h-3.5 w-3.5 stroke-[2px]" />
-                        <span className="hidden sm:inline">Download</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          shareFile({
-                            url: previewDocUrl.url,
-                            fileName: docFilename,
-                            title: `${car.make} ${car.model} - ${previewDocUrl.title}`,
-                            text: car.reg_number ? `Registration: ${car.reg_number}` : undefined,
-                            mimeType: previewDocUrl.mimeType || (isImage ? "image/jpeg" : "application/pdf"),
-                          })
-                        }
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-2.5 py-1 rounded-lg cursor-pointer"
-                        title="Share Document"
-                      >
-                        <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
-                        <span className="hidden sm:inline">Share</span>
-                      </button>
-                    </>
-                  );
-                })()}
-
-                <button
-                  type="button"
-                  onClick={() => setPreviewDocUrl(null)}
-                  className="p-1.5 text-ink-muted hover:text-ink rounded-lg bg-inset border border-line transition-colors cursor-pointer"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 w-full bg-inset relative flex items-center justify-center overflow-auto p-2 sm:p-4">
-              {previewDocUrl.mimeType?.startsWith("image/") ||
-              /\.(jpg|jpeg|png|webp|gif|svg)(\?|$)/i.test(previewDocUrl.url) ? (
-                <AuthenticatedImage
-                  src={previewDocUrl.url}
-                  alt={previewDocUrl.title}
-                  className="max-w-full max-h-full object-contain rounded-lg shadow-md"
-                />
-              ) : (
-                <AuthenticatedIframe
-                  src={previewDocUrl.url}
-                  className="w-full h-full border-0"
-                  title={previewDocUrl.title}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <DocumentPreviewModal
+        isOpen={Boolean(previewDoc)}
+        onClose={() => setPreviewDoc(null)}
+        title={previewDoc?.title || "Document"}
+        fileName={previewDoc?.fileName || previewDoc?.title || "Document"}
+        mimeType={previewDoc?.mimeType || "application/pdf"}
+        src={previewDoc?.src}
+        fetchBlob={previewDoc?.fetchBlob}
+        shareText={car.reg_number ? `Registration: ${car.reg_number}` : undefined}
+      />
 
       {/* ------------------------------------------------------------- */}
       {/* PHOTO LIGHTBOX MODAL                                          */}
