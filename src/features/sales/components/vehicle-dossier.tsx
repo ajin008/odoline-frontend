@@ -39,8 +39,8 @@ import {
   Share2,
 } from "lucide-react";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
-import { documentsApi } from "@/src/features/cars/api/documents-api";
 import { carPhotosApi } from "@/src/features/cars/api/car-photos-api";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
 
 interface VehicleDossierProps {
   carId: string;
@@ -100,6 +100,7 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
   const [previewDocUrl, setPreviewDocUrl] = useState<{
     id?: string;
     url: string;
+    mimeType?: string;
     title: string;
   } | null>(null);
 
@@ -174,21 +175,36 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
   const currentPhoto =
     photoList.at(selectedPhotoIndex) ?? car.primary_photo_url;
 
+  const rcDocs = booking.rc_documents || booking.documents?.rc_documents || [];
+  const deliveryImgs =
+    booking.delivery_images || booking.documents?.delivery_images || [];
+
   // PDF action handlers
   const handleViewPdf = async (docKey: string, bookingId: string) => {
     setActivePdfLoading(`view_${docKey}`);
     try {
       let blob: Blob;
-      if (docKey === "agreement")
+      let title = "Document PDF";
+      if (docKey === "agreement") {
         blob = await bookingApi.getAgreementPdf(bookingId);
-      else if (docKey === "order")
+        title = "Advance Sale Agreement";
+      } else if (docKey === "order") {
         blob = await bookingApi.getOrderPdf(bookingId);
-      else if (docKey === "settlement")
+        title = "Order Form & Accessories";
+      } else if (docKey === "settlement") {
         blob = await bookingApi.getSettlementPdf(bookingId);
-      else blob = await bookingApi.getDeliveryPdf(bookingId);
+        title = "Settlement Statement";
+      } else {
+        blob = await bookingApi.getDeliveryPdf(bookingId);
+        title = "Delivery Handover Note";
+      }
 
       const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
+      setPreviewDocUrl({
+        url,
+        mimeType: "application/pdf",
+        title: `${title} - ${car.reg_number || `${car.make} ${car.model}`}`,
+      });
     } catch (err: unknown) {
       const msg = isAxiosError(err)
         ? err.response?.data?.error?.message || err.message
@@ -601,6 +617,7 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                               setPreviewDocUrl({
                                 id: doc.id,
                                 url: doc.file_url,
+                                mimeType: doc.mime_type || undefined,
                                 title: doc.file_name || doc.doc_type,
                               })
                             }
@@ -1026,58 +1043,170 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                       </div>
 
                       {/* Doc 5: RC Transfer */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 rounded-xl bg-inset border border-line/70">
-                        <div className="flex items-center gap-2.5">
-                          <div className="h-8 w-8 rounded-lg bg-card border border-line flex items-center justify-center text-emerald-600 shrink-0">
-                            <CheckCircle2 className="h-4 w-4" />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-xs font-bold text-ink">
-                                RC Transfer Record &amp; File
-                              </h4>
-                              {booking.documents?.rc_transfer
-                                ?.rc_transfer_date && (
-                                <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.5 rounded">
-                                  Transfer:{" "}
-                                  {
-                                    booking.documents.rc_transfer
-                                      .rc_transfer_date
-                                  }
-                                </span>
-                              )}
+                      <div className="rounded-xl bg-inset border border-line/70 p-3 space-y-2">
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2.5">
+                            <div className="h-8 w-8 rounded-lg bg-card border border-line flex items-center justify-center text-emerald-600 shrink-0">
+                              <CheckCircle2 className="h-4 w-4" />
                             </div>
-                            <p className="text-[10px] text-ink-muted">
-                              {booking.documents?.rc_transfer?.uploaded_at
-                                ? `Uploaded ${formatDateTimeIST(
-                                    booking.documents.rc_transfer.uploaded_at
-                                  )}`
-                                : "RC document file uploaded during sale closure"}
-                            </p>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <h4 className="text-xs font-bold text-ink">
+                                  RC Transfer Record &amp; Files
+                                </h4>
+                                {booking.documents?.rc_transfer
+                                  ?.rc_transfer_date && (
+                                  <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100/90 px-1.5 py-0.5 rounded">
+                                    Transfer:{" "}
+                                    {
+                                      booking.documents.rc_transfer
+                                        .rc_transfer_date
+                                    }
+                                  </span>
+                                )}
+                                {rcDocs.length > 0 && (
+                                  <span className="text-[10px] font-mono font-bold text-indigo-800 bg-indigo-100/90 px-1.5 py-0.5 rounded">
+                                    {rcDocs.length}{" "}
+                                    {rcDocs.length === 1 ? "file" : "files"}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-ink-muted">
+                                {booking.documents?.rc_transfer?.uploaded_at
+                                  ? `Uploaded ${formatDateTimeIST(
+                                      booking.documents.rc_transfer.uploaded_at
+                                    )}`
+                                  : "RC transfer document files uploaded during sale closure"}
+                              </p>
+                            </div>
                           </div>
                         </div>
 
-                        {booking.documents?.rc_transfer?.rc_document_url ? (
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setPreviewDocUrl({
-                                url: booking.documents.rc_transfer
-                                  .rc_document_url!,
-                                title: `RC Transfer Document - ${car.reg_number}`,
-                              })
-                            }
-                            className="px-2.5 py-1 rounded-md bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 self-end sm:self-center cursor-pointer"
-                          >
-                            <Eye className="h-3 w-3 text-ink-subtle" />
-                            <span>View</span>
-                          </button>
+                        {rcDocs.length > 0 ? (
+                          <div className="space-y-1.5 pt-1">
+                            {rcDocs.map((doc, idx) => (
+                              <div
+                                key={doc.id || idx}
+                                className="flex items-center justify-between gap-2 p-2 rounded-lg bg-card border border-line/50 text-xs"
+                              >
+                                <div className="flex items-center gap-2 truncate">
+                                  <FileText className="h-3.5 w-3.5 text-ink-subtle shrink-0" />
+                                  <span className="font-medium text-ink truncate">
+                                    {doc.file_name || `RC Transfer File ${idx + 1}`}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setPreviewDocUrl({
+                                        id: doc.id,
+                                        url: doc.stream_url,
+                                        mimeType: doc.mime_type || undefined,
+                                        title: doc.file_name || `RC Transfer File ${idx + 1} - ${car.reg_number}`,
+                                      })
+                                    }
+                                    className="px-2.5 py-1 rounded-md bg-inset hover:bg-line/40 border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <Eye className="h-3 w-3 text-ink-subtle" />
+                                    <span>View</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      downloadFile({
+                                        url: doc.stream_url,
+                                        fileName: doc.file_name || `RC_Transfer_${car.reg_number}_${idx + 1}`,
+                                        mimeType: doc.mime_type || undefined,
+                                        title: `RC Transfer - ${car.reg_number}`,
+                                      })
+                                    }
+                                    className="px-2.5 py-1 rounded-md bg-inset hover:bg-line/40 border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <Download className="h-3 w-3 text-ink-subtle" />
+                                    <span>Download</span>
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : booking.documents?.rc_transfer?.rc_document_url ? (
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <span className="text-xs font-medium text-ink">
+                              RC Transfer Document
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPreviewDocUrl({
+                                  url: booking.documents.rc_transfer
+                                    .rc_document_url!,
+                                  title: `RC Transfer Document - ${car.reg_number}`,
+                                })
+                              }
+                              className="px-2.5 py-1 rounded-md bg-card hover:bg-inset border border-line text-xs font-semibold text-ink transition-colors flex items-center gap-1 cursor-pointer"
+                            >
+                              <Eye className="h-3 w-3 text-ink-subtle" />
+                              <span>View</span>
+                            </button>
+                          </div>
                         ) : (
-                          <span className="text-[11px] text-ink-subtle italic self-end sm:self-center">
-                            No File
-                          </span>
+                          <div className="pt-1">
+                            <span className="text-[11px] text-ink-subtle italic">
+                              No File
+                            </span>
+                          </div>
                         )}
                       </div>
+
+                      {/* Delivery Handover Photos Section */}
+                      {deliveryImgs.length > 0 && (
+                        <div className="space-y-2 pt-3 border-t border-line/50">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-ink-subtle flex items-center gap-1.5">
+                              <PackageCheck className="h-3.5 w-3.5 text-blue-600" />
+                              <span>
+                                Delivery Handover Photos ({deliveryImgs.length})
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5">
+                            {deliveryImgs.map((img, idx) => (
+                              <div
+                                key={img.id || idx}
+                                onClick={() =>
+                                  setPreviewDocUrl({
+                                    id: img.id,
+                                    url: img.stream_url,
+                                    mimeType: img.mime_type || "image/jpeg",
+                                    title: img.file_name || `Delivery Photo ${idx + 1} - ${car.reg_number}`,
+                                  })
+                                }
+                                className="group relative rounded-xl bg-inset border border-line/60 overflow-hidden flex flex-col justify-between cursor-pointer"
+                              >
+                                <div className="relative aspect-4/3 w-full bg-slate-900 overflow-hidden">
+                                  <AuthenticatedImage
+                                    src={img.stream_url}
+                                    alt={img.file_name || `Delivery photo ${idx + 1}`}
+                                    className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  />
+                                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="p-1.5 rounded-lg bg-black/70 text-white flex items-center justify-center">
+                                      <Eye className="h-3.5 w-3.5" />
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="p-2 bg-inset text-[10px]">
+                                  <p className="font-semibold text-ink truncate">
+                                    {img.file_name || `Delivery Photo ${idx + 1}`}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1376,7 +1505,13 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
               <div className="flex items-center gap-2">
                 {(() => {
                   const vehiclePrefix = `${car.reg_number ? car.reg_number : `${car.make}_${car.model}`}`;
-                  const docFilename = `${vehiclePrefix}_${previewDocUrl.title || "Document"}.pdf`;
+                  const isImage =
+                    previewDocUrl.mimeType?.startsWith("image/") ||
+                    /\.(jpg|jpeg|png|webp|gif|svg)(\?|$)/i.test(previewDocUrl.url);
+                  const ext = isImage
+                    ? previewDocUrl.mimeType?.split("/")[1] || "jpg"
+                    : "pdf";
+                  const docFilename = `${vehiclePrefix}_${previewDocUrl.title || "Document"}.${ext}`;
 
                   return (
                     <>
@@ -1384,11 +1519,9 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                         type="button"
                         onClick={() =>
                           downloadFile({
-                            fetchBlob: previewDocUrl.id
-                              ? () => documentsApi.downloadFileBlob(car.id, previewDocUrl.id!)
-                              : undefined,
-                            url: previewDocUrl.id ? undefined : previewDocUrl.url,
+                            url: previewDocUrl.url,
                             fileName: docFilename,
+                            mimeType: previewDocUrl.mimeType,
                           })
                         }
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold text-ink-muted bg-inset hover:bg-line/40 border border-line cursor-pointer"
@@ -1402,14 +1535,11 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                         type="button"
                         onClick={() =>
                           shareFile({
-                            fetchBlob: previewDocUrl.id
-                              ? () => documentsApi.downloadFileBlob(car.id, previewDocUrl.id!)
-                              : undefined,
-                            url: previewDocUrl.id ? undefined : previewDocUrl.url,
+                            url: previewDocUrl.url,
                             fileName: docFilename,
                             title: `${car.make} ${car.model} - ${previewDocUrl.title}`,
                             text: car.reg_number ? `Registration: ${car.reg_number}` : undefined,
-                            mimeType: "application/pdf",
+                            mimeType: previewDocUrl.mimeType || (isImage ? "image/jpeg" : "application/pdf"),
                           })
                         }
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-2.5 py-1 rounded-lg cursor-pointer"
@@ -1431,12 +1561,21 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
                 </button>
               </div>
             </div>
-            <div className="flex-1 w-full bg-inset relative">
-              <iframe
-                src={previewDocUrl.url}
-                className="w-full h-full border-0"
-                title={previewDocUrl.title}
-              />
+            <div className="flex-1 w-full bg-inset relative flex items-center justify-center overflow-auto p-2 sm:p-4">
+              {previewDocUrl.mimeType?.startsWith("image/") ||
+              /\.(jpg|jpeg|png|webp|gif|svg)(\?|$)/i.test(previewDocUrl.url) ? (
+                <AuthenticatedImage
+                  src={previewDocUrl.url}
+                  alt={previewDocUrl.title}
+                  className="max-w-full max-h-full object-contain rounded-lg shadow-md"
+                />
+              ) : (
+                <iframe
+                  src={previewDocUrl.url}
+                  className="w-full h-full border-0"
+                  title={previewDocUrl.title}
+                />
+              )}
             </div>
           </div>
         </div>

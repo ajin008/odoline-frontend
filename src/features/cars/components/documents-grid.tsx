@@ -32,6 +32,7 @@ import { shareCarDocument } from "../utils/share-car-document";
 import { documentsApi } from "../api/documents-api";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
 
 interface DocumentsGridProps {
   carId: string;
@@ -724,8 +725,7 @@ export function DocumentsGrid({
                   className="w-full h-[75vh] min-h-[480px] rounded-lg border border-line bg-card shadow-xs"
                 />
               ) : (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img
+                <AuthenticatedImage
                   src={previewItem.url}
                   alt="Document Preview"
                   className="max-h-[75vh] w-auto max-w-full rounded-lg shadow-sm object-contain"

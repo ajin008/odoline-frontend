@@ -31,7 +31,6 @@ import {
   MapPin,
   Car,
 } from "lucide-react";
-import { BookingDocumentsCard } from "./booking-documents-card";
 
 interface SettleDeliverFormProps {
   booking: BookingDetail;
@@ -669,15 +668,12 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
           </div>
         </div>
 
-        {/* Optional Delivery & Handover Photos Section */}
-        <div className="pt-2">
-          <BookingDocumentsCard
-            bookingId={booking.id}
-            docType="delivery_image"
-            title="Delivery & Handover Photos"
-            description="Upload photos of the key handover, customer ceremony, or vehicle delivery condition (images only, max 20)."
-            required={false}
-          />
+        {/* Delivery Photos Quiet Info Banner (Available after delivery) */}
+        <div className="p-3.5 rounded-xl bg-inset/50 border border-line/40 text-xs text-ink-subtle flex items-center gap-2.5">
+          <Truck className="h-4 w-4 text-accent shrink-0" />
+          <span>
+            Delivery &amp; Handover Photos upload will be available on this stage once vehicle delivery is completed.
+          </span>
         </div>
 
         {/* Action Button & Guard Message */}

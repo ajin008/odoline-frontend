@@ -29,6 +29,7 @@ export interface DossierDocument {
   doc_category: string;
   file_name: string | null;
   file_url: string;
+  mime_type?: string | null;
   uploaded_by: {
     name: string;
   };
@@ -90,12 +91,28 @@ export interface DossierRcTransferRef {
   rc_note: string | null;
 }
 
+export interface DossierRcDocumentItem {
+  id: string;
+  file_name: string | null;
+  mime_type: string | null;
+  stream_url: string;
+}
+
+export interface DossierDeliveryImageItem {
+  id: string;
+  file_name: string | null;
+  mime_type: string | null;
+  stream_url: string;
+}
+
 export interface DossierBookingDocuments {
   advance_agreement: DossierBookingDocumentRef;
   order_form: DossierOrderFormRef;
   settlement: DossierBookingDocumentRef;
   delivery_note: DossierBookingDocumentRef;
   rc_transfer: DossierRcTransferRef;
+  rc_documents?: DossierRcDocumentItem[];
+  delivery_images?: DossierDeliveryImageItem[];
 }
 
 export interface DossierBooking {
@@ -114,6 +131,8 @@ export interface DossierBooking {
   agreed_price: string;
   grand_total: string;
   amount_paid: string;
+  rc_documents?: DossierRcDocumentItem[];
+  delivery_images?: DossierDeliveryImageItem[];
   documents: DossierBookingDocuments;
 }
 

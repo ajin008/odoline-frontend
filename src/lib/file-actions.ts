@@ -178,7 +178,7 @@ async function fetchSourceBlob(source: Pick<FileActionSource, "url" | "fetchBlob
       // Extract carId & docId from S3 URL or API path
       const docMatch = fetchUrl.match(/cars\/([a-f0-9\-]+)\/documents\/([a-f0-9\-]+)/i);
       // Extract bookingId & docId from S3 URL or API path
-      const bookingDocMatch = fetchUrl.match(/bookings\/([a-f0-9\-]+)\/documents\/([a-f0-9\-]+)/i);
+      const bookingDocMatch = fetchUrl.match(/(?:bookings|booking-documents)\/([a-f0-9\-]+)\/(?:documents\/)?([a-f0-9\-]+)/i);
       // Extract refurb itemId from S3 URL or API path
       const refurbMatch = fetchUrl.match(/refurbishment\/items\/([a-f0-9\-]+)/i);
 

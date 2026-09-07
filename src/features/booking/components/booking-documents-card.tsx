@@ -13,7 +13,9 @@ import {
   X,
   Share2,
   Plus,
+  Download,
 } from "lucide-react";
+import { useBooking } from "../hooks/use-booking";
 import {
   useBookingDocuments,
   useBookingDocumentActions,
@@ -21,6 +23,7 @@ import {
 import type { BookingDocumentFile } from "../types/booking-types";
 import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
 
 interface BookingDocumentsCardProps {
   bookingId: string;
@@ -30,6 +33,34 @@ interface BookingDocumentsCardProps {
   required?: boolean;
   readOnly?: boolean;
   onFilesCountChange?: (count: number) => void;
+}
+
+function buildCleanDocName(
+  doc: { original_name?: string; file_name?: string; mime_type?: string },
+  docType: "rc_transfer" | "delivery_image",
+  bookingNumber?: string,
+  regNumber?: string
+): string {
+  const ext = doc.mime_type === "application/pdf" ? ".pdf" : ".jpg";
+  const raw = doc.original_name || doc.file_name || "";
+  const isRawKey =
+    !raw ||
+    /^[0-9a-f]{16,}/i.test(raw) ||
+    /^\d{10}_[0-9a-f]/i.test(raw) ||
+    /^blob$/i.test(raw);
+
+  if (!isRawKey) {
+    const clean = raw.replace(/\.[a-zA-Z0-9]+$/, "").trim();
+    return `${clean}${ext}`;
+  }
+
+  const prefix = regNumber
+    ? regNumber.replace(/[^a-zA-Z0-9-]/g, "")
+    : bookingNumber || "Booking";
+  if (docType === "rc_transfer") {
+    return `${prefix}-RC-Transfer-Proof${ext}`;
+  }
+  return `${prefix}-Delivery-Handover-Photo${ext}`;
 }
 
 export function BookingDocumentsCard({
@@ -43,6 +74,7 @@ export function BookingDocumentsCard({
 }: BookingDocumentsCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data: booking } = useBooking(bookingId);
   const { data: documentsGroup = {}, isLoading } =
     useBookingDocuments(bookingId);
   const { uploadDocuments, deleteDocument, isUploading, isDeleting } =
@@ -63,6 +95,7 @@ export function BookingDocumentsCard({
   const [previewItem, setPreviewItem] = useState<{
     id: string;
     url: string;
+    streamUrl: string;
     mimeType: string;
     name?: string;
   } | null>(null);
@@ -148,30 +181,51 @@ export function BookingDocumentsCard({
   };
 
   const handleViewPreview = (doc: BookingDocumentFile) => {
+    const backendStreamUrl = `/bookings/${bookingId}/documents/${doc.id}/file`;
+    const cleanName = buildCleanDocName(
+      doc,
+      docType,
+      booking?.booking_number,
+      booking?.car?.reg_number
+    );
     setPreviewItem({
       id: doc.id,
-      url: doc.file_url || doc.file_path,
+      url: doc.presigned_url || backendStreamUrl,
+      streamUrl: backendStreamUrl,
       mimeType: doc.mime_type || "image/jpeg",
-      name: doc.original_name || doc.file_name,
+      name: cleanName,
     });
   };
 
   const handleDownloadDoc = async (doc: BookingDocumentFile) => {
-    const rawName = doc.original_name || doc.file_name || `${docType}-document`;
+    const backendStreamUrl = `/bookings/${bookingId}/documents/${doc.id}/file`;
+    const cleanName = buildCleanDocName(
+      doc,
+      docType,
+      booking?.booking_number,
+      booking?.car?.reg_number
+    );
     await downloadFile({
-      url: doc.file_url || doc.file_path,
-      fileName: rawName,
+      url: backendStreamUrl,
+      fileName: cleanName,
       title: title,
       mimeType: doc.mime_type,
     });
   };
 
   const handleShareDoc = async (doc: BookingDocumentFile) => {
-    const rawName = doc.original_name || doc.file_name || `${docType}-document`;
+    const backendStreamUrl = `/bookings/${bookingId}/documents/${doc.id}/file`;
+    const cleanName = buildCleanDocName(
+      doc,
+      docType,
+      booking?.booking_number,
+      booking?.car?.reg_number
+    );
     await shareFile({
-      url: doc.file_url || doc.file_path,
-      fileName: rawName,
-      title: `${title} - Booking`,
+      url: backendStreamUrl,
+      fileName: cleanName,
+      title: `${title} - Booking Document`,
+      text: title,
       mimeType: doc.mime_type,
     });
   };
@@ -288,9 +342,8 @@ export function BookingDocumentsCard({
                       onClick={() => handleViewPreview(file)}
                       className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-xl overflow-hidden border border-line bg-inset group/thumb cursor-pointer shrink-0 shadow-2xs hover:shadow-md transition-all"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={file.file_url || file.file_path}
+                      <AuthenticatedImage
+                        src={file.presigned_url || file.file_url || file.file_path || `/bookings/${bookingId}/documents/${file.id}/file`}
                         alt={file.original_name || file.file_name}
                         className="h-full w-full object-cover transition-transform duration-200 group-hover/thumb:scale-105"
                       />
@@ -440,43 +493,102 @@ export function BookingDocumentsCard({
         variant="danger"
       />
 
-      {/* Image Preview Lightbox Modal */}
+      {/* Document / Image Preview Lightbox Modal with Download & Share */}
       {previewItem && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-xs select-none"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-6 select-none font-sans"
           onClick={() => setPreviewItem(null)}
         >
           <div
-            className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-2xl bg-card p-2 border border-line shadow-2xl"
+            className="relative flex flex-col max-h-[92vh] max-w-5xl w-full rounded-2xl bg-card shadow-2xl overflow-hidden border border-line"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-line pb-2 mb-2 px-2">
-              <span className="text-xs font-bold text-ink truncate max-w-xs">
-                {previewItem.name || title}
-              </span>
-              <button
-                type="button"
-                onClick={() => setPreviewItem(null)}
-                className="h-7 w-7 rounded-lg bg-inset text-ink hover:bg-line flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <X className="h-4 w-4" />
-              </button>
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-line px-5 py-3.5 bg-card z-10">
+              <div className="flex items-center gap-2 min-w-0">
+                <h3 className="text-sm font-bold tracking-tight text-ink font-sans truncate">
+                  {previewItem.name || title}
+                </h3>
+                {previewItem.mimeType === "application/pdf" && (
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded-md shrink-0">
+                    PDF Document
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                {(() => {
+                  const rawDocName = previewItem.name || title || `${docType}-document`;
+                  const ext = previewItem.mimeType === "application/pdf" ? ".pdf" : ".jpg";
+                  const cleanFileName = rawDocName.endsWith(ext) ? rawDocName : `${rawDocName}${ext}`;
+
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          downloadFile({
+                            url: previewItem.streamUrl || `/bookings/${bookingId}/documents/${previewItem.id}/file`,
+                            fileName: cleanFileName,
+                            title: title,
+                            mimeType: previewItem.mimeType,
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-ink-muted hover:text-ink transition-colors px-2.5 py-1.5 rounded-lg bg-inset hover:bg-line/40 border border-line cursor-pointer"
+                        title="Download File"
+                      >
+                        <Download className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Download</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          shareFile({
+                            url: previewItem.streamUrl || `/bookings/${bookingId}/documents/${previewItem.id}/file`,
+                            fileName: cleanFileName,
+                            title: `${title} - Booking Document`,
+                            text: title,
+                            mimeType: previewItem.mimeType,
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-500/10 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 transition-all px-2.5 py-1.5 rounded-lg cursor-pointer"
+                        title="Share File"
+                      >
+                        <Share2 className="h-3.5 w-3.5 stroke-[2px]" />
+                        <span className="hidden sm:inline">Share</span>
+                      </button>
+                    </>
+                  );
+                })()}
+
+                <button
+                  type="button"
+                  onClick={() => setPreviewItem(null)}
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-subtle hover:bg-inset hover:text-ink transition-colors cursor-pointer"
+                  title="Close preview"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
 
-            {previewItem.mimeType === "application/pdf" ? (
-              <iframe
-                src={previewItem.url}
-                className="h-[75vh] w-[80vw] rounded-xl border border-line"
-                title={previewItem.name || title}
-              />
-            ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={previewItem.url}
-                alt={previewItem.name || title}
-                className="max-h-[75vh] max-w-[80vw] object-contain rounded-xl"
-              />
-            )}
+            {/* Modal Body */}
+            <div className="flex-1 overflow-hidden bg-inset p-3 flex items-center justify-center min-h-[60vh]">
+              {previewItem.mimeType === "application/pdf" ? (
+                <iframe
+                  src={previewItem.url}
+                  title={previewItem.name || title}
+                  className="w-full h-[75vh] min-h-[480px] rounded-xl border border-line bg-card shadow-xs"
+                />
+              ) : (
+                <AuthenticatedImage
+                  src={previewItem.url}
+                  alt={previewItem.name || title}
+                  className="max-h-[75vh] w-auto max-w-full rounded-xl shadow-sm object-contain"
+                />
+              )}
+            </div>
           </div>
         </div>
       )}

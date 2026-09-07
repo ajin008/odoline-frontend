@@ -8,6 +8,7 @@ import { useBooking } from "../hooks/use-booking";
 import { bookingApi } from "../api/booking-api";
 import { downloadPdfDocument, sharePdfDocument, buildDocFilename } from "../utils/doc-actions";
 import { SettleDeliverForm } from "./settle-deliver-form";
+import { BookingDocumentsCard } from "./booking-documents-card";
 import {
   ShieldCheck,
   CreditCard,
@@ -574,6 +575,17 @@ export function BookingSettlementStage({
                 {delivery?.delivery_place || "Main Showroom"}
               </div>
             </div>
+          </div>
+
+          {/* Delivery & Handover Photos Card */}
+          <div className="pt-2">
+            <BookingDocumentsCard
+              bookingId={booking.id}
+              docType="delivery_image"
+              title="Delivery & Handover Photos"
+              description="Upload photos of the key handover, customer ceremony, or vehicle delivery condition (images only, max 20)."
+              readOnly={readOnly || booking.status === "closed"}
+            />
           </div>
 
           {/* Timestamp Meta */}

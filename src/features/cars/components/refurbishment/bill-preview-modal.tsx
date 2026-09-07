@@ -3,6 +3,7 @@
 
 import { X, Download, Share2 } from "lucide-react";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
 
 interface BillPreviewModalProps {
   billPreviewUrl: string | null;
@@ -71,8 +72,7 @@ export function BillPreviewModal({
 
         {/* Modal Image Body */}
         <div className="flex-1 overflow-auto bg-inset p-4 flex items-center justify-center min-h-75">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <AuthenticatedImage
             src={billPreviewUrl}
             alt="Bill Preview"
             className="max-h-[75vh] w-auto max-w-full rounded-lg object-contain"

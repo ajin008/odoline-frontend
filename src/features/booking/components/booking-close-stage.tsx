@@ -392,20 +392,13 @@ export function BookingCloseStage({
           </div>
         </div>
 
-        {/* RC & Delivery Documents View */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* RC Documents View */}
+        <div>
           <BookingDocumentsCard
             bookingId={booking.id}
             docType="rc_transfer"
             title="RC Transfer Proof Documents"
             description="Official RC transfer proof uploaded on booking closure."
-            readOnly={true}
-          />
-          <BookingDocumentsCard
-            bookingId={booking.id}
-            docType="delivery_image"
-            title="Delivery & Handover Photos"
-            description="Vehicle delivery handover photos."
             readOnly={true}
           />
         </div>
