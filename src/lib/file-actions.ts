@@ -257,7 +257,7 @@ export function canShareFiles(files: File[]): boolean {
  * is the only reliable way to save a file — but on desktop, "Download" must mean
  * "save to disk", not "open the OS share panel".
  */
-function isMobileOrTabletDevice(): boolean {
+export function isMobileOrTabletDevice(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent || "";
   if (/Android|iPhone|iPad|iPod/i.test(ua)) return true;

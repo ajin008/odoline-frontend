@@ -8,10 +8,7 @@ import {
   FileWarning,
   FileText,
   ExternalLink,
-  Download,
-  Share2,
 } from "lucide-react";
-import { downloadFile, shareFile } from "@/src/lib/file-actions";
 
 function checkIsMobileDevice(): boolean {
   if (typeof window === "undefined" || typeof navigator === "undefined") return false;
@@ -251,7 +248,7 @@ export function AuthenticatedIframe({
             Mobile browsers display PDFs best in full screen
           </p>
         </div>
-        <div className="flex flex-col w-full gap-2 pt-1">
+        <div className="w-full pt-1">
           <button
             type="button"
             onClick={() => {
@@ -264,39 +261,6 @@ export function AuthenticatedIframe({
             <ExternalLink className="h-4 w-4 stroke-[2px]" />
             <span>Open / View PDF</span>
           </button>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                void downloadFile({
-                  url: src || undefined,
-                  fetchBlob: () => fetch(objectUrl).then((r) => r.blob()),
-                  fileName: `${docTitle}.pdf`,
-                  mimeType: "application/pdf",
-                });
-              }}
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-ink bg-inset hover:bg-line/40 border border-line transition-colors cursor-pointer"
-            >
-              <Download className="h-3.5 w-3.5" />
-              <span>Download</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                void shareFile({
-                  url: src || undefined,
-                  fetchBlob: () => fetch(objectUrl).then((r) => r.blob()),
-                  fileName: `${docTitle}.pdf`,
-                  title: docTitle,
-                  mimeType: "application/pdf",
-                });
-              }}
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 transition-colors cursor-pointer"
-            >
-              <Share2 className="h-3.5 w-3.5" />
-              <span>Share</span>
-            </button>
-          </div>
         </div>
       </div>
     );

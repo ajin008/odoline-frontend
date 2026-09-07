@@ -38,7 +38,7 @@ import {
   X,
   Share2,
 } from "lucide-react";
-import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
+import { downloadFile, shareFile, isMobileOrTabletDevice } from "@/src/lib/file-actions";
 import { AuthenticatedImage, AuthenticatedIframe } from "@/src/components/ui/authenticated-image";
 import { endpoints } from "@/src/lib/endpoints";
 import { carPhotosApi } from "@/src/features/cars/api/car-photos-api";
@@ -216,11 +216,17 @@ export function VehicleDossier({ carId }: VehicleDossierProps) {
       }
 
       const url = URL.createObjectURL(blob);
-      setPreviewDocUrl({
-        url,
-        mimeType: "application/pdf",
-        title: `${title} - ${car.reg_number || `${car.make} ${car.model}`}`,
-      });
+      const docTitle = `${title} - ${car.reg_number || `${car.make} ${car.model}`}`;
+
+      if (isMobileOrTabletDevice()) {
+        window.open(url, "_blank");
+      } else {
+        setPreviewDocUrl({
+          url,
+          mimeType: "application/pdf",
+          title: docTitle,
+        });
+      }
     } catch (err: unknown) {
       const msg = isAxiosError(err)
         ? err.response?.data?.error?.message || err.message
