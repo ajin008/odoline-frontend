@@ -25,6 +25,7 @@ import { carPhotosApi, type CarPhoto } from "../api/car-photos-api";
 import { downloadFile, shareFile } from "@/src/lib/file-action-utils";
 import { AuthenticatedImage } from "@/src/components/ui/authenticated-image";
 import { endpoints } from "@/src/lib/endpoints";
+import { ConfirmModal } from "@/src/components/ui/confirm-modal";
 
 interface CarPhotoGalleryProps {
   carId: string;
@@ -40,12 +41,22 @@ export function CarPhotoGallery({
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<CarPhoto | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const { data: car } = useCar(carId);
   const { data: photos = [], isLoading, isError } = useCarPhotos(carId);
   const uploadPhoto = useUploadCarPhoto(carId);
   const deletePhoto = useDeleteCarPhoto(carId);
   const setPrimaryPhoto = useSetPrimaryCarPhoto(carId);
+
+  const handleConfirmDelete = () => {
+    if (!deleteTargetId) return;
+    deletePhoto.mutate(deleteTargetId, {
+      onSettled: () => {
+        setDeleteTargetId(null);
+      },
+    });
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -179,7 +190,7 @@ export function CarPhotoGallery({
 
                   <button
                     type="button"
-                    onClick={() => deletePhoto.mutate(photo.id)}
+                    onClick={() => setDeleteTargetId(photo.id)}
                     disabled={deletePhoto.isPending}
                     title="Delete photo"
                     className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/60 text-white backdrop-blur-md hover:bg-red-600 transition-colors cursor-pointer"
@@ -307,6 +318,19 @@ export function CarPhotoGallery({
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!deleteTargetId}
+        onClose={() => setDeleteTargetId(null)}
+        onConfirm={handleConfirmDelete}
+        isLoading={deletePhoto.isPending}
+        title="Delete Car Photo"
+        description="Are you sure you want to delete this car photo? This action cannot be undone."
+        confirmText="Delete Photo"
+        cancelText="Cancel"
+        variant="danger"
+        icon={<Trash2 className="h-5.5 w-5.5 stroke-[2.25px]" />}
+      />
     </div>
   );
 }
