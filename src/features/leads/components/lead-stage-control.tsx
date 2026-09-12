@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/src/features/auth/hooks/use-me";
 import { useChangeStage } from "../hooks/use-lead-stage";
 import type { Lead, LeadStage } from "../types/lead-types";
 import { carsApi } from "@/src/features/cars/api/cars-api";
@@ -71,19 +72,19 @@ const STAGE_CONFIG: Record<
     description: "Vehicle test drive done",
   },
   discussion: {
-    label: "Discussion",
+    label: "Discussion / Negotiation",
     shortLabel: "Discussion",
     description: "Price/Terms negotiation",
   },
   won: {
     label: "Won",
     shortLabel: "Won",
-    description: "Deal closed & car selected",
+    description: "Deal closed successfully",
   },
   lost: {
     label: "Lost",
     shortLabel: "Lost",
-    description: "Deal closed (buyer walked)",
+    description: "Lead dropped or lost",
   },
 };
 
@@ -217,6 +218,9 @@ const PAYMENT_METHOD_OPTIONS = [
 ];
 
 export function LeadStageControl({ lead }: LeadStageControlProps) {
+  const { user } = useAuth();
+  const isCro = user?.role === "cro";
+
   const changeStageMutation = useChangeStage(lead.id);
   const createBookingMutation = useCreateBooking();
   const { data: configData } = useConfig();
@@ -492,31 +496,31 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
               </button>
             )}
 
-            <div className="grid grid-cols-3 gap-2">
-              {prevActiveStage ? (
+            <div className="flex items-center gap-2">
+              {prevActiveStage && (
                 <button
                   type="button"
                   onClick={handlePrevStage}
                   disabled={changeStageMutation.isPending}
-                  className="flex items-center justify-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover py-2 px-1 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50 truncate"
+                  className="flex-1 flex items-center justify-center gap-1 rounded-lg border border-line bg-surface hover:bg-hover py-2 px-1 text-xs font-semibold text-ink transition-colors cursor-pointer disabled:opacity-50 truncate"
                 >
                   <ChevronLeft className="h-3.5 w-3.5 shrink-0" />
                   <span className="truncate">
                     {getStageConfig(prevActiveStage).shortLabel}
                   </span>
                 </button>
-              ) : (
-                <div />
               )}
 
-              <button
-                type="button"
-                onClick={handleOpenWonModal}
-                className="flex items-center justify-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-1 text-xs font-bold shadow-xs cursor-pointer"
-              >
-                <Trophy className="h-3.5 w-3.5 stroke-[2.5px] shrink-0" />
-                <span>Won</span>
-              </button>
+              {!isCro && (
+                <button
+                  type="button"
+                  onClick={handleOpenWonModal}
+                  className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-1 text-xs font-bold shadow-xs cursor-pointer"
+                >
+                  <Trophy className="h-3.5 w-3.5 stroke-[2.5px] shrink-0" />
+                  <span>Won</span>
+                </button>
+              )}
 
               <button
                 type="button"
@@ -526,7 +530,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                   setCustomReason("");
                   setLostNotes("");
                 }}
-                className="flex items-center justify-center gap-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white py-2 px-1 text-xs font-bold shadow-xs cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white py-2 px-1 text-xs font-bold shadow-xs cursor-pointer"
               >
                 <XCircle className="h-3.5 w-3.5 stroke-[2.5px] shrink-0" />
                 <span>Lost</span>
@@ -596,14 +600,16 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
                 </button>
               )}
 
-              <button
-                type="button"
-                onClick={handleOpenWonModal}
-                className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
-              >
-                <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
-                <span>Mark Won</span>
-              </button>
+              {!isCro && (
+                <button
+                  type="button"
+                  onClick={handleOpenWonModal}
+                  className="flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3.5 py-1.5 text-xs font-bold shadow-xs hover:shadow transition-all cursor-pointer"
+                >
+                  <Trophy className="h-3.5 w-3.5 stroke-[2.5px]" />
+                  <span>Mark Won</span>
+                </button>
+              )}
 
               <button
                 type="button"
