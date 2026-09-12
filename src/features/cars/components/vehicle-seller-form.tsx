@@ -36,7 +36,7 @@ import { useCreateCar } from "../hooks/use-create-car";
 import { useUpdateCar } from "../hooks/use-update-car";
 import type { Car as CarType } from "../api/cars-api";
 
-import { INDIAN_CAR_BRANDS } from "../type/info";
+import { INDIAN_CAR_BRANDS, BRAND_MODELS } from "../type/info";
 
 const fuelOptions: CustomSelectOption<string>[] = [
   { value: "petrol", label: "Petrol", icon: <Fuel className="h-3.5 w-3.5" /> },
@@ -154,86 +154,6 @@ export function VehicleSellerForm({ car }: VehicleSellerFormProps) {
   });
 
   const selectedMake = watch("make");
-
-  const BRAND_MODELS: Record<string, string[]> = {
-    "Maruti Suzuki": [
-      "Swift",
-      "Baleno",
-      "Brezza",
-      "Dzire",
-      "Ertiga",
-      "WagonR",
-      "Alto",
-      "Fronx",
-      "Grand Vitara",
-      "Jimny",
-      "Ciaz",
-      "XL6",
-      "Ignis",
-      "S-Presso",
-    ],
-    Hyundai: [
-      "Creta",
-      "Venue",
-      "i20",
-      "Verna",
-      "Exter",
-      "Aura",
-      "Grand i10 Nios",
-      "Alcazar",
-      "Tucson",
-      "Ioniq 5",
-    ],
-    "Tata Motors": [
-      "Nexon",
-      "Punch",
-      "Harrier",
-      "Safari",
-      "Altroz",
-      "Tiago",
-      "Tigor",
-      "Curvv",
-    ],
-    Mahindra: [
-      "Thar",
-      "XUV700",
-      "Scorpio-N",
-      "Scorpio Classic",
-      "XUV300",
-      "XUV400",
-      "Bolero",
-      "Bolero Neo",
-    ],
-    Kia: ["Seltos", "Sonet", "Carens", "EV6"],
-    Toyota: [
-      "Fortuner",
-      "Innova Crysta",
-      "Innova Hycross",
-      "Glanza",
-      "Urban Cruiser Taisor",
-      "Hilux",
-      "Camry",
-    ],
-    Honda: ["City", "Elevate", "Amaze"],
-    Volkswagen: ["Virtus", "Taigun", "Tiguan"],
-    Skoda: ["Slavia", "Kushaq", "Kodiaq"],
-    "MG Motor": ["Hector", "Astor", "ZSEV", "Comet EV", "Gloster"],
-    Renault: ["Kiger", "Triber", "Kwid"],
-    Nissan: ["Magnite"],
-    Citroën: ["C3", "C3 Aircross", "eC3", "C5 Aircross"],
-    Jeep: ["Compass", "Meridian", "Wrangler"],
-    BMW: ["3 Series", "5 Series", "X1", "X3", "X5", "7 Series", "M3", "M5"],
-    "Mercedes-Benz": [
-      "C-Class",
-      "E-Class",
-      "S-Class",
-      "GLA",
-      "GLC",
-      "GLE",
-      "GLS",
-    ],
-    Audi: ["A4", "A6", "Q3", "Q5", "Q7", "e-tron"],
-  };
 
   const modelSuggestions =
     selectedMake && typeof selectedMake === "string"
