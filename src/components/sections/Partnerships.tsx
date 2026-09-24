@@ -3,112 +3,99 @@ import { siteContent } from "@/src/content/site";
 import { Container } from "@/src/components/ui/container";
 import { Section } from "@/src/components/ui/section";
 import { SectionHeading } from "@/src/components/ui/section-heading";
-import { ShieldCheck, Eye, Pencil, Sparkles } from "lucide-react";
+import { Eye, PenLine } from "lucide-react";
 
 export function Partnerships() {
   const partnerships = siteContent.partnerships;
   const labels = partnerships.visualLabels;
 
-  // Placeholder partner initials A, B, C, D
-  const partnerVisuals = [
-    { initial: "A", name: "Primary Owner", role: labels.primary, isPrimary: true },
-    { initial: "B", name: "Partner", role: labels.partner, isPrimary: false },
-    { initial: "C", name: "Partner", role: labels.partner, isPrimary: false },
-    { initial: "D", name: "Partner", role: labels.partner, isPrimary: false },
+  // One primary owner + three view-only partners (the 4-login limit)
+  const seats = [
+    { initial: "A", name: labels.primary, access: labels.fullAccess, isPrimary: true },
+    { initial: "B", name: `${labels.partner} 2`, access: labels.viewOnly, isPrimary: false },
+    { initial: "C", name: `${labels.partner} 3`, access: labels.viewOnly, isPrimary: false },
+    { initial: "D", name: `${labels.partner} 4`, access: labels.viewOnly, isPrimary: false },
   ];
 
   return (
-    <Section id="partners" variant="band" spacing="spacious">
+    <Section id="partners" variant="inset" spacing="spacious">
       <Container size="default">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          {/* Left Column: Copy & Highlight */}
-          <div className="lg:col-span-7 space-y-6">
+        <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-6">
             <SectionHeading
+              index="04"
+              eyebrow={siteContent.sectionLabels.partnerships}
               heading={partnerships.heading}
-              variant="band"
+              description={partnerships.paragraph}
               align="left"
-              className="mb-4 md:mb-4"
+              className="mb-10 md:mb-12"
             />
 
-            {/* Problem Paragraph */}
-            <p className="text-body-lg text-band-muted leading-relaxed max-w-2xl">
-              {partnerships.paragraph}
+            <p className="border-l-2 border-accent pl-5 font-heading text-xl font-bold leading-snug tracking-[-0.015em] text-ink text-pretty md:text-2xl">
+              {partnerships.highlight}
             </p>
 
-            {/* Highlight Line */}
-            <div className="p-4 sm:p-5 rounded-xl bg-accent/15 border border-accent/30 text-band-ink font-semibold text-body-lg sm:text-body-xl my-6 flex items-start gap-3.5 shadow-sm">
-              <Sparkles className="h-5 w-5 text-accent shrink-0 mt-1" />
-              <span>{partnerships.highlight}</span>
-            </div>
-
-            {/* Three Differentiator Points */}
-            <ul className="space-y-3.5 list-none p-0 m-0" role="list">
+            <ul className="mt-10 border-t border-line">
               {partnerships.points.map((point, idx) => (
-                <li key={idx} className="flex items-start gap-3.5 text-band-muted text-body-lg leading-relaxed">
-                  <ShieldCheck className="h-5 w-5 text-accent shrink-0 mt-0.5" />
+                <li
+                  key={point}
+                  className="grid grid-cols-[2.5rem_1fr] gap-3 border-b border-line py-5 text-[15px] leading-relaxed text-ink-muted"
+                >
+                  <span className="pt-0.5 font-mono text-[11px] text-ink-subtle">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
                   <span>{point}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Right Column: Visual of 4 Owner Cards (HTML/CSS illustration) */}
-          <div
-            aria-hidden="true"
-            className="lg:col-span-5 w-full max-w-md mx-auto lg:max-w-none space-y-3"
-          >
-            <div className="text-xs font-mono font-semibold text-band-muted uppercase tracking-wider mb-2">
-              Showroom Access Model (4 Logins)
-            </div>
-
-            {partnerVisuals.map((owner, idx) => (
-              <div
-                key={idx}
-                className={`rounded-xl p-4 transition-all flex items-center justify-between gap-3 ${
-                  owner.isPrimary
-                    ? "border-2 border-accent bg-accent/10 text-band-ink shadow-bento"
-                    : "border border-band-muted/20 bg-inset/40 text-band-ink"
-                }`}
-              >
-                {/* Avatar & Role Info */}
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div
-                    className={`h-10 w-10 rounded-full font-mono font-bold text-sm flex items-center justify-center shrink-0 ${
-                      owner.isPrimary
-                        ? "bg-accent text-inverse shadow-sm"
-                        : "bg-band-muted/20 text-band-ink border border-band-muted/30"
-                    }`}
-                  >
-                    {owner.initial}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-heading font-bold text-sm text-band-ink truncate">
-                        {owner.name}
-                      </span>
-                      {owner.isPrimary && (
-                        <Pencil className="h-3.5 w-3.5 text-accent shrink-0" />
-                      )}
-                    </div>
-                    <div className="text-xs font-mono text-band-muted truncate">
-                      {owner.role}
-                    </div>
-                  </div>
+          {/* Access model illustration */}
+          <div aria-hidden="true" className="lg:col-span-5 lg:col-start-8 lg:self-center">
+            <div className="rounded-[1.75rem] border border-line bg-canvas p-1.5 shadow-float sm:p-2">
+              <div className="rounded-[1.35rem] border border-line bg-card">
+                <div className="flex items-center justify-between border-b border-line px-6 py-4">
+                  <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink-subtle">
+                    {labels.title}
+                  </span>
+                  <span className="font-mono text-[11px] text-ink-subtle">4 / 4</span>
                 </div>
-
-                {/* Status / Permission Badge */}
-                <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-semibold shrink-0 ${
-                    owner.isPrimary
-                      ? "bg-accent/20 border border-accent/40 text-accent"
-                      : "bg-band-muted/10 border border-band-muted/20 text-band-muted"
-                  }`}
-                >
-                  {!owner.isPrimary && <Eye className="h-3 w-3 shrink-0" />}
-                  {owner.isPrimary ? "Full access" : "View only"}
-                </span>
+                <ul className="divide-y divide-line">
+                  {seats.map((seat) => (
+                    <li key={seat.initial} className="flex items-center justify-between gap-4 px-6 py-5">
+                      <div className="flex min-w-0 items-center gap-4">
+                        <span
+                          className={`grid size-10 shrink-0 place-items-center rounded-full font-heading text-sm font-bold ${
+                            seat.isPrimary
+                              ? "bg-accent text-inverse"
+                              : "border border-line bg-inset text-ink-muted"
+                          }`}
+                        >
+                          {seat.initial}
+                        </span>
+                        <span className="truncate text-[15px] font-semibold text-ink">
+                          {seat.name}
+                        </span>
+                      </div>
+                      <span
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+                          seat.isPrimary
+                            ? "bg-accent-light text-accent"
+                            : "bg-inset text-ink-muted"
+                        }`}
+                      >
+                        {seat.isPrimary ? (
+                          <PenLine className="size-3" />
+                        ) : (
+                          <Eye className="size-3" />
+                        )}
+                        {seat.access}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </Container>

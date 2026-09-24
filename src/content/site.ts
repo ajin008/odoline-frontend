@@ -52,11 +52,45 @@ export interface HeroMockStage {
   date: string;
 }
 
-export interface HeroMockData {
+export interface HeroDashboard {
+  caption: string;
+  showroom: string;
+  role: string;
+  nav: string[];
+  navFooter: string[];
+  greeting: string;
   title: string;
-  regNumber: string;
-  statusBadge: string;
-  stages: HeroMockStage[];
+  search: string;
+  ranges: string[];
+  activeRange: number;
+  kpis: { label: string; value: string; note: string }[];
+  chart: {
+    title: string;
+    legend: [string, string];
+    highlight: number;
+    months: { label: string; enquiries: number; bookings: number }[];
+  };
+  donut: {
+    title: string;
+    totalLabel: string;
+    segments: { label: string; value: number }[];
+  };
+  activity: {
+    title: string;
+    rows: {
+      car: string;
+      reg: string;
+      event: string;
+      time: string;
+      status: "booked" | "delivered" | "pending";
+    }[];
+    statusLabels: { booked: string; delivered: string; pending: string };
+  };
+  journey: {
+    title: string;
+    car: string;
+    stages: HeroMockStage[];
+  };
 }
 
 export interface LegalPlaceholder {
@@ -94,8 +128,21 @@ export interface LegalTermsContent {
   sections: LegalSection[];
 }
 
+export interface SectionLabels {
+  problem: string;
+  journey: string;
+  features: string;
+  partnerships: string;
+  audiences: string;
+  proof: string;
+  pricing: string;
+  onboarding: string;
+  faq: string;
+}
+
 export interface SiteContent {
   siteConfig: SiteConfig;
+  sectionLabels: SectionLabels;
   flags: Flags;
   metadata: {
     title: string;
@@ -111,14 +158,16 @@ export interface SiteContent {
   hero: {
     tagline: string;
     headline: string;
+    headlineMuted: string;
     subtext: string;
     primaryButton: string;
     secondaryButton: string;
     trustLine: string;
-    mock: HeroMockData;
+    dashboard: HeroDashboard;
   };
   problem: {
     heading: string;
+    intro: string;
     painPoints: string[];
     closingLine: string;
   };
@@ -139,8 +188,11 @@ export interface SiteContent {
     highlight: string;
     points: string[];
     visualLabels: {
+      title: string;
       primary: string;
       partner: string;
+      fullAccess: string;
+      viewOnly: string;
     };
   };
   audiences: {
@@ -161,6 +213,10 @@ export interface SiteContent {
   };
   pricing: {
     heading: string;
+    description: string;
+    planName: string;
+    inclusionsLabel: string;
+    footnote: string;
     plan: {
       amount: number;
       currency: string;
@@ -170,12 +226,15 @@ export interface SiteContent {
     inclusions: string[];
     buttonText: string;
     extraBranch: {
+      title: string;
       amount: number;
       period: string;
       staffIncluded: number;
+      staffLabel: string;
       badgeText: string;
     };
     foundingOfferTemplate: string;
+    monthlyTemplate: string;
   };
   onboarding: {
     heading: string;
@@ -184,9 +243,11 @@ export interface SiteContent {
   };
   faq: {
     heading: string;
+    intro: string;
     items: FaqItem[];
   };
   finalCta: {
+    eyebrow: string;
     heading: string;
     paragraph: string;
     primaryButton: string;
@@ -195,6 +256,8 @@ export interface SiteContent {
   footer: {
     wordmark: string;
     tagline: string;
+    contactHeading: string;
+    legalHeading: string;
     contact: {
       email: string;
       whatsapp: string;
@@ -217,6 +280,18 @@ export const siteContent: SiteContent = {
     whatsappNumber: "916235235097",
     city: "Kerala",
     demoCta: "whatsapp",
+  },
+
+  sectionLabels: {
+    problem: "The problem",
+    journey: "The journey",
+    features: "What's inside",
+    partnerships: "Partners",
+    audiences: "Who it's for",
+    proof: "Origin",
+    pricing: "Pricing",
+    onboarding: "Getting started",
+    faq: "Questions",
   },
 
   flags: {
@@ -246,30 +321,80 @@ export const siteContent: SiteContent = {
 
   hero: {
     tagline: "Every car. Every mile. One timeline.",
-    headline: "Run your used-car showroom from one screen.",
+    headline: "Run your used‑car showroom",
+    headlineMuted: "from one screen.",
     subtext:
       "Odoline tracks every car from purchase to RC transfer, keeps your sales team on top of every enquiry, and shows you exactly where your money is. Built in India, for Indian pre-owned car dealers.",
     primaryButton: "Book a free demo",
     secondaryButton: "Chat on WhatsApp",
     trustLine:
       "₹30,000/year · No per-user fees · Every partner gets their own login",
-    mock: {
-      title: "Hyundai Creta SX (2021)",
-      regNumber: "KL 00 AB 0000",
-      statusBadge: "Active Booking",
-      stages: [
-        { label: "Purchase", status: "completed", date: "12 May" },
-        { label: "Documents", status: "completed", date: "14 May" },
-        { label: "Refurbishment", status: "completed", date: "18 May" },
-        { label: "In Stock", status: "completed", date: "20 May" },
-        { label: "Booking", status: "current", date: "24 May" },
-        { label: "Delivery", status: "pending", date: "Est. 28 May" },
+    dashboard: {
+      caption: "Illustration of the Odoline owner dashboard with sample data",
+      showroom: "Your Showroom",
+      role: "Owner",
+      nav: ["Dashboard", "Stock", "Enquiries", "Bookings", "Documents", "Staff", "Reports"],
+      navFooter: ["Settings", "Help"],
+      greeting: "Good morning",
+      title: "Showroom overview",
+      search: "Search cars, buyers, reg. no.",
+      ranges: ["Today", "Week", "Month"],
+      activeRange: 2,
+      kpis: [
+        { label: "Cars in stock", value: "42", note: "6 in refurbishment" },
+        { label: "Open enquiries", value: "18", note: "5 follow-ups today" },
+        { label: "Bookings", value: "9", note: "This month" },
+        { label: "RC transfers due", value: "3", note: "Needs attention" },
       ],
+      chart: {
+        title: "Enquiries vs bookings",
+        legend: ["Enquiries", "Bookings"],
+        highlight: 2,
+        months: [
+          { label: "May", enquiries: 48, bookings: 14 },
+          { label: "Jun", enquiries: 41, bookings: 12 },
+          { label: "Jul", enquiries: 62, bookings: 19 },
+          { label: "Aug", enquiries: 55, bookings: 16 },
+          { label: "Sep", enquiries: 38, bookings: 9 },
+        ],
+      },
+      donut: {
+        title: "Stock by stage",
+        totalLabel: "cars",
+        segments: [
+          { label: "Ready for sale", value: 26 },
+          { label: "Refurbishment", value: 10 },
+          { label: "Booked", value: 6 },
+        ],
+      },
+      activity: {
+        title: "Recent activity",
+        rows: [
+          { car: "Hyundai Creta SX (2021)", reg: "KL 00 AB 0000", event: "Booking confirmed", time: "10:42", status: "booked" },
+          { car: "Maruti Swift VXi (2020)", reg: "KL 00 CD 0000", event: "Delivered to buyer", time: "09:15", status: "delivered" },
+          { car: "Toyota Innova 2.5 G (2018)", reg: "KL 00 EF 0000", event: "NOC awaited", time: "Yesterday", status: "pending" },
+        ],
+        statusLabels: { booked: "Booked", delivered: "Delivered", pending: "Docs pending" },
+      },
+      journey: {
+        title: "Car journey",
+        car: "Creta SX · KL 00 AB 0000",
+        stages: [
+          { label: "Purchase", status: "completed", date: "12 May" },
+          { label: "Documents", status: "completed", date: "14 May" },
+          { label: "Refurbishment", status: "completed", date: "18 May" },
+          { label: "In Stock", status: "completed", date: "20 May" },
+          { label: "Booking", status: "current", date: "24 May" },
+          { label: "Delivery", status: "pending", date: "Est. 28 May" },
+        ],
+      },
     },
   },
 
   problem: {
     heading: "Sound familiar?",
+    intro:
+      "Most pre-owned showrooms run on memory, paper registers and a dozen WhatsApp groups. It works — until it doesn't.",
     painPoints: [
       "A buyer asks about a car and nobody knows if the NOC has come in yet.",
       "A hot lead goes cold because no one called back on Tuesday.",
@@ -361,8 +486,11 @@ export const siteContent: SiteContent = {
       "Every action is recorded with who did it.",
     ],
     visualLabels: {
+      title: "Showroom access",
       primary: "Primary owner",
-      partner: "Partner · view only",
+      partner: "Partner",
+      fullAccess: "Full access",
+      viewOnly: "View only",
     },
   },
 
@@ -405,6 +533,11 @@ export const siteContent: SiteContent = {
 
   pricing: {
     heading: "Simple pricing. No per-user fees.",
+    description:
+      "One plan for the whole showroom. Every feature, every partner login, and personal onboarding included.",
+    planName: "Showroom plan",
+    inclusionsLabel: "What's included",
+    footnote: "Starts with a free 30-minute demo.",
     plan: {
       amount: 30000,
       currency: "INR",
@@ -421,11 +554,14 @@ export const siteContent: SiteContent = {
     ],
     buttonText: "Book a demo",
     extraBranch: {
+      title: "Extra branch",
       amount: 10000,
       period: "/ year",
       staffIncluded: 10,
+      staffLabel: "more staff included",
       badgeText: "Multi-branch support coming soon",
     },
+    monthlyTemplate: "or {amount} / month",
     foundingOfferTemplate:
       "Founding showroom offer: the first showrooms get {discountPercent}% off, locked for {years} years. {placesLeft} places left.",
   },
@@ -463,6 +599,7 @@ export const siteContent: SiteContent = {
 
   faq: {
     heading: "Frequently asked questions",
+    intro: "Something else on your mind? Ask us on WhatsApp and we'll get back to you.",
     items: [
       {
         question: "Is my data safe?",
@@ -510,6 +647,7 @@ export const siteContent: SiteContent = {
   },
 
   finalCta: {
+    eyebrow: "Book a demo",
     heading: "See your showroom on Odoline.",
     paragraph:
       "Book a free 30-minute demo. We'll show you exactly how it would work for your cars, your team, and your partners.",
@@ -520,6 +658,8 @@ export const siteContent: SiteContent = {
   footer: {
     wordmark: "Odoline",
     tagline: "Every car, every mile, one timeline.",
+    contactHeading: "Contact",
+    legalHeading: "Legal",
     contact: {
       email: "contact@odoline.app",
       whatsapp: "+91 6235235097",

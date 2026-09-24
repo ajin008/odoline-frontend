@@ -23,7 +23,7 @@ export function Container({
 
   return (
     <Component
-      className={`${sizeClasses[size]} mx-auto px-4 sm:px-6 lg:px-8 ${className}`.trim()}
+      className={`${sizeClasses[size]} mx-auto px-5 sm:px-8 md:px-12 lg:px-12 xl:px-10 ${className}`.trim()}
       {...props}
     >
       {children}

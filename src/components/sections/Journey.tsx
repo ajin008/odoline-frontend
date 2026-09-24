@@ -5,126 +5,98 @@ import { Section } from "@/src/components/ui/section";
 import { SectionHeading } from "@/src/components/ui/section-heading";
 import { JourneyReveal } from "@/src/components/sections/JourneyReveal";
 
+// Reveal classes below hide items only after JS mounts and before the section
+// scrolls into view, so the content stays readable without JavaScript.
+
 export function Journey() {
   const journey = siteContent.journey;
+  const stages = journey.stages;
+  const last = stages.length - 1;
+  const inset = `${50 / stages.length}%`;
 
   return (
-    <Section id="journey" variant="default" spacing="spacious">
+    <Section id="journey" variant="dark" spacing="spacious" className="relative overflow-hidden border-y border-footer-line">
       <Container size="default">
-        {/* Section Heading & Copy */}
         <SectionHeading
+          index="02"
+          eyebrow={siteContent.sectionLabels.journey}
           heading={journey.heading}
           description={journey.paragraph}
-          align="center"
+          variant="dark"
         />
 
-        {/* 9 Stages as ONE Continuous Line */}
         <JourneyReveal>
-          <div className="relative pt-6 pb-4">
-            {/* =========================================================================
-               Desktop Horizontal Line Layout (≥ 1024px)
-               All 9 stages fit without horizontal scrolling at 1024px.
-               ========================================================================= */}
-            <div className="hidden lg:block relative">
-              {/* Continuous Decorative Background Line */}
-              <div
-                aria-hidden="true"
-                className="absolute top-5 left-[calc(100%/18)] right-[calc(100%/18)] h-0.5 bg-gradient-to-r from-accent/20 via-accent to-accent/20 z-0 origin-left transition-transform duration-700 ease-out [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:scale-x-0"
-              />
-
-              {/* 9 Stages Grid */}
-              <ol className="relative z-10 grid grid-cols-9 gap-2 list-none p-0 m-0">
-                {journey.stages.map((stage, idx) => {
-                  const stageNum = String(idx + 1).padStart(2, "0");
-                  const isFinalStage = idx === journey.stages.length - 1;
-
-                  return (
-                    <li
-                      key={idx}
-                      style={{ transitionDelay: `${idx * 65}ms` }}
-                      className="flex flex-col items-center text-center group transition-all duration-500 ease-out [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:opacity-0 [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:translate-y-4"
+          {/* Desktop: one horizontal line through all stages */}
+          <div className="relative hidden lg:block">
+            <span
+              aria-hidden="true"
+              className="absolute top-[11px] h-px bg-footer-line"
+              style={{ left: inset, right: inset }}
+            />
+            <span
+              aria-hidden="true"
+              className={`absolute top-[10px] h-[3px] origin-left rounded-full bg-accent transition-transform duration-[1600ms] ease-[cubic-bezier(0.65,0,0.35,1)] [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:scale-x-0`}
+              style={{ left: inset, right: inset }}
+            />
+            <ol className="relative grid" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}>
+              {stages.map((stage, idx) => {
+                const isLast = idx === last;
+                return (
+                  <li
+                    key={stage}
+                    style={{ transitionDelay: `${200 + idx * 140}ms` }}
+                    className={`flex flex-col items-center text-center transition-[opacity,transform] duration-500 [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:translate-y-2 [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:opacity-0`}
+                  >
+                    <span
+                      className={`relative z-10 grid size-6 place-items-center rounded-full ring-8 ring-footer ${
+                        isLast ? "bg-highlight" : "bg-accent"
+                      }`}
                     >
-                      {/* Node Circle */}
-                      <div
-                        className={`h-10 w-10 rounded-full border bg-card flex items-center justify-center font-mono font-bold text-xs shadow-bento group-hover:scale-110 transition-all ${
-                          isFinalStage
-                            ? "border-highlight/60 text-highlight bg-highlight-light group-hover:border-highlight"
-                            : "border-line text-accent group-hover:border-accent"
-                        }`}
-                      >
-                        {stageNum}
-                      </div>
-
-                      {/* Stage Label */}
-                      <span
-                        className={`mt-3 font-heading font-semibold text-xs leading-tight tracking-tight break-words max-w-[100px] ${
-                          isFinalStage ? "text-highlight font-bold" : "text-ink"
-                        }`}
-                      >
-                        {stage}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ol>
-            </div>
-
-            {/* =========================================================================
-               Mobile / Tablet Vertical Line Layout (< 1024px)
-               ========================================================================= */}
-            <div className="lg:hidden relative pl-8">
-              {/* Continuous Decorative Background Line */}
-              <div
-                aria-hidden="true"
-                className="absolute left-4 top-4 bottom-4 w-0.5 bg-gradient-to-b from-accent/20 via-accent to-accent/20 z-0 origin-top transition-transform duration-700 ease-out [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:scale-y-0"
-              />
-
-              {/* 9 Stages Vertical List */}
-              <ol className="relative z-10 space-y-4 list-none p-0 m-0">
-                {journey.stages.map((stage, idx) => {
-                  const stageNum = String(idx + 1).padStart(2, "0");
-                  const isFinalStage = idx === journey.stages.length - 1;
-
-                  return (
-                    <li
-                      key={idx}
-                      style={{ transitionDelay: `${idx * 65}ms` }}
-                      className="relative flex items-center gap-4 transition-all duration-500 ease-out [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:opacity-0 [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:translate-x-3"
+                      <span className="size-2 rounded-full bg-footer" />
+                    </span>
+                    <span className="mt-6 font-mono text-[11px] text-footer-muted">
+                      {String(idx + 1).padStart(2, "0")}
+                    </span>
+                    <span
+                      className={`mt-1.5 px-1 font-heading text-[15px] font-bold leading-tight tracking-tight ${
+                        isLast ? "text-highlight" : "text-footer-ink"
+                      }`}
                     >
-                      {/* Node Circle */}
-                      <div
-                        className={`absolute -left-8 flex h-8 w-8 items-center justify-center rounded-full border bg-card font-mono font-bold text-xs shadow-sm shrink-0 ${
-                          isFinalStage
-                            ? "border-highlight/60 text-highlight bg-highlight-light"
-                            : "border-line text-accent"
-                        }`}
-                      >
-                        {stageNum}
-                      </div>
-
-                      {/* Stage Card / Label */}
-                      <div
-                        className={`flex-1 p-3 rounded-xl border bg-card shadow-sm flex items-center justify-between ${
-                          isFinalStage ? "border-highlight/40" : "border-line"
-                        }`}
-                      >
-                        <span
-                          className={`font-heading font-bold text-sm ${
-                            isFinalStage ? "text-highlight" : "text-ink"
-                          }`}
-                        >
-                          {stage}
-                        </span>
-                        <span className="text-xs font-mono text-ink-subtle">
-                          Stage {idx + 1}
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
-            </div>
+                      {stage}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
+
+          {/* Mobile / tablet: the same line, running down */}
+          <ol className="relative grid gap-x-8 sm:grid-cols-2 lg:hidden">
+            {stages.map((stage, idx) => {
+              const isLast = idx === last;
+              return (
+                <li
+                  key={stage}
+                  style={{ transitionDelay: `${idx * 80}ms` }}
+                  className={`relative flex items-center gap-5 border-b border-footer-line py-4 transition-[opacity,transform] duration-500 [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:translate-x-2 [.journey-reveal-wrapper[data-mounted='true'][data-revealed='false']_&]:opacity-0`}
+                >
+                  <span className="w-6 font-mono text-[11px] text-footer-muted">
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                  <span
+                    className={`size-2.5 shrink-0 rounded-full ${isLast ? "bg-highlight" : "bg-accent"}`}
+                  />
+                  <span
+                    className={`font-heading text-lg font-bold tracking-tight ${
+                      isLast ? "text-highlight" : "text-footer-ink"
+                    }`}
+                  >
+                    {stage}
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
         </JourneyReveal>
       </Container>
     </Section>

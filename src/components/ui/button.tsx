@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "onDark" | "onDarkSecondary";
   size?: "sm" | "md" | "lg";
   href?: string;
   external?: boolean;
@@ -39,6 +39,10 @@ export const Button = React.forwardRef<
         "bg-card text-ink border border-line hover:bg-inset hover:border-line-focus shadow-2xs",
       ghost:
         "bg-transparent text-ink hover:bg-inset border border-transparent",
+      onDark:
+        "bg-footer-ink text-footer hover:opacity-90 border border-transparent",
+      onDarkSecondary:
+        "bg-transparent text-footer-ink border border-footer-line hover:bg-footer-line",
     };
 
     const sizeStyles = {

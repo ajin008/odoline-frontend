@@ -4,13 +4,7 @@ import { Container } from "@/src/components/ui/container";
 import { Section } from "@/src/components/ui/section";
 import { SectionHeading } from "@/src/components/ui/section-heading";
 import { DemoButton } from "@/src/components/ui/DemoButton";
-import {
-  CheckCircle2,
-  Sparkles,
-  Building2,
-  ShieldCheck,
-  Zap,
-} from "lucide-react";
+import { Check } from "lucide-react";
 
 export function Pricing() {
   const pricing = siteContent.pricing;
@@ -25,147 +19,92 @@ export function Pricing() {
     : null;
 
   return (
-    <Section id="pricing" variant="default" spacing="spacious">
+    <Section id="pricing" variant="default" spacing="spacious" className="border-t border-line">
       <Container size="default">
-        {/* Section Heading */}
         <SectionHeading
+          index="07"
+          eyebrow={siteContent.sectionLabels.pricing}
           heading={pricing.heading}
-          description="One transparent plan for your whole team. No per-user charges or hidden fees."
-          align="center"
+          description={pricing.description}
         />
 
-        {/* Optional Founding Offer Box */}
-        {flags.pricingFoundingOffer && foundingOfferText && (
-          <div className="max-w-2xl mx-auto mb-8 p-4 rounded-2xl bg-highlight-light border border-highlight/30 text-highlight-ink text-sm sm:text-body-lg font-medium flex items-center gap-3 shadow-sm">
-            <Sparkles className="h-5 w-5 text-highlight-ink shrink-0" />
-            <span>{foundingOfferText}</span>
-          </div>
+        {foundingOfferText && (
+          <p className="mb-6 flex items-center gap-3 rounded-2xl bg-highlight-light px-5 py-4 text-[15px] font-medium text-ink">
+            <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-highlight" />
+            {foundingOfferText}
+          </p>
         )}
 
-        {/* Main Modern SaaS Split Pricing Architecture */}
-        <div className="max-w-4xl mx-auto rounded-3xl border border-line bg-card shadow-float overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12">
-            {/* Left Column: Plan Inclusions & Value (7 cols) */}
-            <div className="lg:col-span-7 p-6 sm:p-10 space-y-6 flex flex-col justify-between">
+        <div className="rounded-[1.75rem] border border-line bg-inset p-1.5 shadow-float sm:p-2">
+          <div className="grid overflow-hidden rounded-[1.35rem] lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+            {/* Price */}
+            <div className="relative flex flex-col justify-between gap-12 bg-footer p-8 text-footer-ink sm:p-10 lg:p-12">
               <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-accent bg-accent-light px-2.5 py-1 rounded-md border border-accent/20">
-                    COMPLETE SHOWROOM PLAN
+                <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-footer-muted">
+                  {pricing.planName}
+                </div>
+                <div className="mt-8 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className="font-heading text-[clamp(3.25rem,7vw,5rem)] font-extrabold leading-none tracking-[-0.045em]">
+                    {formatINR(pricing.plan.amount)}
                   </span>
+                  <span className="text-lg text-footer-muted">{pricing.plan.period}</span>
                 </div>
-
-                <h3 className="font-heading font-extrabold text-2xl sm:text-3xl text-ink tracking-tight mb-2">
-                  Everything included. Zero limits.
-                </h3>
-                <p className="text-sm sm:text-body-lg text-ink-muted leading-relaxed">
-                  Run your stock, documents, leads, bookings, attendance, and owner dashboards under one subscription.
-                </p>
-
-                {/* Feature Inclusions Grid */}
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {pricing.inclusions.map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-2.5 p-3 rounded-xl bg-inset border border-line/60"
-                    >
-                      <CheckCircle2 className="h-4.5 w-4.5 text-accent shrink-0 mt-0.5" />
-                      <span className="text-xs sm:text-sm font-semibold text-ink leading-snug">
-                        {item}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Transparency Footnote */}
-              <div className="pt-6 border-t border-line/60 flex items-center gap-2 text-xs font-mono text-ink-subtle">
-                <ShieldCheck className="h-4 w-4 text-accent shrink-0" />
-                <span>Includes onboarding &amp; personal team training</span>
-              </div>
-            </div>
-
-            {/* Right Column: Investment Summary & Checkout Action (5 cols) */}
-            <div className="lg:col-span-5 bg-inset p-6 sm:p-10 border-t lg:border-t-0 lg:border-l border-line flex flex-col justify-between space-y-6">
-              <div>
-                <div className="text-xs font-mono font-bold uppercase tracking-wider text-ink-subtle mb-4">
-                  ANNUAL INVESTMENT
-                </div>
-
-                {/* Price Display */}
-                <div className="space-y-1">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-heading text-display-xl sm:text-display-2xl font-extrabold text-ink tracking-tight">
-                      {formatINR(pricing.plan.amount)}
-                    </span>
-                    <span className="text-body-lg font-medium text-ink-muted">
-                      {pricing.plan.period}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs font-mono font-medium text-ink-muted">
-                    <span>{pricing.plan.taxNote}</span>
-                    <span>·</span>
-                    <span className="text-accent font-semibold">~₹82 / day</span>
-                  </div>
-                </div>
-
-                {/* Optional Monthly Line */}
+                <div className="mt-3 text-sm text-footer-muted">{pricing.plan.taxNote}</div>
                 {flags.pricingMonthly && (
-                  <div className="mt-3 p-2.5 rounded-xl bg-card border border-line text-xs font-mono text-accent font-semibold">
-                    or {formatINR(flags.pricingMonthly.amount)} / month
+                  <div className="mt-2 text-sm text-footer-ink">
+                    {pricing.monthlyTemplate.replace("{amount}", formatINR(flags.pricingMonthly.amount))}
                   </div>
                 )}
-
-                {/* Key Benefits List */}
-                <div className="mt-6 space-y-2.5 text-xs font-medium text-ink-muted">
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Instant setup for your showroom</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>No credit card required for demo</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-3.5 w-3.5 text-accent shrink-0" />
-                    <span>Isolated private database</span>
-                  </div>
-                </div>
               </div>
 
-              {/* Action Button */}
-              <div className="pt-4 space-y-3">
+              <div className="space-y-4">
                 <DemoButton
-                  variant="primary"
+                  variant="onDark"
                   size="lg"
                   label={pricing.buttonText}
-                  className="w-full justify-center shadow-md"
+                  className="w-full"
                 />
-                <p className="text-[11px] text-center font-mono text-ink-subtle">
-                  30-minute live demo on your showroom structure
-                </p>
+                <p className="text-center text-xs text-footer-muted">{pricing.footnote}</p>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Extra Branch Extension Card */}
-        <div className="mt-8 max-w-2xl mx-auto rounded-2xl border border-line bg-card p-5 sm:p-6 shadow-bento flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="h-10 w-10 rounded-xl bg-accent-light border border-accent/20 flex items-center justify-center text-accent shrink-0">
-              <Building2 className="h-5 w-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-heading font-bold text-base text-ink">
-                  Need Multi-Branch Support?
-                </h4>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-highlight-light border border-highlight/30 text-highlight-ink">
+            {/* Inclusions */}
+            <div className="bg-card p-8 sm:p-10 lg:p-12">
+              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-subtle">
+                {pricing.inclusionsLabel}
+              </div>
+              <ul className="mt-6 grid border-t border-line sm:grid-cols-2 sm:gap-x-10">
+                {pricing.inclusions.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-3.5 border-b border-line py-4 text-[15px] font-medium text-ink"
+                  >
+                    <span className="grid size-5 shrink-0 place-items-center rounded-full bg-accent-light text-accent">
+                      <Check className="size-3" strokeWidth={3} />
+                    </span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              {/* Extra branch */}
+              <div className="mt-10 flex flex-col gap-3 rounded-2xl border border-dashed border-line p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <div className="font-heading text-lg font-bold tracking-tight text-ink">
+                    {pricing.extraBranch.title}{" "}
+                    <span className="text-ink-muted">
+                      +{formatINR(pricing.extraBranch.amount)}
+                      {pricing.extraBranch.period}
+                    </span>
+                  </div>
+                  <div className="mt-0.5 text-sm text-ink-muted">
+                    +{pricing.extraBranch.staffIncluded} {pricing.extraBranch.staffLabel}
+                  </div>
+                </div>
+                <span className="self-start rounded-full border border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-muted sm:self-auto">
                   {pricing.extraBranch.badgeText}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-ink-muted mt-0.5">
-                Add extra branches for {formatINR(pricing.extraBranch.amount)}{pricing.extraBranch.period} with {pricing.extraBranch.staffIncluded} more staff included.
-              </p>
             </div>
           </div>
         </div>

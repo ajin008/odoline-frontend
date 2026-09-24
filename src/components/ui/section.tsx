@@ -3,7 +3,7 @@ import * as React from "react";
 
 export interface SectionProps extends React.HTMLAttributes<HTMLElement> {
   id?: string;
-  variant?: "default" | "inset" | "band" | "card" | "highlight";
+  variant?: "default" | "inset" | "band" | "card" | "highlight" | "dark";
   children: React.ReactNode;
   className?: string;
   spacing?: "default" | "compact" | "spacious";
@@ -23,12 +23,13 @@ export function Section({
     card: "bg-card text-ink",
     band: "bg-band text-band-ink",
     highlight: "bg-highlight text-highlight-ink",
+    dark: "bg-footer text-footer-ink",
   };
 
   const spacingClasses = {
     compact: "py-10 md:py-16",
-    default: "py-16 md:py-24",
-    spacious: "py-20 md:py-32",
+    default: "py-20 md:py-28",
+    spacious: "py-24 md:py-36",
   };
 
   return (

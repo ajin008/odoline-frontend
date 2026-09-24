@@ -1,9 +1,9 @@
 import * as React from "react";
-import { siteContent } from "@/src/content/site";
+import { siteContent, buildWhatsAppLink } from "@/src/content/site";
 import { Container } from "@/src/components/ui/container";
 import { Section } from "@/src/components/ui/section";
 import { SectionHeading } from "@/src/components/ui/section-heading";
-import { ChevronDown } from "lucide-react";
+import { ArrowUpRight, Plus } from "lucide-react";
 
 export function Faq() {
   const faq = siteContent.faq;
@@ -12,31 +12,45 @@ export function Faq() {
 
   return (
     <Section id="faq" variant="default" spacing="spacious">
-      <Container size="narrow">
-        {/* Section Heading */}
-        <SectionHeading
-          heading={faq.heading}
-          align="center"
-        />
-
-        {/* Clean, Flat Modern SaaS Accordion Container (Zero Shadow) */}
-        <div className="max-w-3xl mx-auto bg-card border border-line rounded-2xl overflow-hidden divide-y divide-line/60">
-          {publishedItems.map((item, idx) => (
-            <details
-              key={idx}
-              className="group p-5 sm:p-6 transition-colors hover:bg-inset/40 group-open:bg-inset/20"
+      <Container size="default">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-4">
+            <SectionHeading
+              index="09"
+              eyebrow={siteContent.sectionLabels.faq}
+              heading={faq.heading}
+              description={faq.intro}
+              align="left"
+              className="mb-6 md:mb-8"
+            />
+            <a
+              href={buildWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-1.5 rounded-md text-[15px] font-semibold text-ink underline decoration-line decoration-2 underline-offset-[6px] transition-colors hover:decoration-accent"
             >
-              <summary className="flex items-center justify-between gap-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 rounded-lg">
-                <span className="font-heading font-bold text-base sm:text-lg text-ink leading-snug">
-                  {item.question}
-                </span>
-                <ChevronDown className="h-5 w-5 text-accent shrink-0 transition-transform duration-200 group-open:rotate-180" />
-              </summary>
-              <div className="mt-3 text-body-lg text-ink-muted leading-relaxed">
-                {item.answer}
-              </div>
-            </details>
-          ))}
+              {siteContent.hero.secondaryButton}
+              <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          </div>
+
+          <div className="border-t border-line lg:col-span-8">
+            {publishedItems.map((item) => (
+              <details key={item.question} className="group border-b border-line">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-6 rounded-lg py-6 [&::-webkit-details-marker]:hidden md:py-7">
+                  <span className="font-heading text-lg font-bold tracking-[-0.01em] text-ink md:text-xl">
+                    {item.question}
+                  </span>
+                  <span className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-ink-muted transition-[transform,background-color,color] duration-300 group-open:rotate-45 group-open:bg-cta group-open:text-cta-ink group-open:border-transparent">
+                    <Plus className="size-4" />
+                  </span>
+                </summary>
+                <p className="max-w-2xl pb-7 pr-14 text-[15px] leading-relaxed text-ink-muted">
+                  {item.answer}
+                </p>
+              </details>
+            ))}
+          </div>
         </div>
       </Container>
     </Section>

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { siteContent } from "@/src/content/site";
 import { DemoButton } from "@/src/components/ui/DemoButton";
 import { Container } from "@/src/components/ui/container";
@@ -72,8 +73,8 @@ export function Nav() {
     <header
       className={`sticky top-0 z-40 w-full transition-all duration-200 border-b ${
         isScrolled
-          ? "bg-card/90 backdrop-blur-md border-line shadow-2xs py-3"
-          : "bg-transparent border-transparent py-5"
+          ? "bg-canvas/85 backdrop-blur-md border-line py-3"
+          : "bg-canvas border-transparent py-5"
       }`}
     >
       <Container size="default">
@@ -84,14 +85,22 @@ export function Nav() {
           {/* Wordmark Branding */}
           <Link
             href="/#top"
-            className="font-heading text-xl font-extrabold tracking-tight text-ink hover:text-accent transition-colors"
+            className="inline-flex items-center gap-2.5 rounded-lg font-heading text-xl font-extrabold tracking-tight text-ink"
           >
+            <Image
+              src="/icons/icon-192.png"
+              alt=""
+              width={32}
+              height={32}
+              priority
+              className="size-8 rounded-lg"
+            />
             {nav.wordmark}
           </Link>
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center gap-8">
-            <ul className="flex items-center gap-6 text-sm font-medium">
+            <ul className="flex items-center gap-7 text-sm font-medium">
               {nav.links.map((link) => (
                 <li key={link.href}>
                   <a
