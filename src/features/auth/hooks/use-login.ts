@@ -1,8 +1,7 @@
 // features/auth/hooks/use-login.ts
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 import { authApi } from "../api/auth-api";
@@ -13,23 +12,10 @@ export type { LoginFormValues };
 import { getApiErrorMessage } from "@/src/utils/error-handler";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/src/lib/query-keys";
-import { useMe } from "./use-me";
 
 export function useLogin() {
-  const router = useRouter();
   const queryClient = useQueryClient();
   const [role, setRole] = useState<UserRole>("owner");
-
-  const { data: user } = useMe();
-
-  // If user visits /login while already authenticated, redirect to their dashboard
-  useEffect(() => {
-    if (user) {
-      const targetUrl =
-        user.role === "owner" ? "/owner/dashboard" : "/staff/dashboard";
-      router.replace(targetUrl);
-    }
-  }, [user, router]);
 
   const {
     register,

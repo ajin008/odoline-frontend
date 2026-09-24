@@ -1,5 +1,6 @@
 // features/auth/hooks/use-me.ts
 import { useQuery } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import { authApi } from "../api/auth-api";
 import { queryKeys } from "@/src/lib/query-keys";
 
@@ -16,8 +17,22 @@ import { queryKeys } from "@/src/lib/query-keys";
 export function useMe() {
   return useQuery({
     queryKey: queryKeys.me,
-    queryFn: authApi.me,
+    // "Not logged in" is a valid answer, not an error: resolve it as null so
+    // the query holds data and never flips back to "pending" on a refetch.
+    queryFn: async () => {
+      try {
+        return await authApi.me();
+      } catch (error) {
+        if (isAxiosError(error) && error.response?.status === 401) return null;
+        throw error;
+      }
+    },
     retry: false, // a 401 means "not logged in" — don't retry it
+    // An errored /me (429, 5xx, offline) must NOT refetch just because another
+    // component mounted — on /login that re-shows the splash, unmounts the form,
+    // and remounts it on failure: an infinite request loop.
+    retryOnMount: false,
+    refetchOnWindowFocus: false,
     staleTime: 5 * 60 * 1000, // user rarely changes; keep fresh 5 min
   });
 }
