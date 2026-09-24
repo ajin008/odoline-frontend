@@ -16,7 +16,7 @@ export function StaffSidebar() {
         <div className="flex items-center gap-2.5">
           <Image
             src="/icons/icon-192.png"
-            alt="Cars4 Logo"
+            alt="Odoline Logo"
             width={28}
             height={28}
             className="rounded-md object-contain"
@@ -24,7 +24,7 @@ export function StaffSidebar() {
           />
           <div className="flex flex-col">
             <span className="font-heading text-[15px] font-semibold tracking-tight text-white leading-tight">
-              Cars4
+              Odoline
             </span>
             <span className="text-[10px] font-mono text-emerald-400/90 font-medium tracking-wider uppercase flex items-center gap-1.5 mt-0.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />

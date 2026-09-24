@@ -17,14 +17,14 @@ export function OwnerSidebar() {
         <div className="flex items-center gap-2.5">
           <Image
             src="/icons/icon-192.png"
-            alt="Cars4 Logo"
+            alt="Odoline Logo"
             width={28}
             height={28}
             className="rounded-md object-contain"
             priority
           />
           <span className="font-heading text-[15px] font-semibold tracking-tight text-white">
-            Cars4
+            Odoline
           </span>
         </div>
       </div>

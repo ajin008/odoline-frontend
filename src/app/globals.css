@@ -1,107 +1,251 @@
 @import "tailwindcss";
-@import "sonner/dist/styles.css";
 
-/* 1. Style Configurations & System Custom Variables */
+/* ==========================================================================
+   Odoline Web — Landing page theme (v2)
+   Palette: warm off-white canvas, white cards, black pill CTAs, violet brand,
+   sunshine yellow + lime accents, six pastel tiles, violet band, dark footer.
+
+   Token NAMES used by components are unchanged.
+   New in v2: pastel-* tiles, footer-*, marker utility.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. Theme variables — LIGHT
+   ========================================================================== */
 :root {
-  /* Canvas Matrix (Minimal container sheets) */
-  --canvas-bg: #f3f4f6;
-  --canvas-card: #ffffff;
-  --canvas-inset: #f9fafb;
+  /* Canvas */
+  --canvas-bg: #faf8f4; /* warm off-white page */
+  --canvas-card: #ffffff; /* cards */
+  --canvas-inset: #f3f0ea; /* subtle wells, alternate sections */
+  --canvas-elevated: #ffffff; /* floating cards (hero mock, pricing) */
 
-  /* Text & Contrast Typography */
-  --ink-primary: #111827;
-  --ink-secondary: #4b5563;
-  --ink-muted: #9ca3af;
+  /* Violet band (Partnerships) */
+  --canvas-band: #6c4dff;
+  --canvas-band-card: rgba(255, 255, 255, 0.12);
+  --canvas-band-ink: #ffffff;
+  --canvas-band-muted: #f3f0ff; /* stays ≥ 4.5:1 on the band */
+  --canvas-band-line: rgba(255, 255, 255, 0.22);
+
+  /* Footer */
+  --canvas-footer: #121212;
+  --canvas-footer-ink: #f5f4fa;
+  --canvas-footer-muted: #a1a1aa;
+  --canvas-footer-line: rgba(255, 255, 255, 0.08);
+
+  /* Text */
+  --ink-primary: #111111;
+  --ink-secondary: #55535f;
+  --ink-muted: #8d8b99;
   --inverse: #ffffff;
 
-  /* Signature Accent Color Block */
-  --brand-accent: #2c7aff;
-  --brand-accent-hover: #1b66e6;
-  --brand-accent-light: rgba(44, 122, 255, 0.09);
+  /* Primary buttons — black pill */
+  --cta-bg: #121212;
+  --cta-bg-hover: #2a2a2e;
+  --cta-ink: #ffffff;
+
+  /* Violet — brand accent (icons, markers, eyebrow dots, links) */
+  --brand-accent: #6c4dff;
+  --brand-accent-hover: #5a3cf0;
+  --brand-accent-light: rgba(108, 77, 255, 0.1);
+
+  /* Sunshine yellow — highlight (final CTA block, badges, current stage) */
+  --brand-highlight: #ffd34d;
+  --brand-highlight-hover: #f5c62e;
+  --brand-highlight-light: #fff4c7;
+  --brand-highlight-ink: #111111; /* text on yellow is always dark */
+
+  /* Lime — positive badges */
+  --brand-lime: #c5f16c;
+  --brand-lime-light: #eef9d4;
+  --brand-lime-ink: #1a2e05;
+
+  /* Pastel tiles (feature icons, chips). Text/icons on them use --pastel-ink */
+  --pastel-lavender: #e6deff;
+  --pastel-periwinkle: #d8e4ff;
+  --pastel-blush: #ffdceb;
+  --pastel-butter: #fff1b8;
+  --pastel-mint: #d4f5e6;
+  --pastel-lime: #eaf9c9;
+  --pastel-ink: #1b1a24;
 
   /* Hairlines */
-  --border-clean: rgba(17, 24, 39, 0.07);
-  --border-focus: rgba(44, 122, 255, 0.2);
+  --border-clean: rgba(17, 17, 17, 0.08);
+  --border-focus: rgba(108, 77, 255, 0.3);
 
-  /* System state colors */
+  /* States */
   --state-danger: #dc2626;
-  --state-danger-light: rgba(220, 38, 38, 0.09);
-  --state-success: #10b981;
-  --state-success-light: rgba(16, 185, 129, 0.09);
-  --state-warning: #d97706;
-  --state-warning-light: rgba(217, 119, 6, 0.09);
-  --state-neutral: #171819;
+  --state-danger-light: rgba(220, 38, 38, 0.08);
+  --state-success: #3f8f0a;
+  --state-success-light: #eef9d4;
+  --state-warning: #b45309;
+  --state-warning-light: #fff4c7;
+  --state-neutral: #121212;
   --state-neutral-text: #ffffff;
-  --state-neutral-light: rgba(23, 24, 25, 0.08);
-  --state-future: #e5e7eb;
+  --state-neutral-light: rgba(18, 18, 18, 0.06);
+  --state-future: #e7e3dc;
 
-  /* Unified Font Stack Mapping — Satoshi for body/UI, Cabinet Grotesk for headings */
-  --font-sans: var(--font-satoshi), -apple-system, BlinkMacSystemFont,
+  /* Hero glow — soft violet + warm yellow */
+  --glow-1: rgba(108, 77, 255, 0.14);
+  --glow-2: rgba(255, 211, 77, 0.22);
+
+  /* Shadows (warm-tinted) */
+  --shadow-bento: 0 1px 2px rgba(38, 30, 20, 0.04),
+    0 8px 24px rgba(38, 30, 20, 0.06);
+  --shadow-float: 0 2px 4px rgba(38, 30, 20, 0.05),
+    0 18px 44px rgba(38, 30, 20, 0.1);
+
+  /* Fonts (next/font variables set in layout.tsx) */
+  --font-body-stack: var(--font-satoshi), -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
-  --font-heading: var(--font-cabinet-grotesk), var(--font-satoshi),
+  --font-heading-stack: var(--font-cabinet-grotesk), var(--font-satoshi),
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
-
-  /* Soft-Shadow Layering */
-  --shadow-bento: 0 1px 3px rgba(0, 0, 0, 0.01),
-    0 4px 20px rgba(17, 24, 39, 0.03);
+  --font-mono-stack: ui-monospace, SFMono-Regular, monospace;
 }
 
+/* ==========================================================================
+   2. Theme variables — DARK
+   ========================================================================== */
 .dark {
-  /* Canvas Matrix (Deep black root bg + rich dark scale) */
-  --canvas-bg: #000000;
-  --canvas-card: #121315;
-  --canvas-inset: #1a1b1e;
+  /* Canvas — violet-tinted near-black */
+  --canvas-bg: #0f0e17;
+  --canvas-card: #181724;
+  --canvas-inset: #13121c;
+  --canvas-elevated: #1f1d2e;
 
-  /* Text & Contrast Typography */
-  --ink-primary: #f4f4f5;
-  --ink-secondary: #a1a1aa;
-  --ink-muted: #71717a;
+  /* Violet band */
+  --canvas-band: #5a3ff0;
+  --canvas-band-card: rgba(255, 255, 255, 0.1);
+  --canvas-band-ink: #ffffff;
+  --canvas-band-muted: #efeaff;
+  --canvas-band-line: rgba(255, 255, 255, 0.2);
+
+  /* Footer — slightly lifted from the page */
+  --canvas-footer: #0a0910;
+  --canvas-footer-ink: #f5f4fa;
+  --canvas-footer-muted: #9d9ab0;
+  --canvas-footer-line: rgba(255, 255, 255, 0.08);
+
+  /* Text */
+  --ink-primary: #f5f4fa;
+  --ink-secondary: #aba8bd;
+  --ink-muted: #75728a;
   --inverse: #ffffff;
 
-  /* Signature Accent Color Block */
-  --brand-accent: #2c7aff;
-  --brand-accent-hover: #1b66e6;
-  --brand-accent-light: rgba(44, 122, 255, 0.18);
+  /* Primary buttons — inverted near-white pill */
+  --cta-bg: #f5f4fa;
+  --cta-bg-hover: #dedbe9;
+  --cta-ink: #111111;
+
+  /* Violet */
+  --brand-accent: #8f78ff;
+  --brand-accent-hover: #a693ff;
+  --brand-accent-light: rgba(143, 120, 255, 0.16);
+
+  /* Sunshine */
+  --brand-highlight: #ffd95e;
+  --brand-highlight-hover: #ffe27f;
+  --brand-highlight-light: rgba(255, 217, 94, 0.14);
+  --brand-highlight-ink: #111111;
+
+  /* Lime */
+  --brand-lime: #cff57e;
+  --brand-lime-light: rgba(207, 245, 126, 0.14);
+  --brand-lime-ink: #1a2e05;
+
+  /* Pastel tiles become soft tints; icons/text on them go light */
+  --pastel-lavender: rgba(143, 120, 255, 0.18);
+  --pastel-periwinkle: rgba(120, 155, 255, 0.18);
+  --pastel-blush: rgba(255, 120, 175, 0.16);
+  --pastel-butter: rgba(255, 217, 94, 0.16);
+  --pastel-mint: rgba(80, 210, 160, 0.16);
+  --pastel-lime: rgba(207, 245, 126, 0.16);
+  --pastel-ink: #f5f4fa;
 
   /* Hairlines */
   --border-clean: rgba(255, 255, 255, 0.08);
-  --border-focus: rgba(44, 122, 255, 0.35);
+  --border-focus: rgba(143, 120, 255, 0.45);
 
-  /* System State Colors (Tuned for dark backgrounds) */
+  /* States */
   --state-danger: #f87171;
-  --state-danger-light: rgba(248, 113, 113, 0.18);
-  --state-success: #34d399;
-  --state-success-light: rgba(52, 211, 153, 0.18);
-  --state-warning: #fbbf24;
-  --state-warning-light: rgba(251, 191, 36, 0.18);
-  --state-neutral: #e0e0e0;
-  --state-neutral-text: #111827;
-  --state-neutral-light: rgba(224, 224, 224, 0.15);
-  --state-future: #262629;
+  --state-danger-light: rgba(248, 113, 113, 0.16);
+  --state-success: #b5ec5c;
+  --state-success-light: rgba(207, 245, 126, 0.14);
+  --state-warning: #ffd95e;
+  --state-warning-light: rgba(255, 217, 94, 0.14);
+  --state-neutral: #f5f4fa;
+  --state-neutral-text: #111111;
+  --state-neutral-light: rgba(245, 244, 250, 0.1);
+  --state-future: #29273a;
 
-  /* Soft-Shadow Layering (Dark Mode) */
-  --shadow-bento: 0 1px 3px rgba(0, 0, 0, 0.5),
-    0 4px 20px rgba(0, 0, 0, 0.7);
+  /* Hero glow — dimmer */
+  --glow-1: rgba(143, 120, 255, 0.16);
+  --glow-2: rgba(255, 217, 94, 0.08);
+
+  /* Shadows */
+  --shadow-bento: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --shadow-float: 0 2px 4px rgba(0, 0, 0, 0.5), 0 18px 44px rgba(0, 0, 0, 0.55);
 }
 
+/* ==========================================================================
+   3. Tailwind theme mapping (class names components use)
+   ========================================================================== */
 @theme inline {
+  /* Canvas */
   --color-canvas: var(--canvas-bg);
   --color-card: var(--canvas-card);
   --color-inset: var(--canvas-inset);
+  --color-elevated: var(--canvas-elevated);
 
+  --color-band: var(--canvas-band);
+  --color-band-card: var(--canvas-band-card);
+  --color-band-ink: var(--canvas-band-ink);
+  --color-band-muted: var(--canvas-band-muted);
+  --color-band-line: var(--canvas-band-line);
+
+  --color-footer: var(--canvas-footer);
+  --color-footer-ink: var(--canvas-footer-ink);
+  --color-footer-muted: var(--canvas-footer-muted);
+  --color-footer-line: var(--canvas-footer-line);
+
+  /* Text */
   --color-ink: var(--ink-primary);
   --color-ink-muted: var(--ink-secondary);
   --color-ink-subtle: var(--ink-muted);
   --color-inverse: var(--inverse);
 
+  /* Buttons */
+  --color-cta: var(--cta-bg);
+  --color-cta-hover: var(--cta-bg-hover);
+  --color-cta-ink: var(--cta-ink);
+
+  /* Brand */
   --color-accent: var(--brand-accent);
   --color-accent-hover: var(--brand-accent-hover);
   --color-accent-light: var(--brand-accent-light);
 
+  --color-highlight: var(--brand-highlight);
+  --color-highlight-hover: var(--brand-highlight-hover);
+  --color-highlight-light: var(--brand-highlight-light);
+  --color-highlight-ink: var(--brand-highlight-ink);
+
+  --color-lime: var(--brand-lime);
+  --color-lime-light: var(--brand-lime-light);
+  --color-lime-ink: var(--brand-lime-ink);
+
+  /* Pastel tiles */
+  --color-pastel-lavender: var(--pastel-lavender);
+  --color-pastel-periwinkle: var(--pastel-periwinkle);
+  --color-pastel-blush: var(--pastel-blush);
+  --color-pastel-butter: var(--pastel-butter);
+  --color-pastel-mint: var(--pastel-mint);
+  --color-pastel-lime: var(--pastel-lime);
+  --color-pastel-ink: var(--pastel-ink);
+
+  /* Lines */
   --color-line: var(--border-clean);
   --color-line-focus: var(--border-focus);
 
+  /* States */
   --color-danger: var(--state-danger);
   --color-danger-light: var(--state-danger-light);
   --color-success: var(--state-success);
@@ -113,76 +257,173 @@
   --color-neutral-state-light: var(--state-neutral-light);
   --color-future-state: var(--state-future);
 
-  --font-sans: var(--font-sans);
-  --font-heading: var(--font-heading);
-  --font-mono: var(--font-mono);
+  /* Fonts */
+  --font-sans: var(--font-body-stack);
+  --font-heading: var(--font-heading-stack);
+  --font-mono: var(--font-mono-stack);
 
+  /* Shadows */
   --shadow-bento: var(--shadow-bento);
+  --shadow-float: var(--shadow-float);
+
+  /* Radius — big, friendly corners */
+  --radius-card: 1.25rem;
+  --radius-card-lg: 1.75rem;
+  --radius-pill: 9999px;
+}
+
+/* ==========================================================================
+   4. Base styles
+   ========================================================================== */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
   background-color: var(--canvas-bg);
   color: var(--ink-primary);
-  font-family: var(--font-sans);
+  font-family: var(--font-body-stack);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.font-heading {
-  font-family: var(--font-heading);
-}
-
-/* Ensure clean font inheritance & prevent letter collision */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: inherit;
-  letter-spacing: normal;
+  font-family: var(--font-heading-stack);
+  letter-spacing: -0.02em;
 }
 
-/* Sonner toasts styling */
-[data-sonner-toaster] {
-  --border-radius: 0.875rem;
-  --normal-bg: var(--canvas-card);
-  --normal-border: var(--border-clean);
-  --normal-text: var(--ink-primary);
-
-  --success-bg: var(--state-success-light);
-  --success-border: var(--state-success);
-  --success-text: var(--ink-primary);
-
-  --info-bg: var(--brand-accent-light);
-  --info-border: var(--brand-accent);
-  --info-text: var(--ink-primary);
-
-  --warning-bg: var(--state-warning-light);
-  --warning-border: var(--state-warning);
-  --warning-text: var(--ink-primary);
-
-  --error-bg: var(--state-danger-light);
-  --error-border: var(--state-danger);
-  --error-text: var(--ink-primary);
+::selection {
+  background-color: var(--brand-highlight);
+  color: var(--brand-highlight-ink);
 }
 
-[data-sonner-toast] {
-  font-family: var(--font-sans);
-  box-shadow: var(--shadow-bento) !important;
+:focus-visible {
+  outline: 2px solid var(--brand-accent);
+  outline-offset: 2px;
 }
 
-[data-sonner-toast] [data-title] {
-  font-family: var(--font-sans);
-  font-weight: 600;
+/* ==========================================================================
+   5. Marketing type scale (unchanged)
+   ========================================================================== */
+.font-heading {
+  font-family: var(--font-heading-stack);
 }
 
-[data-sonner-toast] [data-button] {
-  background: var(--brand-accent) !important;
-  color: var(--inverse) !important;
+.text-display-2xl {
+  font-family: var(--font-heading-stack);
+  font-size: clamp(2.75rem, 5vw + 1rem, 4.5rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
+.text-display-xl {
+  font-family: var(--font-heading-stack);
+  font-size: clamp(2.25rem, 4vw + 1rem, 3.75rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
 
+.text-display-lg {
+  font-family: var(--font-heading-stack);
+  font-size: clamp(1.875rem, 3vw + 0.75rem, 3rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
 
+.text-display-md {
+  font-family: var(--font-heading-stack);
+  font-size: clamp(1.5rem, 2vw + 0.5rem, 2.25rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
 
+.text-body-xl {
+  font-size: clamp(1.125rem, 1vw + 0.875rem, 1.375rem);
+  line-height: 1.6;
+}
 
+.text-body-lg {
+  font-size: clamp(1rem, 0.5vw + 0.875rem, 1.125rem);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   6. Marketing utilities
+   ========================================================================== */
+
+/* Soft violet + warm yellow glow behind the hero */
+@utility hero-glow {
+  background-image: radial-gradient(
+      ellipse 55% 50% at 25% 15%,
+      var(--glow-1),
+      transparent 70%
+    ),
+    radial-gradient(ellipse 50% 45% at 80% 25%, var(--glow-2), transparent 70%);
+}
+
+/* Subtle top-light on the violet band */
+@utility band-sheen {
+  background-image: radial-gradient(
+    ellipse 70% 60% at 50% 0%,
+    rgba(255, 255, 255, 0.14),
+    transparent 70%
+  );
+}
+
+/* Small pill label with a dot — e.g. "● Features" above headings */
+@utility eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-clean);
+  background-color: var(--canvas-elevated);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ink-secondary);
+  box-shadow: var(--shadow-bento);
+}
+
+/* Yellow highlighter behind ONE word in a headline (use at most once or twice) */
+@utility marker {
+  background-image: linear-gradient(
+    transparent 58%,
+    var(--brand-highlight) 58%,
+    var(--brand-highlight) 92%,
+    transparent 92%
+  );
+  padding-inline: 0.1em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* ==========================================================================
+   7. Accessibility
+   ========================================================================== */
+.sr-only-focusable:not(:focus):not(:focus-within) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

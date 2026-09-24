@@ -408,7 +408,7 @@ export function LeadStageControl({ lead }: LeadStageControlProps) {
     ? `${selectedCarObj.year} ${selectedCarObj.make} ${selectedCarObj.model} (${selectedCarObj.reg_number})`
     : "Vehicle Selected";
 
-  const showroomName = configData?.showroom_name || "Cars4";
+  const showroomName = configData?.showroom_name || "Odoline";
 
   return (
     <div className="font-sans select-none space-y-4">

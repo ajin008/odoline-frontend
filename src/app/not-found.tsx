@@ -47,7 +47,7 @@ export default function NotFound() {
 
       {/* Simple divider with brand */}
       <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center gap-4 text-xs text-ink-secondary/20">
-        <span className="tracking-[0.15em] uppercase">Cars4</span>
+        <span className="tracking-[0.15em] uppercase">Odoline</span>
         <span className="w-px h-3 bg-line/50" />
         <span className="tracking-[0.1em]">Dealership Management</span>
       </div>

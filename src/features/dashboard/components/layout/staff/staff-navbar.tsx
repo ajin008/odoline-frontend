@@ -19,7 +19,7 @@ export function StaffNavbar() {
             />
           </div>
           <span className="font-heading text-sm font-semibold tracking-tight text-ink">
-            Cars4
+            Odoline
           </span>
         </div>
 

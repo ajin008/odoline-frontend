@@ -98,13 +98,13 @@ export function BookingOrderSection({
       booking.booking_number,
       customerName
     );
-    const shareText = `Cars4 Order Form — ${booking.booking_number} — ${customerName}`;
+    const shareText = `Odoline Order Form — ${booking.booking_number} — ${customerName}`;
 
     try {
       await sharePdfDocument({
         fetchBlob: () => bookingApi.getOrderPdf(booking.id),
         filename,
-        shareTitle: `Cars4 Order Form ${booking.booking_number}`,
+        shareTitle: `Odoline Order Form ${booking.booking_number}`,
         shareText,
       });
     } catch {
@@ -392,7 +392,7 @@ export function BookingOrderSection({
           )}
           mimeType="application/pdf"
           fetchBlob={() => bookingApi.getOrderPdf(booking.id)}
-          shareText={`Cars4 Order Form — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+          shareText={`Odoline Order Form — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
         />
       )}
     </div>

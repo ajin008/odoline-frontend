@@ -507,7 +507,7 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
                   title={SHOWROOM_ADDRESS}
                 >
                   <Building className="h-3 w-3" />
-                  <span>Cars4 Showroom (Thirurkkad)</span>
+                  <span>Odoline Showroom (Thirurkkad)</span>
                 </button>
                 <button
                   type="button"
@@ -523,13 +523,13 @@ export function SettleDeliverForm({ booking }: SettleDeliverFormProps) {
             <input
               type="text"
               list="delivery-location-options"
-              placeholder="Cars4 Showroom — Near Mahindra Showroom, Thirurkkad, Perinthalmanna, Malappuram Dist., Kerala"
+              placeholder="Odoline Showroom — Near Mahindra Showroom, Thirurkkad, Perinthalmanna, Malappuram Dist., Kerala"
               {...register("delivery_place")}
               className="w-full h-9 rounded-xl border border-line/60 bg-inset px-3 text-xs font-medium text-ink focus:border-accent focus:bg-card focus:outline-none transition-all"
             />
             <datalist id="delivery-location-options">
               <option value={SHOWROOM_ADDRESS}>
-                Cars4 Showroom (Near Mahindra Showroom, Thirurkkad...)
+                Odoline Showroom (Near Mahindra Showroom, Thirurkkad...)
               </option>
               <option value="Customer Residence" />
             </datalist>

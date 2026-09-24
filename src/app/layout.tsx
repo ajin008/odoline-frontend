@@ -1,16 +1,13 @@
-import { Geist_Mono } from "next/font/google";
-import { Toaster } from "sonner";
+import type { Metadata } from "next";
 import { satoshi, cabinetGrotesk } from "./fonts";
+import { siteContent } from "@/src/content/site";
+import { Providers } from "@/src/components/providers";
 import "./globals.css";
-import RegisterServiceWorker from "./register-sw";
 
-export { metadata, viewport } from "./metadata";
-import { Providers } from "../components/providers";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const metadata: Metadata = {
+  title: siteContent.metadata.title,
+  description: siteContent.metadata.description,
+};
 
 export default function RootLayout({
   children,
@@ -19,20 +16,21 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       suppressHydrationWarning
-      className={`${satoshi.variable} ${cabinetGrotesk.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${satoshi.variable} ${cabinetGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
-        <RegisterServiceWorker />
+      <body className="min-h-full flex flex-col font-sans bg-canvas text-ink">
         <Providers>
+          {/* Accessibility Skip-to-content link */}
+          <a
+            href="#main"
+            className="sr-only-focusable fixed top-4 left-4 z-50 rounded-lg bg-accent px-4 py-2 font-medium text-inverse shadow-lg focus:not-sr-only"
+          >
+            Skip to content
+          </a>
+
           {children}
-          <Toaster
-            position="top-right"
-            theme="system"
-            richColors={false}
-            closeButton
-          />
         </Providers>
       </body>
     </html>

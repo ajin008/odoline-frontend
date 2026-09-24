@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "cars4-dms-documents-prod.s3.ap-south-1.amazonaws.com",
+        hostname: "odoline-dms-documents-prod.s3.ap-south-1.amazonaws.com",
         port: "",
         pathname: "/**",
       },

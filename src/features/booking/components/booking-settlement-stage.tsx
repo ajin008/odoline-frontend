@@ -159,13 +159,13 @@ export function BookingSettlementStage({
       booking.booking_number,
       customerName
     );
-    const shareText = `Cars4 Settlement Statement — ${booking.booking_number} — ${customerName}`;
+    const shareText = `Odoline Settlement Statement — ${booking.booking_number} — ${customerName}`;
 
     try {
       await sharePdfDocument({
         fetchBlob: () => bookingApi.getSettlementPdf(booking.id),
         filename,
-        shareTitle: `Cars4 Settlement Form ${booking.booking_number}`,
+        shareTitle: `Odoline Settlement Form ${booking.booking_number}`,
         shareText,
       });
     } catch {
@@ -208,13 +208,13 @@ export function BookingSettlementStage({
       booking.booking_number,
       customerName
     );
-    const shareText = `Cars4 Delivery Note — ${booking.booking_number} — ${customerName}`;
+    const shareText = `Odoline Delivery Note — ${booking.booking_number} — ${customerName}`;
 
     try {
       await sharePdfDocument({
         fetchBlob: () => bookingApi.getDeliveryPdf(booking.id),
         filename,
-        shareTitle: `Cars4 Delivery Note ${booking.booking_number}`,
+        shareTitle: `Odoline Delivery Note ${booking.booking_number}`,
         shareText,
       });
     } catch {
@@ -624,7 +624,7 @@ export function BookingSettlementStage({
         )}
         mimeType="application/pdf"
         fetchBlob={() => bookingApi.getSettlementPdf(booking.id)}
-        shareText={`Cars4 Settlement Statement — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+        shareText={`Odoline Settlement Statement — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
       />
       <DocumentPreviewModal
         isOpen={isDeliveryPreviewOpen}
@@ -637,7 +637,7 @@ export function BookingSettlementStage({
         )}
         mimeType="application/pdf"
         fetchBlob={() => bookingApi.getDeliveryPdf(booking.id)}
-        shareText={`Cars4 Delivery Note — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+        shareText={`Odoline Delivery Note — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-# Cars4 Design System
+# Odoline Design System
 
 This document provides the source of truth for all UI components. Please adhere to these standards to ensure the application maintains its high-fidelity, professional SaaS aesthetic.
 

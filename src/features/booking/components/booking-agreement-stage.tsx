@@ -110,13 +110,13 @@ export function BookingAgreementStage({
       booking.booking_number,
       customerName
     );
-    const shareText = `Cars4 Booking Agreement — ${booking.booking_number} — ${customerName}`;
+    const shareText = `Odoline Booking Agreement — ${booking.booking_number} — ${customerName}`;
 
     try {
       await sharePdfDocument({
         fetchBlob: () => bookingApi.getAgreementPdf(booking.id),
         filename,
-        shareTitle: `Cars4 Booking Agreement ${booking.booking_number}`,
+        shareTitle: `Odoline Booking Agreement ${booking.booking_number}`,
         shareText,
       });
     } catch {
@@ -525,7 +525,7 @@ export function BookingAgreementStage({
           )}
           mimeType="application/pdf"
           fetchBlob={() => bookingApi.getAgreementPdf(booking.id)}
-          shareText={`Cars4 Booking Agreement — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
+          shareText={`Odoline Booking Agreement — ${booking.booking_number} — ${booking.customer?.name || "Customer"}`}
         />
       )}
     </div>

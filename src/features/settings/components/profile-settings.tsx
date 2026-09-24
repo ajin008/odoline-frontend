@@ -274,7 +274,7 @@ export function ProfileSettings() {
               <div className="h-10 rounded-xl border border-line/60 bg-surface px-3.5 text-xs font-semibold text-ink flex items-center justify-between shadow-2xs">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Building2 className="h-4 w-4 text-accent shrink-0 stroke-[2px]" />
-                  <span className="truncate">{config?.showroom_name || "Cars4 Showroom"}</span>
+                  <span className="truncate">{config?.showroom_name || "Odoline Showroom"}</span>
                 </div>
                 <Lock className="h-3.5 w-3.5 text-ink-subtle/50 shrink-0 ml-2" />
               </div>

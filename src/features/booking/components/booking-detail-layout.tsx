@@ -476,7 +476,7 @@ export function BookingDetailLayout({
 
             <div className="space-y-1.5 text-xs">
               <div className="font-bold text-ink text-sm">
-                {booking.seller?.name || "Cars4 Showroom"}
+                {booking.seller?.name || "Odoline Showroom"}
               </div>
               {booking.seller?.address && (
                 <div className="text-ink-muted text-[11px] leading-relaxed">
