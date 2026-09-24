@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { X, Plus, Trash2, CheckCircle2, PhoneCall, User } from "lucide-react";
 
 export interface BookDemoModalProps {
@@ -79,7 +80,9 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
     onClose();
   };
 
-  return (
+  // Portal to <body> so a transformed/animated ancestor (e.g. the hero's
+  // entrance animation) can't trap this fixed overlay inside its own box.
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150"
       onClick={handleResetAndClose}
@@ -214,5 +217,7 @@ export function BookDemoModal({ isOpen, onClose }: BookDemoModalProps) {
         )}
       </div>
     </div>
+    ,
+    document.body
   );
 }

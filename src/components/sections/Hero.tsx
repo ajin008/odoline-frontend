@@ -34,7 +34,11 @@ export function Hero() {
           {/* The page's only h1 */}
           <h1 className="rise-in mt-8 font-heading text-[clamp(2.6rem,6.6vw,5.75rem)] font-extrabold leading-[0.98] tracking-[-0.045em] text-ink text-balance [animation-delay:80ms] md:mt-10">
             {hero.headline}{" "}
-            <span className="block text-ink-subtle">{hero.headlineMuted}</span>
+            <span className="block">
+              <span className="bg-highlight px-[0.06em] text-highlight-ink [box-decoration-break:clone]">
+                {hero.headlineMuted}
+              </span>
+            </span>
           </h1>
 
           <p className="rise-in mx-auto mt-7 max-w-2xl text-body-lg leading-relaxed text-ink-muted text-pretty [animation-delay:160ms] md:mt-8 md:text-body-xl">
